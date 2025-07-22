@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planner Pro - Professional Financial Planning Platform</title>
+    
+    <!-- External Resources -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --warning-color: #f97316;
+            --success-color: #22c55e;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-xl: 0 35px 60px -12px rgba(0, 0, 0, 0.35);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Cover Page Styles */
+        .cover-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .logo-container {
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .cover-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .cover-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 1rem 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Main App Styles */
+        .main-app {
+            display: none;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem 2rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .app-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Navigation Styles */
+        .main-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sub-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .sub-nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .sub-nav-item:hover,
+        .sub-nav-item.active {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Content Styles */
+        .content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-subtitle {
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-input,
+        .form-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-select option {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        /* Button Styles */
+        .btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-success {
+            background: var(--gradient-secondary);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Assessment Styles */
+        .assessment-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .assessment-progress {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .assessment-progress-bar {
+            background: var(--gradient-primary);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .assessment-question {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .question-number {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+        }
+
+        .assessment-options {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .assessment-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .assessment-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .assessment-option.selected {
+            background: rgba(37, 99, 235, 0.2);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .assessment-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        /* Results Styles */
+        .results-container {
+            display: none;
+            text-align: center;
+        }
+
+        .results-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 1rem 0;
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Chart Styles */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            height: 400px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* List Styles */
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .list-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .list-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(4px);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .item-details {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Metric Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            display: none;
+            flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+
+        .chatbot-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            text-align: center;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .chat-message.user {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.bot {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chatbot-input {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .chatbot-input button {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-input button:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-app {
+                padding: 1rem;
+            }
+
+            .app-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .chatbot-window {
+                width: 300px;
+                height: 400px;
+            }
+
+            .cover-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-4 { margin-top: 2rem; }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 1rem; }
+        .w-full { width: 100%; }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div id="cover-page" class="cover-page">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1 class="cover-title">Financial Planner Pro</h1>
+            <p class="cover-subtitle">
+                Transform your financial future with our comprehensive planning platform. 
+                Get personalized recommendations, track your goals, and build wealth systematically.
+            </p>
+        </div>
+        
+        <div class="cta-buttons">
+            <button class="btn-primary" onclick="startAssessment()">
+                <i class="fas fa-brain"></i>
+                Start 2-Min Assessment
+            </button>
+            <button class="btn-secondary" onclick="skipToPlanning()">
+                <i class="fas fa-forward"></i>
+                Skip to Planning
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="main-app">
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="app-logo">
+                <div class="app-logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div>
+                    <div class="app-title">Financial Planner Pro</div>
+                    <div style="color: var(--text-muted); font-size: 0.875rem;">Professional Financial Planning</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="back-btn" onclick="goBackToCover()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Navigation -->
+        <div class="main-nav">
+            <div class="nav-item active" onclick="showSection('assessment')">
+                <i class="fas fa-brain"></i>
+                Assessment
+            </div>
+            <div class="nav-item" onclick="showSection('profile')">
+                <i class="fas fa-user"></i>
+                Profile
+            </div>
+            <div class="nav-item" onclick="showSection('networth')">
+                <i class="fas fa-wallet"></i>
+                Net Worth
+            </div>
+            <div class="nav-item" onclick="showSection('goals')">
+                <i class="fas fa-target"></i>
+                Goals
+            </div>
+            <div class="nav-item" onclick="showSection('analytics')">
+                <i class="fas fa-chart-pie"></i>
+                Analytics
+            </div>
+            <div class="nav-item" onclick="showSection('reports')">
+                <i class="fas fa-file-alt"></i>
+                Reports
+            </div>
+        </div>
+
+        <!-- Content Container -->
+        <div class="content-container">
+            <!-- Assessment Section -->
+            <div id="assessment" class="section active">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div>
+                            <div class="card-title">Financial Personality Assessment</div>
+                            <div class="card-subtitle">Discover your investment personality in 2 minutes</div>
+                        </div>
+                    </div>
+
+                    <div class="assessment-container">
+                        <div class="assessment-progress">
+                            <div id="progress-bar" class="assessment-progress-bar" style="width: 0%"></div>
+                        </div>
+
+                        <div id="question-container" class="assessment-question">
+                            <!-- Questions will be loaded here -->
+                        </div>
+
+                        <div class="assessment-nav">
+                            <button id="prev-btn" class="btn btn-secondary hidden" onclick="previousQuestion()">
+                                <i class="fas fa-arrow-left"></i>
+                                Previous
+                            </button>
+                            <button id="next-btn" class="btn hidden" onclick="nextQuestion()">
+                                Next
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="results-container" class="results-container">
+                            <h3 style="margin-bottom: 2rem;">Your Financial Personality</h3>
+                            <div id="results-content"></div>
+                            <button class="btn mt-4" onclick="proceedToProfile()">
+                                Continue to Profile
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profile" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="card-title">Personal Information</div>
+                            <div class="card-subtitle">Tell us about yourself</div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>
+                                Full Name
+                            </label>
+                            <input type="text" id="fullName" class="form-input" placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar"></i>
+                                Age
+                            </label>
+                            <input type="number" id="age" class="form-input" placeholder="Enter your age" min="18" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                Email
+                            </label>
+                            <input type="email" id="email" class="form-input" placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-phone"></i>
+                                Phone
+                            </label>
+                            <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-briefcase"></i>
+                                Occupation
+                            </label>
+                            <input type="text" id="occupation" class="form-input" placeholder="Enter your occupation">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-rupee-sign"></i>
+                                Monthly Income
+                            </label>
+                            <input type="number" id="monthlyIncome" class="form-input" placeholder="Enter monthly income">
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="saveProfile()">
+                        <i class="fas fa-save"></i>
+                        Save Profile
+                    </button>
+                </div>
+            </div>
+
+            <!-- Net Worth Section -->
+            <div id="networth" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div>
+                            <div class="card-title">Net Worth Calculator</div>
+                            <div class="card-subtitle">Track your assets and liabilities</div>
+                        </div>
+                    </div>
+
+                    <!-- Assets Section -->
+                    <div style="margin-bottom: 3rem;">
+                        <h3 style="color: var(--success-color); margin-bottom: 1rem;">
+                            <i class="fas fa-plus-circle"></i>
+                            Assets
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Asset Type</label>
+                                <select id="assetType" class="form-select">
+                                    <option value="">Select asset type</option>
+                                    <option value="Savings Account">Savings Account</option>
+                                    <option value="Fixed Deposit">Fixed Deposit</option>
+                                    <option value="Mutual Funds">Mutual Funds</option>
+                                    <option value="Stocks">Stocks</option>
+                                    <option value="Real Estate">Real Estate</option>
+                                    <option value="Gold">Gold</option>
+                                    <option value="PPF">PPF</option>
+                                    <option value="EPF">EPF</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Current Value (₹)</label>
+                                <input type="number" id="assetValue" class="form-input" placeholder="Enter current value">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success" onclick="addAsset()">
+                            <i class="fas fa-plus"></i>
+                            Add Asset
+                        </button>
+
+                        <div id="assetsList" class="item-list"></div>
+                    </div>
+
+                    <!-- Liabilities Section -->
+                    <div style="margin-bottom: 3rem;">
+                        <h3 style="color: var(--danger-color); margin-bottom: 1rem;">
+                            <i class="fas fa-minus-circle"></i>
+                            Liabilities
+                        </h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Liability Type</label>
+                                <select id="liabilityType" class="form-select">
+                                    <option value="">Select liability type</option>
+                                    <option value="Home Loan">Home Loan</option>
+                                    <option value="Car Loan">Car Loan</option>
+                                    <option value="Personal Loan">Personal Loan</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Education Loan">Education Loan</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Outstanding Amount (₹)</label>
+                                <input type="number" id="liabilityAmount" class="form-input" placeholder="Enter outstanding amount">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-danger" onclick="addLiability()">
+                            <i class="fas fa-plus"></i>
+                            Add Liability
+                        </button>
+
+                        <div id="liabilitiesList" class="item-list"></div>
+                    </div>
+
+                    <!-- Net Worth Summary -->
+                    <div id="networthSummary" class="metrics-grid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Goals Section -->
+            <div id="goals" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-target"></i>
+                        </div>
+                        <div>
+                            <div class="card-title">Financial Goals</div>
+                            <div class="card-subtitle">Set and track your financial objectives</div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Goal Name</label>
+                            <input type="text" id="goalName" class="form-input" placeholder="e.g., Emergency Fund, House Down Payment">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Amount (₹)</label>
+                            <input type="number" id="goalAmount" class="form-input" placeholder="Enter target amount">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Time Frame (Years)</label>
+                            <input type="number" id="goalYears" class="form-input" placeholder="Years to achieve goal" min="1" max="50">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority Level</label>
+                            <select id="goalPriority" class="form-select">
+                                <option value="">Select priority</option>
+                                <option value="High">High Priority</option>
+                                <option value="Medium">Medium Priority</option>
+                                <option value="Low">Low Priority</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="addGoal()">
+                        <i class="fas fa-plus"></i>
+                        Add Goal
+                    </button>
+
+                    <div id="goalsList" class="item-list"></div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div>
+                            <div class="card-title">Financial Analytics</div>
+                            <div class="card-subtitle">Visualize your financial data</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+                        <div class="chart-container">
+                            <div class="chart-title">Asset Distribution</div>
+                            <canvas id="assetChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">Net Worth Trend</div>
+                            <canvas id="networthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="reports" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div>
+                            <div class="card-title">Financial Reports</div>
+                            <div class="card-subtitle">Generate comprehensive financial reports</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                        <button class="btn" onclick="generateReport('summary')">
+                            <i class="fas fa-chart-bar"></i>
+                            Financial Summary
+                        </button>
+                        <button class="btn btn-success" onclick="generateReport('detailed')">
+                            <i class="fas fa-file-pdf"></i>
+                            Detailed Report
+                        </button>
+                        <button class="btn btn-warning" onclick="downloadPDF()">
+                            <i class="fas fa-download"></i>
+                            Download PDF
+                        </button>
+                    </div>
+
+                    <div id="reportContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <div id="chatbot-window" class="chatbot-window">
+            <div class="chatbot-header">
+                <i class="fas fa-robot"></i>
+                Financial Assistant
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="chat-message bot">
+                    Hello! I'm your financial assistant. How can I help you today?
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatInput" placeholder="Ask me anything..." onkeypress="handleChatEnter(event)">
+                <button onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+        <button class="chatbot-toggle" onclick="toggleChat()">
+            <i class="fas fa-comments"></i>
+        </button>
+    </div>
+
+    <script>
+        // Global Variables
+        let currentQuestionIndex = 0;
+        let assessmentAnswers = [];
+        let userData = {
+            profile: {},
+            assets: [],
+            liabilities: [],
+            goals: [],
+            assessmentResult: null
+        };
+
+        // Assessment Questions
+        const assessmentQuestions = [
+            {
+                question: "What is your primary investment goal?",
+                options: [
+                    { text: "Build wealth for retirement", score: 3 },
+                    { text: "Generate regular income", score: 1 },
+                    { text: "Preserve capital safely", score: 0 },
+                    { text: "Save on taxes", score: 2 }
+                ]
+            },
+            {
+                question: "How do you react to market volatility?",
+                options: [
+                    { text: "I panic and want to sell", score: 0 },
+                    { text: "I worry but stay invested", score: 1 },
+                    { text: "I remain calm", score: 2 },
+                    { text: "I see it as opportunity", score: 3 }
+                ]
+            },
+            {
+                question: "What's your investment time horizon?",
+                options: [
+                    { text: "Less than 3 years", score: 0 },
+                    { text: "3-7 years", score: 1 },
+                    { text: "7-15 years", score: 2 },
+                    { text: "More than 15 years", score: 3 }
+                ]
+            },
+            {
+                question: "How much investment experience do you have?",
+                options: [
+                    { text: "Complete beginner", score: 0 },
+                    { text: "Some basic knowledge", score: 1 },
+                    { text: "Good understanding", score: 2 },
+                    { text: "Very experienced", score: 3 }
+                ]
+            },
+            {
+                question: "What percentage of income can you invest?",
+                options: [
+                    { text: "Less than 10%", score: 0 },
+                    { text: "10-20%", score: 1 },
+                    { text: "20-30%", score: 2 },
+                    { text: "More than 30%", score: 3 }
+                ]
+            }
+        ];
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuestion();
+            updateNetWorthSummary();
+            console.log('Financial Planner Pro loaded successfully!');
+        });
+
+        // Navigation Functions
+        function startAssessment() {
+            document.getElementById('cover-page').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            showSection('assessment');
+        }
+
+        function skipToPlanning() {
+            document.getElementById('cover-page').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            showSection('profile');
+        }
+
+        function goBackToCover() {
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('cover-page').style.display = 'flex';
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Initialize charts if analytics section
+            if (sectionId === 'analytics') {
+                setTimeout(initializeCharts, 100);
+            }
+        }
+
+        // Assessment Functions
+        function loadQuestion() {
+            if (currentQuestionIndex < assessmentQuestions.length) {
+                const question = assessmentQuestions[currentQuestionIndex];
+                const progress = ((currentQuestionIndex) / assessmentQuestions.length) * 100;
+                
+                document.getElementById('progress-bar').style.width = progress + '%';
+                
+                document.getElementById('question-container').innerHTML = `
+                    <div class="question-number">Question ${currentQuestionIndex + 1} of ${assessmentQuestions.length}</div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="assessment-options">
+                        ${question.options.map((option, index) => `
+                            <div class="assessment-option" onclick="selectOption(${index})">
+                                ${option.text}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Show/hide navigation buttons
+                document.getElementById('prev-btn').classList.toggle('hidden', currentQuestionIndex === 0);
+                document.getElementById('next-btn').classList.add('hidden');
+            }
+        }
+
+        function selectOption(optionIndex) {
+            const question = assessmentQuestions[currentQuestionIndex];
+            assessmentAnswers[currentQuestionIndex] = question.options[optionIndex];
+            
+            // Update UI
+            document.querySelectorAll('.assessment-option').forEach((option, index) => {
+                option.classList.toggle('selected', index === optionIndex);
+            });
+            
+            // Show next button
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < assessmentQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                completeAssessment();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+                
+                // Pre-select previous answer
+                if (assessmentAnswers[currentQuestionIndex]) {
+                    const prevAnswer = assessmentAnswers[currentQuestionIndex];
+                    const question = assessmentQuestions[currentQuestionIndex];
+                    const optionIndex = question.options.findIndex(opt => opt.text === prevAnswer.text);
+                    if (optionIndex !== -1) {
+                        setTimeout(() => selectOption(optionIndex), 100);
+                    }
+                }
+            }
+        }
+
+        function completeAssessment() {
+            const totalScore = assessmentAnswers.reduce((sum, answer) => sum + answer.score, 0);
+            const maxScore = assessmentQuestions.length * 3;
+            const percentage = (totalScore / maxScore) * 100;
+            
+            let result = {};
+            if (percentage >= 80) {
+                result = {
+                    type: "Aggressive Investor",
+                    risk: "High Risk, High Return",
+                    description: "You're comfortable with market volatility and focused on long-term wealth creation.",
+                    recommendations: [
+                        "80-90% equity allocation",
+                        "Growth-oriented mutual funds",
+                        "Direct equity investments",
+                        "International diversification"
+                    ],
+                    color: "var(--danger-color)"
+                };
+            } else if (percentage >= 60) {
+                result = {
+                    type: "Balanced Investor",
+                    risk: "Moderate Risk, Balanced Return",
+                    description: "You seek a balance between growth and stability in your investments.",
+                    recommendations: [
+                        "60-70% equity, 30-40% debt",
+                        "Balanced mutual funds",
+                        "Mix of growth and value funds",
+                        "Regular portfolio rebalancing"
+                    ],
+                    color: "var(--warning-color)"
+                };
+            } else if (percentage >= 40) {
+                result = {
+                    type: "Conservative Investor",
+                    risk: "Low to Moderate Risk",
+                    description: "You prefer stability and are cautious about market fluctuations.",
+                    recommendations: [
+                        "40-50% equity, 50-60% debt",
+                        "Large-cap and hybrid funds",
+                        "Fixed deposits and bonds",
+                        "Systematic investment approach"
+                    ],
+                    color: "var(--primary-color)"
+                };
+            } else {
+                result = {
+                    type: "Risk-Averse Investor",
+                    risk: "Very Low Risk",
+                    description: "You prioritize capital preservation over growth and prefer guaranteed returns.",
+                    recommendations: [
+                        "20-30% equity, 70-80% debt",
+                        "Fixed deposits and bonds",
+                        "Liquid funds for emergency",
+                        "Government securities"
+                    ],
+                    color: "var(--success-color)"
+                };
+            }
+
+            userData.assessmentResult = result;
+            displayResults(result, percentage);
+        }
+
+        function displayResults(result, score) {
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('question-container').style.display = 'none';
+            document.querySelector('.assessment-nav').style.display = 'none';
+            
+            document.getElementById('results-content').innerHTML = `
+                <div class="results-grid">
+                    <div class="result-card" style="border-color: ${result.color};">
+                        <div class="result-label">Investor Type</div>
+                        <div class="result-value" style="color: ${result.color};">${result.type}</div>
+                    </div>
+                    <div class="result-card" style="border-color: ${result.color};">
+                        <div class="result-label">Risk Profile</div>
+                        <div class="result-value" style="color: ${result.color}; font-size: 1.25rem;">${result.risk}</div>
+                    </div>
+                    <div class="result-card" style="border-color: ${result.color};">
+                        <div class="result-label">Assessment Score</div>
+                        <div class="result-value" style="color: ${result.color};">${Math.round(score)}%</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: left; margin: 2rem 0;">
+                    <p style="font-size: 1.125rem; margin-bottom: 1.5rem; color: var(--text-secondary);">
+                        ${result.description}
+                    </p>
+                    
+                    <h4 style="margin-bottom: 1rem; color: var(--text-primary);">
+                        <i class="fas fa-lightbulb"></i> Recommended Strategy
+                    </h4>
+                    <ul style="list-style: none; padding: 0;">
+                        ${result.recommendations.map(rec => `
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">
+                                <i class="fas fa-check" style="color: ${result.color}; margin-right: 0.5rem;"></i>
+                                ${rec}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('results-container').classList.add('show');
+        }
+
+        function proceedToProfile() {
+            showSection('profile');
+        }
+
+        // Profile Functions
+        function saveProfile() {
+            userData.profile = {
+                fullName: document.getElementById('fullName').value,
+                age: parseInt(document.getElementById('age').value) || 0,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                occupation: document.getElementById('occupation').value,
+                monthlyIncome: parseInt(document.getElementById('monthlyIncome').value) || 0
+            };
+            
+            showNotification('Profile saved successfully!', 'success');
+            updateNetWorthSummary();
+        }
+
+        // Net Worth Functions
+        function addAsset() {
+            const type = document.getElementById('assetType').value;
+            const value = parseInt(document.getElementById('assetValue').value) || 0;
+            
+            if (type && value > 0) {
+                const asset = {
+                    id: Date.now(),
+                    type: type,
+                    value: value
+                };
+                
+                userData.assets.push(asset);
+                updateAssetsList();
+                updateNetWorthSummary();
+                
+                // Clear form
+                document.getElementById('assetType').value = '';
+                document.getElementById('assetValue').value = '';
+                
+                showNotification('Asset added successfully!', 'success');
+            } else {
+                showNotification('Please fill in all asset details', 'warning');
+            }
+        }
+
+        function addLiability() {
+            const type = document.getElementById('liabilityType').value;
+            const amount = parseInt(document.getElementById('liabilityAmount').value) || 0;
+            
+            if (type && amount > 0) {
+                const liability = {
+                    id: Date.now(),
+                    type: type,
+                    amount: amount
+                };
+                
+                userData.liabilities.push(liability);
+                updateLiabilitiesList();
+                updateNetWorthSummary();
+                
+                // Clear form
+                document.getElementById('liabilityType').value = '';
+                document.getElementById('liabilityAmount').value = '';
+                
+                showNotification('Liability added successfully!', 'success');
+            } else {
+                showNotification('Please fill in all liability details', 'warning');
+            }
+        }
+
+        function updateAssetsList() {
+            const container = document.getElementById('assetsList');
+            container.innerHTML = userData.assets.map(asset => `
+                <div class="list-item">
+                    <div class="item-info">
+                        <div class="item-title">${asset.type}</div>
+                        <div class="item-details">Value: ${formatCurrency(asset.value)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-sm btn-danger" onclick="removeAsset(${asset.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateLiabilitiesList() {
+            const container = document.getElementById('liabilitiesList');
+            container.innerHTML = userData.liabilities.map(liability => `
+                <div class="list-item">
+                    <div class="item-info">
+                        <div class="item-title">${liability.type}</div>
+                        <div class="item-details">Amount: ${formatCurrency(liability.amount)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-sm btn-danger" onclick="removeLiability(${liability.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeAsset(id) {
+            userData.assets = userData.assets.filter(asset => asset.id !== id);
+            updateAssetsList();
+            updateNetWorthSummary();
+            showNotification('Asset removed', 'success');
+        }
+
+        function removeLiability(id) {
+            userData.liabilities = userData.liabilities.filter(liability => liability.id !== id);
+            updateLiabilitiesList();
+            updateNetWorthSummary();
+            showNotification('Liability removed', 'success');
+        }
+
+        function updateNetWorthSummary() {
+            const totalAssets = userData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = userData.liabilities.reduce((sum, liability) => sum + liability.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            const monthlyIncome = userData.profile.monthlyIncome || 0;
+            
+            document.getElementById('networthSummary').innerHTML = `
+                <div class="metric-card" style="border-color: var(--success-color);">
+                    <div class="metric-value" style="color: var(--success-color);">${formatCurrency(totalAssets)}</div>
+                    <div class="metric-label">Total Assets</div>
+                </div>
+                <div class="metric-card" style="border-color: var(--danger-color);">
+                    <div class="metric-value" style="color: var(--danger-color);">${formatCurrency(totalLiabilities)}</div>
+                    <div class="metric-label">Total Liabilities</div>
+                </div>
+                <div class="metric-card" style="border-color: ${netWorth >= 0 ? 'var(--success-color)' : 'var(--danger-color)'};">
+                    <div class="metric-value" style="color: ${netWorth >= 0 ? 'var(--success-color)' : 'var(--danger-color)'};">${formatCurrency(netWorth)}</div>
+                    <div class="metric-label">Net Worth</div>
+                </div>
+                <div class="metric-card" style="border-color: var(--primary-color);">
+                    <div class="metric-value" style="color: var(--primary-color);">${formatCurrency(monthlyIncome)}</div>
+                    <div class="metric-label">Monthly Income</div>
+                </div>
+            `;
+            
+            // Show alerts for negative net worth
+            if (netWorth < 0) {
+                const alertHtml = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Negative Net Worth:</strong> Your liabilities exceed your assets. Consider debt reduction strategies.
+                    </div>
+                `;
+                document.getElementById('networthSummary').insertAdjacentHTML('afterend', alertHtml);
+            }
+        }
+
+        // Goals Functions
+        function addGoal() {
+            const name = document.getElementById('goalName').value;
+            const amount = parseInt(document.getElementById('goalAmount').value) || 0;
+            const years = parseInt(document.getElementById('goalYears').value) || 0;
+            const priority = document.getElementById('goalPriority').value;
+            
+            if (name && amount > 0 && years > 0 && priority) {
+                // Calculate required monthly SIP (assuming 12% annual return)
+                const monthlyReturn = 0.12 / 12;
+                const months = years * 12;
+                const monthlySIP = amount / (((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn) * (1 + monthlyReturn));
+                
+                const goal = {
+                    id: Date.now(),
+                    name: name,
+                    amount: amount,
+                    years: years,
+                    priority: priority,
+                    monthlySIP: Math.round(monthlySIP)
+                };
+                
+                userData.goals.push(goal);
+                updateGoalsList();
+                
+                // Clear form
+                document.getElementById('goalName').value = '';
+                document.getElementById('goalAmount').value = '';
+                document.getElementById('goalYears').value = '';
+                document.getElementById('goalPriority').value = '';
+                
+                showNotification('Goal added successfully!', 'success');
+            } else {
+                showNotification('Please fill in all goal details', 'warning');
+            }
+        }
+
+        function updateGoalsList() {
+            const container = document.getElementById('goalsList');
+            container.innerHTML = userData.goals.map(goal => {
+                const priorityColor = goal.priority === 'High' ? 'var(--danger-color)' : 
+                                    goal.priority === 'Medium' ? 'var(--warning-color)' : 'var(--success-color)';
+                
+                return `
+                    <div class="list-item">
+                        <div class="item-info">
+                            <div class="item-title">${goal.name}</div>
+                            <div class="item-details">
+                                Target: ${formatCurrency(goal.amount)} | 
+                                Timeline: ${goal.years} years | 
+                                Required SIP: ${formatCurrency(goal.monthlySIP)}/month |
+                                <span style="color: ${priorityColor};">${goal.priority} Priority</span>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-danger" onclick="removeGoal(${goal.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeGoal(id) {
+            userData.goals = userData.goals.filter(goal => goal.id !== id);
+            updateGoalsList();
+            showNotification('Goal removed', 'success');
+        }
+
+        // Charts Functions
+        function initializeCharts() {
+            createAssetChart();
+            createNetWorthChart();
+        }
+
+        function createAssetChart() {
+            const ctx = document.getElementById('assetChart');
+            if (!ctx || userData.assets.length === 0) return;
+            
+            const assetData = userData.assets.reduce((acc, asset) => {
+                acc[asset.type] = (acc[asset.type] || 0) + asset.value;
+                return acc;
+            }, {});
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(assetData),
+                    datasets: [{
+                        data: Object.values(assetData),
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#f5576c',
+                            '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'var(--text-primary)',
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createNetWorthChart() {
+            const ctx = document.getElementById('networthChart');
+            if (!ctx) return;
+            
+            const totalAssets = userData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = userData.liabilities.reduce((sum, liability) => sum + liability.amount, 0);
+            const currentNetWorth = totalAssets - totalLiabilities;
+            const monthlyIncome = userData.profile.monthlyIncome || 0;
+            const monthlySavings = monthlyIncome * 0.2; // Assume 20% savings rate
+            
+            // Project net worth for next 5 years
+            const projectedData = [];
+            for (let i = 0; i <= 5; i++) {
+                projectedData.push(currentNetWorth + (monthlySavings * 12 * i * 1.12)); // 12% growth
+            }
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Current', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [{
+                        label: 'Projected Net Worth',
+                        data: projectedData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'var(--text-primary)'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'var(--text-secondary)' },
+                            grid: { color: 'var(--border-color)' }
+                        },
+                        y: {
+                            ticks: { 
+                                color: 'var(--text-secondary)',
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            },
+                            grid: { color: 'var(--border-color)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Reports Functions
+        function generateReport(type) {
+            const totalAssets = userData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = userData.liabilities.reduce((sum, liability) => sum + liability.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            const monthlyIncome = userData.profile.monthlyIncome || 0;
+            const totalGoalAmount = userData.goals.reduce((sum, goal) => sum + goal.amount, 0);
+            const totalMonthlySIP = userData.goals.reduce((sum, goal) => sum + goal.monthlySIP, 0);
+            
+            let reportContent = '';
+            
+            if (type === 'summary') {
+                reportContent = `
+                    <div class="card">
+                        <h3 style="margin-bottom: 2rem; text-align: center;">Financial Summary Report</h3>
+                        
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value" style="color: var(--success-color);">${formatCurrency(netWorth)}</div>
+                                <div class="metric-label">Current Net Worth</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" style="color: var(--primary-color);">${formatCurrency(monthlyIncome)}</div>
+                                <div class="metric-label">Monthly Income</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" style="color: var(--warning-color);">${userData.goals.length}</div>
+                                <div class="metric-label">Active Goals</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" style="color: var(--secondary-color);">${formatCurrency(totalMonthlySIP)}</div>
+                                <div class="metric-label">Required Monthly SIP</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2rem;">
+                            <h4>Key Insights</h4>
+                            <ul style="margin-left: 1.5rem; line-height: 1.8; color: var(--text-secondary);">
+                                <li>Your current net worth is ${netWorth >= 0 ? 'positive' : 'negative'}</li>
+                                <li>You have ${userData.assets.length} assets and ${userData.liabilities.length} liabilities</li>
+                                <li>Total goal amount: ${formatCurrency(totalGoalAmount)}</li>
+                                <li>Asset to liability ratio: ${totalLiabilities > 0 ? (totalAssets / totalLiabilities).toFixed(2) : 'N/A'}</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'detailed') {
+                reportContent = `
+                    <div class="card">
+                        <h3 style="margin-bottom: 2rem; text-align: center;">Detailed Financial Report</h3>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4>Personal Information</h4>
+                            <p><strong>Name:</strong> ${userData.profile.fullName || 'N/A'}</p>
+                            <p><strong>Age:</strong> ${userData.profile.age || 'N/A'}</p>
+                            <p><strong>Occupation:</strong> ${userData.profile.occupation || 'N/A'}</p>
+                            <p><strong>Monthly Income:</strong> ${formatCurrency(monthlyIncome)}</p>
+                        </div>
+                        
+                        ${userData.assessmentResult ? `
+                            <div style="margin-bottom: 2rem;">
+                                <h4>Investment Profile</h4>
+                                <p><strong>Investor Type:</strong> ${userData.assessmentResult.type}</p>
+                                <p><strong>Risk Profile:</strong> ${userData.assessmentResult.risk}</p>
+                                <p>${userData.assessmentResult.description}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4>Assets (${userData.assets.length})</h4>
+                            ${userData.assets.length > 0 ? `
+                                <ul style="margin-left: 1.5rem;">
+                                    ${userData.assets.map(asset => `<li>${asset.type}: ${formatCurrency(asset.value)}</li>`).join('')}
+                                </ul>
+                            ` : '<p>No assets recorded</p>'}
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4>Liabilities (${userData.liabilities.length})</h4>
+                            ${userData.liabilities.length > 0 ? `
+                                <ul style="margin-left: 1.5rem;">
+                                    ${userData.liabilities.map(liability => `<li>${liability.type}: ${formatCurrency(liability.amount)}</li>`).join('')}
+                                </ul>
+                            ` : '<p>No liabilities recorded</p>'}
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4>Financial Goals (${userData.goals.length})</h4>
+                            ${userData.goals.length > 0 ? `
+                                <ul style="margin-left: 1.5rem;">
+                                    ${userData.goals.map(goal => `
+                                        <li>${goal.name}: ${formatCurrency(goal.amount)} in ${goal.years} years 
+                                        (Required SIP: ${formatCurrency(goal.monthlySIP)}/month)</li>
+                                    `).join('')}
+                                </ul>
+                            ` : '<p>No goals set</p>'}
+                        </div>
+                        
+                        <div>
+                            <h4>Recommendations</h4>
+                            <ul style="margin-left: 1.5rem; line-height: 1.8; color: var(--text-secondary);">
+                                <li>Maintain an emergency fund of 6-12 months of expenses</li>
+                                <li>Diversify your investment portfolio across asset classes</li>
+                                <li>Review and rebalance your portfolio annually</li>
+                                <li>Consider tax-saving investment options</li>
+                                <li>Increase your savings rate gradually</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('reportContent').innerHTML = reportContent;
+            showNotification('Report generated successfully!', 'success');
+        }
+
+        function downloadPDF() {
+            // Create a simplified PDF download
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.text('Financial Planning Report', 20, 30);
+            
+            // Add client info
+            doc.setFontSize(12);
+            doc.text(`Name: ${userData.profile.fullName || 'N/A'}`, 20, 50);
+            doc.text(`Age: ${userData.profile.age || 'N/A'}`, 20, 60);
+            doc.text(`Monthly Income: ${formatCurrency(userData.profile.monthlyIncome || 0)}`, 20, 70);
+            
+            // Add net worth summary
+            const totalAssets = userData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = userData.liabilities.reduce((sum, liability) => sum + liability.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            
+            doc.text('Financial Summary:', 20, 90);
+            doc.text(`Total Assets: ${formatCurrency(totalAssets)}`, 30, 100);
+            doc.text(`Total Liabilities: ${formatCurrency(totalLiabilities)}`, 30, 110);
+            doc.text(`Net Worth: ${formatCurrency(netWorth)}`, 30, 120);
+            
+            // Save the PDF
+            doc.save('financial-report.pdf');
+            showNotification('PDF downloaded successfully!', 'success');
+        }
+
+        // Chatbot Functions
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatbot-window');
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addChatMessage(message, 'user');
+                input.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    const response = getChatResponse(message);
+                    addChatMessage(response, 'bot');
+                }, 1000);
+            }
+        }
+
+        function addChatMessage(message, sender) {
+            const messagesContainer = document.getElementById('chatbot-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            messageDiv.textContent = message;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getChatResponse(message) {
+            const msg = message.toLowerCase();
+            
+            if (msg.includes('net worth') || msg.includes('wealth')) {
+                const totalAssets = userData.assets.reduce((sum, asset) => sum + asset.value, 0);
+                const totalLiabilities = userData.liabilities.reduce((sum, liability) => sum + liability.amount, 0);
+                const netWorth = totalAssets - totalLiabilities;
+                return `Your current net worth is ${formatCurrency(netWorth)}. ${netWorth > 0 ? 'Great job building wealth!' : 'Consider focusing on debt reduction and asset building.'}`;
+            }
+            
+            if (msg.includes('goal') || msg.includes('target')) {
+                const totalGoals = userData.goals.length;
+                const totalAmount = userData.goals.reduce((sum, goal) => sum + goal.amount, 0);
+                return totalGoals > 0 ? 
+                    `You have ${totalGoals} financial goals totaling ${formatCurrency(totalAmount)}. Keep working towards them systematically!` :
+                    'You haven\'t set any financial goals yet. Consider adding some goals to track your progress.';
+            }
+            
+            if (msg.includes('investment') || msg.includes('invest')) {
+                return userData.assessmentResult ? 
+                    `Based on your assessment, you're a ${userData.assessmentResult.type}. Consider ${userData.assessmentResult.recommendations[0]}.` :
+                    'Complete the assessment first to get personalized investment recommendations.';
+            }
+            
+            if (msg.includes('emergency fund')) {
+                const monthlyIncome = userData.profile.monthlyIncome || 0;
+                const emergencyFund = monthlyIncome * 6;
+                return `You should maintain an emergency fund of ${formatCurrency(emergencyFund)} (6 months of income). Keep this in liquid, easily accessible investments.`;
+            }
+            
+            if (msg.includes('hello') || msg.includes('hi')) {
+                return 'Hello! I\'m here to help with your financial planning. You can ask me about your net worth, goals, investment recommendations, or any financial planning questions.';
+            }
+            
+            return 'I can help you with financial planning questions. Try asking about your net worth, goals, investment strategy, or emergency fund planning.';
+        }
+
+        function handleChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Utility Functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                min-width: 300px;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

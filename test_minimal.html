@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planner Pro - Test</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #000; 
+            color: #fff; 
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #111;
+            border-radius: 10px;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .btn:hover { background: #0056b3; }
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1><i class="fas fa-chart-line"></i> Financial Planner Test</h1>
+        <p>Testing basic functionality...</p>
+        
+        <div id="test-results">
+            <button class="btn" onclick="testBasicFunction()">Test Basic Function</button>
+            <button class="btn" onclick="testDataStorage()">Test Data Storage</button>
+            <button class="btn" onclick="testJavaScript()">Test JavaScript</button>
+        </div>
+        
+        <div id="output"></div>
+    </div>
+
+    <script>
+        let testData = {
+            name: "Test User",
+            income: 50000
+        };
+
+        function showMessage(message, type = 'success') {
+            const output = document.getElementById('output');
+            output.innerHTML += `<div class="alert">${message}</div>`;
+        }
+
+        function testBasicFunction() {
+            try {
+                showMessage("✅ Basic function test passed!");
+                console.log("Basic function works");
+            } catch (error) {
+                showMessage("❌ Basic function test failed: " + error.message);
+            }
+        }
+
+        function testDataStorage() {
+            try {
+                localStorage.setItem('test', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('test'));
+                if (retrieved.name === "Test User") {
+                    showMessage("✅ Data storage test passed!");
+                } else {
+                    showMessage("❌ Data storage test failed!");
+                }
+            } catch (error) {
+                showMessage("❌ Data storage test failed: " + error.message);
+            }
+        }
+
+        function testJavaScript() {
+            try {
+                // Test all major JavaScript features we use
+                const testArray = [1, 2, 3];
+                const testMap = testArray.map(x => x * 2);
+                const testObj = { a: 1, b: 2 };
+                const testSpread = { ...testObj, c: 3 };
+                
+                if (testMap.length === 3 && testSpread.c === 3) {
+                    showMessage("✅ JavaScript features test passed!");
+                } else {
+                    showMessage("❌ JavaScript features test failed!");
+                }
+            } catch (error) {
+                showMessage("❌ JavaScript test failed: " + error.message);
+            }
+        }
+
+        // Test DOM loading
+        document.addEventListener('DOMContentLoaded', function() {
+            showMessage("✅ DOM loaded successfully!");
+            console.log("DOM ready");
+        });
+
+        // Test if all libraries load
+        window.addEventListener('load', function() {
+            showMessage("✅ All resources loaded!");
+            console.log("All resources loaded");
+        });
+    </script>
+</body>
+</html>

@@ -5191,6 +5191,23 @@
             return Math.round(amount).toLocaleString('en-IN');
         }
 
+        function saveClientData() {
+            try {
+                if (currentProfileId) {
+                    const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+                    clientData.profileInfo.lastModified = new Date().toISOString();
+                    profiles[currentProfileId] = clientData;
+                    localStorage.setItem('financialPlannerProfiles', JSON.stringify(profiles));
+                    console.log('Client data saved successfully');
+                } else {
+                    console.log('No current profile ID, data not saved');
+                }
+            } catch (error) {
+                console.error('Error saving client data:', error);
+                showAlert('Error saving data: ' + error.message, 'error');
+            }
+        }
+
         function showAlert(message, type = 'success') {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
@@ -7468,10 +7485,10 @@
                 
                 showAlert('Report preview generated successfully!', 'success');
                 
-                         } catch (error) {
-                 console.error('Error showing report preview:', error);
-                 showAlert('Error showing report preview: ' + error.message, 'error');
-             }
+            } catch (error) {
+                console.error('Error showing report preview:', error);
+                showAlert('Error showing report preview: ' + error.message, 'error');
+            }
         }
 
         function closeReportPreview() {

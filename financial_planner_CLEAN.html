@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planner Pro - Clean Edition</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #111, #222);
+            border-right: 2px solid #333;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #aaa;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #333;
+            color: #fff;
+            border-left: 3px solid #fff;
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 15px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #111, #222);
+            padding: 20px;
+            border-bottom: 2px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 500;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .section {
+            display: none;
+            padding: 30px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #111, #222);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-subtitle {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin: 20px 0;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #222;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #fff;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #222;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #fff, #ddd);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .btn-secondary:hover {
+            background: #333;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        /* Data Display */
+        .data-box {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            margin: 10px 0;
+        }
+
+        .data-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .data-label {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* Alert System */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            min-width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .alert-success { background: #28a745; }
+        .alert-error { background: #dc3545; }
+        .alert-warning { background: #ffc107; color: #000; }
+        .alert-info { background: #17a2b8; }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block !important;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+        }
+
+        /* Recommendation Cards */
+        .recommendation-card {
+            background: #1a472a;
+            border: 1px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .recommendation-title {
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            background: #333;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s;
+        }
+
+        /* Report Styles */
+        .report-section {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .report-title {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i> FinPro
+            </div>
+        </div>
+        
+        <nav class="nav-menu">
+            <div class="nav-item">
+                <a class="nav-link active" onclick="showSection('dashboard')">
+                    <i class="fas fa-home nav-icon"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('profile')">
+                    <i class="fas fa-user nav-icon"></i>
+                    <span>Profile Setup</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('recommendations')">
+                    <i class="fas fa-lightbulb nav-icon"></i>
+                    <span>Investment Recommendations</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('retirement')">
+                    <i class="fas fa-umbrella nav-icon"></i>
+                    <span>Retirement Planning</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('tax')">
+                    <i class="fas fa-receipt nav-icon"></i>
+                    <span>Tax Planning</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('budget')">
+                    <i class="fas fa-chart-pie nav-icon"></i>
+                    <span>Budget Planner</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('loans')">
+                    <i class="fas fa-calculator nav-icon"></i>
+                    <span>Loan Calculator</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('reports')">
+                    <i class="fas fa-file-pdf nav-icon"></i>
+                    <span>Reports</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showSection('goals')">
+                    <i class="fas fa-target nav-icon"></i>
+                    <span>Financial Goals</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 id="page-title">Financial Planner Pro</h1>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-home"></i>
+                    Welcome to Financial Planner Pro
+                </h2>
+                <p class="card-subtitle">Your comprehensive financial planning solution</p>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3><i class="fas fa-user"></i> Profile Setup</h3>
+                        <p>Complete your financial profile to get personalized recommendations.</p>
+                        <button class="btn btn-primary" onclick="showSection('profile')">
+                            <i class="fas fa-arrow-right"></i> Setup Profile
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-lightbulb"></i> Smart Recommendations</h3>
+                        <p>Get AI-powered investment and financial planning advice.</p>
+                        <button class="btn btn-primary" onclick="showSection('recommendations')">
+                            <i class="fas fa-magic"></i> Get Recommendations
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-chart-line"></i> Financial Analysis</h3>
+                        <p>Analyze your financial health and track progress.</p>
+                        <button class="btn btn-primary" onclick="showSection('reports')">
+                            <i class="fas fa-chart-bar"></i> View Analysis
+                        </button>
+                    </div>
+                </div>
+
+                <div id="dashboard-summary"></div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-user"></i>
+                    Financial Profile Setup
+                </h2>
+                <p class="card-subtitle">Tell us about your financial situation</p>
+                
+                <div class="grid">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="full-name" placeholder="Your full name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Age</label>
+                            <input type="number" class="form-input" id="age" placeholder="Your age">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Monthly Income (₹)</label>
+                            <input type="number" class="form-input" id="monthly-income" placeholder="50000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Monthly Expenses (₹)</label>
+                            <input type="number" class="form-input" id="monthly-expenses" placeholder="35000">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Current Savings (₹)</label>
+                            <input type="number" class="form-input" id="current-savings" placeholder="200000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Investment Experience</label>
+                            <select class="form-select" id="investment-experience">
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Risk Tolerance</label>
+                            <select class="form-select" id="risk-tolerance">
+                                <option value="conservative">Conservative</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="aggressive">Aggressive</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Investment Timeline</label>
+                            <select class="form-select" id="investment-timeline">
+                                <option value="short">Short Term (1-3 years)</option>
+                                <option value="medium">Medium Term (3-7 years)</option>
+                                <option value="long">Long Term (7+ years)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save"></i> Save Profile
+                </button>
+            </div>
+        </section>
+
+        <!-- Recommendations Section -->
+        <section id="recommendations" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Investment Recommendations
+                </h2>
+                <p class="card-subtitle">Personalized investment advice based on your profile</p>
+                
+                <button class="btn btn-primary" onclick="generateRecommendations()">
+                    <i class="fas fa-magic"></i> Generate Recommendations
+                </button>
+                
+                <div id="recommendations-content"></div>
+            </div>
+        </section>
+
+        <!-- Retirement Planning Section -->
+        <section id="retirement" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-umbrella"></i>
+                    Retirement Planning
+                </h2>
+                <p class="card-subtitle">Plan for a secure retirement</p>
+                
+                <div class="grid">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Current Age</label>
+                            <input type="number" class="form-input" id="current-age" placeholder="30">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Retirement Age</label>
+                            <input type="number" class="form-input" id="retirement-age" placeholder="60">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Current Annual Income (₹)</label>
+                            <input type="number" class="form-input" id="annual-income" placeholder="600000">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Current Retirement Savings (₹)</label>
+                            <input type="number" class="form-input" id="retirement-savings" placeholder="500000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Monthly Contribution (₹)</label>
+                            <input type="number" class="form-input" id="monthly-contribution" placeholder="10000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Expected Return (%)</label>
+                            <input type="number" class="form-input" id="expected-return" placeholder="12" step="0.1">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="calculateRetirement()">
+                    <i class="fas fa-calculator"></i> Calculate Retirement Plan
+                </button>
+                
+                <div id="retirement-results"></div>
+            </div>
+        </section>
+
+        <!-- Tax Planning Section -->
+        <section id="tax" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-receipt"></i>
+                    Tax Planning
+                </h2>
+                <p class="card-subtitle">Optimize your tax savings</p>
+                
+                <div class="grid">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Annual Income (₹)</label>
+                            <input type="number" class="form-input" id="tax-annual-income" placeholder="800000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Current 80C Investments (₹)</label>
+                            <input type="number" class="form-input" id="tax-80c" placeholder="150000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Home Loan Interest (₹)</label>
+                            <input type="number" class="form-input" id="tax-home-loan" placeholder="200000">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Health Insurance Premium (₹)</label>
+                            <input type="number" class="form-input" id="tax-health-insurance" placeholder="25000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">NPS Contribution (₹)</label>
+                            <input type="number" class="form-input" id="tax-nps" placeholder="50000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Donations (₹)</label>
+                            <input type="number" class="form-input" id="tax-donations" placeholder="10000">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="calculateTax()">
+                    <i class="fas fa-calculator"></i> Calculate Tax Savings
+                </button>
+                
+                <div id="tax-results"></div>
+            </div>
+        </section>
+
+        <!-- Budget Planner Section -->
+        <section id="budget" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Budget Planner
+                </h2>
+                <p class="card-subtitle">Track and manage your expenses</p>
+                
+                <div class="grid">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Expense Category</label>
+                            <select class="form-select" id="expense-category">
+                                <option value="food">Food & Dining</option>
+                                <option value="transportation">Transportation</option>
+                                <option value="housing">Housing</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Amount (₹)</label>
+                            <input type="number" class="form-input" id="expense-amount" placeholder="5000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-input" id="expense-description" placeholder="Expense description">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="addExpense()">
+                            <i class="fas fa-plus"></i> Add Expense
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <h3>Budget Summary</h3>
+                        <div id="budget-summary"></div>
+                    </div>
+                </div>
+                
+                <div id="expense-list"></div>
+            </div>
+        </section>
+
+        <!-- Loan Calculator Section -->
+        <section id="loans" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-calculator"></i>
+                    Loan Calculator
+                </h2>
+                <p class="card-subtitle">Calculate EMI and loan details</p>
+                
+                <div class="grid">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Loan Amount (₹)</label>
+                            <input type="number" class="form-input" id="loan-amount" placeholder="2000000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Interest Rate (% per annum)</label>
+                            <input type="number" class="form-input" id="loan-rate" placeholder="8.5" step="0.1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Loan Tenure (years)</label>
+                            <input type="number" class="form-input" id="loan-tenure" placeholder="20">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="calculateLoan()">
+                            <i class="fas fa-calculator"></i> Calculate EMI
+                        </button>
+                    </div>
+                    
+                    <div id="loan-results"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Goals Section -->
+        <section id="goals" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-target"></i>
+                    Financial Goals
+                </h2>
+                <p class="card-subtitle">Set and track your financial objectives</p>
+                
+                <div class="grid">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Goal Name</label>
+                            <input type="text" class="form-input" id="goal-name" placeholder="Dream Home">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Target Amount (₹)</label>
+                            <input type="number" class="form-input" id="goal-amount" placeholder="5000000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Time to Achieve (years)</label>
+                            <input type="number" class="form-input" id="goal-time" placeholder="10">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Current Savings for this Goal (₹)</label>
+                            <input type="number" class="form-input" id="goal-current" placeholder="500000">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="addGoal()">
+                            <i class="fas fa-plus"></i> Add Goal
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <h3>Goal Planning Summary</h3>
+                        <div id="goal-planning"></div>
+                    </div>
+                </div>
+                
+                <div id="goals-list"></div>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-file-pdf"></i>
+                    Financial Reports
+                </h2>
+                <p class="card-subtitle">Generate comprehensive financial analysis</p>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3><i class="fas fa-chart-line"></i> Financial Summary Report</h3>
+                        <p>Complete overview of your financial health and recommendations.</p>
+                        <button class="btn btn-primary" onclick="generateReport('summary')">
+                            <i class="fas fa-file-alt"></i> Generate Summary
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-bullseye"></i> Goal Progress Report</h3>
+                        <p>Track progress towards your financial goals.</p>
+                        <button class="btn btn-primary" onclick="generateReport('goals')">
+                            <i class="fas fa-target"></i> Goal Report
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-chart-pie"></i> Budget Analysis Report</h3>
+                        <p>Detailed analysis of your spending patterns.</p>
+                        <button class="btn btn-primary" onclick="generateReport('budget')">
+                            <i class="fas fa-chart-pie"></i> Budget Report
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="downloadPDF()">
+                    <i class="fas fa-download"></i> Download PDF Report
+                </button>
+                
+                <div id="report-content"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Global Data Store
+        let financialData = {
+            profile: {},
+            expenses: [],
+            goals: [],
+            recommendations: []
+        };
+
+        // Load data from localStorage
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('financialPlannerData');
+                if (saved) {
+                    financialData = { ...financialData, ...JSON.parse(saved) };
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('financialPlannerData', JSON.stringify(financialData));
+                return true;
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showAlert('Error saving data', 'error');
+                return false;
+            }
+        }
+
+        // Alert System
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                ${message}
+                <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit; cursor: pointer; margin-left: 10px;">×</button>
+            `;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            try {
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show target section
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+                
+                // Update navigation
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                const activeLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+                
+                // Update page title
+                const titles = {
+                    'dashboard': 'Dashboard',
+                    'profile': 'Profile Setup',
+                    'recommendations': 'Investment Recommendations',
+                    'retirement': 'Retirement Planning',
+                    'tax': 'Tax Planning',
+                    'budget': 'Budget Planner',
+                    'loans': 'Loan Calculator',
+                    'goals': 'Financial Goals',
+                    'reports': 'Reports'
+                };
+                
+                document.getElementById('page-title').textContent = titles[sectionId] || 'Financial Planner Pro';
+                
+                // Close mobile menu
+                closeMobileMenu();
+                
+            } catch (error) {
+                console.error('Error in showSection:', error);
+                showAlert('Error switching sections', 'error');
+            }
+        }
+
+        // Mobile Menu
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        }
+
+        // Profile Management
+        function saveProfile() {
+            try {
+                const profile = {
+                    fullName: document.getElementById('full-name').value,
+                    age: parseInt(document.getElementById('age').value) || 0,
+                    monthlyIncome: parseFloat(document.getElementById('monthly-income').value) || 0,
+                    monthlyExpenses: parseFloat(document.getElementById('monthly-expenses').value) || 0,
+                    currentSavings: parseFloat(document.getElementById('current-savings').value) || 0,
+                    investmentExperience: document.getElementById('investment-experience').value,
+                    riskTolerance: document.getElementById('risk-tolerance').value,
+                    investmentTimeline: document.getElementById('investment-timeline').value
+                };
+                
+                if (!profile.fullName || !profile.monthlyIncome) {
+                    showAlert('Please fill in at least name and monthly income', 'warning');
+                    return;
+                }
+                
+                financialData.profile = profile;
+                
+                if (saveData()) {
+                    showAlert('Profile saved successfully!', 'success');
+                    updateDashboard();
+                }
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showAlert('Error saving profile', 'error');
+            }
+        }
+
+        // Investment Recommendations
+        function generateRecommendations() {
+            try {
+                if (!financialData.profile.monthlyIncome) {
+                    showAlert('Please complete your profile first', 'warning');
+                    showSection('profile');
+                    return;
+                }
+                
+                const profile = financialData.profile;
+                const monthlySavings = profile.monthlyIncome - profile.monthlyExpenses;
+                const savingsRate = (monthlySavings / profile.monthlyIncome * 100).toFixed(1);
+                
+                let recommendations = [];
+                
+                // Emergency Fund
+                const emergencyNeeded = profile.monthlyExpenses * 6;
+                if (profile.currentSavings < emergencyNeeded) {
+                    recommendations.push({
+                        title: 'Build Emergency Fund',
+                        description: `You need ₹${emergencyNeeded.toLocaleString()} for a 6-month emergency fund. Currently short by ₹${(emergencyNeeded - profile.currentSavings).toLocaleString()}.`,
+                        priority: 'High',
+                        type: 'emergency'
+                    });
+                }
+                
+                // Investment allocation based on risk tolerance
+                const investmentAmount = Math.max(0, monthlySavings * 0.7);
+                
+                if (profile.riskTolerance === 'aggressive') {
+                    recommendations.push({
+                        title: 'Aggressive Growth Portfolio',
+                        description: `Invest ₹${investmentAmount.toLocaleString()} monthly in 70% equity funds, 20% mid-cap, 10% debt funds.`,
+                        priority: 'Medium',
+                        type: 'investment'
+                    });
+                } else if (profile.riskTolerance === 'moderate') {
+                    recommendations.push({
+                        title: 'Balanced Investment Portfolio',
+                        description: `Invest ₹${investmentAmount.toLocaleString()} monthly in 60% equity funds, 40% debt funds.`,
+                        priority: 'Medium',
+                        type: 'investment'
+                    });
+                } else {
+                    recommendations.push({
+                        title: 'Conservative Investment Portfolio',
+                        description: `Invest ₹${investmentAmount.toLocaleString()} monthly in 40% equity funds, 60% debt funds and FDs.`,
+                        priority: 'Medium',
+                        type: 'investment'
+                    });
+                }
+                
+                // Tax Saving
+                recommendations.push({
+                    title: 'Tax Saving Investments',
+                    description: 'Invest ₹1.5L annually in 80C options: ELSS mutual funds, PPF, or ULIP for tax benefits.',
+                    priority: 'High',
+                    type: 'tax'
+                });
+                
+                // Life Insurance
+                const insuranceNeeded = profile.monthlyIncome * 12 * 10;
+                recommendations.push({
+                    title: 'Life Insurance Coverage',
+                    description: `Consider term insurance of ₹${(insuranceNeeded/100000).toFixed(1)}L (10x annual income) for family protection.`,
+                    priority: 'High',
+                    type: 'insurance'
+                });
+                
+                financialData.recommendations = recommendations;
+                saveData();
+                
+                displayRecommendations(recommendations);
+                showAlert('Recommendations generated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating recommendations:', error);
+                showAlert('Error generating recommendations', 'error');
+            }
+        }
+
+        function displayRecommendations(recommendations) {
+            const container = document.getElementById('recommendations-content');
+            
+            let html = `
+                <h3 style="margin: 20px 0;">Your Personalized Recommendations</h3>
+                <div class="data-box">
+                    <div class="data-label">Savings Rate</div>
+                    <div class="data-value">${((financialData.profile.monthlyIncome - financialData.profile.monthlyExpenses) / financialData.profile.monthlyIncome * 100).toFixed(1)}%</div>
+                </div>
+            `;
+            
+            recommendations.forEach(rec => {
+                html += `
+                    <div class="recommendation-card">
+                        <div class="recommendation-title">${rec.title} - ${rec.priority} Priority</div>
+                        <div>${rec.description}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Retirement Planning
+        function calculateRetirement() {
+            try {
+                const currentAge = parseInt(document.getElementById('current-age').value) || 30;
+                const retirementAge = parseInt(document.getElementById('retirement-age').value) || 60;
+                const annualIncome = parseFloat(document.getElementById('annual-income').value) || 600000;
+                const currentSavings = parseFloat(document.getElementById('retirement-savings').value) || 500000;
+                const monthlyContribution = parseFloat(document.getElementById('monthly-contribution').value) || 10000;
+                const expectedReturn = parseFloat(document.getElementById('expected-return').value) / 100 || 0.12;
+                
+                const yearsToRetirement = retirementAge - currentAge;
+                const monthsToRetirement = yearsToRetirement * 12;
+                const monthlyReturn = expectedReturn / 12;
+                
+                // Future value of current savings
+                const futureCurrentSavings = currentSavings * Math.pow(1 + expectedReturn, yearsToRetirement);
+                
+                // Future value of monthly contributions
+                const futureMonthlySavings = monthlyContribution * (Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn;
+                
+                const totalCorpus = futureCurrentSavings + futureMonthlySavings;
+                const requiredCorpus = annualIncome * 25; // 25x annual income rule
+                const shortfall = Math.max(0, requiredCorpus - totalCorpus);
+                
+                const results = `
+                    <div class="report-section">
+                        <h3 class="report-title">Retirement Planning Results</h3>
+                        <div class="grid">
+                            <div class="data-box">
+                                <div class="data-label">Years to Retirement</div>
+                                <div class="data-value">${yearsToRetirement}</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Projected Corpus</div>
+                                <div class="data-value">₹${(totalCorpus/10000000).toFixed(2)}Cr</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Required Corpus</div>
+                                <div class="data-value">₹${(requiredCorpus/10000000).toFixed(2)}Cr</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Shortfall</div>
+                                <div class="data-value" style="color: ${shortfall > 0 ? '#dc3545' : '#28a745'}">
+                                    ${shortfall > 0 ? '₹' + (shortfall/10000000).toFixed(2) + 'Cr' : 'On Track!'}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${shortfall > 0 ? `
+                            <div style="margin-top: 20px; padding: 15px; background: #1a1a1a; border-radius: 8px;">
+                                <h4 style="color: #dc3545;">Recommendation:</h4>
+                                <p>To bridge the shortfall, consider increasing your monthly contribution to ₹${(monthlyContribution + (shortfall / ((Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn))).toFixed(0)}</p>
+                            </div>
+                        ` : `
+                            <div style="margin-top: 20px; padding: 15px; background: #1a472a; border-radius: 8px;">
+                                <h4 style="color: #28a745;">Great Job!</h4>
+                                <p>You're on track for a comfortable retirement. Keep up the good work!</p>
+                            </div>
+                        `}
+                    </div>
+                `;
+                
+                document.getElementById('retirement-results').innerHTML = results;
+                showAlert('Retirement plan calculated!', 'success');
+                
+            } catch (error) {
+                console.error('Error calculating retirement:', error);
+                showAlert('Error calculating retirement plan', 'error');
+            }
+        }
+
+        // Tax Calculator
+        function calculateTax() {
+            try {
+                const income = parseFloat(document.getElementById('tax-annual-income').value) || 800000;
+                const deductions80C = Math.min(parseFloat(document.getElementById('tax-80c').value) || 150000, 150000);
+                const homeLoanInterest = Math.min(parseFloat(document.getElementById('tax-home-loan').value) || 200000, 200000);
+                const healthInsurance = Math.min(parseFloat(document.getElementById('tax-health-insurance').value) || 25000, 50000);
+                const nps = Math.min(parseFloat(document.getElementById('tax-nps').value) || 50000, 50000);
+                const donations = parseFloat(document.getElementById('tax-donations').value) || 10000;
+                
+                const standardDeduction = 50000;
+                const totalDeductions = deductions80C + homeLoanInterest + healthInsurance + nps + donations + standardDeduction;
+                const taxableIncome = Math.max(0, income - totalDeductions);
+                
+                // Calculate tax based on new tax regime
+                let tax = 0;
+                if (taxableIncome > 1500000) {
+                    tax += (taxableIncome - 1500000) * 0.30;
+                    tax += (1500000 - 1250000) * 0.25;
+                    tax += (1250000 - 1000000) * 0.20;
+                    tax += (1000000 - 750000) * 0.15;
+                    tax += (750000 - 500000) * 0.10;
+                    tax += (500000 - 300000) * 0.05;
+                } else if (taxableIncome > 1250000) {
+                    tax += (taxableIncome - 1250000) * 0.25;
+                    tax += (1250000 - 1000000) * 0.20;
+                    tax += (1000000 - 750000) * 0.15;
+                    tax += (750000 - 500000) * 0.10;
+                    tax += (500000 - 300000) * 0.05;
+                } else if (taxableIncome > 1000000) {
+                    tax += (taxableIncome - 1000000) * 0.20;
+                    tax += (1000000 - 750000) * 0.15;
+                    tax += (750000 - 500000) * 0.10;
+                    tax += (500000 - 300000) * 0.05;
+                } else if (taxableIncome > 750000) {
+                    tax += (taxableIncome - 750000) * 0.15;
+                    tax += (750000 - 500000) * 0.10;
+                    tax += (500000 - 300000) * 0.05;
+                } else if (taxableIncome > 500000) {
+                    tax += (taxableIncome - 500000) * 0.10;
+                    tax += (500000 - 300000) * 0.05;
+                } else if (taxableIncome > 300000) {
+                    tax += (taxableIncome - 300000) * 0.05;
+                }
+                
+                const cess = tax * 0.04; // 4% health and education cess
+                const totalTax = tax + cess;
+                
+                const results = `
+                    <div class="report-section">
+                        <h3 class="report-title">Tax Calculation Results</h3>
+                        <div class="grid">
+                            <div class="data-box">
+                                <div class="data-label">Gross Income</div>
+                                <div class="data-value">₹${income.toLocaleString()}</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Total Deductions</div>
+                                <div class="data-value">₹${totalDeductions.toLocaleString()}</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Taxable Income</div>
+                                <div class="data-value">₹${taxableIncome.toLocaleString()}</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Total Tax</div>
+                                <div class="data-value">₹${totalTax.toLocaleString()}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <h4>Deduction Breakdown:</h4>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Standard Deduction: ₹${standardDeduction.toLocaleString()}</li>
+                                <li>80C Investments: ₹${deductions80C.toLocaleString()}</li>
+                                <li>Home Loan Interest: ₹${homeLoanInterest.toLocaleString()}</li>
+                                <li>Health Insurance: ₹${healthInsurance.toLocaleString()}</li>
+                                <li>NPS (80CCD): ₹${nps.toLocaleString()}</li>
+                                <li>Donations: ₹${donations.toLocaleString()}</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: #1a472a; border-radius: 8px;">
+                            <h4 style="color: #28a745;">Tax Saving Tip:</h4>
+                            <p>You can save up to ₹${Math.max(0, 150000 - deductions80C).toLocaleString()} more in 80C investments and ₹${Math.max(0, 50000 - nps).toLocaleString()} in NPS for additional tax benefits.</p>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('tax-results').innerHTML = results;
+                showAlert('Tax calculation completed!', 'success');
+                
+            } catch (error) {
+                console.error('Error calculating tax:', error);
+                showAlert('Error calculating tax', 'error');
+            }
+        }
+
+        // Budget Management
+        function addExpense() {
+            try {
+                const category = document.getElementById('expense-category').value;
+                const amount = parseFloat(document.getElementById('expense-amount').value);
+                const description = document.getElementById('expense-description').value;
+                
+                if (!amount || amount <= 0) {
+                    showAlert('Please enter a valid amount', 'warning');
+                    return;
+                }
+                
+                const expense = {
+                    id: Date.now(),
+                    category,
+                    amount,
+                    description: description || category,
+                    date: new Date().toISOString().split('T')[0]
+                };
+                
+                financialData.expenses.push(expense);
+                saveData();
+                
+                // Clear form
+                document.getElementById('expense-amount').value = '';
+                document.getElementById('expense-description').value = '';
+                
+                updateBudgetDisplay();
+                showAlert('Expense added successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding expense:', error);
+                showAlert('Error adding expense', 'error');
+            }
+        }
+
+        function updateBudgetDisplay() {
+            const expenses = financialData.expenses || [];
+            const categories = {};
+            let totalExpenses = 0;
+            
+            expenses.forEach(expense => {
+                categories[expense.category] = (categories[expense.category] || 0) + expense.amount;
+                totalExpenses += expense.amount;
+            });
+            
+            // Budget summary
+            let summaryHtml = `
+                <div class="data-box">
+                    <div class="data-label">Total Monthly Expenses</div>
+                    <div class="data-value">₹${totalExpenses.toLocaleString()}</div>
+                </div>
+            `;
+            
+            Object.entries(categories).forEach(([category, amount]) => {
+                const percentage = ((amount / totalExpenses) * 100).toFixed(1);
+                summaryHtml += `
+                    <div style="margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                            <span>₹${amount.toLocaleString()} (${percentage}%)</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('budget-summary').innerHTML = summaryHtml;
+            
+            // Expense list
+            let listHtml = '<h3>Recent Expenses</h3>';
+            expenses.slice(-10).reverse().forEach(expense => {
+                listHtml += `
+                    <div class="data-box">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: bold;">${expense.description}</div>
+                                <div style="color: #aaa; font-size: 14px;">${expense.category} • ${expense.date}</div>
+                            </div>
+                            <div class="data-value">₹${expense.amount.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('expense-list').innerHTML = listHtml;
+        }
+
+        // Loan Calculator
+        function calculateLoan() {
+            try {
+                const principal = parseFloat(document.getElementById('loan-amount').value) || 2000000;
+                const rate = parseFloat(document.getElementById('loan-rate').value) / 100 / 12 || 0.085/12;
+                const time = parseFloat(document.getElementById('loan-tenure').value) * 12 || 240;
+                
+                const emi = (principal * rate * Math.pow(1 + rate, time)) / (Math.pow(1 + rate, time) - 1);
+                const totalAmount = emi * time;
+                const totalInterest = totalAmount - principal;
+                
+                const results = `
+                    <div class="report-section">
+                        <h3 class="report-title">Loan Calculator Results</h3>
+                        <div class="grid">
+                            <div class="data-box">
+                                <div class="data-label">Monthly EMI</div>
+                                <div class="data-value">₹${emi.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Total Amount Payable</div>
+                                <div class="data-value">₹${totalAmount.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Total Interest</div>
+                                <div class="data-value">₹${totalInterest.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                            </div>
+                            <div class="data-box">
+                                <div class="data-label">Interest %</div>
+                                <div class="data-value">${((totalInterest/principal)*100).toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <h4>Loan Breakdown:</h4>
+                            <div style="margin: 10px 0;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Principal Amount</span>
+                                    <span>₹${principal.toLocaleString()}</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${(principal/totalAmount)*100}%; background: #28a745;"></div>
+                                </div>
+                            </div>
+                            <div style="margin: 10px 0;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Interest Amount</span>
+                                    <span>₹${totalInterest.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${(totalInterest/totalAmount)*100}%; background: #dc3545;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('loan-results').innerHTML = results;
+                showAlert('Loan calculation completed!', 'success');
+                
+            } catch (error) {
+                console.error('Error calculating loan:', error);
+                showAlert('Error calculating loan', 'error');
+            }
+        }
+
+        // Financial Goals
+        function addGoal() {
+            try {
+                const name = document.getElementById('goal-name').value;
+                const amount = parseFloat(document.getElementById('goal-amount').value);
+                const time = parseFloat(document.getElementById('goal-time').value);
+                const current = parseFloat(document.getElementById('goal-current').value) || 0;
+                
+                if (!name || !amount || !time) {
+                    showAlert('Please fill in all required fields', 'warning');
+                    return;
+                }
+                
+                const remainingAmount = amount - current;
+                const monthlyRequired = remainingAmount / (time * 12);
+                
+                const goal = {
+                    id: Date.now(),
+                    name,
+                    targetAmount: amount,
+                    timeYears: time,
+                    currentAmount: current,
+                    monthlyRequired,
+                    progress: (current / amount * 100).toFixed(1)
+                };
+                
+                financialData.goals.push(goal);
+                saveData();
+                
+                // Clear form
+                document.getElementById('goal-name').value = '';
+                document.getElementById('goal-amount').value = '';
+                document.getElementById('goal-time').value = '';
+                document.getElementById('goal-current').value = '';
+                
+                updateGoalsDisplay();
+                showAlert('Goal added successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding goal:', error);
+                showAlert('Error adding goal', 'error');
+            }
+        }
+
+        function updateGoalsDisplay() {
+            const goals = financialData.goals || [];
+            
+            // Goal planning summary
+            let planningHtml = '';
+            if (goals.length > 0) {
+                const totalRequired = goals.reduce((sum, goal) => sum + goal.monthlyRequired, 0);
+                planningHtml = `
+                    <div class="data-box">
+                        <div class="data-label">Total Monthly Investment Needed</div>
+                        <div class="data-value">₹${totalRequired.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('goal-planning').innerHTML = planningHtml;
+            
+            // Goals list
+            let listHtml = '<h3>Your Financial Goals</h3>';
+            
+            if (goals.length === 0) {
+                listHtml += '<p style="color: #aaa;">No goals added yet. Add your first financial goal above!</p>';
+            } else {
+                goals.forEach(goal => {
+                    listHtml += `
+                        <div class="data-box">
+                            <div style="margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <h4 style="margin: 0;">${goal.name}</h4>
+                                    <span class="data-value">₹${goal.targetAmount.toLocaleString()}</span>
+                                </div>
+                                <div style="color: #aaa; font-size: 14px; margin: 5px 0;">
+                                    Target: ${goal.timeYears} years • Monthly Required: ₹${goal.monthlyRequired.toLocaleString(undefined, {maximumFractionDigits: 0})}
+                                </div>
+                            </div>
+                            <div style="margin: 10px 0;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Progress: ${goal.progress}%</span>
+                                    <span>₹${goal.currentAmount.toLocaleString()} / ₹${goal.targetAmount.toLocaleString()}</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${goal.progress}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('goals-list').innerHTML = listHtml;
+        }
+
+        // Reports
+        function generateReport(type) {
+            try {
+                const profile = financialData.profile;
+                if (!profile.monthlyIncome) {
+                    showAlert('Please complete your profile first', 'warning');
+                    showSection('profile');
+                    return;
+                }
+                
+                let reportHtml = '';
+                
+                if (type === 'summary') {
+                    const savings = profile.monthlyIncome - profile.monthlyExpenses;
+                    const savingsRate = (savings / profile.monthlyIncome * 100).toFixed(1);
+                    
+                    reportHtml = `
+                        <div class="report-section">
+                            <h3 class="report-title">Financial Summary Report</h3>
+                            <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>Client:</strong> ${profile.fullName || 'Not specified'}</p>
+                            
+                            <h4>Financial Overview</h4>
+                            <div class="grid">
+                                <div class="data-box">
+                                    <div class="data-label">Monthly Income</div>
+                                    <div class="data-value">₹${profile.monthlyIncome.toLocaleString()}</div>
+                                </div>
+                                <div class="data-box">
+                                    <div class="data-label">Monthly Expenses</div>
+                                    <div class="data-value">₹${profile.monthlyExpenses.toLocaleString()}</div>
+                                </div>
+                                <div class="data-box">
+                                    <div class="data-label">Monthly Savings</div>
+                                    <div class="data-value">₹${savings.toLocaleString()}</div>
+                                </div>
+                                <div class="data-box">
+                                    <div class="data-label">Savings Rate</div>
+                                    <div class="data-value">${savingsRate}%</div>
+                                </div>
+                            </div>
+                            
+                            <h4>Financial Health Analysis</h4>
+                            <ul style="margin: 15px 0; padding-left: 20px;">
+                                <li><strong>Savings Rate:</strong> ${savingsRate}% ${parseFloat(savingsRate) >= 20 ? '(Excellent)' : parseFloat(savingsRate) >= 10 ? '(Good)' : '(Needs Improvement)'}</li>
+                                <li><strong>Emergency Fund:</strong> ${profile.currentSavings > (profile.monthlyExpenses * 6) ? 'Adequate' : 'Build Further'}</li>
+                                <li><strong>Risk Profile:</strong> ${profile.riskTolerance || 'Not assessed'}</li>
+                                <li><strong>Investment Timeline:</strong> ${profile.investmentTimeline || 'Not specified'}</li>
+                            </ul>
+                            
+                            <h4>Key Recommendations</h4>
+                            <ul style="margin: 15px 0; padding-left: 20px;">
+                                <li>Build emergency fund of ₹${(profile.monthlyExpenses * 6).toLocaleString()}</li>
+                                <li>Invest ₹${Math.floor(savings * 0.6).toLocaleString()} monthly in mutual funds</li>
+                                <li>Consider tax-saving investments under Section 80C</li>
+                                <li>Review and rebalance portfolio annually</li>
+                            </ul>
+                        </div>
+                    `;
+                } else if (type === 'goals') {
+                    const goals = financialData.goals || [];
+                    reportHtml = `
+                        <div class="report-section">
+                            <h3 class="report-title">Goal Progress Report</h3>
+                            <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                            
+                            ${goals.length === 0 ? '<p>No financial goals set yet.</p>' : 
+                                goals.map(goal => `
+                                    <div style="border: 1px solid #333; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                                        <h4>${goal.name}</h4>
+                                        <p><strong>Target:</strong> ₹${goal.targetAmount.toLocaleString()} in ${goal.timeYears} years</p>
+                                        <p><strong>Current Progress:</strong> ₹${goal.currentAmount.toLocaleString()} (${goal.progress}%)</p>
+                                        <p><strong>Monthly Investment Needed:</strong> ₹${goal.monthlyRequired.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    `;
+                } else if (type === 'budget') {
+                    const expenses = financialData.expenses || [];
+                    const categories = {};
+                    let total = 0;
+                    
+                    expenses.forEach(expense => {
+                        categories[expense.category] = (categories[expense.category] || 0) + expense.amount;
+                        total += expense.amount;
+                    });
+                    
+                    reportHtml = `
+                        <div class="report-section">
+                            <h3 class="report-title">Budget Analysis Report</h3>
+                            <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>Total Tracked Expenses:</strong> ₹${total.toLocaleString()}</p>
+                            
+                            <h4>Expense Breakdown by Category</h4>
+                            ${Object.entries(categories).map(([category, amount]) => `
+                                <div style="margin: 10px 0;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                                        <span>₹${amount.toLocaleString()} (${((amount/total)*100).toFixed(1)}%)</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            <h4>Recent Transactions</h4>
+                            ${expenses.slice(-5).map(expense => `
+                                <div style="border-bottom: 1px solid #333; padding: 10px 0;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <div>
+                                            <strong>${expense.description}</strong><br>
+                                            <small style="color: #aaa;">${expense.category} • ${expense.date}</small>
+                                        </div>
+                                        <strong>₹${expense.amount.toLocaleString()}</strong>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('report-content').innerHTML = reportHtml;
+                showAlert(`${type.charAt(0).toUpperCase() + type.slice(1)} report generated!`, 'success');
+                
+            } catch (error) {
+                console.error('Error generating report:', error);
+                showAlert('Error generating report', 'error');
+            }
+        }
+
+        function downloadPDF() {
+            try {
+                const reportContent = document.getElementById('report-content');
+                if (!reportContent || !reportContent.innerHTML.trim()) {
+                    showAlert('Please generate a report first', 'warning');
+                    return;
+                }
+                
+                // Open print dialog
+                window.print();
+                showAlert('Print dialog opened. You can save as PDF from there.', 'info');
+                
+            } catch (error) {
+                console.error('Error downloading PDF:', error);
+                showAlert('Error opening print dialog', 'error');
+            }
+        }
+
+        // Dashboard Updates
+        function updateDashboard() {
+            const profile = financialData.profile;
+            if (!profile.monthlyIncome) return;
+            
+            const savings = profile.monthlyIncome - profile.monthlyExpenses;
+            const savingsRate = (savings / profile.monthlyIncome * 100).toFixed(1);
+            const goals = financialData.goals || [];
+            const expenses = financialData.expenses || [];
+            
+            const summaryHtml = `
+                <div style="margin-top: 30px;">
+                    <h3>Your Financial Summary</h3>
+                    <div class="grid">
+                        <div class="data-box">
+                            <div class="data-label">Monthly Savings</div>
+                            <div class="data-value">₹${savings.toLocaleString()}</div>
+                        </div>
+                        <div class="data-box">
+                            <div class="data-label">Savings Rate</div>
+                            <div class="data-value">${savingsRate}%</div>
+                        </div>
+                        <div class="data-box">
+                            <div class="data-label">Financial Goals</div>
+                            <div class="data-value">${goals.length}</div>
+                        </div>
+                        <div class="data-box">
+                            <div class="data-label">Tracked Expenses</div>
+                            <div class="data-value">${expenses.length}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('dashboard-summary').innerHTML = summaryHtml;
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Financial Planner Pro - Clean Edition loaded successfully');
+            
+            loadData();
+            updateDashboard();
+            updateBudgetDisplay();
+            updateGoalsDisplay();
+            
+            showAlert('Financial Planner Pro loaded successfully!', 'success');
+        });
+    </script>
+</body>
+</html>

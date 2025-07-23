@@ -13,25 +13,25 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     <style>
         :root {
-            --primary-black: #000000;
-            --secondary-black: #0a0a0a;
-            --card-black: #111111;
-            --border-gray: #333333;
-            --text-white: #ffffff;
-            --text-gray: #aaaaaa;
+            --primary-black: #111216; /* Slightly softer black */
+            --secondary-black: #18191d; /* Slightly lighter for contrast */
+            --card-black: #1c1d22; /* Lighter for cards */
+            --border-gray: #2a2b2f; /* Softer border */
+            --text-white: #f7f7f7; /* Softer white */
+            --text-gray: #cccccc; /* Lighter gray for text */
             --accent-white: #ffffff;
             --success-green: #00ff88;
             --warning-orange: #ff9f43;
             --error-red: #ff6b6b;
             --info-blue: #00d4ff;
-            --gradient-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
-            --gradient-card: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
-            --gradient-accent: linear-gradient(90deg, #ffffff 0%, #e0e0e0 100%);
-            --shadow-light: 0 4px 20px rgba(255, 255, 255, 0.1);
-            --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.8);
-            --border-radius-sm: 8px;
-            --border-radius-md: 15px;
-            --border-radius-lg: 25px;
+            --gradient-primary: linear-gradient(135deg, #18191d 0%, #111216 100%);
+            --gradient-card: linear-gradient(145deg, #23242a 0%, #18191d 100%);
+            --gradient-accent: linear-gradient(90deg, #f7f7f7 0%, #cccccc 100%);
+            --shadow-light: 0 4px 24px rgba(255,255,255,0.04);
+            --shadow-heavy: 0 20px 60px rgba(0,0,0,0.7);
+            --border-radius-sm: 10px;
+            --border-radius-md: 18px;
+            --border-radius-lg: 30px;
             --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
@@ -49,13 +49,14 @@
             line-height: 1.6;
             overflow-x: hidden;
             scroll-behavior: smooth;
+            font-size: 15px;
         }
 
         /* Enhanced Container System */
         .container {
-            max-width: 1400px;
+            max-width: 1300px; /* Standard professional width */
             margin: 0 auto;
-            padding: 0 2rem;
+            padding: 0 2rem; /* Comfortable padding */
         }
 
         .container-fluid {
@@ -81,27 +82,18 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            background: linear-gradient(120deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            z-index: 0;
         }
 
         .profile-card {
             background: var(--gradient-card);
-            border: 2px solid var(--border-gray);
+            border: 1.5px solid var(--border-gray);
             border-radius: var(--border-radius-lg);
-            padding: 3rem;
+            padding: 2.5rem 2rem 2rem 2rem;
             max-width: 900px;
-            width: 95%;
+            width: 98%;
             position: relative;
-            backdrop-filter: blur(20px);
             box-shadow: var(--shadow-heavy);
             z-index: 2;
             animation: slideInUp 1s ease-out;
@@ -138,7 +130,7 @@
 
         .profile-header h1 {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
             font-weight: 800;
             margin-bottom: 1rem;
             background: var(--gradient-accent);
@@ -150,7 +142,7 @@
         }
 
         .profile-header .subtitle {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--text-gray);
             font-weight: 400;
             margin-bottom: 0.5rem;
@@ -160,19 +152,20 @@
             font-size: 1rem;
             color: var(--text-gray);
             font-style: italic;
-            opacity: 0.8;
+            opacity: 0.7;
         }
 
         /* Enhanced Welcome Section */
         .welcome-section {
             text-align: center;
             margin: 2rem 0 3rem;
-            padding: 2rem;
-            background: var(--gradient-card);
+            padding: 2rem 1.5rem;
+            background: var(--card-black);
             border-radius: var(--border-radius-md);
             border: 1px solid var(--border-gray);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-light);
         }
 
         .welcome-section::before {
@@ -192,14 +185,14 @@
         }
 
         .welcome-section h3 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
             color: var(--text-white);
         }
 
         .welcome-section p {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--text-gray);
             line-height: 1.7;
             max-width: 600px;
@@ -282,10 +275,10 @@
         /* Enhanced Action Buttons */
         .action-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 1.2rem;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 2rem;
+            margin-top: 2.2rem;
         }
 
         /* Stunning Cover Page */
@@ -306,39 +299,32 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%);
-            animation: coverAnimation 12s ease-in-out infinite;
-        }
-
-        @keyframes coverAnimation {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            33% { transform: rotate(1deg) scale(1.02); }
-            66% { transform: rotate(-1deg) scale(0.98); }
+            background: linear-gradient(120deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+            z-index: 0;
         }
 
         .cover-content {
-            max-width: 800px;
+            max-width: 700px;
             text-align: center;
-            padding: 2rem;
+            padding: 2.5rem 1.5rem;
             position: relative;
             z-index: 2;
+            background: var(--card-black);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-light);
         }
 
         .app-title {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(3rem, 8vw, 6rem);
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
             font-weight: 900;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             background: var(--gradient-accent);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.03em;
             line-height: 1;
-            animation: titleGlow 3s ease-in-out infinite;
         }
 
         @keyframes titleGlow {
@@ -347,7 +333,7 @@
         }
 
         .app-subtitle {
-            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-size: 1.2rem;
             color: var(--text-gray);
             margin-bottom: 2rem;
             font-weight: 400;
@@ -398,7 +384,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            padding: 1rem 2rem;
+            padding: 0.7rem 1.5rem;
             border: none;
             border-radius: var(--border-radius-lg);
             font-weight: 600;
@@ -408,7 +394,7 @@
             text-decoration: none;
             position: relative;
             overflow: hidden;
-            min-width: 180px;
+            min-width: 200px;
         }
 
         .btn::before {
@@ -438,9 +424,9 @@
         }
 
         .btn-secondary {
-            background: var(--gradient-card);
+            background: var(--card-black);
             color: var(--text-white);
-            border: 2px solid var(--border-gray);
+            border: 1.5px solid var(--border-gray);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
@@ -468,9 +454,9 @@
         }
 
         .btn-large {
-            padding: 1.25rem 2.5rem;
-            font-size: 1.1rem;
-            min-width: 220px;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            min-width: 260px;
         }
 
         /* Enhanced Main App Layout */
@@ -540,7 +526,7 @@
             border-bottom: 1px solid var(--border-gray);
             padding: 1rem 0;
             position: sticky;
-            top: 70px;
+            top: 64px; /* Height of header (approx 64px) */
             z-index: 99;
             backdrop-filter: blur(10px);
         }
@@ -556,7 +542,7 @@
             background: var(--card-black);
             color: var(--text-white);
             border: 2px solid var(--border-gray);
-            padding: 0.8rem 1.5rem;
+            padding: 0.6rem 1.1rem;
             border-radius: var(--border-radius-lg);
             cursor: pointer;
             font-weight: 500;
@@ -597,7 +583,7 @@
         /* Premium Section Layout */
         .section {
             display: none;
-            padding: 3rem 0;
+            padding: 1.2rem 0;
             min-height: calc(100vh - 200px);
         }
 
@@ -637,7 +623,7 @@
 
         .section-title {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(2rem, 4vw, 3rem);
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
             font-weight: 700;
             margin-bottom: 1rem;
             color: var(--text-white);
@@ -657,8 +643,8 @@
             background: var(--gradient-card);
             border: 2px solid var(--border-gray);
             border-radius: var(--border-radius-md);
-            padding: 2rem;
-            margin: 1.5rem 0;
+            padding: 1.2rem;
+            margin: 1rem 0;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
@@ -1673,6 +1659,86 @@
                 break-inside: avoid;
             }
         }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+            70% { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+        }
+        /* Card and Button Hover Effects */
+        .card, .profile-card, .cover-content, .feature-item, .widget, .export-option {
+            transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
+        }
+        .card:hover, .profile-card:hover, .cover-content:hover, .feature-item:hover, .widget:hover, .export-option:hover {
+            box-shadow: 0 8px 32px rgba(255,255,255,0.10);
+            border-color: var(--accent-white);
+            transform: translateY(-6px) scale(1.03);
+        }
+        .btn, .nav-btn, .sub-nav-btn {
+            transition: box-shadow 0.2s, transform 0.2s, filter 0.2s;
+        }
+        .btn:hover, .nav-btn:hover, .sub-nav-btn:hover {
+            filter: brightness(1.12);
+            box-shadow: 0 4px 16px rgba(255,255,255,0.10);
+            transform: scale(1.04);
+        }
+        .btn:active {
+            animation: pulse 0.4s;
+        }
+        /* Section Alternating Backgrounds */
+        .section:nth-of-type(even) {
+            background: #16171a;
+        }
+        .section:nth-of-type(odd) {
+            background: #111216;
+        }
+        /* Fade/slide-in on section/card entry */
+        .section, .card, .profile-card, .cover-content {
+            opacity: 0;
+            animation: fadeIn 0.8s forwards;
+        }
+        .section.active, .card[data-animate], .profile-card[data-animate], .cover-content[data-animate] {
+            animation: slideInUp 0.8s forwards;
+        }
+        /* Expandable Card */
+        .expandable-card {
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s;
+            max-height: 80px;
+            cursor: pointer;
+        }
+        .expandable-card.expanded {
+            max-height: 600px;
+            box-shadow: 0 8px 32px rgba(255,255,255,0.10);
+        }
+        .expandable-card .expand-content {
+            opacity: 0;
+            transition: opacity 0.4s;
+            height: 0;
+        }
+        .expandable-card.expanded .expand-content {
+            opacity: 1;
+            height: auto;
+        }
+        /* Info Icon */
+        .info-icon {
+            margin-left: 0.5rem;
+            color: #aaaaaa;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+        .info-icon:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -1894,11 +1960,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-brain"></i>
-                        Advanced Financial Personality Assessment
+                        Advanced Financial Personality Assessment <span class="info-icon" title="Discover your unique financial DNA through our scientifically-designed assessment that analyzes your investment behavior, risk tolerance, and wealth-building preferences."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Discover your unique financial DNA through our scientifically-designed assessment that analyzes your investment behavior, risk tolerance, and wealth-building preferences.
-                    </p>
                 </div>
 
                 <div class="assessment-container" data-aos="fade-up" data-aos-delay="200">
@@ -1960,11 +2023,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-user-edit"></i>
-                        Comprehensive Client Profile
+                        Comprehensive Client Profile <span class="info-icon" title="Build your detailed financial profile with our advanced data collection system that ensures personalized recommendations and accurate planning."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Build your detailed financial profile with our advanced data collection system that ensures personalized recommendations and accurate planning.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2050,11 +2110,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-chart-line"></i>
-                        Advanced Financial Status Analysis
+                        Advanced Financial Status Analysis <span class="info-icon" title="Provide comprehensive details about your current financial situation for accurate planning and personalized recommendations."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Provide comprehensive details about your current financial situation for accurate planning and personalized recommendations.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2123,11 +2180,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-calculator"></i>
-                        Advanced Net Worth Calculator
+                        Advanced Net Worth Calculator <span class="info-icon" title="Build a comprehensive picture of your financial position with our advanced asset and liability tracking system featuring real-time calculations and visual analytics."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Build a comprehensive picture of your financial position with our advanced asset and liability tracking system featuring real-time calculations and visual analytics.
-                    </p>
                 </div>
 
                 <div class="form-grid">
@@ -2233,9 +2287,8 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-chart-pie"></i>
-                            Comprehensive Net Worth Analysis
+                            Comprehensive Net Worth Analysis <span class="info-icon" title="Real-time calculation with detailed breakdown and insights"><i class="fas fa-info-circle"></i></span>
                         </h3>
-                        <p class="card-subtitle">Real-time calculation with detailed breakdown and insights</p>
                     </div>
                     
                     <div class="form-grid">
@@ -2282,11 +2335,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-bullseye"></i>
-                        Smart Goals & Insurance Planning
+                        Smart Goals & Insurance Planning <span class="info-icon" title="Set intelligent financial goals with inflation adjustment and comprehensive insurance planning with automated calculations for optimal coverage."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Set intelligent financial goals with inflation adjustment and comprehensive insurance planning with automated calculations for optimal coverage.
-                    </p>
                 </div>
 
                 <div class="form-grid">
@@ -2427,11 +2477,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-chart-area"></i>
-                        Advanced Risk Profile Analysis
+                        Advanced Risk Profile Analysis <span class="info-icon" title="Comprehensive risk assessment using behavioral finance principles to determine your optimal investment strategy and risk tolerance levels."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Comprehensive risk assessment using behavioral finance principles to determine your optimal investment strategy and risk tolerance levels.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2543,11 +2590,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-lightbulb"></i>
-                        AI-Powered Investment Recommendations
+                        AI-Powered Investment Recommendations <span class="info-icon" title="Get personalized investment strategies powered by advanced algorithms that analyze your complete financial profile, goals, and market conditions."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Get personalized investment strategies powered by advanced algorithms that analyze your complete financial profile, goals, and market conditions.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2571,11 +2615,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-pie-chart"></i>
-                        Advanced Portfolio Analysis
+                        Advanced Portfolio Analysis <span class="info-icon" title="Comprehensive portfolio analysis with risk metrics, performance tracking, and intelligent rebalancing recommendations."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Comprehensive portfolio analysis with risk metrics, performance tracking, and intelligent rebalancing recommendations.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2602,11 +2643,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-calendar-check"></i>
-                        Advanced SIP Calculator
+                        Advanced SIP Calculator <span class="info-icon" title="Sophisticated SIP planning with inflation adjustment, step-up calculations, and goal-based recommendations."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Sophisticated SIP planning with inflation adjustment, step-up calculations, and goal-based recommendations.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2659,11 +2697,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-receipt"></i>
-                        Comprehensive Tax Planning
+                        Comprehensive Tax Planning <span class="info-icon" title="Advanced tax optimization strategies with detailed analysis of both old and new tax regimes, including smart investment recommendations."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Advanced tax optimization strategies with detailed analysis of both old and new tax regimes, including smart investment recommendations.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2722,11 +2757,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-umbrella"></i>
-                        Comprehensive Retirement Planning
+                        Comprehensive Retirement Planning <span class="info-icon" title="Advanced retirement planning with inflation modeling, lifestyle adjustments, healthcare considerations, and multiple scenario analysis."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Advanced retirement planning with inflation modeling, lifestyle adjustments, healthcare considerations, and multiple scenario analysis.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2786,11 +2818,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-balance-scale"></i>
-                        AI-Powered Product Comparison
+                        AI-Powered Product Comparison <span class="info-icon" title="Intelligent product comparison engine that analyzes thousands of financial products to find the perfect match for your profile and goals."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Intelligent product comparison engine that analyzes thousands of financial products to find the perfect match for your profile and goals.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -2814,11 +2843,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-chart-bar"></i>
-                        Advanced Financial Analytics
+                        Advanced Financial Analytics <span class="info-icon" title="Comprehensive financial analytics with real-time insights, predictive modeling, and interactive visualizations powered by advanced algorithms."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Comprehensive financial analytics with real-time insights, predictive modeling, and interactive visualizations powered by advanced algorithms.
-                    </p>
                 </div>
 
                 <!-- Enhanced Financial Health Widgets -->
@@ -2890,11 +2916,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-file-alt"></i>
-                        Professional Report Generation
+                        Professional Report Generation <span class="info-icon" title="Generate comprehensive, professional-grade financial reports with advanced analytics, insights, and recommendations in multiple formats."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Generate comprehensive, professional-grade financial reports with advanced analytics, insights, and recommendations in multiple formats.
-                    </p>
                 </div>
 
                 <div class="form-grid" data-aos="fade-up" data-aos-delay="200">
@@ -3009,11 +3032,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-clipboard-list"></i>
-                        Executive Summary & Intelligence
+                        Executive Summary & Intelligence <span class="info-icon" title="AI-powered executive summary with key insights, actionable alerts, and strategic recommendations for optimal financial decisions."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        AI-powered executive summary with key insights, actionable alerts, and strategic recommendations for optimal financial decisions.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -3037,11 +3057,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-bell"></i>
-                        Smart Financial Alerts
+                        Smart Financial Alerts <span class="info-icon" title="Intelligent alert system that monitors your financial health and provides timely notifications for important financial decisions."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Intelligent alert system that monitors your financial health and provides timely notifications for important financial decisions.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -3072,11 +3089,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-home"></i>
-                        Advanced Loan Calculator
+                        Advanced Loan Calculator <span class="info-icon" title="Comprehensive loan analysis with EMI calculations, amortization schedules, and prepayment strategies."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Comprehensive loan analysis with EMI calculations, amortization schedules, and prepayment strategies.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -3129,11 +3143,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-chart-pie"></i>
-                        Smart Budget Planner
+                        Smart Budget Planner <span class="info-icon" title="Intelligent budget planning with expense categorization, spending analysis, and optimization recommendations."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Intelligent budget planning with expense categorization, spending analysis, and optimization recommendations.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -3193,11 +3204,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-trending-up"></i>
-                        Investment Performance Tracker
+                        Investment Performance Tracker <span class="info-icon" title="Track and analyze your investment performance with real-time data, benchmarking, and portfolio optimization insights."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Track and analyze your investment performance with real-time data, benchmarking, and portfolio optimization insights.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -3262,11 +3270,8 @@
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-calendar-alt"></i>
-                        Smart Financial Calendar
+                        Smart Financial Calendar <span class="info-icon" title="Never miss important financial deadlines with our intelligent calendar that tracks tax dates, investment reviews, and financial milestones."><i class="fas fa-info-circle"></i></span>
                     </h2>
-                    <p class="section-subtitle">
-                        Never miss important financial deadlines with our intelligent calendar that tracks tax dates, investment reviews, and financial milestones.
-                    </p>
                 </div>
 
                 <div class="card" data-aos="fade-up" data-aos-delay="200">
@@ -4685,71 +4690,773 @@
 
         // Placeholder functions for features to be implemented
         function addAsset() {
-            showAlert('Asset management feature is being enhanced. Coming soon!', 'info');
+            const asset = {
+                id: Date.now(),
+                type: document.getElementById('asset-type').value,
+                name: document.getElementById('asset-name').value,
+                value: parseFloat(document.getElementById('asset-value').value)
+            };
+            clientData.assets.push(asset);
+            updateAssetsList();
+            updateNetWorth();
+            document.getElementById('asset-form').reset();
+            autoSave && autoSave();
         }
 
         function updateAssetsList() {
-            // Placeholder for asset list update
+            const container = document.getElementById('assets-list');
+            if (!container) return;
+            container.innerHTML = '';
+            (clientData.assets || []).forEach(asset => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${asset.name}</div>
+                        <div class="item-details">${asset.type} - ₹${formatCurrency(asset.value)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editAsset(${asset.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteAsset(${asset.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+            updateAssetChart && updateAssetChart();
+        }
+
+        function deleteAsset(id) {
+            if (confirm('Are you sure you want to delete this asset?')) {
+                clientData.assets = clientData.assets.filter(asset => asset.id !== id);
+                updateAssetsList();
+                updateNetWorth();
+                autoSave && autoSave();
+            }
+        }
+
+        function editAsset(id) {
+            const asset = clientData.assets.find(a => a.id === id);
+            if (asset) {
+                document.getElementById('asset-type').value = asset.type;
+                document.getElementById('asset-name').value = asset.name;
+                document.getElementById('asset-value').value = asset.value;
+                deleteAsset(id);
+            }
         }
 
         function addLoan() {
-            showAlert('Loan management feature is being enhanced. Coming soon!', 'info');
+            const loan = {
+                id: Date.now(),
+                type: document.getElementById('loan-type').value,
+                amount: parseFloat(document.getElementById('loan-amount').value),
+                rate: parseFloat(document.getElementById('loan-rate').value),
+                tenure: parseFloat(document.getElementById('loan-tenure').value)
+            };
+            clientData.loans.push(loan);
+            updateLoansList();
+            updateNetWorth();
+            document.getElementById('loan-form').reset();
+            autoSave && autoSave();
         }
 
         function updateLoansList() {
-            // Placeholder for loan list update
+            const container = document.getElementById('loans-list');
+            if (!container) return;
+            container.innerHTML = '';
+            (clientData.loans || []).forEach(loan => {
+                const totalInterest = calculateTotalInterest(loan.amount, loan.rate, loan.tenure);
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${loan.type} Loan</div>
+                        <div class="item-details">
+                            Amount: ₹${formatCurrency(loan.amount)} | Rate: ${loan.rate}% | 
+                            Tenure: ${loan.tenure} years | Total Interest: ₹${formatCurrency(totalInterest)}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editLoan(${loan.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteLoan(${loan.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function deleteLoan(id) {
+            if (confirm('Are you sure you want to delete this loan?')) {
+                clientData.loans = clientData.loans.filter(loan => loan.id !== id);
+                updateLoansList();
+                updateNetWorth();
+                autoSave && autoSave();
+            }
+        }
+
+        function editLoan(id) {
+            const loan = clientData.loans.find(l => l.id === id);
+            if (loan) {
+                document.getElementById('loan-type').value = loan.type;
+                document.getElementById('loan-amount').value = loan.amount;
+                document.getElementById('loan-rate').value = loan.rate;
+                document.getElementById('loan-tenure').value = loan.tenure;
+                deleteLoan(id);
+            }
+        }
+
+        function calculateTotalInterest(principal, rate, tenure) {
+            const monthlyRate = rate / 12 / 100;
+            const months = tenure * 12;
+            const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+            return (emi * months) - principal;
         }
 
         function updateNetWorth() {
-            // Placeholder for net worth calculation
+            const totalAssets = (clientData.assets || []).reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = (clientData.loans || []).reduce((sum, loan) => sum + loan.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            document.getElementById('total-assets').textContent = '₹' + formatCurrency(totalAssets);
+            document.getElementById('total-liabilities').textContent = '₹' + formatCurrency(totalLiabilities);
+            document.getElementById('net-worth').textContent = '₹' + formatCurrency(netWorth);
+        }
+
+        function updateAssetChart() {
+            const ctx = document.getElementById('asset-chart');
+            if (!ctx) return;
+            if (window.charts && window.charts.assetChart) {
+                window.charts.assetChart.destroy();
+            }
+            const assetTypes = {};
+            (clientData.assets || []).forEach(asset => {
+                if (!assetTypes[asset.type]) {
+                    assetTypes[asset.type] = 0;
+                }
+                assetTypes[asset.type] += asset.value;
+            });
+            const labels = Object.keys(assetTypes);
+            const data = Object.values(assetTypes);
+            const colors = ['#fff', '#ccc', '#888', '#444', '#222'];
+            if (labels.length === 0) {
+                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+                return;
+            }
+            window.charts = window.charts || {};
+            window.charts.assetChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#333'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function addGoal() {
-            showAlert('Goal management feature is being enhanced. Coming soon!', 'info');
+            const todayAmount = parseFloat(document.getElementById('goal-amount').value);
+            const timeframe = parseFloat(document.getElementById('goal-timeframe').value);
+            const inflationRate = parseFloat(document.getElementById('goal-inflation').value) / 100;
+            const futureValue = todayAmount * Math.pow(1 + inflationRate, timeframe);
+            const goal = {
+                id: Date.now(),
+                name: document.getElementById('goal-name').value,
+                todayAmount: todayAmount,
+                futureAmount: futureValue,
+                timeframe: timeframe,
+                inflationRate: inflationRate * 100,
+                priority: document.getElementById('goal-priority').value,
+                progress: 0
+            };
+            clientData.goals.push(goal);
+            updateGoalsList();
+            document.getElementById('goal-form').reset();
+            document.getElementById('goal-inflation').value = 6;
+            autoSave && autoSave();
         }
 
         function updateGoalsList() {
-            // Placeholder for goals list update
+            const container = document.getElementById('goals-list');
+            if (!container) return;
+            container.innerHTML = '';
+            (clientData.goals || []).forEach(goal => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${goal.name}</div>
+                        <div class="item-details">
+                            Today's Value: ₹${formatCurrency(goal.todayAmount)} | 
+                            Future Value: ₹${formatCurrency(goal.futureAmount)} | 
+                            Timeframe: ${goal.timeframe} years | 
+                            Priority: ${goal.priority}
+                        </div>
+                        <div class="item-details" style="margin-top: 5px;">
+                            Inflation Rate: ${goal.inflationRate}% | 
+                            Required Monthly SIP: ₹${formatCurrency(calculateRequiredSIP(goal.futureAmount, goal.timeframe))}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editGoal(${goal.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteGoal(${goal.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function deleteGoal(id) {
+            if (confirm('Are you sure you want to delete this goal?')) {
+                clientData.goals = clientData.goals.filter(goal => goal.id !== id);
+                updateGoalsList();
+                autoSave && autoSave();
+            }
+        }
+
+        function editGoal(id) {
+            const goal = clientData.goals.find(g => g.id === id);
+            if (goal) {
+                document.getElementById('goal-name').value = goal.name;
+                document.getElementById('goal-amount').value = goal.todayAmount;
+                document.getElementById('goal-timeframe').value = goal.timeframe;
+                document.getElementById('goal-inflation').value = goal.inflationRate;
+                document.getElementById('goal-priority').value = goal.priority;
+                deleteGoal(id);
+            }
+        }
+
+        function calculateRequiredSIP(futureValue, years) {
+            const monthlyReturn = 0.12 / 12;
+            const months = years * 12;
+            return futureValue * monthlyReturn / (Math.pow(1 + monthlyReturn, months) - 1);
+        }
+
+        function calculateLifeInsurance() {
+            const familyExpenses = parseFloat(document.getElementById('family-expenses').value) || 0;
+            const outstandingLoans = parseFloat(document.getElementById('outstanding-loans').value) || 0;
+            const incomeYears = parseFloat(document.getElementById('income-years').value) || 10;
+            const lifeInsuranceNeed = (familyExpenses * incomeYears) + outstandingLoans;
+            clientData.insuranceProfile.lifeInsuranceNeed = lifeInsuranceNeed;
+            document.getElementById('insurance-results').style.display = 'block';
+            document.getElementById('insurance-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h4><i class="fas fa-calculator"></i> Life Insurance Calculation</h4>
+                    <div class="data-display">
+                        <div class="data-row">
+                            <span class="data-label">Family Annual Expenses:</span>
+                            <span class="data-value">₹${formatCurrency(familyExpenses)}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Income Replacement Years:</span>
+                            <span class="data-value">${incomeYears} years</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Outstanding Loans:</span>
+                            <span class="data-value">₹${formatCurrency(outstandingLoans)}</span>
+                        </div>
+                        <div class="data-row" style="border-top: 2px solid #17a2b8; font-weight: bold;">
+                            <span class="data-label">Recommended Life Insurance:</span>
+                            <span class="data-value">₹${formatCurrency(lifeInsuranceNeed)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateHealthInsurance() {
+            const familyExpenses = parseFloat(document.getElementById('family-expenses').value) || 0;
+            const healthInsuranceNeed = Math.max(500000, familyExpenses * 0.1);
+            clientData.insuranceProfile.healthInsuranceNeed = healthInsuranceNeed;
+            const existingContent = document.getElementById('insurance-results').innerHTML;
+            document.getElementById('insurance-results').style.display = 'block';
+            document.getElementById('insurance-results').innerHTML = existingContent + `
+                <div class="alert alert-info" style="margin-top: 15px;">
+                    <h4><i class="fas fa-calculator"></i> Health Insurance Calculation</h4>
+                    <div class="data-display">
+                        <div class="data-row">
+                            <span class="data-label">Family Annual Expenses:</span>
+                            <span class="data-value">₹${formatCurrency(familyExpenses)}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Calculation Method:</span>
+                            <span class="data-value">Max(₹5,00,000, 10% of annual expenses)</span>
+                        </div>
+                        <div class="data-row" style="border-top: 2px solid #17a2b8; font-weight: bold;">
+                            <span class="data-label">Recommended Health Insurance:</span>
+                            <span class="data-value">₹${formatCurrency(healthInsuranceNeed)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function saveInsuranceProfile() {
-            showAlert('Insurance profile feature is being enhanced. Coming soon!', 'info');
+            clientData.insuranceProfile = {
+                currentLifeInsurance: parseFloat(document.getElementById('current-life-insurance').value) || 0,
+                currentHealthInsurance: parseFloat(document.getElementById('current-health-insurance').value) || 0,
+                outstandingLoans: parseFloat(document.getElementById('outstanding-loans').value) || 0,
+                familyExpenses: parseFloat(document.getElementById('family-expenses').value) || 0,
+                incomeYears: parseFloat(document.getElementById('income-years').value) || 10,
+                lifeInsuranceNeed: clientData.insuranceProfile.lifeInsuranceNeed || 0,
+                healthInsuranceNeed: clientData.insuranceProfile.healthInsuranceNeed || 0
+            };
+            displayInsuranceInfo();
+            autoSave && autoSave();
         }
 
         function displayInsuranceInfo() {
-            // Placeholder for insurance info display
+            const info = clientData.insuranceProfile;
+            document.getElementById('insurance-form').style.display = 'none';
+            document.getElementById('saved-insurance-info').style.display = 'block';
+            document.getElementById('insurance-info-display').innerHTML = `
+                <div class="data-display">
+                    <div class="data-row">
+                        <span class="data-label">Current Life Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.currentLifeInsurance)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Current Health Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.currentHealthInsurance)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Recommended Life Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.lifeInsuranceNeed)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Recommended Health Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.healthInsuranceNeed)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Life Insurance Gap:</span>
+                        <span class="data-value">₹${formatCurrency(Math.max(0, info.lifeInsuranceNeed - info.currentLifeInsurance))}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Health Insurance Gap:</span>
+                        <span class="data-value">₹${formatCurrency(Math.max(0, info.healthInsuranceNeed - info.currentHealthInsurance))}</span>
+                    </div>
+                </div>
+            `;
         }
 
         function editInsuranceInfo() {
-            // Placeholder for insurance info editing
+            document.getElementById('insurance-form').style.display = 'block';
+            document.getElementById('saved-insurance-info').style.display = 'none';
         }
 
         function saveRiskProfile() {
-            showAlert('Risk profile feature is being enhanced. Coming soon!', 'info');
+            clientData.riskProfile = {
+                experience: document.getElementById('investment-experience').value,
+                tolerance: document.getElementById('risk-tolerance').value,
+                horizon: document.getElementById('investment-horizon').value,
+                monthlyInvestment: parseFloat(document.getElementById('monthly-investment').value)
+            };
+            displayRiskInfo();
+            autoSave && autoSave();
         }
 
         function displayRiskInfo() {
-            // Placeholder for risk info display
+            const info = clientData.riskProfile;
+            document.getElementById('risk-form').style.display = 'none';
+            document.getElementById('saved-risk-info').style.display = 'block';
+            document.getElementById('risk-info-display').innerHTML = `
+                <div class="data-display">
+                    <div class="data-row">
+                        <span class="data-label">Investment Experience:</span>
+                        <span class="data-value">${info.experience}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Risk Tolerance:</span>
+                        <span class="data-value">${info.tolerance}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Investment Horizon:</span>
+                        <span class="data-value">${info.horizon}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Monthly Investment Capacity:</span>
+                        <span class="data-value">₹${formatCurrency(info.monthlyInvestment)}</span>
+                    </div>
+                </div>
+            `;
         }
 
         function editRiskInfo() {
-            // Placeholder for risk info editing
+            document.getElementById('risk-form').style.display = 'block';
+            document.getElementById('saved-risk-info').style.display = 'none';
         }
 
         function updateAllCharts() {
-            showAlert('Advanced analytics and charts are being enhanced. Coming soon!', 'info');
+            updateAssetChart && updateAssetChart();
+            // Add more chart updates as needed
         }
 
         function generateDetailedReport() {
-            showAlert('Professional report generation is being enhanced. Coming soon!', 'info');
+            const doc = new jspdf.jsPDF('p', 'mm', 'a4');
+            let y = 15;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(20);
+            doc.text('Detailed Financial Report', 105, y, { align: 'center' });
+            y += 10;
+            doc.setLineWidth(0.5);
+            doc.line(15, y, 195, y);
+            y += 8;
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Personal Information', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.text(`Name: ${clientData.basicInfo?.name || 'Not provided'}`, 15, y);
+            y += 6;
+            doc.text(`Age: ${clientData.basicInfo?.age || 'Not provided'}`, 15, y);
+            y += 6;
+            doc.text(`Occupation: ${clientData.basicInfo?.occupation || 'Not provided'}`, 15, y);
+            y += 6;
+            doc.text(`City: ${clientData.basicInfo?.city || 'Not provided'}`, 15, y);
+            y += 10;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Financial Summary', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            const income = clientData.financialStatus?.monthlyIncome || 0;
+            const expenses = clientData.financialStatus?.monthlyExpenses || 0;
+            const savings = income - expenses;
+            const savingsRate = income ? ((savings / income) * 100).toFixed(1) : '0';
+            doc.text(`Monthly Income: ₹${formatCurrency(income)}`, 15, y);
+            y += 6;
+            doc.text(`Monthly Expenses: ₹${formatCurrency(expenses)}`, 15, y);
+            y += 6;
+            doc.text(`Monthly Savings: ₹${formatCurrency(savings)}`, 15, y);
+            y += 6;
+            doc.text(`Savings Rate: ${savingsRate}%`, 15, y);
+            y += 6;
+            doc.text(`Current Savings: ₹${formatCurrency(clientData.financialStatus?.currentSavings || 0)}`, 15, y);
+            y += 10;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Net Worth Analysis', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            const totalAssets = (clientData.assets||[]).reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = (clientData.loans||[]).reduce((sum, loan) => sum + loan.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            const netWorthStatus = netWorth > 0 ? 'Positive' : (netWorth < 0 ? 'Negative' : 'Neutral');
+            doc.text(`Total Assets: ₹${formatCurrency(totalAssets)}`, 15, y);
+            y += 6;
+            doc.text(`Total Liabilities: ₹${formatCurrency(totalLiabilities)}`, 15, y);
+            y += 6;
+            doc.text(`Net Worth: ₹${formatCurrency(netWorth)} (${netWorthStatus})`, 15, y);
+            y += 10;
+            // Asset Allocation Pie Chart (simple, 2D)
+            if ((clientData.assets||[]).length > 0) {
+                doc.setFont('helvetica', 'bold');
+                doc.text('Asset Allocation', 15, y);
+                y += 2;
+                // Pie chart center and radius
+                const cx = 45, cy = y + 25, r = 20;
+                let total = clientData.assets.reduce((sum, a) => sum + a.value, 0);
+                let startAngle = 0;
+                const colors = ['#222', '#888', '#ccc', '#444', '#aaa'];
+                clientData.assets.forEach((asset, i) => {
+                    const value = asset.value;
+                    const angle = (value / total) * 2 * Math.PI;
+                    doc.setFillColor(colors[i % colors.length]);
+                    doc.sector(cx, cy, r, startAngle, startAngle + angle, 'F');
+                    startAngle += angle;
+                });
+                // Legend
+                let legendY = cy - r;
+                clientData.assets.forEach((asset, i) => {
+                    doc.setFillColor(colors[i % colors.length]);
+                    doc.rect(cx + r + 10, legendY, 5, 5, 'F');
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.text(asset.name, cx + r + 17, legendY + 4);
+                    legendY += 7;
+                });
+                y = cy + r + 10;
+            }
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Financial Goals', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            if ((clientData.goals||[]).length > 0) {
+                (clientData.goals||[]).forEach(goal => {
+                    doc.text(`Goal: ${goal.name}`, 15, y);
+                    y += 6;
+                    doc.text(`  Target Amount: ₹${formatCurrency(goal.futureAmount)} | Timeframe: ${goal.timeframe} years | Priority: ${goal.priority}`, 15, y);
+                    y += 6;
+                    if (y > 270) { doc.addPage(); y = 15; }
+                });
+            } else {
+                doc.text('No financial goals defined yet.', 15, y);
+                y += 6;
+            }
+            y += 4;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Investment Profile', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.text(`Personality Type: ${clientData.assessmentResults?.personalityType || 'Not assessed'}`, 15, y);
+            y += 6;
+            doc.text(`Risk Tolerance: ${clientData.riskProfile?.tolerance || 'Not defined'}`, 15, y);
+            y += 6;
+            doc.text(`Investment Horizon: ${clientData.riskProfile?.horizon || 'Not defined'}`, 15, y);
+            y += 6;
+            doc.text(`Monthly Investment Capacity: ₹${formatCurrency(clientData.riskProfile?.monthlyInvestment || 0)}`, 15, y);
+            doc.save('Financial_Report.pdf');
         }
 
         function downloadDetailedReport() {
-            showAlert('PDF report download is being enhanced. Coming soon!', 'info');
+            const doc = new jspdf.jsPDF('p', 'mm', 'a4');
+            let y = 15;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(20);
+            doc.text('Detailed Financial Report', 105, y, { align: 'center' });
+            y += 10;
+            doc.setLineWidth(0.5);
+            doc.line(15, y, 195, y);
+            y += 8;
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Personal Information', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.text(`Name: ${clientData.basicInfo?.name || 'Not provided'}`, 15, y);
+            y += 6;
+            doc.text(`Age: ${clientData.basicInfo?.age || 'Not provided'}`, 15, y);
+            y += 6;
+            doc.text(`Occupation: ${clientData.basicInfo?.occupation || 'Not provided'}`, 15, y);
+            y += 6;
+            doc.text(`City: ${clientData.basicInfo?.city || 'Not provided'}`, 15, y);
+            y += 10;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Financial Summary', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            const income = clientData.financialStatus?.monthlyIncome || 0;
+            const expenses = clientData.financialStatus?.monthlyExpenses || 0;
+            const savings = income - expenses;
+            const savingsRate = income ? ((savings / income) * 100).toFixed(1) : '0';
+            doc.text(`Monthly Income: ₹${formatCurrency(income)}`, 15, y);
+            y += 6;
+            doc.text(`Monthly Expenses: ₹${formatCurrency(expenses)}`, 15, y);
+            y += 6;
+            doc.text(`Monthly Savings: ₹${formatCurrency(savings)}`, 15, y);
+            y += 6;
+            doc.text(`Savings Rate: ${savingsRate}%`, 15, y);
+            y += 6;
+            doc.text(`Current Savings: ₹${formatCurrency(clientData.financialStatus?.currentSavings || 0)}`, 15, y);
+            y += 10;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Net Worth Analysis', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            const totalAssets = (clientData.assets||[]).reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = (clientData.loans||[]).reduce((sum, loan) => sum + loan.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            const netWorthStatus = netWorth > 0 ? 'Positive' : (netWorth < 0 ? 'Negative' : 'Neutral');
+            doc.text(`Total Assets: ₹${formatCurrency(totalAssets)}`, 15, y);
+            y += 6;
+            doc.text(`Total Liabilities: ₹${formatCurrency(totalLiabilities)}`, 15, y);
+            y += 6;
+            doc.text(`Net Worth: ₹${formatCurrency(netWorth)} (${netWorthStatus})`, 15, y);
+            y += 10;
+            // Asset Allocation Pie Chart (simple, 2D)
+            if ((clientData.assets||[]).length > 0) {
+                doc.setFont('helvetica', 'bold');
+                doc.text('Asset Allocation', 15, y);
+                y += 2;
+                // Pie chart center and radius
+                const cx = 45, cy = y + 25, r = 20;
+                let total = clientData.assets.reduce((sum, a) => sum + a.value, 0);
+                let startAngle = 0;
+                const colors = ['#222', '#888', '#ccc', '#444', '#aaa'];
+                clientData.assets.forEach((asset, i) => {
+                    const value = asset.value;
+                    const angle = (value / total) * 2 * Math.PI;
+                    doc.setFillColor(colors[i % colors.length]);
+                    doc.sector(cx, cy, r, startAngle, startAngle + angle, 'F');
+                    startAngle += angle;
+                });
+                // Legend
+                let legendY = cy - r;
+                clientData.assets.forEach((asset, i) => {
+                    doc.setFillColor(colors[i % colors.length]);
+                    doc.rect(cx + r + 10, legendY, 5, 5, 'F');
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.text(asset.name, cx + r + 17, legendY + 4);
+                    legendY += 7;
+                });
+                y = cy + r + 10;
+            }
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Financial Goals', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            if ((clientData.goals||[]).length > 0) {
+                (clientData.goals||[]).forEach(goal => {
+                    doc.text(`Goal: ${goal.name}`, 15, y);
+                    y += 6;
+                    doc.text(`  Target Amount: ₹${formatCurrency(goal.futureAmount)} | Timeframe: ${goal.timeframe} years | Priority: ${goal.priority}`, 15, y);
+                    y += 6;
+                    if (y > 270) { doc.addPage(); y = 15; }
+                });
+            } else {
+                doc.text('No financial goals defined yet.', 15, y);
+                y += 6;
+            }
+            y += 4;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Investment Profile', 15, y);
+            y += 7;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(12);
+            doc.text(`Personality Type: ${clientData.assessmentResults?.personalityType || 'Not assessed'}`, 15, y);
+            y += 6;
+            doc.text(`Risk Tolerance: ${clientData.riskProfile?.tolerance || 'Not defined'}`, 15, y);
+            y += 6;
+            doc.text(`Investment Horizon: ${clientData.riskProfile?.horizon || 'Not defined'}`, 15, y);
+            y += 6;
+            doc.text(`Monthly Investment Capacity: ₹${formatCurrency(clientData.riskProfile?.monthlyInvestment || 0)}`, 15, y);
+            doc.save('Financial_Report.pdf');
+        }
+
+        function generateInvestmentReport() {
+            showAlert('Investment strategy report generation is being enhanced. Coming soon!', 'info');
+        }
+
+        function downloadInvestmentReport() {
+            showAlert('Investment strategy report download is being enhanced. Coming soon!', 'info');
+        }
+
+        function generateActionPlan() {
+            showAlert('Action plan report generation is being enhanced. Coming soon!', 'info');
+        }
+
+        function downloadActionPlan() {
+            showAlert('Action plan report download is being enhanced. Coming soon!', 'info');
+        }
+
+        function generateRiskReport() {
+            showAlert('Risk assessment report generation is being enhanced. Coming soon!', 'info');
+        }
+
+        function downloadRiskReport() {
+            showAlert('Risk assessment report download is being enhanced. Coming soon!', 'info');
         }
 
         function generateExecutiveSummary() {
             showAlert('AI-powered executive summary is being enhanced. Coming soon!', 'info');
+        }
+
+        function generateQuickInsights() {
+            showAlert('Quick insights generation is being enhanced. Coming soon!', 'info');
+        }
+
+        function refreshAlerts() {
+            showAlert('Refreshing alerts...', 'info');
+            // Implement logic to refresh alerts
+        }
+
+        function configureAlerts() {
+            showAlert('Configuring alerts...', 'info');
+            // Implement logic to configure alerts
+        }
+
+        function calculateLoanDetails() {
+            showAlert('Calculating loan details...', 'info');
+            // Implement logic to calculate loan details
+        }
+
+        function calculateAdvancedSIPReturns() {
+            showAlert('Calculating advanced SIP returns...', 'info');
+            // Implement logic to calculate advanced SIP returns
+        }
+
+        function calculateAdvancedRetirement() {
+            showAlert('Calculating advanced retirement needs...', 'info');
+            // Implement logic to calculate advanced retirement needs
+        }
+
+        function generateAdvancedTaxPlan() {
+            showAlert('Generating advanced tax plan...', 'info');
+            // Implement logic to generate advanced tax plan
+        }
+
+        function addBudgetItem() {
+            showAlert('Adding budget item...', 'info');
+            // Implement logic to add budget item
+        }
+
+        function addInvestment() {
+            showAlert('Adding investment...', 'info');
+            // Implement logic to add investment
+        }
+
+        function analyzeAdvancedPortfolio() {
+            showAlert('Analyzing advanced portfolio...', 'info');
+            // Implement logic to analyze advanced portfolio
+        }
+
+        function generateRebalancingPlan() {
+            showAlert('Generating rebalancing plan...', 'info');
+            // Implement logic to generate rebalancing plan
+        }
+
+        function performRiskAnalysis() {
+            showAlert('Performing risk analysis...', 'info');
+            // Implement logic to perform risk analysis
+        }
+
+        function loadFinancialCalendar() {
+            showAlert('Loading financial calendar...', 'info');
+            // Implement logic to load financial calendar
+        }
+
+        function addFinancialEvent() {
+            showAlert('Adding financial event...', 'info');
+            // Implement logic to add financial event
         }
 
         // Add CSS for typing indicator animation
@@ -4812,6 +5519,49 @@
         styleSheet.textContent = typingCSS;
         document.head.appendChild(styleSheet);
 
+        // Animation on scroll for cards/sections
+        function animateOnScroll() {
+          const animatedEls = document.querySelectorAll('.card, .profile-card, .cover-content, .section');
+          animatedEls.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 60) {
+              el.setAttribute('data-animate', '');
+            }
+          });
+        }
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('DOMContentLoaded', animateOnScroll);
+
+        // Expandable card logic
+        function setupExpandableCards() {
+          document.querySelectorAll('.expandable-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+              // Prevent toggling if clicking inside expand-content (e.g., on a button)
+              if (e.target.closest('.expand-content')) return;
+              card.classList.toggle('expanded');
+            });
+          });
+        }
+        window.addEventListener('DOMContentLoaded', setupExpandableCards);
+
+        // After clicking on 'Client Profile', scroll to the 'Assessment' section
+        function scrollToAssessment() {
+          const assessmentSection = document.getElementById('personality');
+          if (assessmentSection) {
+            assessmentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+        // Attach scrollToAssessment to the Client Profile button if it exists
+        window.addEventListener('DOMContentLoaded', function() {
+          const clientProfileBtn = document.querySelector("button[onclick*='showMainSection']");
+          if (clientProfileBtn) {
+            clientProfileBtn.addEventListener('click', function() {
+              setTimeout(scrollToAssessment, 400); // Wait for section to show
+            });
+          }
+        });
     </script>
 </body>
+<!-- Version: 1.0.0 | Last updated: 2025-07-23 18:24 -->
+<footer style="text-align:center;color:#888;font-size:12px;margin:24px 0 8px 0;">Version: 1.0.0 | Last updated: 2025-07-23 18:24</footer>
 </html>

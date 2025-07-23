@@ -473,18 +473,215 @@
             min-width: 220px;
         }
 
-        /* Enhanced Main App Layout */
+        /* Enhanced Main App Layout with Sidebar */
         .main-app {
             display: none;
             min-height: 100vh;
             background: var(--primary-black);
         }
 
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Modern Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: var(--gradient-card);
+            border-right: 2px solid var(--border-gray);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 1.5rem 1rem;
+            justify-content: center;
+        }
+
+        .sidebar-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--secondary-black);
+            color: var(--text-white);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            display: none;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: var(--secondary-black);
+            color: var(--text-white);
+            border-left-color: var(--accent-white);
+        }
+
+        .nav-link.active {
+            background: var(--secondary-black);
+            color: var(--text-white);
+            border-left-color: var(--accent-white);
+            position: relative;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent-white);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .nav-arrow {
+            margin-left: auto;
+            font-size: 0.8rem;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-item.expanded .nav-arrow {
+            transform: rotate(90deg);
+        }
+
+        .nav-submenu {
+            display: none;
+            background: var(--primary-black);
+            border-top: 1px solid var(--border-gray);
+        }
+
+        .nav-item.expanded .nav-submenu {
+            display: block;
+        }
+
+        .nav-sublink {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem 0.8rem 3rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            font-size: 0.9rem;
+        }
+
+        .nav-sublink:hover {
+            background: var(--secondary-black);
+            color: var(--text-white);
+        }
+
+        .nav-sublink.active {
+            background: var(--secondary-black);
+            color: var(--text-white);
+            position: relative;
+        }
+
+        .nav-sublink.active::before {
+            content: '';
+            position: absolute;
+            left: 2.5rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-white);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            transition: var(--transition-smooth);
+            min-height: 100vh;
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: 70px;
+        }
+
         /* Premium Header */
         .app-header {
             background: var(--gradient-card);
             border-bottom: 2px solid var(--border-gray);
-            padding: 1rem 0;
+            padding: 1rem 2rem;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -497,6 +694,12 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+        }
+
+        .breadcrumb {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-white);
         }
 
         .app-logo {
@@ -594,11 +797,129 @@
             box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
         }
 
+        /* Dashboard Layout */
+        .dashboard {
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-gray);
+            font-size: 1.1rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-card {
+            background: var(--gradient-card);
+            border: 2px solid var(--border-gray);
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-bounce);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-light);
+            border-color: var(--accent-white);
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+            transform: scaleX(0);
+            transition: var(--transition-smooth);
+        }
+
+        .dashboard-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-white);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: var(--text-gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .card-action {
+            margin-top: auto;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--border-radius-md);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
         /* Premium Section Layout */
         .section {
             display: none;
-            padding: 3rem 0;
-            min-height: calc(100vh - 200px);
+            padding: 2rem;
+            min-height: calc(100vh - 100px);
         }
 
         .section.active {
@@ -1519,6 +1840,37 @@
         }
 
         @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.collapsed {
+                width: 100%;
+                transform: translateX(-100%);
+            }
+
+                                .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar.collapsed + .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
             .profile-card {
                 padding: 2rem;
             }
@@ -1544,20 +1896,12 @@
             .header-content {
                 flex-direction: column;
                 text-align: center;
+                gap: 0.5rem;
             }
             
             .profile-info-header {
                 justify-content: center;
-            }
-            
-            .nav-buttons, .sub-nav-buttons {
-                justify-content: flex-start;
-                overflow-x: auto;
-                padding-bottom: 0.5rem;
-            }
-            
-            .nav-btn, .sub-nav-btn {
-                flex-shrink: 0;
+                flex-wrap: wrap;
             }
             
             .widgets-grid {
@@ -1576,6 +1920,14 @@
             .modal-content {
                 padding: 1.5rem;
                 margin: 1rem;
+            }
+
+            .app-header {
+                padding: 1rem;
+            }
+
+            .breadcrumb {
+                font-size: 1.1rem;
             }
         }
 
@@ -1658,6 +2010,18 @@
         *:focus {
             outline: 2px solid rgba(255, 255, 255, 0.3);
             outline-offset: 2px;
+        }
+
+        /* Mobile Overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
         }
 
         /* Print Styles */
@@ -1755,142 +2119,281 @@
 
     <!-- Advanced Main Application -->
     <div id="main-app" class="main-app">
-        <!-- Premium Header -->
-        <header class="app-header">
-            <div class="container">
-                <div class="header-content">
-                    <div class="app-logo">
+        <div class="app-layout">
+            <!-- Modern Sidebar Navigation -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">
                         <i class="fas fa-chart-line"></i>
-                        Financial Planner Pro
+                        <span class="sidebar-text">FinPro</span>
                     </div>
-                    <div class="profile-info-header">
-                        <div class="current-profile">
-                            <i class="fas fa-user-circle"></i>
-                            <span id="current-profile-name">Profile Name</span>
-                            <span id="current-profile-status" class="profile-status">●</span>
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <!-- Dashboard Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Overview</div>
+                        <div class="nav-item">
+                            <a class="nav-link active" onclick="showSection('dashboard')">
+                                <i class="nav-icon fas fa-home"></i>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
                         </div>
-                        <button class="btn btn-small btn-primary" onclick="saveCurrentProfile()">
-                            <i class="fas fa-save"></i> Save
-                        </button>
-                        <button class="btn btn-small btn-secondary" onclick="showExportModal()">
-                            <i class="fas fa-download"></i> Export
-                        </button>
-                        <button class="btn btn-small btn-secondary" onclick="showSettingsModal()">
-                            <i class="fas fa-cog"></i> Settings
-                        </button>
-                        <button class="btn btn-small btn-secondary" onclick="goBackToProfiles()">
-                            <i class="fas fa-home"></i> Home
-                        </button>
                     </div>
-                </div>
-            </div>
-        </header>
 
-        <!-- Advanced Navigation -->
-        <nav class="main-nav">
-            <div class="container">
-                <div class="nav-buttons">
-                    <button class="nav-btn active" onclick="showMainSection('client-data')">
-                        <i class="fas fa-user-edit"></i> Client Data
-                    </button>
-                    <button class="nav-btn" onclick="showMainSection('investment-advisory')">
-                        <i class="fas fa-chart-line"></i> Investment Advisory
-                    </button>
-                    <button class="nav-btn" onclick="showMainSection('analytics-reports')">
-                        <i class="fas fa-analytics"></i> Analytics & Reports
-                    </button>
-                    <button class="nav-btn" onclick="showMainSection('advanced-tools')">
-                        <i class="fas fa-tools"></i> Advanced Tools
-                    </button>
-                </div>
-            </div>
-        </nav>
+                    <!-- Client Data Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Client Data</div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="toggleNavItem(this)">
+                                <i class="nav-icon fas fa-user-edit"></i>
+                                <span class="nav-text">Client Profile</span>
+                                <i class="nav-arrow fas fa-chevron-right"></i>
+                            </a>
+                            <div class="nav-submenu">
+                                <a class="nav-sublink" onclick="showSection('personality')">
+                                    <i class="fas fa-brain"></i> Assessment
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('profile')">
+                                    <i class="fas fa-id-card"></i> Basic Info
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('financial')">
+                                    <i class="fas fa-wallet"></i> Financial Status
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('networth')">
+                                    <i class="fas fa-calculator"></i> Net Worth
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('goals')">
+                                    <i class="fas fa-bullseye"></i> Goals & Insurance
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('risk')">
+                                    <i class="fas fa-chart-area"></i> Risk Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Enhanced Sub Navigation -->
-        <nav class="sub-nav">
-            <div class="container">
-                <!-- Client Data Sub-nav -->
-                <div id="client-data-subnav" class="sub-nav-buttons">
-                    <button class="sub-nav-btn active" onclick="showSubSection('personality', this)">
-                        <i class="fas fa-brain"></i> Assessment
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('profile', this)">
-                        <i class="fas fa-id-card"></i> Basic Info
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('financial', this)">
-                        <i class="fas fa-wallet"></i> Financial Status
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('networth', this)">
-                        <i class="fas fa-calculator"></i> Net Worth
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('goals', this)">
-                        <i class="fas fa-bullseye"></i> Goals & Insurance
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('risk', this)">
-                        <i class="fas fa-chart-area"></i> Risk Profile
-                    </button>
-                </div>
+                    <!-- Investment Advisory Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Advisory</div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="toggleNavItem(this)">
+                                <i class="nav-icon fas fa-chart-line"></i>
+                                <span class="nav-text">Investment Advisory</span>
+                                <i class="nav-arrow fas fa-chevron-right"></i>
+                            </a>
+                            <div class="nav-submenu">
+                                <a class="nav-sublink" onclick="showSection('recommendations')">
+                                    <i class="fas fa-lightbulb"></i> Investment Plan
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('portfolio')">
+                                    <i class="fas fa-pie-chart"></i> Portfolio Analysis
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('sip')">
+                                    <i class="fas fa-calendar-check"></i> SIP Calculator
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('tax')">
+                                    <i class="fas fa-receipt"></i> Tax Planning
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('retirement')">
+                                    <i class="fas fa-umbrella"></i> Retirement
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('comparison')">
+                                    <i class="fas fa-balance-scale"></i> Product Compare
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Investment Advisory Sub-nav -->
-                <div id="investment-advisory-subnav" class="sub-nav-buttons" style="display: none;">
-                    <button class="sub-nav-btn active" onclick="showSubSection('recommendations', this)">
-                        <i class="fas fa-lightbulb"></i> Investment Plan
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('portfolio', this)">
-                        <i class="fas fa-pie-chart"></i> Portfolio Analysis
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('sip', this)">
-                        <i class="fas fa-calendar-check"></i> SIP Calculator
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('tax', this)">
-                        <i class="fas fa-receipt"></i> Tax Planning
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('retirement', this)">
-                        <i class="fas fa-umbrella"></i> Retirement
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('comparison', this)">
-                        <i class="fas fa-balance-scale"></i> Product Compare
-                    </button>
-                </div>
+                    <!-- Analytics & Reports Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Reports</div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="toggleNavItem(this)">
+                                <i class="nav-icon fas fa-chart-bar"></i>
+                                <span class="nav-text">Analytics & Reports</span>
+                                <i class="nav-arrow fas fa-chevron-right"></i>
+                            </a>
+                            <div class="nav-submenu">
+                                <a class="nav-sublink" onclick="showSection('analytics')">
+                                    <i class="fas fa-chart-bar"></i> Analytics
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('reports')">
+                                    <i class="fas fa-file-alt"></i> Reports
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('summary')">
+                                    <i class="fas fa-clipboard-list"></i> Executive Summary
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('alerts')">
+                                    <i class="fas fa-bell"></i> Smart Alerts
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Analytics & Reports Sub-nav -->
-                <div id="analytics-reports-subnav" class="sub-nav-buttons" style="display: none;">
-                    <button class="sub-nav-btn active" onclick="showSubSection('analytics', this)">
-                        <i class="fas fa-chart-bar"></i> Analytics
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('reports', this)">
-                        <i class="fas fa-file-alt"></i> Reports
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('summary', this)">
-                        <i class="fas fa-clipboard-list"></i> Executive Summary
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('alerts', this)">
-                        <i class="fas fa-bell"></i> Smart Alerts
-                    </button>
-                </div>
+                    <!-- Financial Tools Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">Tools</div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="toggleNavItem(this)">
+                                <i class="nav-icon fas fa-tools"></i>
+                                <span class="nav-text">Financial Tools</span>
+                                <i class="nav-arrow fas fa-chevron-right"></i>
+                            </a>
+                            <div class="nav-submenu">
+                                <a class="nav-sublink" onclick="showSection('loan-calculator')">
+                                    <i class="fas fa-home"></i> Loan Calculator
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('budget-planner')">
+                                    <i class="fas fa-chart-pie"></i> Budget Planner
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('investment-tracker')">
+                                    <i class="fas fa-trending-up"></i> Investment Tracker
+                                </a>
+                                <a class="nav-sublink" onclick="showSection('financial-calendar')">
+                                    <i class="fas fa-calendar-alt"></i> Financial Calendar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </aside>
 
-                <!-- Advanced Tools Sub-nav -->
-                <div id="advanced-tools-subnav" class="sub-nav-buttons" style="display: none;">
-                    <button class="sub-nav-btn active" onclick="showSubSection('loan-calculator', this)">
-                        <i class="fas fa-home"></i> Loan Calculator
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('budget-planner', this)">
-                        <i class="fas fa-chart-pie"></i> Budget Planner
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('investment-tracker', this)">
-                        <i class="fas fa-trending-up"></i> Investment Tracker
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('financial-calendar', this)">
-                        <i class="fas fa-calendar-alt"></i> Financial Calendar
-                    </button>
-                </div>
-            </div>
-        </nav>
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Premium Header -->
+                <header class="app-header">
+                    <div class="header-content">
+                        <div class="breadcrumb">
+                            <span id="current-section-title">Dashboard</span>
+                        </div>
+                        <div class="profile-info-header">
+                            <div class="current-profile">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="current-profile-name">Profile Name</span>
+                                <span id="current-profile-status" class="profile-status">●</span>
+                            </div>
+                            <button class="btn btn-small btn-primary" onclick="saveCurrentProfile()">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                            <button class="btn btn-small btn-secondary" onclick="showExportModal()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-small btn-secondary" onclick="showSettingsModal()">
+                                <i class="fas fa-cog"></i> Settings
+                            </button>
+                            <button class="btn btn-small btn-secondary" onclick="goBackToProfiles()">
+                                <i class="fas fa-home"></i> Home
+                            </button>
+                        </div>
+                    </div>
+                </header>
 
-        <!-- Sections Container -->
-        <main class="container">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="section active">
+                    <div class="dashboard">
+                        <div class="dashboard-header" data-aos="fade-down">
+                            <h1 class="dashboard-title">Financial Dashboard</h1>
+                            <p class="dashboard-subtitle">Your comprehensive financial overview and quick access to all planning tools</p>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="quick-stats" data-aos="fade-up" data-aos-delay="200">
+                            <div class="stat-card">
+                                <div class="stat-value" id="dashboard-net-worth">₹0</div>
+                                <div class="stat-label">Net Worth</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="dashboard-monthly-savings">₹0</div>
+                                <div class="stat-label">Monthly Savings</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="dashboard-investment-value">₹0</div>
+                                <div class="stat-label">Investments</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="dashboard-financial-score">0%</div>
+                                <div class="stat-label">Financial Health</div>
+                            </div>
+                        </div>
+
+                        <!-- Main Dashboard Cards -->
+                        <div class="dashboard-grid" data-aos="fade-up" data-aos-delay="300">
+                            <div class="dashboard-card">
+                                <div class="card-icon"><i class="fas fa-brain"></i></div>
+                                <h3 class="card-title">Financial Assessment</h3>
+                                <p class="card-description">Discover your investment personality and risk profile through our advanced AI-powered assessment.</p>
+                                <div class="card-action">
+                                    <button class="btn btn-primary" onclick="showSection('personality')">
+                                        <i class="fas fa-play"></i> Start Assessment
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card">
+                                <div class="card-icon"><i class="fas fa-user-edit"></i></div>
+                                <h3 class="card-title">Client Profile</h3>
+                                <p class="card-description">Build your comprehensive financial profile with personal information and financial status.</p>
+                                <div class="card-action">
+                                    <button class="btn btn-primary" onclick="showSection('profile')">
+                                        <i class="fas fa-edit"></i> Update Profile
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card">
+                                <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
+                                <h3 class="card-title">Investment Recommendations</h3>
+                                <p class="card-description">Get personalized investment strategies powered by advanced algorithms and market analysis.</p>
+                                <div class="card-action">
+                                    <button class="btn btn-primary" onclick="showSection('recommendations')">
+                                        <i class="fas fa-magic"></i> Get Recommendations
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card">
+                                <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+                                <h3 class="card-title">Portfolio Analytics</h3>
+                                <p class="card-description">Advanced analytics and performance tracking for your investment portfolio.</p>
+                                <div class="card-action">
+                                    <button class="btn btn-primary" onclick="showSection('analytics')">
+                                        <i class="fas fa-chart-line"></i> View Analytics
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card">
+                                <div class="card-icon"><i class="fas fa-file-alt"></i></div>
+                                <h3 class="card-title">Professional Reports</h3>
+                                <p class="card-description">Generate comprehensive financial reports with professional insights and recommendations.</p>
+                                <div class="card-action">
+                                    <button class="btn btn-primary" onclick="showSection('reports')">
+                                        <i class="fas fa-download"></i> Generate Reports
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card">
+                                <div class="card-icon"><i class="fas fa-tools"></i></div>
+                                <h3 class="card-title">Financial Tools</h3>
+                                <p class="card-description">Access powerful calculators and planning tools for loans, SIPs, retirement, and more.</p>
+                                <div class="card-action">
+                                    <button class="btn btn-primary" onclick="showSection('loan-calculator')">
+                                        <i class="fas fa-calculator"></i> Use Tools
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sections Container -->
             <!-- Enhanced Personality Assessment Section -->
-            <section id="personality" class="section active">
+            <section id="personality" class="section">
                 <div class="section-header" data-aos="fade-down">
                     <h2 class="section-title">
                         <i class="fas fa-brain"></i>
@@ -3291,8 +3794,12 @@
                     </div>
                 </div>
             </section>
-        </main>
+            </main>
+        </div>
     </div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay" onclick="closeMobileSidebar()"></div>
 
     <!-- Premium Chatbot -->
     <div class="chatbot-container">
@@ -3590,10 +4097,29 @@
             startAutoSave();
             loadAssessmentQuestion();
             
+            // Initialize sidebar collapse state based on screen size
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('mobile-open');
+            }
+            
+            // Initialize dashboard as the default active section
+            updateDashboardStats();
+            
             // Initialize tooltips and animations
             setTimeout(() => {
                 AOS.refresh();
             }, 100);
+        });
+
+        // Handle window resize for responsive sidebar
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('mobile-open');
+                overlay.style.display = 'none';
+            }
         });
 
         // Enhanced Event Listeners
@@ -3777,56 +4303,171 @@
         function startPersonalityAssessment() {
             document.getElementById('cover-page').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
-            showMainSection('client-data');
-            showSubSection('personality', document.querySelector('[onclick="showSubSection(\'personality\', this)"]'));
+            showSection('personality');
             loadAssessmentQuestion();
         }
 
         function startClientProfiling() {
             document.getElementById('cover-page').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
-            showMainSection('client-data');
-            showSubSection('profile', document.querySelector('[onclick="showSubSection(\'profile\', this)"]'));
+            showSection('profile');
         }
 
-        function showMainSection(section) {
-            // Hide all sub-nav groups
-            document.querySelectorAll('[id$="-subnav"]').forEach(nav => nav.style.display = 'none');
+        // New Sidebar Navigation Functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            const isMobile = window.innerWidth <= 768;
             
-            // Show selected sub-nav
-            document.getElementById(section + '-subnav').style.display = 'flex';
-            
-            // Update main navigation
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Show first sub-section of the selected main section
-            const firstSubBtn = document.querySelector(`#${section}-subnav .sub-nav-btn`);
-            if (firstSubBtn) {
-                firstSubBtn.click();
+            if (isMobile) {
+                const isOpen = sidebar.classList.toggle('mobile-open');
+                overlay.style.display = isOpen ? 'block' : 'none';
+            } else {
+                sidebar.classList.toggle('collapsed');
             }
         }
 
-        function showSubSection(section, element) {
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.remove('mobile-open');
+            overlay.style.display = 'none';
+        }
+
+        function toggleNavItem(element) {
+            const navItem = element.parentElement;
+            const isExpanded = navItem.classList.contains('expanded');
+            
+            // Close all other nav items
+            document.querySelectorAll('.nav-item.expanded').forEach(item => {
+                if (item !== navItem) {
+                    item.classList.remove('expanded');
+                }
+            });
+            
+            // Toggle current nav item
+            navItem.classList.toggle('expanded', !isExpanded);
+        }
+
+        function showSection(sectionId) {
             // Hide all sections
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             
             // Show selected section
-            document.getElementById(section).classList.add('active');
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
 
-            // Update sub-navigation
-            document.querySelectorAll('.sub-nav-btn').forEach(btn => btn.classList.remove('active'));
-            if (element) element.classList.add('active');
+            // Update navigation active states
+            document.querySelectorAll('.nav-link, .nav-sublink').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Find and activate the corresponding nav link
+            const navLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (navLink) {
+                navLink.classList.add('active');
+                
+                // If it's a sublink, also expand the parent
+                if (navLink.classList.contains('nav-sublink')) {
+                    const parentNavItem = navLink.closest('.nav-item');
+                    if (parentNavItem) {
+                        parentNavItem.classList.add('expanded');
+                        const parentLink = parentNavItem.querySelector('.nav-link');
+                        if (parentLink) {
+                            parentLink.classList.add('active');
+                        }
+                    }
+                }
+            }
+
+            // Update breadcrumb
+            updateBreadcrumb(sectionId);
 
             // Auto-save when switching sections
             if (currentProfileId) {
                 autoSave();
             }
             
+            // Update dashboard stats when switching to dashboard
+            if (sectionId === 'dashboard') {
+                updateDashboardStats();
+            }
+
+            // Close mobile sidebar when switching sections
+            if (window.innerWidth <= 768) {
+                closeMobileSidebar();
+            }
+            
             // Refresh AOS animations for the new section
             setTimeout(() => {
                 AOS.refresh();
             }, 100);
+        }
+
+        function updateBreadcrumb(sectionId) {
+            const breadcrumbTitle = document.getElementById('current-section-title');
+            const sectionTitles = {
+                'dashboard': 'Dashboard',
+                'personality': 'Financial Assessment',
+                'profile': 'Basic Information',
+                'financial': 'Financial Status',
+                'networth': 'Net Worth Calculator',
+                'goals': 'Goals & Insurance',
+                'risk': 'Risk Profile',
+                'recommendations': 'Investment Recommendations',
+                'portfolio': 'Portfolio Analysis',
+                'sip': 'SIP Calculator',
+                'tax': 'Tax Planning',
+                'retirement': 'Retirement Planning',
+                'comparison': 'Product Comparison',
+                'analytics': 'Analytics Dashboard',
+                'reports': 'Professional Reports',
+                'summary': 'Executive Summary',
+                'alerts': 'Smart Alerts',
+                'loan-calculator': 'Loan Calculator',
+                'budget-planner': 'Budget Planner',
+                'investment-tracker': 'Investment Tracker',
+                'financial-calendar': 'Financial Calendar'
+            };
+            
+            if (breadcrumbTitle && sectionTitles[sectionId]) {
+                breadcrumbTitle.textContent = sectionTitles[sectionId];
+            }
+        }
+
+        function updateDashboardStats() {
+            // Update dashboard statistics with current data
+            const netWorthElement = document.getElementById('dashboard-net-worth');
+            const monthlySavingsElement = document.getElementById('dashboard-monthly-savings');
+            const investmentValueElement = document.getElementById('dashboard-investment-value');
+            const financialScoreElement = document.getElementById('dashboard-financial-score');
+
+            if (clientData.financialStatus) {
+                const netWorth = (clientData.financialStatus.currentSavings || 0) - (clientData.financialStatus.currentDebt || 0);
+                const monthlySavings = clientData.financialStatus.monthlySavings || 0;
+                const savingsRate = clientData.financialStatus.savingsRate || 0;
+
+                if (netWorthElement) netWorthElement.textContent = `₹${formatCurrency(netWorth)}`;
+                if (monthlySavingsElement) monthlySavingsElement.textContent = `₹${formatCurrency(monthlySavings)}`;
+                if (financialScoreElement) financialScoreElement.textContent = `${Math.round(savingsRate)}%`;
+            }
+
+            // Calculate total investment value from assets
+            let totalInvestments = 0;
+            if (clientData.assets) {
+                totalInvestments = clientData.assets.reduce((sum, asset) => {
+                    if (asset.type === 'stocks' || asset.type === 'crypto' || asset.type === 'business') {
+                        return sum + (asset.value || 0);
+                    }
+                    return sum;
+                }, 0);
+            }
+
+            if (investmentValueElement) {
+                investmentValueElement.textContent = `₹${formatCurrency(totalInvestments)}`;
+            }
         }
 
         // Enhanced Auto-save System
@@ -4021,7 +4662,7 @@
         }
 
         function proceedToClientProfiling() {
-            showSubSection('profile', document.querySelector('[onclick="showSubSection(\'profile\', this)"]'));
+            showSection('profile');
         }
 
         // Enhanced Basic Info Functions

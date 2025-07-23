@@ -58,16 +58,25 @@
             position: relative;
         }
 
-        /* Enhanced Container System */
+        /* Enhanced Container System - COMPLETELY FIXED */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         .container-fluid {
             width: 100%;
             padding: 0 1rem;
+            position: relative;
         }
 
         /* Stunning Profile Management Screen */
@@ -492,7 +501,7 @@
             min-height: 100vh;
         }
 
-        /* Modern Sidebar Navigation - COMPLETELY FIXED */
+        /* Modern Sidebar Navigation - ULTIMATE FIX */
         .sidebar {
             width: 280px;
             background: var(--gradient-card);
@@ -501,11 +510,12 @@
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            z-index: 100;
+            z-index: 1000;
             transition: var(--transition-smooth);
             left: 0;
             top: 0;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
         }
 
         .sidebar.collapsed {
@@ -676,33 +686,38 @@
             background: var(--accent-white);
         }
 
-        /* Main Content Area - COMPLETELY FIXED */
+        /* Main Content Area - ULTIMATE FIX */
         .main-content {
             margin-left: 280px;
-            width: calc(100% - 280px);
+            width: calc(100vw - 280px);
             min-height: 100vh;
             transition: var(--transition-smooth);
             position: relative;
             z-index: 1;
             background: var(--primary-black);
+            overflow-x: hidden;
+            flex: 1;
+            padding: 0;
         }
 
         .sidebar.collapsed + .main-content {
             margin-left: 70px;
-            width: calc(100% - 70px);
+            width: calc(100vw - 70px);
         }
 
-        /* Premium Header - COMPLETELY FIXED */
+        /* Premium Header - ULTIMATE FIX */
         .app-header {
             background: var(--gradient-card);
             border-bottom: 2px solid var(--border-gray);
             padding: 1rem 2rem;
             position: sticky;
             top: 0;
-            z-index: 50;
+            z-index: 500;
             backdrop-filter: blur(20px);
             width: 100%;
             box-sizing: border-box;
+            margin: 0;
+            left: 0;
         }
 
         .header-content {
@@ -2157,21 +2172,25 @@
             }
         }
 
-        /* CRITICAL OVERLAP FIXES */
+        /* CRITICAL OVERLAP FIXES - ULTIMATE */
         .section {
             position: relative;
             z-index: 1;
             background: var(--primary-black);
             min-height: auto;
             clear: both;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 2rem;
+            margin: 0;
         }
 
         .section.active {
-            display: block;
+            display: block !important;
         }
 
         .section:not(.active) {
-            display: none;
+            display: none !important;
         }
 
         /* Ensure no elements escape their containers */
@@ -7415,28 +7434,52 @@
         }
 
         function showReportPreview(content, title) {
-            const previewContainer = document.getElementById('report-preview');
-            const reportContent = document.getElementById('report-content');
+            console.log('Showing report preview for:', title);
             
-            reportContent.innerHTML = `
-                <div style="max-height: 70vh; overflow-y: auto; padding: 1rem;">
-                    ${content}
-                </div>
-                <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-gray);">
-                    <button class="btn btn-primary" onclick="downloadPDFReport('${title}')">
-                        <i class="fas fa-download"></i> Download PDF
-                    </button>
-                    <button class="btn btn-secondary" onclick="printReport()">
-                        <i class="fas fa-print"></i> Print Report
-                    </button>
-                </div>
-            `;
-            
-            previewContainer.style.display = 'block';
-            previewContainer.scrollIntoView({ behavior: 'smooth' });
+            try {
+                const previewContainer = document.getElementById('report-preview');
+                const reportContent = document.getElementById('report-content');
+                
+                if (!previewContainer || !reportContent) {
+                    console.error('Report preview elements not found');
+                    showAlert('Report preview elements not found', 'error');
+                    return;
+                }
+                
+                reportContent.innerHTML = `
+                    <div style="max-height: 70vh; overflow-y: auto; padding: 1rem; background: var(--primary-black); color: var(--text-white);">
+                        ${content}
+                    </div>
+                    <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-gray);">
+                        <button class="btn btn-primary" onclick="downloadPDFReport('${title}')">
+                            <i class="fas fa-download"></i> Download PDF
+                        </button>
+                        <button class="btn btn-secondary" onclick="printReport()" style="margin-left: 1rem;">
+                            <i class="fas fa-print"></i> Print Report
+                        </button>
+                        <button class="btn btn-outline" onclick="closeReportPreview()" style="margin-left: 1rem;">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                    </div>
+                `;
+                
+                previewContainer.style.display = 'block';
+                previewContainer.scrollIntoView({ behavior: 'smooth' });
+                
+                showAlert('Report preview generated successfully!', 'success');
+                
+                         } catch (error) {
+                 console.error('Error showing report preview:', error);
+                 showAlert('Error showing report preview: ' + error.message, 'error');
+             }
         }
 
         function closeReportPreview() {
+            const previewContainer = document.getElementById('report-preview');
+            if (previewContainer) {
+                previewContainer.style.display = 'none';
+            }
+        }
             document.getElementById('report-preview').style.display = 'none';
         }
 

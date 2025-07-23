@@ -1,0 +1,241 @@
+{
+  "profileInfo": {
+    "lastModified": "2024-12-19T10:30:00.000Z",
+    "version": "1.0",
+    "profileName": "Sample Financial Profile"
+  },
+  "basicInfo": {
+    "fullName": "Rahul Sharma",
+    "age": 32,
+    "email": "rahul.sharma@email.com",
+    "phone": "+91-9876543210",
+    "occupation": "Software Engineer",
+    "city": "Bangalore",
+    "maritalStatus": "married",
+    "dependents": 2
+  },
+  "financialStatus": {
+    "monthlyIncome": 85000,
+    "monthlyExpenses": 55000,
+    "monthlySavings": 30000,
+    "currentSavings": 650000,
+    "fixedDeposits": 200000,
+    "emergencyFund": 300000,
+    "otherInvestments": 150000,
+    "totalAssets": 1300000,
+    "totalLiabilities": 450000,
+    "netWorth": 850000
+  },
+  "riskProfile": {
+    "riskScore": 7,
+    "horizon": "Long Term (>5 years)",
+    "experience": "intermediate",
+    "monthlyInvestment": 25000,
+    "goalType": "wealth_building",
+    "riskTolerance": "moderate_aggressive"
+  },
+  "goals": [
+    {
+      "id": 1640123456789,
+      "name": "Child Education",
+      "targetAmount": 2500000,
+      "timeHorizon": 15,
+      "currentAmount": 150000,
+      "monthlyContribution": 8000,
+      "priority": "high"
+    },
+    {
+      "id": 1640123456790,
+      "name": "Retirement Planning",
+      "targetAmount": 15000000,
+      "timeHorizon": 25,
+      "currentAmount": 400000,
+      "monthlyContribution": 15000,
+      "priority": "high"
+    },
+    {
+      "id": 1640123456791,
+      "name": "Dream Home",
+      "targetAmount": 8000000,
+      "timeHorizon": 8,
+      "currentAmount": 500000,
+      "monthlyContribution": 20000,
+      "priority": "medium"
+    }
+  ],
+  "assets": [
+    {
+      "id": 1640123456792,
+      "type": "Property",
+      "name": "Current Residence",
+      "value": 4500000,
+      "purchaseDate": "2020-03-15",
+      "appreciationRate": 8
+    },
+    {
+      "id": 1640123456793,
+      "type": "Vehicle",
+      "name": "Honda City",
+      "value": 850000,
+      "purchaseDate": "2022-01-10",
+      "depreciationRate": 15
+    },
+    {
+      "id": 1640123456794,
+      "type": "Jewelry",
+      "name": "Gold Ornaments",
+      "value": 350000,
+      "purchaseDate": "2021-11-05",
+      "appreciationRate": 6
+    }
+  ],
+  "liabilities": [
+    {
+      "id": 1640123456795,
+      "type": "Home Loan",
+      "amount": 2800000,
+      "interestRate": 8.5,
+      "tenure": 20,
+      "monthlyEMI": 24000,
+      "remainingAmount": 2200000
+    },
+    {
+      "id": 1640123456796,
+      "type": "Car Loan",
+      "amount": 650000,
+      "interestRate": 9.2,
+      "tenure": 5,
+      "monthlyEMI": 13500,
+      "remainingAmount": 380000
+    }
+  ],
+  "investments": [
+    {
+      "id": 1640123456797,
+      "name": "HDFC Sensex Index Fund",
+      "type": "Mutual Fund",
+      "amount": 150000,
+      "currentValue": 185000,
+      "purchaseDate": "2023-01-15",
+      "addedDate": "2023-01-15"
+    },
+    {
+      "id": 1640123456798,
+      "name": "ICICI Prudential Bluechip Fund",
+      "type": "Mutual Fund",
+      "amount": 200000,
+      "currentValue": 235000,
+      "purchaseDate": "2022-06-10",
+      "addedDate": "2022-06-10"
+    },
+    {
+      "id": 1640123456799,
+      "name": "Infosys Ltd",
+      "type": "Equity",
+      "amount": 100000,
+      "currentValue": 125000,
+      "purchaseDate": "2023-03-20",
+      "addedDate": "2023-03-20"
+    },
+    {
+      "id": 1640123456800,
+      "name": "Public Provident Fund",
+      "type": "Tax Saving",
+      "amount": 150000,
+      "currentValue": 180000,
+      "purchaseDate": "2020-04-01",
+      "addedDate": "2020-04-01"
+    }
+  ],
+  "budget": {
+    "income": [
+      {
+        "id": 1640123456801,
+        "category": "Salary",
+        "description": "Monthly Salary",
+        "amount": 85000,
+        "type": "income",
+        "date": "2024-12-01"
+      },
+      {
+        "id": 1640123456802,
+        "category": "Freelancing",
+        "description": "Part-time Projects",
+        "amount": 15000,
+        "type": "income",
+        "date": "2024-12-15"
+      }
+    ],
+    "expenses": [
+      {
+        "id": 1640123456803,
+        "category": "Housing",
+        "description": "Rent/EMI",
+        "amount": 24000,
+        "type": "expenses",
+        "date": "2024-12-01"
+      },
+      {
+        "id": 1640123456804,
+        "category": "Food",
+        "description": "Groceries & Dining",
+        "amount": 12000,
+        "type": "expenses",
+        "date": "2024-12-05"
+      },
+      {
+        "id": 1640123456805,
+        "category": "Transportation",
+        "description": "Fuel & Car EMI",
+        "amount": 18000,
+        "type": "expenses",
+        "date": "2024-12-03"
+      },
+      {
+        "id": 1640123456806,
+        "category": "Utilities",
+        "description": "Electricity, Internet, Phone",
+        "amount": 8000,
+        "type": "expenses",
+        "date": "2024-12-02"
+      },
+      {
+        "id": 1640123456807,
+        "category": "Healthcare",
+        "description": "Medical & Insurance",
+        "amount": 6000,
+        "type": "expenses",
+        "date": "2024-12-10"
+      },
+      {
+        "id": 1640123456808,
+        "category": "Entertainment",
+        "description": "Movies, Travel, Shopping",
+        "amount": 8000,
+        "type": "expenses",
+        "date": "2024-12-12"
+      }
+    ]
+  },
+  "taxProfile": {
+    "annualIncome": 1020000,
+    "currentInvestments": 150000,
+    "houseLoanInterest": 240000,
+    "medicalInsurance": 25000,
+    "donationsCharity": 10000,
+    "age": 32,
+    "taxSlab": "30%"
+  },
+  "insuranceNeeds": {
+    "lifeInsurance": {
+      "required": 8500000,
+      "current": 2000000,
+      "gap": 6500000
+    },
+    "healthInsurance": {
+      "required": 1000000,
+      "current": 500000,
+      "gap": 500000
+    }
+  }
+}

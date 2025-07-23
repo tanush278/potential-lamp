@@ -1659,6 +1659,76 @@
                 break-inside: avoid;
             }
         }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+            70% { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+        }
+        /* Card and Button Hover Effects */
+        .card, .profile-card, .cover-content, .feature-item, .widget, .export-option {
+            transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
+        }
+        .card:hover, .profile-card:hover, .cover-content:hover, .feature-item:hover, .widget:hover, .export-option:hover {
+            box-shadow: 0 8px 32px rgba(255,255,255,0.10);
+            border-color: var(--accent-white);
+            transform: translateY(-6px) scale(1.03);
+        }
+        .btn, .nav-btn, .sub-nav-btn {
+            transition: box-shadow 0.2s, transform 0.2s, filter 0.2s;
+        }
+        .btn:hover, .nav-btn:hover, .sub-nav-btn:hover {
+            filter: brightness(1.12);
+            box-shadow: 0 4px 16px rgba(255,255,255,0.10);
+            transform: scale(1.04);
+        }
+        .btn:active {
+            animation: pulse 0.4s;
+        }
+        /* Section Alternating Backgrounds */
+        .section:nth-of-type(even) {
+            background: #16171a;
+        }
+        .section:nth-of-type(odd) {
+            background: #111216;
+        }
+        /* Fade/slide-in on section/card entry */
+        .section, .card, .profile-card, .cover-content {
+            opacity: 0;
+            animation: fadeIn 0.8s forwards;
+        }
+        .section.active, .card[data-animate], .profile-card[data-animate], .cover-content[data-animate] {
+            animation: slideInUp 0.8s forwards;
+        }
+        /* Expandable Card */
+        .expandable-card {
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s;
+            max-height: 80px;
+            cursor: pointer;
+        }
+        .expandable-card.expanded {
+            max-height: 600px;
+            box-shadow: 0 8px 32px rgba(255,255,255,0.10);
+        }
+        .expandable-card .expand-content {
+            opacity: 0;
+            transition: opacity 0.4s;
+            height: 0;
+        }
+        .expandable-card.expanded .expand-content {
+            opacity: 1;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -4798,6 +4868,30 @@
         styleSheet.textContent = typingCSS;
         document.head.appendChild(styleSheet);
 
+        // Animation on scroll for cards/sections
+        function animateOnScroll() {
+          const animatedEls = document.querySelectorAll('.card, .profile-card, .cover-content, .section');
+          animatedEls.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 60) {
+              el.setAttribute('data-animate', '');
+            }
+          });
+        }
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('DOMContentLoaded', animateOnScroll);
+
+        // Expandable card logic
+        function setupExpandableCards() {
+          document.querySelectorAll('.expandable-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+              // Prevent toggling if clicking inside expand-content (e.g., on a button)
+              if (e.target.closest('.expand-content')) return;
+              card.classList.toggle('expanded');
+            });
+          });
+        }
+        window.addEventListener('DOMContentLoaded', setupExpandableCards);
     </script>
 </body>
 </html>

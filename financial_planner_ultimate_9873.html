@@ -947,10 +947,13 @@
             display: none;
             padding: 2rem;
             min-height: calc(100vh - 100px);
+            overflow-x: auto;
+            position: relative;
+            width: 100%;
         }
 
         .section.active {
-            display: block;
+            display: block !important;
             animation: sectionFadeIn 0.5s ease-out;
         }
 
@@ -4062,6 +4065,9 @@
                 <button class="btn btn-primary" onclick="importFromFile()">
                     <i class="fas fa-upload"></i> Import Data
                 </button>
+                <button class="btn btn-secondary" onclick="loadSampleData()" style="margin-left: 10px;">
+                    <i class="fas fa-database"></i> Load Sample Data
+                </button>
             </div>
         </div>
     </div>
@@ -5432,6 +5438,120 @@
                     uploadArea.querySelector('.upload-text').textContent = 'Click to select or drag & drop your file here';
                 }, 2000);
             }
+        }
+
+        // Load Sample Data Function
+        function loadSampleData() {
+            const sampleData = {
+                profileInfo: {
+                    id: "sample_" + Date.now(),
+                    created: new Date().toISOString(),
+                    lastModified: new Date().toISOString(),
+                    version: "1.0"
+                },
+                basicInfo: {
+                    name: "Rahul Sharma",
+                    age: 32,
+                    occupation: "Software Engineer",
+                    maritalStatus: "married",
+                    dependents: 2,
+                    city: "Mumbai",
+                    incomeRange: "500000-1000000",
+                    educationLevel: "Graduate"
+                },
+                financialStatus: {
+                    monthlyIncome: 85000,
+                    monthlyExpenses: 55000,
+                    monthlySavings: 30000,
+                    currentSavings: 650000,
+                    otherAssets: 1200000,
+                    totalLiabilities: 450000,
+                    emergencyFund: 300000,
+                    insuranceCoverage: 5000000
+                },
+                riskProfile: {
+                    riskScore: 7,
+                    riskCategory: "Moderate to Aggressive",
+                    investmentExperience: "Intermediate",
+                    timeHorizon: "Long-term (7+ years)",
+                    investmentGoals: ["Wealth Creation", "Tax Saving", "Retirement Planning"]
+                },
+                goals: [
+                    {
+                        name: "Dream Home",
+                        targetAmount: 5000000,
+                        timeframe: 8,
+                        priority: "High",
+                        currentProgress: 650000,
+                        monthlyContribution: 35000
+                    },
+                    {
+                        name: "Child Education",
+                        targetAmount: 2500000,
+                        timeframe: 15,
+                        priority: "High",
+                        currentProgress: 150000,
+                        monthlyContribution: 15000
+                    }
+                ],
+                assets: [
+                    { type: "Mutual Funds", value: 450000, category: "Equity" },
+                    { type: "Fixed Deposits", value: 200000, category: "Debt" },
+                    { type: "PPF", value: 180000, category: "Tax Saving" },
+                    { type: "Stocks", value: 120000, category: "Equity" }
+                ],
+                liabilities: [
+                    { type: "Home Loan", amount: 350000, emi: 28000, tenure: 15 },
+                    { type: "Personal Loan", amount: 100000, emi: 8500, tenure: 2 }
+                ],
+                investments: [
+                    { type: "SIP", amount: 25000, fund: "Large Cap Equity", frequency: "Monthly" },
+                    { type: "ELSS", amount: 12500, fund: "Tax Saver Fund", frequency: "Monthly" }
+                ],
+                budget: {
+                    income: [
+                        { category: "Salary", amount: 85000 },
+                        { category: "Bonus", amount: 10000 }
+                    ],
+                    expenses: [
+                        { category: "Housing", amount: 25000 },
+                        { category: "Food", amount: 12000 },
+                        { category: "Transportation", amount: 8000 },
+                        { category: "Utilities", amount: 5000 },
+                        { category: "Entertainment", amount: 5000 }
+                    ]
+                },
+                taxProfile: {
+                    annualIncome: 1020000,
+                    section80C: 150000,
+                    section80D: 25000,
+                    homeLoanInterest: 180000,
+                    npsContribution: 50000
+                },
+                insuranceNeeds: {
+                    lifeInsurance: 5000000,
+                    healthInsurance: 1000000,
+                    vehicleInsurance: 50000
+                }
+            };
+
+            // Load the sample data into clientData
+            clientData = { ...clientData, ...sampleData };
+            
+            // Generate new profile ID
+            currentProfileId = Date.now().toString();
+            clientData.profileInfo.lastModified = new Date().toISOString();
+            
+            // Save sample profile
+            const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+            profiles[currentProfileId] = clientData;
+            localStorage.setItem('financialPlannerProfiles', JSON.stringify(profiles));
+            
+            // Refresh the display
+            loadClientData();
+            updateHeaderProfileInfo();
+            hideImportModal();
+            showAlert('Sample data loaded successfully! You can now explore all features.', 'success');
         }
 
         function loadClientData() {

@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Planner Pro - Professional Financial Planning Platform</title>
-    
-    <!-- External Resources -->
+    <title>Financial Planner Pro - Complete Solution</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -20,7 +16,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #000000;
             color: #ffffff;
             line-height: 1.6;
@@ -28,18 +24,18 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
 
-        /* Profile Management Styles */
+        /* Profile Management Screen */
         .profile-management {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
         }
 
         .profile-card {
@@ -47,93 +43,80 @@
             border: 1px solid #333333;
             border-radius: 20px;
             padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
         .profile-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .profile-header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
+            font-size: 3rem;
+            font-weight: 700;
             margin-bottom: 10px;
             background: linear-gradient(45deg, #ffffff, #cccccc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .profile-list {
-            margin: 20px 0;
+            margin: 30px 0;
         }
 
         .profile-item {
             background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 10px;
+            border: 1px solid #333333;
+            border-radius: 15px;
             padding: 20px;
             margin: 15px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
         }
 
-        .profile-item:hover {
-            background: #222;
-            border-color: #555;
-        }
-
-        .profile-info h3 {
+        .profile-item-info h4 {
             margin-bottom: 5px;
+            color: #ffffff;
         }
 
-        .profile-meta {
+        .profile-item-info p {
+            color: #aaaaaa;
             font-size: 0.9rem;
-            color: #aaa;
         }
 
-        .profile-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Cover Page Styles */
+        /* Cover Page */
         .cover-page {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            text-align: center;
         }
 
         .cover-content {
-            text-align: center;
-            z-index: 2;
-            max-width: 800px;
-            padding: 0 20px;
+            max-width: 600px;
+            padding: 40px;
         }
 
         .app-title {
             font-size: 4rem;
-            font-weight: 800;
+            font-weight: 700;
             margin-bottom: 20px;
             background: linear-gradient(45deg, #ffffff, #cccccc);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255,255,255,0.1);
+            background-clip: text;
         }
 
         .app-subtitle {
             font-size: 1.5rem;
-            color: #cccccc;
-            margin-bottom: 50px;
-            font-weight: 300;
+            color: #aaaaaa;
+            margin-bottom: 40px;
         }
 
         .cover-buttons {
@@ -143,85 +126,18 @@
             flex-wrap: wrap;
         }
 
-        /* Button Styles */
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 180px;
-            justify-content: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #ffffff, #f0f0f0);
-            color: #000000;
-            box-shadow: 0 10px 20px rgba(255,255,255,0.1);
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(255,255,255,0.2);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #ffffff;
-            border: 2px solid #ffffff;
-        }
-
-        .btn-secondary:hover {
-            background: #ffffff;
-            color: #000000;
-            transform: translateY(-2px);
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            min-width: auto;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #218838;
-        }
-
-        /* Main App Styles */
+        /* Main App */
         .main-app {
             display: none;
-            background: #000000;
             min-height: 100vh;
+            background: #000000;
         }
 
+        /* Header */
         .app-header {
             background: #111111;
             border-bottom: 1px solid #333333;
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            padding: 15px 0;
         }
 
         .header-content {
@@ -231,7 +147,7 @@
         }
 
         .app-logo {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #ffffff;
         }
@@ -242,90 +158,49 @@
             gap: 15px;
         }
 
-        .current-profile {
+        /* Navigation */
+        .main-nav, .sub-nav {
             background: #1a1a1a;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
-        }
-
-        /* Navigation Styles */
-        .main-nav {
-            background: #111111;
             border-bottom: 1px solid #333333;
             padding: 15px 0;
         }
 
-        .nav-buttons {
+        .nav-buttons, .sub-nav-buttons {
             display: flex;
             gap: 10px;
-            justify-content: center;
             flex-wrap: wrap;
         }
 
-        .nav-btn {
-            padding: 12px 24px;
-            background: transparent;
-            color: #cccccc;
-            border: 1px solid #333333;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .nav-btn.active, .nav-btn:hover {
-            background: #ffffff;
-            color: #000000;
-            border-color: #ffffff;
-        }
-
-        .sub-nav {
-            background: #0a0a0a;
-            padding: 10px 0;
-            border-bottom: 1px solid #222222;
-        }
-
-        .sub-nav-buttons {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .sub-nav-btn {
-            padding: 8px 16px;
-            background: transparent;
-            color: #aaaaaa;
-            border: 1px solid #222222;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .sub-nav-btn.active, .sub-nav-btn:hover {
+        .nav-btn, .sub-nav-btn {
             background: #333333;
             color: #ffffff;
-            border-color: #555555;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
-        /* Section Styles */
+        .nav-btn:hover, .sub-nav-btn:hover {
+            background: #555555;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active, .sub-nav-btn.active {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        /* Sections */
         .section {
             display: none;
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 40px 0;
+            min-height: calc(100vh - 200px);
         }
 
         .section.active {
             display: block;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .section-header {
@@ -337,57 +212,47 @@
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .section-title i {
             color: #ffffff;
         }
 
         .section-subtitle {
             font-size: 1.2rem;
-            color: #cccccc;
-            font-weight: 300;
+            color: #aaaaaa;
         }
 
-        /* Card Styles */
+        /* Cards */
         .card {
             background: #111111;
             border: 1px solid #333333;
             border-radius: 15px;
             padding: 30px;
             margin: 20px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
         .card-header {
             margin-bottom: 25px;
-            padding-bottom: 15px;
             border-bottom: 1px solid #333333;
+            padding-bottom: 15px;
         }
 
         .card-title {
             font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: #ffffff;
+            margin-bottom: 5px;
         }
 
         .card-subtitle {
             color: #aaaaaa;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
-        /* Form Styles */
+        /* Forms */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 30px;
             margin: 20px 0;
         }
 
@@ -403,99 +268,137 @@
         }
 
         .required {
-            color: #ff4444;
+            color: #ff6b6b;
         }
 
-        .form-input {
+        .form-input, .form-select {
             width: 100%;
             padding: 12px 15px;
             background: #1a1a1a;
-            border: 1px solid #333333;
+            border: 2px solid #333333;
             border-radius: 8px;
             color: #ffffff;
             font-size: 1rem;
             transition: all 0.3s ease;
         }
 
-        .form-input:focus {
+        .form-input:focus, .form-select:focus {
             outline: none;
             border-color: #ffffff;
             background: #222222;
         }
 
-        .form-select {
-            width: 100%;
-            padding: 12px 15px;
-            background: #1a1a1a;
-            border: 1px solid #333333;
-            border-radius: 8px;
-            color: #ffffff;
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
-        /* Assessment Styles */
+        .btn-primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .btn-primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary {
+            background: #333333;
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background: #555555;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* Assessment */
         .assessment-container {
             max-width: 800px;
             margin: 0 auto;
         }
 
         .progress-bar {
-            background: #333333;
+            width: 100%;
             height: 8px;
+            background: #333333;
             border-radius: 4px;
             margin-bottom: 30px;
             overflow: hidden;
         }
 
         .progress-fill {
-            background: linear-gradient(90deg, #ffffff, #cccccc);
             height: 100%;
+            background: linear-gradient(90deg, #ffffff, #cccccc);
             transition: width 0.3s ease;
         }
 
         .question-card {
-            background: #111111;
+            background: #1a1a1a;
             border: 1px solid #333333;
             border-radius: 15px;
             padding: 40px;
             text-align: center;
-            margin: 30px 0;
         }
 
         .question-number {
             color: #aaaaaa;
             font-size: 1rem;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .question-text {
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 30px;
-            line-height: 1.4;
+            color: #ffffff;
         }
 
         .options-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin: 30px 0;
         }
 
         .option-btn {
-            padding: 20px;
-            background: #1a1a1a;
-            border: 2px solid #333333;
-            border-radius: 10px;
+            background: #333333;
             color: #ffffff;
+            border: 2px solid #333333;
+            padding: 15px 20px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         .option-btn:hover {
-            background: #222222;
+            background: #555555;
             border-color: #555555;
         }
 
@@ -505,7 +408,6 @@
             border-color: #ffffff;
         }
 
-        /* Results Styles */
         .results-container {
             text-align: center;
             padding: 40px;
@@ -514,21 +416,18 @@
         .personality-type {
             font-size: 2rem;
             font-weight: 700;
+            color: #ffffff;
             margin: 20px 0;
-            padding: 20px;
-            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
-            border-radius: 15px;
-            border: 1px solid #333333;
         }
 
         .personality-description {
             font-size: 1.2rem;
-            color: #cccccc;
-            line-height: 1.6;
-            margin: 20px 0;
+            color: #aaaaaa;
+            margin-bottom: 30px;
+            line-height: 1.8;
         }
 
-        /* Data Display Styles */
+        /* Data Display */
         .data-display {
             background: #0a0a0a;
             border: 1px solid #333333;
@@ -551,7 +450,7 @@
 
         .data-label {
             font-weight: 500;
-            color: #cccccc;
+            color: #aaaaaa;
         }
 
         .data-value {
@@ -559,7 +458,7 @@
             color: #ffffff;
         }
 
-        /* List Styles */
+        /* Lists */
         .items-list {
             margin: 20px 0;
         }
@@ -581,6 +480,7 @@
 
         .item-title {
             font-weight: 600;
+            color: #ffffff;
             margin-bottom: 5px;
         }
 
@@ -594,10 +494,10 @@
             gap: 10px;
         }
 
-        /* Chart Styles */
+        /* Charts */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
             margin: 30px 0;
         }
@@ -617,7 +517,7 @@
             color: #ffffff;
         }
 
-        /* Analytics Widgets */
+        /* Widgets */
         .widgets-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -651,7 +551,7 @@
             font-size: 0.9rem;
         }
 
-        /* Chatbot Styles */
+        /* Chatbot */
         .chatbot-container {
             position: fixed;
             bottom: 20px;
@@ -705,28 +605,47 @@
             padding: 15px;
         }
 
-        .message {
+        .chat-message {
             margin: 10px 0;
-            padding: 10px 15px;
-            border-radius: 10px;
-            max-width: 80%;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
         }
 
-        .message.user {
-            background: #ffffff;
-            color: #000000;
-            margin-left: auto;
+        .chat-message.user {
+            flex-direction: row-reverse;
         }
 
-        .message.bot {
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #333333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .message-content {
             background: #333333;
             color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user .message-content {
+            background: #ffffff;
+            color: #000000;
         }
 
         .chatbot-input {
             display: flex;
             padding: 15px;
             border-top: 1px solid #333333;
+            gap: 10px;
         }
 
         .chatbot-input input {
@@ -736,10 +655,9 @@
             border: 1px solid #333333;
             border-radius: 8px;
             color: #ffffff;
-            margin-right: 10px;
         }
 
-        /* Modal Styles */
+        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -751,10 +669,6 @@
             z-index: 2000;
             align-items: center;
             justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
         }
 
         .modal-content {
@@ -794,49 +708,7 @@
             color: #ffffff;
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .app-title {
-                font-size: 2.5rem;
-            }
-
-            .cover-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .widgets-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .chatbot-window {
-                width: 300px;
-                height: 400px;
-            }
-
-            .chatbot-messages {
-                height: 250px;
-            }
-        }
-
-        /* Success/Error Messages */
+        /* Alerts */
         .alert {
             padding: 15px;
             border-radius: 8px;
@@ -850,7 +722,7 @@
             color: #28a745;
         }
 
-        .alert-error {
+        .alert-danger {
             background: rgba(220, 53, 69, 0.2);
             border: 1px solid #dc3545;
             color: #dc3545;
@@ -862,22 +734,13 @@
             color: #17a2b8;
         }
 
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #333333;
-            border-radius: 50%;
-            border-top-color: #ffffff;
-            animation: spin 1s ease-in-out infinite;
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            color: #ffc107;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* File Upload Styles */
+        /* File Upload */
         .file-upload {
             border: 2px dashed #333333;
             border-radius: 10px;
@@ -893,11 +756,6 @@
             background: #111111;
         }
 
-        .file-upload.dragover {
-            border-color: #ffffff;
-            background: #1a1a1a;
-        }
-
         .upload-icon {
             font-size: 3rem;
             color: #666666;
@@ -907,11 +765,6 @@
         .upload-text {
             color: #aaaaaa;
             margin-bottom: 10px;
-        }
-
-        .upload-formats {
-            color: #666666;
-            font-size: 0.9rem;
         }
 
         /* Export Options */
@@ -951,6 +804,73 @@
         .export-description {
             color: #aaaaaa;
             font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: 2.5rem;
+            }
+
+            .cover-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .widgets-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chatbot-window {
+                width: 300px;
+                height: 400px;
+            }
+
+            .chatbot-messages {
+                height: 250px;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .section {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .card {
+            transition: transform 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -1021,8 +941,8 @@
                         Financial Planner Pro
                     </div>
                     <div class="profile-info-header">
-                        <div class="current-profile">
-                            <i class="fas fa-user"></i>
+                        <div id="current-profile-info">
+                            <i class="fas fa-user-circle"></i>
                             <span id="current-profile-name">Profile Name</span>
                         </div>
                         <button class="btn btn-small btn-secondary" onclick="saveCurrentProfile()">
@@ -1061,29 +981,29 @@
             <div class="container">
                 <!-- Client Data Sub-nav -->
                 <div id="client-data-subnav" class="sub-nav-buttons">
-                    <button class="sub-nav-btn active" onclick="showSubSection('personality')">Assessment</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('profile')">Basic Info</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('financial')">Financial Status</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('networth')">Net Worth</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('goals')">Goals & Insurance</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('risk')">Risk Profile</button>
+                    <button class="sub-nav-btn active" onclick="showSubSection('personality', this)">Assessment</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('profile', this)">Basic Info</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('financial', this)">Financial Status</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('networth', this)">Net Worth</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('goals', this)">Goals & Insurance</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('risk', this)">Risk Profile</button>
                 </div>
 
                 <!-- Investment Advisory Sub-nav -->
                 <div id="investment-advisory-subnav" class="sub-nav-buttons" style="display: none;">
-                    <button class="sub-nav-btn active" onclick="showSubSection('recommendations')">Investment Plan</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('portfolio')">Portfolio Analysis</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('sip')">SIP Calculator</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('tax')">Tax Planning</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('retirement')">Retirement</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('comparison')">Product Comparison</button>
+                    <button class="sub-nav-btn active" onclick="showSubSection('recommendations', this)">Investment Plan</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('portfolio', this)">Portfolio Analysis</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('sip', this)">SIP Calculator</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('tax', this)">Tax Planning</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('retirement', this)">Retirement</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('comparison', this)">Product Comparison</button>
                 </div>
 
                 <!-- Analytics & Reports Sub-nav -->
                 <div id="analytics-reports-subnav" class="sub-nav-buttons" style="display: none;">
-                    <button class="sub-nav-btn active" onclick="showSubSection('analytics')">Analytics Dashboard</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('reports')">Professional Reports</button>
-                    <button class="sub-nav-btn" onclick="showSubSection('summary')">Executive Summary</button>
+                    <button class="sub-nav-btn active" onclick="showSubSection('analytics', this)">Analytics Dashboard</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('reports', this)">Professional Reports</button>
+                    <button class="sub-nav-btn" onclick="showSubSection('summary', this)">Executive Summary</button>
                 </div>
             </div>
         </nav>
@@ -1642,7 +1562,7 @@
                         SIP Calculator
                     </h2>
                     <p class="section-subtitle">
-                        Calculate your systematic investment plan returns
+                        Calculate your systematic investment plan returns with inflation adjustment
                     </p>
                 </div>
 
@@ -1741,7 +1661,7 @@
                         Retirement Planning
                     </h2>
                     <p class="section-subtitle">
-                        Plan for a comfortable retirement
+                        Plan for a comfortable retirement with inflation adjustment
                     </p>
                 </div>
 
@@ -1771,22 +1691,6 @@
                             <div class="form-group">
                                 <label class="form-label">Expected Return on Investments (%)</label>
                                 <input type="number" id="retirement-return" class="form-input" value="10" min="5" max="20" step="0.1">
-                            </div>
-                        </div>
-
-                        <!-- Expense Adjustment Tab -->
-                        <div style="margin: 30px 0;">
-                            <h4><i class="fas fa-chart-line"></i> Expense Adjustment Over Time</h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label">Expense Change Rate (% per year)</label>
-                                    <input type="number" id="expense-change-rate" class="form-input" value="0" min="-10" max="10" step="0.1">
-                                    <small style="color: #aaa;">Positive for increase, negative for decrease</small>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Years for Expense Change</label>
-                                    <input type="number" id="expense-change-years" class="form-input" value="10" min="1" max="50">
-                                </div>
                             </div>
                         </div>
                         
@@ -1899,7 +1803,7 @@
                         Professional Reports
                     </h2>
                     <p class="section-subtitle">
-                        Generate comprehensive financial reports
+                        Generate comprehensive financial reports with preview and PDF download
                     </p>
                 </div>
 
@@ -1992,26 +1896,10 @@
                         <button class="btn btn-primary" onclick="generateExecutiveSummary()">
                             <i class="fas fa-chart-line"></i> Generate Executive Summary
                         </button>
-                        <button class="btn btn-secondary" onclick="downloadExecutiveSummary()">
-                            <i class="fas fa-download"></i> Download Summary PDF
-                        </button>
                     </div>
                     
                     <div id="executive-summary-content">
                         <!-- Executive summary will be displayed here -->
-                    </div>
-                </div>
-
-                <!-- Alerts Section -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-bell"></i>
-                            Financial Alerts & Reminders
-                        </h3>
-                    </div>
-                    <div id="financial-alerts">
-                        <!-- Alerts will be displayed here -->
                     </div>
                 </div>
             </section>
@@ -2025,15 +1913,15 @@
         </button>
         <div class="chatbot-window" id="chatbot-window">
             <div class="chatbot-header">
-                <h4>Financial Assistant</h4>
+                <h4><i class="fas fa-robot"></i> Financial Assistant</h4>
                 <button class="close-btn" onclick="toggleChatbot()">×</button>
             </div>
-            <div class="chatbot-messages" id="chatbot-messages">
-                <div class="message bot">Hello! I'm your financial assistant. How can I help you today?</div>
+            <div class="chatbot-messages" id="chat-messages">
+                <!-- Messages will be added here -->
             </div>
             <div class="chatbot-input">
-                <input type="text" id="chatbot-input" placeholder="Type your message..." onkeypress="handleChatbotEnter(event)">
-                <button class="btn btn-primary btn-small" onclick="sendChatbotMessage()">Send</button>
+                <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)">
+                <button class="btn btn-primary btn-small" onclick="sendMessage()">Send</button>
             </div>
         </div>
     </div>
@@ -2043,22 +1931,18 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Save Profile</h3>
-                <button class="close-btn" onclick="closeSaveModal()">&times;</button>
+                <button class="close-btn" onclick="hideProfileModal()">&times;</button>
             </div>
             <form id="save-profile-form">
                 <div class="form-group">
                     <label class="form-label">Profile Name <span class="required">*</span></label>
-                    <input type="text" id="profile-name" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <input type="text" id="profile-description" class="form-input" placeholder="Optional description">
+                    <input type="text" id="profile-name-input" class="form-input" required>
                 </div>
                 <div style="text-align: center; margin-top: 20px;">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Save Profile
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="closeSaveModal()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideProfileModal()">Cancel</button>
                 </div>
             </form>
         </div>
@@ -2069,39 +1953,34 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Export Your Data</h3>
-                <button class="close-btn" onclick="closeExportModal()">&times;</button>
+                <button class="close-btn" onclick="hideExportModal()">&times;</button>
             </div>
             <div class="export-options">
-                <div class="export-option" onclick="exportData('json')">
+                <div class="export-option" onclick="exportCurrentData()">
                     <div class="export-icon"><i class="fas fa-file-code"></i></div>
                     <div class="export-title">JSON File</div>
                     <div class="export-description">Complete backup for import</div>
-                </div>
-                <div class="export-option" onclick="exportData('pdf')">
-                    <div class="export-icon"><i class="fas fa-file-pdf"></i></div>
-                    <div class="export-title">PDF Summary</div>
-                    <div class="export-description">Readable format for sharing</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Import Modal -->
-    <div id="import-modal" class="modal">
+    <div id="import-data-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Import Your Data</h3>
-                <button class="close-btn" onclick="closeImportModal()">&times;</button>
+                <button class="close-btn" onclick="hideImportModal()">&times;</button>
             </div>
-            <div class="file-upload" id="file-upload-area">
+            <div class="file-upload">
                 <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                <div class="upload-text">Drag & drop your file here</div>
-                <div class="upload-text">or</div>
-                <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
-                    <i class="fas fa-folder-open"></i> Browse Files
-                </button>
-                <div class="upload-formats">Supported: .json files</div>
-                <input type="file" id="file-input" accept=".json" style="display: none;" onchange="handleFileUpload(event)">
+                <div class="upload-text">Select JSON file to import</div>
+                <input type="file" id="import-file-input" accept=".json" style="margin: 20px 0;">
+                <div style="text-align: center;">
+                    <button class="btn btn-primary" onclick="importFromFile()">
+                        <i class="fas fa-upload"></i> Import Data
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2173,6 +2052,70 @@
         let selectedAnswers = [];
         let charts = {};
         let isChatbotOpen = false;
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfiles();
+            
+            // Add event listeners for forms
+            document.getElementById('basic-info-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveBasicInfo();
+            });
+            
+            document.getElementById('financial-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveFinancialStatus();
+            });
+            
+            document.getElementById('asset-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addAsset();
+            });
+            
+            document.getElementById('loan-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addLoan();
+            });
+            
+            document.getElementById('goal-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addGoal();
+            });
+            
+            document.getElementById('insurance-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveInsuranceProfile();
+            });
+            
+            document.getElementById('risk-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveRiskProfile();
+            });
+            
+            document.getElementById('sip-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateSIPReturns();
+            });
+            
+            document.getElementById('tax-planning-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateTaxSavingPlan();
+            });
+            
+            document.getElementById('retirement-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateRetirement();
+            });
+            
+            document.getElementById('save-profile-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveCurrentProfile();
+            });
+            
+            // Initialize assessment
+            loadAssessmentQuestion();
+        });
 
         // Profile Management Functions
         function loadProfiles() {
@@ -2269,7 +2212,7 @@
             document.getElementById('cover-page').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
             showMainSection('client-data');
-            showSubSection('personality');
+            showSubSection('personality', document.querySelector('[onclick="showSubSection(\'personality\', this)"]'));
             loadAssessmentQuestion();
         }
 
@@ -2277,7 +2220,7 @@
             document.getElementById('cover-page').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
             showMainSection('client-data');
-            showSubSection('profile');
+            showSubSection('profile', document.querySelector('[onclick="showSubSection(\'profile\', this)"]'));
         }
 
         function showMainSection(section) {
@@ -2433,161 +2376,6 @@
         function proceedToClientProfiling() {
             showSubSection('profile', document.querySelector('[onclick="showSubSection(\'profile\', this)"]'));
         }
-
-        // Utility Functions
-        function formatCurrency(amount) {
-            if (amount >= 10000000) {
-                return (amount / 10000000).toFixed(2) + ' Cr';
-            } else if (amount >= 100000) {
-                return (amount / 100000).toFixed(2) + ' L';
-            } else if (amount >= 1000) {
-                return (amount / 1000).toFixed(0) + 'K';
-            }
-            return Math.round(amount).toString();
-        }
-
-        function showAlert(message, type = 'success') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 1000;
-                min-width: 300px;
-                animation: slideIn 0.3s ease-out;
-            `;
-            alertDiv.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
-                ${message}
-                <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit; font-size: 1.2em; cursor: pointer;">&times;</button>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                if (alertDiv.parentElement) {
-                    alertDiv.remove();
-                }
-            }, 5000);
-        }
-
-        // Chatbot Functions
-        function toggleChatbot() {
-            const chatbotWindow = document.getElementById('chatbot-window');
-            isChatbotOpen = !isChatbotOpen;
-            chatbotWindow.style.display = isChatbotOpen ? 'block' : 'none';
-        }
-
-        function sendChatbotMessage() {
-            const input = document.getElementById('chatbot-input');
-            const message = input.value.trim();
-            
-            if (message === '') return;
-
-            // Add user message to chat
-            addChatbotMessage('user', message);
-            
-            // Clear input
-            input.value = '';
-
-            // Simulate bot response
-            setTimeout(() => {
-                const response = generateBotResponse(message);
-                addChatbotMessage('bot', response);
-            }, 1000);
-        }
-
-        function addChatbotMessage(sender, message) {
-            const messagesContainer = document.getElementById('chatbot-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            messageDiv.textContent = message;
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function generateBotResponse(message) {
-            const lowerMessage = message.toLowerCase();
-            
-            if (lowerMessage.includes('sip') || lowerMessage.includes('investment')) {
-                return "SIP is a great way to build wealth over time. Based on your risk profile, I recommend starting with ₹" + formatCurrency(clientData.riskProfile.monthlyInvestment || 10000) + " monthly. Would you like me to show you some fund recommendations?";
-            }
-            
-            if (lowerMessage.includes('retirement')) {
-                return "Retirement planning is crucial! Based on your current age and expenses, you should aim to accumulate a corpus that can provide 25-30 times your annual expenses. Have you calculated your retirement needs using our retirement calculator?";
-            }
-            
-            return "That's a great question! I can help you with investment advice, retirement planning, tax saving strategies, and more. Feel free to ask me about specific areas of financial planning.";
-        }
-
-        function handleChatbotEnter(event) {
-            if (event.key === 'Enter') {
-                sendChatbotMessage();
-            }
-        }
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            loadProfiles();
-            
-            // Add event listeners for forms
-            document.getElementById('basic-info-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveBasicInfo();
-            });
-            
-            document.getElementById('financial-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveFinancialStatus();
-            });
-            
-            document.getElementById('asset-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                addAsset();
-            });
-            
-            document.getElementById('loan-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                addLoan();
-            });
-            
-            document.getElementById('goal-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                addGoal();
-            });
-            
-            document.getElementById('insurance-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveInsuranceProfile();
-            });
-            
-            document.getElementById('risk-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveRiskProfile();
-            });
-            
-            document.getElementById('sip-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                calculateSIPReturns();
-            });
-            
-            document.getElementById('tax-planning-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                generateTaxSavingPlan();
-            });
-            
-            document.getElementById('retirement-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                calculateRetirement();
-            });
-            
-            document.getElementById('save-profile-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveProfile();
-            });
-        });
 
         // Basic Info Functions
         function saveBasicInfo() {
@@ -3160,129 +2948,1379 @@
             document.getElementById('saved-risk-info').style.display = 'none';
         }
 
-        // Placeholder functions for features not fully implemented
+        // Investment Advisory Functions
         function generateInvestmentPlan() {
-            showAlert('Investment plan generated! This is a demo feature.', 'info');
+            const results = document.getElementById('investment-plan-results');
+            
+            // Get user's risk profile and financial data
+            const riskProfile = clientData.riskProfile.tolerance || 'moderate';
+            const monthlyInvestment = clientData.riskProfile.monthlyInvestment || 10000;
+            const personalityType = clientData.assessmentResults.personalityType || 'Moderate Investor';
+
+            let allocation, expectedReturn, recommendations;
+
+            // Determine allocation based on risk profile
+            switch (riskProfile) {
+                case 'conservative':
+                    allocation = { equity: 30, debt: 60, gold: 10 };
+                    expectedReturn = 8;
+                    recommendations = [
+                        'Focus on debt mutual funds and fixed deposits',
+                        'Consider government bonds for stability',
+                        'Limit equity exposure to large-cap funds',
+                        'Maintain emergency fund in liquid funds'
+                    ];
+                    break;
+                case 'aggressive':
+                    allocation = { equity: 80, debt: 15, gold: 5 };
+                    expectedReturn = 14;
+                    recommendations = [
+                        'Invest heavily in equity mutual funds',
+                        'Consider mid-cap and small-cap funds',
+                        'Use SIP for rupee cost averaging',
+                        'Review portfolio quarterly for rebalancing'
+                    ];
+                    break;
+                default: // moderate
+                    allocation = { equity: 60, debt: 30, gold: 10 };
+                    expectedReturn = 12;
+                    recommendations = [
+                        'Balanced mix of equity and debt funds',
+                        'Focus on diversified equity funds',
+                        'Include some international exposure',
+                        'Regular portfolio review and rebalancing'
+                    ];
+            }
+
+            results.innerHTML = `
+                <div class="alert alert-success">
+                    <h4><i class="fas fa-lightbulb"></i> Personalized Investment Plan</h4>
+                    <p><strong>Based on your ${personalityType} profile</strong></p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-pie-chart"></i> Recommended Asset Allocation</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Equity (Stocks/Mutual Funds):</span>
+                                <span class="data-value">${allocation.equity}% (₹${formatCurrency(monthlyInvestment * allocation.equity / 100)})</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Debt (Bonds/Fixed Income):</span>
+                                <span class="data-value">${allocation.debt}% (₹${formatCurrency(monthlyInvestment * allocation.debt / 100)})</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Gold/Commodities:</span>
+                                <span class="data-value">${allocation.gold}% (₹${formatCurrency(monthlyInvestment * allocation.gold / 100)})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-line"></i> Expected Returns</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Expected Annual Return:</span>
+                                <span class="data-value">${expectedReturn}%</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">10-Year Projected Value:</span>
+                                <span class="data-value">₹${formatCurrency(calculateSIPValue(monthlyInvestment, expectedReturn, 10))}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">20-Year Projected Value:</span>
+                                <span class="data-value">₹${formatCurrency(calculateSIPValue(monthlyInvestment, expectedReturn, 20))}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-list-ul"></i> Key Recommendations</h4>
+                    </div>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
         }
 
         function analyzePortfolio() {
-            showAlert('Portfolio analysis completed! This is a demo feature.', 'info');
+            const results = document.getElementById('portfolio-analysis-results');
+            
+            // Create mock portfolio data based on user's assets
+            const totalAssets = clientData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            const mockPortfolio = [
+                { name: 'Large Cap Equity Funds', value: totalAssets * 0.4, allocation: 40, target: 45, performance: 12.5 },
+                { name: 'Mid Cap Equity Funds', value: totalAssets * 0.2, allocation: 20, target: 25, performance: 15.2 },
+                { name: 'Debt Funds', value: totalAssets * 0.3, allocation: 30, target: 25, performance: 7.8 },
+                { name: 'Gold ETF', value: totalAssets * 0.1, allocation: 10, target: 5, performance: 8.9 }
+            ];
+
+            results.innerHTML = `
+                <div class="alert alert-info">
+                    <h4><i class="fas fa-search"></i> Portfolio Analysis Results</h4>
+                    <p>Analysis based on your current assets worth ₹${formatCurrency(totalAssets)}</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-chart-bar"></i> Current vs Target Allocation</h4>
+                    </div>
+                    <div class="data-display">
+                        ${mockPortfolio.map(item => `
+                            <div class="data-row">
+                                <span class="data-label">${item.name}:</span>
+                                <span class="data-value">
+                                    Current: ${item.allocation}% | Target: ${item.target}% | 
+                                    Performance: ${item.performance}%
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Portfolio Health Check</h4>
+                    </div>
+                    <div class="alert alert-success">
+                        <strong>Overall Score: 85/100</strong>
+                        <ul style="margin: 10px 0 0 20px;">
+                            <li>✅ Good diversification across asset classes</li>
+                            <li>⚠️ Slightly overweight in debt funds</li>
+                            <li>✅ Strong performance in equity funds</li>
+                            <li>⚠️ Consider reducing gold allocation</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
         }
 
         function generateRebalancingPlan() {
-            showAlert('Rebalancing plan generated! This is a demo feature.', 'info');
+            const results = document.getElementById('portfolio-analysis-results');
+            const existingContent = results.innerHTML;
+            
+            results.innerHTML = existingContent + `
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-balance-scale"></i> Rebalancing Recommendations</h4>
+                    </div>
+                    <div class="alert alert-warning">
+                        <h5>Suggested Actions:</h5>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Reduce Debt Funds:</span>
+                                <span class="data-value">Sell ₹50,000 worth</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Increase Mid Cap Equity:</span>
+                                <span class="data-value">Buy ₹30,000 worth</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Reduce Gold ETF:</span>
+                                <span class="data-value">Sell ₹20,000 worth</span>
+                            </div>
+                        </div>
+                        <p style="margin-top: 15px;"><strong>Next Review Date:</strong> ${new Date(Date.now() + 90*24*60*60*1000).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `;
         }
 
+        // SIP Calculator Functions
         function calculateSIPReturns() {
-            showAlert('SIP returns calculated! This is a demo feature.', 'info');
+            const sipAmount = parseFloat(document.getElementById('sip-amount').value);
+            const annualReturn = parseFloat(document.getElementById('sip-return').value);
+            const years = parseFloat(document.getElementById('sip-period').value);
+            const inflationRate = parseFloat(document.getElementById('sip-inflation').value) / 100;
+
+            // Calculate maturity value
+            const monthlyReturn = annualReturn / 12 / 100;
+            const months = years * 12;
+            const maturityValue = sipAmount * (Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn * (1 + monthlyReturn);
+            
+            // Calculate inflation-adjusted value (real value in today's terms)
+            const realValue = maturityValue / Math.pow(1 + inflationRate, years);
+            const totalInvestment = sipAmount * months;
+            const returns = maturityValue - totalInvestment;
+
+            document.getElementById('sip-results').style.display = 'block';
+            document.getElementById('sip-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h4><i class="fas fa-calculator"></i> SIP Calculation Results</h4>
+                </div>
+
+                <div class="form-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-line"></i> Investment Summary</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Monthly SIP Amount:</span>
+                                <span class="data-value">₹${formatCurrency(sipAmount)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Investment Period:</span>
+                                <span class="data-value">${years} years (${months} months)</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Expected Annual Return:</span>
+                                <span class="data-value">${annualReturn}%</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Total Investment:</span>
+                                <span class="data-value">₹${formatCurrency(totalInvestment)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-money-bill-wave"></i> Returns Analysis</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row" style="border-bottom: 2px solid #28a745;">
+                                <span class="data-label"><strong>Maturity Value (Nominal):</strong></span>
+                                <span class="data-value"><strong>₹${formatCurrency(maturityValue)}</strong></span>
+                            </div>
+                            <div class="data-row" style="border-bottom: 2px solid #17a2b8;">
+                                <span class="data-label"><strong>Real Value (Today's Terms):</strong></span>
+                                <span class="data-value"><strong>₹${formatCurrency(realValue)}</strong></span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Total Returns:</span>
+                                <span class="data-value">₹${formatCurrency(returns)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Wealth Multiplier:</span>
+                                <span class="data-value">${(maturityValue / totalInvestment).toFixed(2)}x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle"></i> Understanding Your Returns</h5>
+                    <p><strong>Nominal Value:</strong> The actual amount you'll receive (₹${formatCurrency(maturityValue)})</p>
+                    <p><strong>Real Value:</strong> What that amount is worth in today's purchasing power (₹${formatCurrency(realValue)})</p>
+                    <p><strong>Impact of Inflation:</strong> Due to ${(inflationRate * 100).toFixed(1)}% inflation, your purchasing power reduces by ₹${formatCurrency(maturityValue - realValue)} over ${years} years.</p>
+                </div>
+            `;
         }
 
+        function calculateSIPValue(monthlyAmount, annualReturn, years) {
+            const monthlyReturn = annualReturn / 12 / 100;
+            const months = years * 12;
+            return monthlyAmount * (Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn * (1 + monthlyReturn);
+        }
+
+        // Tax Planning Functions
         function generateTaxSavingPlan() {
-            showAlert('Tax saving plan generated! This is a demo feature.', 'info');
+            const income = parseFloat(document.getElementById('taxable-income').value);
+            const regime = document.getElementById('tax-regime').value;
+            const current80C = parseFloat(document.getElementById('current-80c').value) || 0;
+            const healthPremium = parseFloat(document.getElementById('health-premium').value) || 0;
+
+            // Calculate tax savings
+            const remaining80C = Math.max(0, 150000 - current80C);
+            const remaining80D = Math.max(0, 25000 - healthPremium);
+            
+            let taxRate = 0;
+            if (income <= 250000) taxRate = 0;
+            else if (income <= 500000) taxRate = 5;
+            else if (income <= 1000000) taxRate = 20;
+            else taxRate = 30;
+
+            const potentialSavings = (remaining80C + remaining80D) * (taxRate / 100);
+
+            document.getElementById('tax-plan-results').style.display = 'block';
+            document.getElementById('tax-plan-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h4><i class="fas fa-receipt"></i> Tax Saving Analysis</h4>
+                    <p>Based on ${regime === 'old' ? 'Old Tax Regime' : 'New Tax Regime'}</p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-calculator"></i> Current Status</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Annual Taxable Income:</span>
+                                <span class="data-value">₹${formatCurrency(income)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Applicable Tax Rate:</span>
+                                <span class="data-value">${taxRate}%</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Current 80C Investments:</span>
+                                <span class="data-value">₹${formatCurrency(current80C)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Health Insurance Premium:</span>
+                                <span class="data-value">₹${formatCurrency(healthPremium)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-piggy-bank"></i> Tax Saving Opportunities</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Remaining 80C Limit:</span>
+                                <span class="data-value">₹${formatCurrency(remaining80C)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Remaining 80D Limit:</span>
+                                <span class="data-value">₹${formatCurrency(remaining80D)}</span>
+                            </div>
+                            <div class="data-row" style="border-top: 2px solid #28a745; font-weight: bold;">
+                                <span class="data-label">Potential Tax Savings:</span>
+                                <span class="data-value">₹${formatCurrency(potentialSavings)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-list-ul"></i> Recommended Tax-Saving Investments</h4>
+                    </div>
+                    <div style="padding: 1rem; border: 1px solid #333; border-radius: 8px; margin: 10px 0;">
+                        <h6><i class="fas fa-coins"></i> Section 80C (₹${formatCurrency(remaining80C)} remaining)</h6>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li>ELSS Mutual Funds (Best option - equity returns + tax saving)</li>
+                            <li>Public Provident Fund (PPF) - 15 year lock-in</li>
+                            <li>Employee Provident Fund (EPF)</li>
+                            <li>Life Insurance Premium</li>
+                            <li>Principal repayment of home loan</li>
+                            <li>National Savings Certificate (NSC)</li>
+                        </ul>
+                    </div>
+                    <div style="padding: 1rem; border: 1px solid #333; border-radius: 8px; margin: 10px 0;">
+                        <h6><i class="fas fa-heartbeat"></i> Section 80D (₹${formatCurrency(remaining80D)} remaining)</h6>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li>Health Insurance Premium for self and family</li>
+                            <li>Preventive health check-up expenses</li>
+                            <li>Medical insurance for parents (additional ₹25,000)</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
         }
 
+        // Retirement Planning Functions
         function calculateRetirement() {
-            showAlert('Retirement plan calculated! This is a demo feature.', 'info');
+            const currentAge = parseFloat(document.getElementById('current-age').value);
+            const retirementAge = parseFloat(document.getElementById('retirement-age').value);
+            const currentExpenses = parseFloat(document.getElementById('current-monthly-expenses').value);
+            const inflationRate = parseFloat(document.getElementById('retirement-inflation').value) / 100;
+            const lifeExpectancy = parseFloat(document.getElementById('life-expectancy').value);
+            const returnRate = parseFloat(document.getElementById('retirement-return').value) / 100;
+
+            const yearsToRetirement = retirementAge - currentAge;
+            const yearsInRetirement = lifeExpectancy - retirementAge;
+
+            // Calculate future monthly expenses at retirement (inflation-adjusted)
+            const futureMonthlyExpenses = currentExpenses * Math.pow(1 + inflationRate, yearsToRetirement);
+            const futureAnnualExpenses = futureMonthlyExpenses * 12;
+
+            // Calculate required retirement corpus (simplified calculation)
+            const requiredCorpus = futureAnnualExpenses * yearsInRetirement;
+
+            // Calculate monthly SIP required
+            const monthlyReturn = returnRate / 12;
+            const months = yearsToRetirement * 12;
+            const requiredMonthlySIP = requiredCorpus * monthlyReturn / (Math.pow(1 + monthlyReturn, months) - 1);
+
+            document.getElementById('retirement-results').style.display = 'block';
+            document.getElementById('retirement-results').innerHTML = `
+                <div class="alert alert-success">
+                    <h4><i class="fas fa-umbrella"></i> Retirement Planning Analysis</h4>
+                </div>
+
+                <div class="form-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-calendar-alt"></i> Timeline</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Current Age:</span>
+                                <span class="data-value">${currentAge} years</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Retirement Age:</span>
+                                <span class="data-value">${retirementAge} years</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Years to Retirement:</span>
+                                <span class="data-value">${yearsToRetirement} years</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Years in Retirement:</span>
+                                <span class="data-value">${yearsInRetirement} years</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-line"></i> Expense Projection</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Current Monthly Expenses:</span>
+                                <span class="data-value">₹${formatCurrency(currentExpenses)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Future Monthly Expenses (at retirement):</span>
+                                <span class="data-value">₹${formatCurrency(futureMonthlyExpenses)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Future Annual Expenses:</span>
+                                <span class="data-value">₹${formatCurrency(futureAnnualExpenses)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-bullseye"></i> Retirement Corpus Required</h4>
+                    </div>
+                    <div class="data-display">
+                        <div class="data-row" style="border-bottom: 2px solid #28a745; font-size: 1.2rem; font-weight: bold;">
+                            <span class="data-label">Required Retirement Corpus:</span>
+                            <span class="data-value">₹${formatCurrency(requiredCorpus)}</span>
+                        </div>
+                        <div class="data-row" style="border-bottom: 2px solid #17a2b8; font-size: 1.1rem; font-weight: bold;">
+                            <span class="data-label">Monthly SIP Required:</span>
+                            <span class="data-value">₹${formatCurrency(requiredMonthlySIP)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-lightbulb"></i> Key Insights</h5>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Your expenses will increase by ${((futureMonthlyExpenses / currentExpenses) - 1) * 100}% due to inflation over ${yearsToRetirement} years</li>
+                        <li>Starting early gives you the power of compounding - delay by 5 years and your SIP requirement could double</li>
+                        <li>Consider increasing your SIP by 10% annually to account for salary increases</li>
+                        <li>Review and adjust your retirement plan every 3-5 years</li>
+                    </ul>
+                </div>
+            `;
         }
 
+        // Product Comparison Functions
         function generateSmartComparison() {
-            showAlert('Smart comparison generated! This is a demo feature.', 'info');
+            const results = document.getElementById('product-comparison-results');
+            
+            // Generate recommendations based on user profile
+            const riskProfile = clientData.riskProfile.tolerance || 'moderate';
+            const goals = clientData.goals || [];
+            const monthlyInvestment = clientData.riskProfile.monthlyInvestment || 10000;
+
+            let products = [];
+
+            // Equity Mutual Funds
+            if (riskProfile === 'aggressive' || riskProfile === 'moderate') {
+                products.push({
+                    category: 'Large Cap Equity Funds',
+                    products: [
+                        { name: 'HDFC Top 100 Fund', returns: '12.5%', expense: '2.05%', rating: '4.5/5' },
+                        { name: 'ICICI Prudential Bluechip Fund', returns: '11.8%', expense: '2.25%', rating: '4.2/5' },
+                        { name: 'Axis Bluechip Fund', returns: '13.2%', expense: '1.95%', rating: '4.7/5' }
+                    ]
+                });
+            }
+
+            // Debt Funds
+            if (riskProfile === 'conservative' || riskProfile === 'moderate') {
+                products.push({
+                    category: 'Debt Funds',
+                    products: [
+                        { name: 'HDFC Corporate Bond Fund', returns: '7.8%', expense: '0.85%', rating: '4.3/5' },
+                        { name: 'ICICI Prudential Corporate Bond Fund', returns: '7.5%', expense: '0.95%', rating: '4.1/5' },
+                        { name: 'Axis Corporate Debt Fund', returns: '8.1%', expense: '0.75%', rating: '4.4/5' }
+                    ]
+                });
+            }
+
+            // Tax Saving Funds (if user has goals)
+            if (goals.some(goal => goal.name.toLowerCase().includes('tax') || clientData.financialStatus.annualIncome > 250000)) {
+                products.push({
+                    category: 'ELSS Tax Saving Funds',
+                    products: [
+                        { name: 'Axis Long Term Equity Fund', returns: '15.2%', expense: '1.85%', rating: '4.8/5' },
+                        { name: 'Mirae Asset Tax Saver Fund', returns: '14.7%', expense: '1.95%', rating: '4.6/5' },
+                        { name: 'DSP Tax Saver Fund', returns: '13.9%', expense: '2.15%', rating: '4.4/5' }
+                    ]
+                });
+            }
+
+            results.innerHTML = `
+                <div class="alert alert-success">
+                    <h4><i class="fas fa-search"></i> Smart Product Recommendations</h4>
+                    <p>Based on your ${riskProfile} risk profile and ₹${formatCurrency(monthlyInvestment)} monthly investment capacity</p>
+                </div>
+
+                ${products.map(category => `
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-star"></i> ${category.category}</h4>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+                                <thead>
+                                    <tr style="background: #1a1a1a; border-bottom: 2px solid #333;">
+                                        <th style="padding: 12px; text-align: left; border: 1px solid #333;">Fund Name</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #333;">3Y Returns</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #333;">Expense Ratio</th>
+                                        <th style="padding: 12px; text-align: center; border: 1px solid #333;">Rating</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${category.products.map(product => `
+                                        <tr style="border-bottom: 1px solid #333;">
+                                            <td style="padding: 12px; border: 1px solid #333; font-weight: 500;">${product.name}</td>
+                                            <td style="padding: 12px; text-align: center; border: 1px solid #333; color: #28a745;">${product.returns}</td>
+                                            <td style="padding: 12px; text-align: center; border: 1px solid #333;">${product.expense}</td>
+                                            <td style="padding: 12px; text-align: center; border: 1px solid #333; color: #ffc107;">${product.rating}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `).join('')}
+
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle"></i> How to Choose</h5>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Returns:</strong> Look for consistent performers over 3-5 years, not just recent winners</li>
+                        <li><strong>Expense Ratio:</strong> Lower is better - even 0.5% difference compounds significantly over time</li>
+                        <li><strong>Rating:</strong> Choose funds with 4+ star ratings from reputable agencies</li>
+                        <li><strong>Fund Size:</strong> Avoid very small funds (less than ₹500 crores) and very large funds (more than ₹20,000 crores)</li>
+                        <li><strong>Fund Manager:</strong> Check the track record and experience of the fund manager</li>
+                    </ul>
+                </div>
+            `;
         }
 
+        // Analytics Functions
         function updateAllCharts() {
-            showAlert('Analytics updated! This is a demo feature.', 'info');
+            updateAnalyticsWidgets();
+            createAnalyticsCharts();
         }
 
+        function updateAnalyticsWidgets() {
+            // Calculate financial metrics
+            const totalAssets = clientData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = clientData.loans.reduce((sum, loan) => sum + loan.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            const monthlyIncome = clientData.financialStatus.monthlyIncome || 0;
+            const monthlyExpenses = clientData.financialStatus.monthlyExpenses || 0;
+            const monthlySavings = monthlyIncome - monthlyExpenses;
+            const savingsRate = monthlyIncome > 0 ? (monthlySavings / monthlyIncome * 100) : 0;
+            const emergencyFundMonths = monthlyExpenses > 0 ? Math.floor(clientData.financialStatus.currentSavings / monthlyExpenses) : 0;
+            
+            // Calculate financial health score
+            let score = 0;
+            if (savingsRate >= 20) score += 25;
+            else if (savingsRate >= 10) score += 15;
+            else if (savingsRate >= 5) score += 10;
+            
+            if (emergencyFundMonths >= 6) score += 25;
+            else if (emergencyFundMonths >= 3) score += 15;
+            else if (emergencyFundMonths >= 1) score += 10;
+            
+            if (netWorth > 0) score += 25;
+            if (clientData.goals.length > 0) score += 15;
+            if (clientData.riskProfile.experience) score += 10;
+
+            // Update widgets
+            document.getElementById('financial-score').textContent = score;
+            document.getElementById('net-worth-widget').textContent = '₹' + formatCurrency(netWorth);
+            document.getElementById('savings-rate').textContent = savingsRate.toFixed(1) + '%';
+            document.getElementById('emergency-fund-months').textContent = emergencyFundMonths;
+        }
+
+        function createAnalyticsCharts() {
+            createAnalyticsAssetChart();
+            createIncomeExpenseChart();
+            createGoalProgressChart();
+            createNetWorthProjectionChart();
+        }
+
+        function createAnalyticsAssetChart() {
+            const ctx = document.getElementById('analytics-asset-chart');
+            if (!ctx) return;
+
+            if (charts.analyticsAssetChart) {
+                charts.analyticsAssetChart.destroy();
+            }
+
+            const assetTypes = {};
+            clientData.assets.forEach(asset => {
+                if (!assetTypes[asset.type]) {
+                    assetTypes[asset.type] = 0;
+                }
+                assetTypes[asset.type] += asset.value;
+            });
+
+            const labels = Object.keys(assetTypes);
+            const data = Object.values(assetTypes);
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+
+            if (labels.length === 0) {
+                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+                return;
+            }
+
+            charts.analyticsAssetChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#333'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createIncomeExpenseChart() {
+            const ctx = document.getElementById('income-expense-chart');
+            if (!ctx) return;
+
+            if (charts.incomeExpenseChart) {
+                charts.incomeExpenseChart.destroy();
+            }
+
+            const income = clientData.financialStatus.monthlyIncome || 0;
+            const expenses = clientData.financialStatus.monthlyExpenses || 0;
+            const savings = income - expenses;
+
+            charts.incomeExpenseChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Monthly Income', 'Monthly Expenses', 'Monthly Savings'],
+                    datasets: [{
+                        data: [income, expenses, Math.max(0, savings)],
+                        backgroundColor: ['#28a745', '#dc3545', '#17a2b8'],
+                        borderWidth: 2,
+                        borderColor: '#333'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffffff',
+                                callback: function(value) {
+                                    return '₹' + formatCurrency(value);
+                                }
+                            },
+                            grid: {
+                                color: '#333'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createGoalProgressChart() {
+            const ctx = document.getElementById('goal-progress-chart');
+            if (!ctx) return;
+
+            if (charts.goalProgressChart) {
+                charts.goalProgressChart.destroy();
+            }
+
+            if (clientData.goals.length === 0) {
+                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+                return;
+            }
+
+            const labels = clientData.goals.map(goal => goal.name);
+            const data = clientData.goals.map(goal => goal.progress || 0);
+
+            charts.goalProgressChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Progress %',
+                        data: data,
+                        backgroundColor: '#36A2EB',
+                        borderWidth: 2,
+                        borderColor: '#333'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: '#ffffff',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: '#333'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createNetWorthProjectionChart() {
+            const ctx = document.getElementById('networth-projection-chart');
+            if (!ctx) return;
+
+            if (charts.networthProjectionChart) {
+                charts.networthProjectionChart.destroy();
+            }
+
+            const currentNetWorth = clientData.assets.reduce((sum, asset) => sum + asset.value, 0) - 
+                                   clientData.loans.reduce((sum, loan) => sum + loan.amount, 0);
+            const monthlySavings = (clientData.financialStatus.monthlyIncome || 0) - (clientData.financialStatus.monthlyExpenses || 0);
+            const annualReturn = 0.12; // 12% assumed return
+
+            const projectedData = [];
+            let projectedValue = currentNetWorth;
+
+            for (let year = 0; year <= 10; year++) {
+                projectedData.push(projectedValue);
+                if (year < 10) {
+                    projectedValue = projectedValue * (1 + annualReturn) + (monthlySavings * 12);
+                }
+            }
+
+            charts.networthProjectionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 11}, (_, i) => `Year ${i}`),
+                    datasets: [{
+                        label: 'Projected Net Worth',
+                        data: projectedData,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffffff',
+                                callback: function(value) {
+                                    return '₹' + formatCurrency(value);
+                                }
+                            },
+                            grid: {
+                                color: '#333'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Report Generation Functions
         function generateDetailedReport() {
-            showAlert('Detailed report generated! This is a demo feature.', 'info');
-        }
+            const reportContent = `
+                <div style="padding: 20px; background: #0a0a0a; border-radius: 10px;">
+                    <h3 style="text-align: center; margin-bottom: 30px; color: #fff;">
+                        <i class="fas fa-chart-bar"></i> Detailed Financial Report
+                    </h3>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #17a2b8; border-bottom: 2px solid #17a2b8; padding-bottom: 10px;">
+                            Personal Information
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <strong>Name:</strong> ${clientData.basicInfo.name || 'Not provided'}<br>
+                            <strong>Age:</strong> ${clientData.basicInfo.age || 'Not provided'}<br>
+                            <strong>Occupation:</strong> ${clientData.basicInfo.occupation || 'Not provided'}<br>
+                            <strong>City:</strong> ${clientData.basicInfo.city || 'Not provided'}
+                        </div>
+                    </div>
 
-        function downloadDetailedReport() {
-            showAlert('PDF download initiated! This is a demo feature.', 'info');
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #28a745; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
+                            Financial Summary
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <strong>Monthly Income:</strong> ₹${formatCurrency(clientData.financialStatus.monthlyIncome || 0)}<br>
+                            <strong>Monthly Expenses:</strong> ₹${formatCurrency(clientData.financialStatus.monthlyExpenses || 0)}<br>
+                            <strong>Monthly Savings:</strong> ₹${formatCurrency((clientData.financialStatus.monthlyIncome || 0) - (clientData.financialStatus.monthlyExpenses || 0))}<br>
+                            <strong>Current Savings:</strong> ₹${formatCurrency(clientData.financialStatus.currentSavings || 0)}
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #ffc107; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">
+                            Net Worth Analysis
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <strong>Total Assets:</strong> ₹${formatCurrency(clientData.assets.reduce((sum, asset) => sum + asset.value, 0))}<br>
+                            <strong>Total Liabilities:</strong> ₹${formatCurrency(clientData.loans.reduce((sum, loan) => sum + loan.amount, 0))}<br>
+                            <strong>Net Worth:</strong> ₹${formatCurrency(clientData.assets.reduce((sum, asset) => sum + asset.value, 0) - clientData.loans.reduce((sum, loan) => sum + loan.amount, 0))}
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 10px;">
+                            Financial Goals
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            ${clientData.goals.length > 0 ? 
+                                clientData.goals.map(goal => `
+                                    <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                        <strong>${goal.name}</strong><br>
+                                        Target Amount: ₹${formatCurrency(goal.futureAmount)}<br>
+                                        Timeframe: ${goal.timeframe} years<br>
+                                        Priority: ${goal.priority}
+                                    </div>
+                                `).join('') : 
+                                '<p>No financial goals defined yet.</p>'
+                            }
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #6f42c1; border-bottom: 2px solid #6f42c1; padding-bottom: 10px;">
+                            Investment Profile
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <strong>Personality Type:</strong> ${clientData.assessmentResults.personalityType || 'Not assessed'}<br>
+                            <strong>Risk Tolerance:</strong> ${clientData.riskProfile.tolerance || 'Not defined'}<br>
+                            <strong>Investment Horizon:</strong> ${clientData.riskProfile.horizon || 'Not defined'}<br>
+                            <strong>Monthly Investment Capacity:</strong> ₹${formatCurrency(clientData.riskProfile.monthlyInvestment || 0)}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('report-preview').style.display = 'block';
+            document.getElementById('report-content').innerHTML = reportContent;
         }
 
         function generateInvestmentReport() {
-            showAlert('Investment report generated! This is a demo feature.', 'info');
-        }
+            const reportContent = `
+                <div style="padding: 20px; background: #0a0a0a; border-radius: 10px;">
+                    <h3 style="text-align: center; margin-bottom: 30px; color: #fff;">
+                        <i class="fas fa-lightbulb"></i> Investment Strategy Report
+                    </h3>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #17a2b8; border-bottom: 2px solid #17a2b8; padding-bottom: 10px;">
+                            Your Investment Profile
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <strong>Investor Type:</strong> ${clientData.assessmentResults.personalityType || 'Moderate Investor'}<br>
+                            <strong>Risk Appetite:</strong> ${clientData.riskProfile.tolerance || 'Moderate'}<br>
+                            <strong>Investment Experience:</strong> ${clientData.riskProfile.experience || 'Intermediate'}<br>
+                            <strong>Time Horizon:</strong> ${clientData.riskProfile.horizon || 'Medium Term'}
+                        </div>
+                    </div>
 
-        function downloadInvestmentReport() {
-            showAlert('Investment report PDF download initiated! This is a demo feature.', 'info');
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #28a745; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
+                            Recommended Asset Allocation
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            ${clientData.riskProfile.tolerance === 'aggressive' ? `
+                                <strong>Equity:</strong> 80% (High growth potential)<br>
+                                <strong>Debt:</strong> 15% (Stability)<br>
+                                <strong>Gold:</strong> 5% (Hedge against inflation)
+                            ` : clientData.riskProfile.tolerance === 'conservative' ? `
+                                <strong>Equity:</strong> 30% (Limited growth)<br>
+                                <strong>Debt:</strong> 60% (High stability)<br>
+                                <strong>Gold:</strong> 10% (Hedge against inflation)
+                            ` : `
+                                <strong>Equity:</strong> 60% (Balanced growth)<br>
+                                <strong>Debt:</strong> 30% (Stability)<br>
+                                <strong>Gold:</strong> 10% (Hedge against inflation)
+                            `}
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #ffc107; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">
+                            Investment Recommendations
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                <strong>Equity Investments:</strong><br>
+                                • Large Cap Funds: 40% of equity allocation<br>
+                                • Mid Cap Funds: 35% of equity allocation<br>
+                                • Small Cap Funds: 25% of equity allocation
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                <strong>Debt Investments:</strong><br>
+                                • Corporate Bond Funds: 50% of debt allocation<br>
+                                • Government Securities: 30% of debt allocation<br>
+                                • Liquid Funds: 20% of debt allocation
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                <strong>Gold Investment:</strong><br>
+                                • Gold ETFs or Gold Funds for easy liquidity
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 10px;">
+                            Expected Returns & Projections
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <strong>Expected Annual Return:</strong> ${clientData.riskProfile.tolerance === 'aggressive' ? '14%' : clientData.riskProfile.tolerance === 'conservative' ? '8%' : '12%'}<br>
+                            <strong>10-Year Projection:</strong> ₹${formatCurrency(calculateSIPValue(clientData.riskProfile.monthlyInvestment || 10000, clientData.riskProfile.tolerance === 'aggressive' ? 14 : clientData.riskProfile.tolerance === 'conservative' ? 8 : 12, 10))}<br>
+                            <strong>20-Year Projection:</strong> ₹${formatCurrency(calculateSIPValue(clientData.riskProfile.monthlyInvestment || 10000, clientData.riskProfile.tolerance === 'aggressive' ? 14 : clientData.riskProfile.tolerance === 'conservative' ? 8 : 12, 20))}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('report-preview').style.display = 'block';
+            document.getElementById('report-content').innerHTML = reportContent;
         }
 
         function generateActionPlan() {
-            showAlert('Action plan generated! This is a demo feature.', 'info');
+            const reportContent = `
+                <div style="padding: 20px; background: #0a0a0a; border-radius: 10px;">
+                    <h3 style="text-align: center; margin-bottom: 30px; color: #fff;">
+                        <i class="fas fa-tasks"></i> Financial Action Plan
+                    </h3>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 10px;">
+                            Immediate Actions (Next 30 Days)
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                ✅ <strong>Emergency Fund:</strong> Build emergency fund of ₹${formatCurrency((clientData.financialStatus.monthlyExpenses || 50000) * 6)}
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                ✅ <strong>Insurance Review:</strong> Ensure adequate life and health insurance coverage
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                ✅ <strong>Debt Management:</strong> List all debts and create repayment strategy
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #ffc107; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">
+                            Short-term Goals (3-6 Months)
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                🎯 <strong>Start SIP:</strong> Begin systematic investment of ₹${formatCurrency(clientData.riskProfile.monthlyInvestment || 10000)} monthly
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                🎯 <strong>Tax Planning:</strong> Optimize tax savings through 80C and 80D investments
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                �� <strong>Budget Tracking:</strong> Implement expense tracking and budget optimization
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #28a745; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
+                            Medium-term Goals (6-12 Months)
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                📈 <strong>Portfolio Diversification:</strong> Spread investments across different asset classes
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                📈 <strong>Goal-based Investing:</strong> Create separate funds for each financial goal
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                📈 <strong>Review & Rebalance:</strong> Quarterly portfolio review and rebalancing
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #17a2b8; border-bottom: 2px solid #17a2b8; padding-bottom: 10px;">
+                            Long-term Strategy (1+ Years)
+                        </h4>
+                        <div style="margin: 15px 0;">
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                🚀 <strong>Wealth Creation:</strong> Focus on equity investments for long-term wealth building
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                🚀 <strong>Retirement Planning:</strong> Increase retirement corpus contributions
+                            </div>
+                            <div style="margin: 10px 0; padding: 10px; background: #1a1a1a; border-radius: 5px;">
+                                🚀 <strong>Estate Planning:</strong> Create will and succession planning
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('report-preview').style.display = 'block';
+            document.getElementById('report-content').innerHTML = reportContent;
+        }
+
+        function downloadDetailedReport() {
+            generatePDFReport('Detailed Financial Report');
+        }
+
+        function downloadInvestmentReport() {
+            generatePDFReport('Investment Strategy Report');
         }
 
         function downloadActionPlan() {
-            showAlert('Action plan PDF download initiated! This is a demo feature.', 'info');
+            generatePDFReport('Financial Action Plan');
         }
 
+        function generatePDFReport(title) {
+            // This is a demo implementation
+            // In a real application, you would use jsPDF to generate actual PDFs
+            showAlert(`${title} PDF generation initiated. This is a demo version - in production, this would generate and download a professional PDF report.`, 'info');
+        }
+
+        // Executive Summary Functions
         function generateExecutiveSummary() {
-            showAlert('Executive summary generated! This is a demo feature.', 'info');
+            const totalAssets = clientData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = clientData.loans.reduce((sum, loan) => sum + loan.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            const monthlyIncome = clientData.financialStatus.monthlyIncome || 0;
+            const monthlyExpenses = clientData.financialStatus.monthlyExpenses || 0;
+            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome * 100) : 0;
+
+            const summaryContent = `
+                <div class="alert alert-success">
+                    <h4><i class="fas fa-chart-line"></i> Executive Summary</h4>
+                    <p>Generated on ${new Date().toLocaleDateString()}</p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-user"></i> Client Overview</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Name:</span>
+                                <span class="data-value">${clientData.basicInfo.name || 'Not provided'}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Age:</span>
+                                <span class="data-value">${clientData.basicInfo.age || 'Not provided'} years</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Investor Type:</span>
+                                <span class="data-value">${clientData.assessmentResults.personalityType || 'Not assessed'}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Risk Profile:</span>
+                                <span class="data-value">${clientData.riskProfile.tolerance || 'Not defined'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-bar"></i> Financial Health</h4>
+                        </div>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Net Worth:</span>
+                                <span class="data-value">₹${formatCurrency(netWorth)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Monthly Income:</span>
+                                <span class="data-value">₹${formatCurrency(monthlyIncome)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Savings Rate:</span>
+                                <span class="data-value">${savingsRate.toFixed(1)}%</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Financial Goals:</span>
+                                <span class="data-value">${clientData.goals.length} active goals</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-bullseye"></i> Key Recommendations</h4>
+                    </div>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        ${savingsRate < 10 ? '<li style="color: #dc3545;">⚠️ Increase your savings rate to at least 20% of income</li>' : ''}
+                        ${netWorth < 0 ? '<li style="color: #dc3545;">⚠️ Focus on debt reduction to improve net worth</li>' : ''}
+                        ${clientData.goals.length === 0 ? '<li style="color: #ffc107;">📋 Define clear financial goals with timelines</li>' : ''}
+                        ${!clientData.assessmentResults.personalityType ? '<li style="color: #17a2b8;">📊 Complete personality assessment for better recommendations</li>' : ''}
+                        <li style="color: #28a745;">✅ Consider starting SIP of ₹${formatCurrency(clientData.riskProfile.monthlyInvestment || 10000)} monthly</li>
+                        <li style="color: #28a745;">✅ Build emergency fund of ₹${formatCurrency(monthlyExpenses * 6)}</li>
+                        <li style="color: #28a745;">✅ Review and optimize insurance coverage</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-road"></i> Next Steps</h4>
+                    </div>
+                    <div class="alert alert-info">
+                        <ol style="margin-left: 20px; line-height: 1.8;">
+                            <li>Complete all sections of the financial planner</li>
+                            <li>Review and finalize investment strategy</li>
+                            <li>Implement recommended portfolio allocation</li>
+                            <li>Set up automatic investments (SIP)</li>
+                            <li>Schedule quarterly review meetings</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('executive-summary-content').innerHTML = summaryContent;
         }
 
-        function downloadExecutiveSummary() {
-            showAlert('Executive summary PDF download initiated! This is a demo feature.', 'info');
+        // Chatbot Functions
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbot-window');
+            isChatbotOpen = !isChatbotOpen;
+            chatbotWindow.style.display = isChatbotOpen ? 'block' : 'none';
+            
+            if (isChatbotOpen && document.getElementById('chat-messages').children.length === 0) {
+                addMessageToChat('bot', 'Hello! I\'m your financial planning assistant. I can help you with investment advice, retirement planning, tax saving strategies, and more. What would you like to know about your financial plan?');
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+
+            // Add user message to chat
+            addMessageToChat('user', message);
+            
+            // Clear input
+            input.value = '';
+
+            // Simulate bot response
+            setTimeout(() => {
+                const response = generateBotResponse(message);
+                addMessageToChat('bot', response);
+            }, 1000);
+        }
+
+        function addMessageToChat(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            
+            if (sender === 'bot') {
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">${message}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-content">${message}</div>
+                    <div class="message-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateBotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('sip') || lowerMessage.includes('investment')) {
+                return "SIP (Systematic Investment Plan) is a great way to build wealth over time. Based on your risk profile, I recommend starting with ₹" + formatCurrency(clientData.riskProfile.monthlyInvestment || 10000) + " monthly. Would you like me to show you some fund recommendations?";
+            }
+            
+            if (lowerMessage.includes('retirement')) {
+                return "Retirement planning is crucial! Based on your current age and expenses, you should aim to accumulate a corpus that can provide 25-30 times your annual expenses. Have you calculated your retirement needs using our retirement calculator?";
+            }
+            
+            if (lowerMessage.includes('tax') || lowerMessage.includes('saving')) {
+                return "Tax saving is important for wealth building. You can save up to ₹46,800 annually by investing ₹1.5 lakh in 80C and ₹25,000 in health insurance under 80D. ELSS funds are particularly good as they offer equity returns with tax benefits.";
+            }
+            
+            if (lowerMessage.includes('emergency') || lowerMessage.includes('fund')) {
+                return "An emergency fund should cover 6-12 months of expenses. Based on your monthly expenses of ₹" + formatCurrency(clientData.financialStatus.monthlyExpenses || 50000) + ", you should maintain ₹" + formatCurrency((clientData.financialStatus.monthlyExpenses || 50000) * 6) + " in liquid funds or savings account.";
+            }
+            
+            if (lowerMessage.includes('insurance')) {
+                return "Insurance is your financial safety net. You need life insurance of 10-15 times your annual income and health insurance of at least ₹5 lakhs. Have you reviewed your current insurance coverage in our insurance section?";
+            }
+            
+            if (lowerMessage.includes('goal') || lowerMessage.includes('planning')) {
+                return "Goal-based financial planning is the key to success. I see you have " + clientData.goals.length + " goals defined. Each goal should have a specific timeline and investment strategy. Would you like help prioritizing your goals?";
+            }
+            
+            if (lowerMessage.includes('risk')) {
+                return "Your risk profile shows you're a " + (clientData.riskProfile.tolerance || 'moderate') + " investor. This means you should allocate " + (clientData.riskProfile.tolerance === 'aggressive' ? '70-80%' : clientData.riskProfile.tolerance === 'conservative' ? '20-40%' : '50-70%') + " to equity investments for optimal returns.";
+            }
+            
+            if (lowerMessage.includes('debt') || lowerMessage.includes('loan')) {
+                return "Debt management is crucial for financial health. Focus on paying off high-interest debts first (credit cards, personal loans). For home loans, consider prepayment if the interest rate is above 8%. Your current debt-to-income ratio should be below 40%.";
+            }
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return "Hello! I'm your financial planning assistant. I can help you with investment advice, retirement planning, tax saving strategies, and more. What would you like to know about your financial plan?";
+            }
+            
+            // Default response
+            return "That's a great question! Based on your financial profile, I'd recommend focusing on building a diversified portfolio aligned with your risk tolerance. You can explore our investment advisory section for personalized recommendations, or feel free to ask me about specific areas like SIP planning, tax saving, or retirement planning.";
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Utility Functions
+        function formatCurrency(amount) {
+            if (amount >= 10000000) {
+                return (amount / 10000000).toFixed(2) + ' Cr';
+            } else if (amount >= 100000) {
+                return (amount / 100000).toFixed(2) + ' L';
+            } else if (amount >= 1000) {
+                return (amount / 1000).toFixed(0) + 'K';
+            }
+            return Math.round(amount).toString();
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                min-width: 300px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+                <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit; font-size: 1.2em; cursor: pointer;">&times;</button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 5000);
         }
 
         // Modal Functions
-        function showExportModal() {
-            document.getElementById('export-modal').classList.add('active');
+        function showProfileModal() {
+            document.getElementById('save-profile-modal').style.display = 'flex';
+            document.getElementById('profile-name-input').focus();
         }
 
-        function closeExportModal() {
-            document.getElementById('export-modal').classList.remove('active');
+        function hideProfileModal() {
+            document.getElementById('save-profile-modal').style.display = 'none';
+            document.getElementById('profile-name-input').value = '';
         }
 
-        function showImportModal() {
-            document.getElementById('import-modal').classList.add('active');
-        }
-
-        function closeImportModal() {
-            document.getElementById('import-modal').classList.remove('active');
-        }
-
-        function closeSaveModal() {
-            document.getElementById('save-profile-modal').classList.remove('active');
-        }
-
-        function exportData(format) {
-            if (format === 'json') {
-                const dataStr = JSON.stringify(clientData, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(dataBlob);
-                link.download = `financial_data_${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-                showAlert('Data exported successfully!', 'success');
-                closeExportModal();
-            } else if (format === 'pdf') {
-                showAlert('PDF export initiated! This is a demo feature.', 'info');
-                closeExportModal();
-            }
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedData = JSON.parse(e.target.result);
-                        clientData = { ...clientData, ...importedData };
-                        loadClientData();
-                        showAlert('Data imported successfully!', 'success');
-                        closeImportModal();
-                    } catch (error) {
-                        showAlert('Error reading file. Please check the format.', 'danger');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        }
-
-        function saveProfile() {
-            const profileName = document.getElementById('profile-name').value.trim();
+        function saveCurrentProfile() {
+            const profileName = document.getElementById('profile-name-input').value.trim();
             
             if (!profileName) {
                 showAlert('Please enter a profile name', 'danger');
@@ -3292,9 +4330,9 @@
             const profileId = Date.now().toString();
             const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
             
+            // Update client data with profile info
             clientData.profileInfo = {
                 name: profileName,
-                description: document.getElementById('profile-description').value,
                 createdDate: new Date().toISOString(),
                 lastModified: new Date().toISOString()
             };
@@ -3303,18 +4341,88 @@
             localStorage.setItem('financialPlannerProfiles', JSON.stringify(profiles));
             
             currentProfileId = profileId;
-            closeSaveModal();
+            hideProfileModal();
             showAlert(`Profile "${profileName}" saved successfully!`, 'success');
+            
+            // Update header
             updateHeaderProfileInfo();
         }
 
-        function saveCurrentProfile() {
-            if (currentProfileId) {
-                autoSave();
-                showAlert('Profile updated successfully!', 'success');
-            } else {
-                document.getElementById('save-profile-modal').classList.add('active');
+        function showExportModal() {
+            document.getElementById('export-modal').style.display = 'flex';
+        }
+
+        function hideExportModal() {
+            document.getElementById('export-modal').style.display = 'none';
+        }
+
+        function showImportModal() {
+            document.getElementById('import-data-modal').style.display = 'flex';
+        }
+
+        function hideImportModal() {
+            document.getElementById('import-data-modal').style.display = 'none';
+        }
+
+        function importFromFile() {
+            const fileInput = document.getElementById('import-file-input');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('Please select a file to import', 'danger');
+                return;
             }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Validate data structure
+                    if (importedData.basicInfo || importedData.financialStatus || importedData.assets) {
+                        clientData = { ...clientData, ...importedData };
+                        
+                        // Generate new profile ID
+                        currentProfileId = Date.now().toString();
+                        
+                        // Save imported profile
+                        const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+                        profiles[currentProfileId] = clientData;
+                        localStorage.setItem('financialPlannerProfiles', JSON.stringify(profiles));
+                        
+                        hideImportModal();
+                        showAlert('Data imported successfully!', 'success');
+                        
+                        // Refresh all displays
+                        loadClientData();
+                    } else {
+                        showAlert('Invalid file format', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Error reading file. Please check the format.', 'danger');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function exportCurrentData() {
+            const dataToExport = {
+                ...clientData,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `financial_data_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            hideExportModal();
+            showAlert('Data exported successfully!', 'success');
         }
 
         function updateHeaderProfileInfo() {

@@ -49,7 +49,7 @@
             line-height: 1.6;
             overflow-x: hidden;
             scroll-behavior: smooth;
-            font-size: 17px;
+            font-size: 15px;
         }
 
         /* Enhanced Container System */
@@ -130,7 +130,7 @@
 
         .profile-header h1 {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(1.4rem, 2.5vw, 2.1rem); /* Reduced for professional look */
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
             font-weight: 800;
             margin-bottom: 1rem;
             background: var(--gradient-accent);
@@ -316,7 +316,7 @@
 
         .app-title {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(1.5rem, 3vw, 2.2rem); /* Reduced for professional look */
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
             font-weight: 900;
             margin-bottom: 1.2rem;
             background: var(--gradient-accent);
@@ -384,17 +384,17 @@
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            padding: 1.2rem 2.5rem; /* Increased padding */
+            padding: 0.7rem 1.5rem;
             border: none;
             border-radius: var(--border-radius-lg);
             font-weight: 600;
-            font-size: 1.2rem; /* Increased font size */
+            font-size: 1rem;
             cursor: pointer;
             transition: var(--transition-bounce);
             text-decoration: none;
             position: relative;
             overflow: hidden;
-            min-width: 200px; /* Increased min width */
+            min-width: 200px;
         }
 
         .btn::before {
@@ -454,9 +454,9 @@
         }
 
         .btn-large {
-            padding: 1.5rem 3rem; /* Increased padding */
-            font-size: 1.3rem; /* Increased font size */
-            min-width: 260px; /* Increased min width */
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            min-width: 260px;
         }
 
         /* Enhanced Main App Layout */
@@ -542,7 +542,7 @@
             background: var(--card-black);
             color: var(--text-white);
             border: 2px solid var(--border-gray);
-            padding: 0.8rem 1.5rem;
+            padding: 0.6rem 1.1rem;
             border-radius: var(--border-radius-lg);
             cursor: pointer;
             font-weight: 500;
@@ -583,7 +583,7 @@
         /* Premium Section Layout */
         .section {
             display: none;
-            padding: 2.5rem 0;
+            padding: 1.2rem 0;
             min-height: calc(100vh - 200px);
         }
 
@@ -623,7 +623,7 @@
 
         .section-title {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(1.2rem, 2vw, 1.7rem); /* Reduced for professional look */
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
             font-weight: 700;
             margin-bottom: 1rem;
             color: var(--text-white);
@@ -643,8 +643,8 @@
             background: var(--gradient-card);
             border: 2px solid var(--border-gray);
             border-radius: var(--border-radius-md);
-            padding: 3rem; /* Increased from 2rem */
-            margin: 2rem 0; /* Increased margin */
+            padding: 1.2rem;
+            margin: 1rem 0;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
@@ -5195,11 +5195,17 @@
             y += 7;
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(12);
-            doc.text(`Monthly Income: ₹${formatCurrency(clientData.financialStatus?.monthlyIncome || 0)}`, 15, y);
+            const income = clientData.financialStatus?.monthlyIncome || 0;
+            const expenses = clientData.financialStatus?.monthlyExpenses || 0;
+            const savings = income - expenses;
+            const savingsRate = income ? ((savings / income) * 100).toFixed(1) : '0';
+            doc.text(`Monthly Income: ₹${formatCurrency(income)}`, 15, y);
             y += 6;
-            doc.text(`Monthly Expenses: ₹${formatCurrency(clientData.financialStatus?.monthlyExpenses || 0)}`, 15, y);
+            doc.text(`Monthly Expenses: ₹${formatCurrency(expenses)}`, 15, y);
             y += 6;
-            doc.text(`Monthly Savings: ₹${formatCurrency((clientData.financialStatus?.monthlyIncome || 0) - (clientData.financialStatus?.monthlyExpenses || 0))}`, 15, y);
+            doc.text(`Monthly Savings: ₹${formatCurrency(savings)}`, 15, y);
+            y += 6;
+            doc.text(`Savings Rate: ${savingsRate}%`, 15, y);
             y += 6;
             doc.text(`Current Savings: ₹${formatCurrency(clientData.financialStatus?.currentSavings || 0)}`, 15, y);
             y += 10;
@@ -5212,12 +5218,42 @@
             const totalAssets = (clientData.assets||[]).reduce((sum, asset) => sum + asset.value, 0);
             const totalLiabilities = (clientData.loans||[]).reduce((sum, loan) => sum + loan.amount, 0);
             const netWorth = totalAssets - totalLiabilities;
+            const netWorthStatus = netWorth > 0 ? 'Positive' : (netWorth < 0 ? 'Negative' : 'Neutral');
             doc.text(`Total Assets: ₹${formatCurrency(totalAssets)}`, 15, y);
             y += 6;
             doc.text(`Total Liabilities: ₹${formatCurrency(totalLiabilities)}`, 15, y);
             y += 6;
-            doc.text(`Net Worth: ₹${formatCurrency(netWorth)}`, 15, y);
+            doc.text(`Net Worth: ₹${formatCurrency(netWorth)} (${netWorthStatus})`, 15, y);
             y += 10;
+            // Asset Allocation Pie Chart (simple, 2D)
+            if ((clientData.assets||[]).length > 0) {
+                doc.setFont('helvetica', 'bold');
+                doc.text('Asset Allocation', 15, y);
+                y += 2;
+                // Pie chart center and radius
+                const cx = 45, cy = y + 25, r = 20;
+                let total = clientData.assets.reduce((sum, a) => sum + a.value, 0);
+                let startAngle = 0;
+                const colors = ['#222', '#888', '#ccc', '#444', '#aaa'];
+                clientData.assets.forEach((asset, i) => {
+                    const value = asset.value;
+                    const angle = (value / total) * 2 * Math.PI;
+                    doc.setFillColor(colors[i % colors.length]);
+                    doc.sector(cx, cy, r, startAngle, startAngle + angle, 'F');
+                    startAngle += angle;
+                });
+                // Legend
+                let legendY = cy - r;
+                clientData.assets.forEach((asset, i) => {
+                    doc.setFillColor(colors[i % colors.length]);
+                    doc.rect(cx + r + 10, legendY, 5, 5, 'F');
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.text(asset.name, cx + r + 17, legendY + 4);
+                    legendY += 7;
+                });
+                y = cy + r + 10;
+            }
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(14);
             doc.text('Financial Goals', 15, y);
@@ -5283,11 +5319,17 @@
             y += 7;
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(12);
-            doc.text(`Monthly Income: ₹${formatCurrency(clientData.financialStatus?.monthlyIncome || 0)}`, 15, y);
+            const income = clientData.financialStatus?.monthlyIncome || 0;
+            const expenses = clientData.financialStatus?.monthlyExpenses || 0;
+            const savings = income - expenses;
+            const savingsRate = income ? ((savings / income) * 100).toFixed(1) : '0';
+            doc.text(`Monthly Income: ₹${formatCurrency(income)}`, 15, y);
             y += 6;
-            doc.text(`Monthly Expenses: ₹${formatCurrency(clientData.financialStatus?.monthlyExpenses || 0)}`, 15, y);
+            doc.text(`Monthly Expenses: ₹${formatCurrency(expenses)}`, 15, y);
             y += 6;
-            doc.text(`Monthly Savings: ₹${formatCurrency((clientData.financialStatus?.monthlyIncome || 0) - (clientData.financialStatus?.monthlyExpenses || 0))}`, 15, y);
+            doc.text(`Monthly Savings: ₹${formatCurrency(savings)}`, 15, y);
+            y += 6;
+            doc.text(`Savings Rate: ${savingsRate}%`, 15, y);
             y += 6;
             doc.text(`Current Savings: ₹${formatCurrency(clientData.financialStatus?.currentSavings || 0)}`, 15, y);
             y += 10;
@@ -5300,12 +5342,42 @@
             const totalAssets = (clientData.assets||[]).reduce((sum, asset) => sum + asset.value, 0);
             const totalLiabilities = (clientData.loans||[]).reduce((sum, loan) => sum + loan.amount, 0);
             const netWorth = totalAssets - totalLiabilities;
+            const netWorthStatus = netWorth > 0 ? 'Positive' : (netWorth < 0 ? 'Negative' : 'Neutral');
             doc.text(`Total Assets: ₹${formatCurrency(totalAssets)}`, 15, y);
             y += 6;
             doc.text(`Total Liabilities: ₹${formatCurrency(totalLiabilities)}`, 15, y);
             y += 6;
-            doc.text(`Net Worth: ₹${formatCurrency(netWorth)}`, 15, y);
+            doc.text(`Net Worth: ₹${formatCurrency(netWorth)} (${netWorthStatus})`, 15, y);
             y += 10;
+            // Asset Allocation Pie Chart (simple, 2D)
+            if ((clientData.assets||[]).length > 0) {
+                doc.setFont('helvetica', 'bold');
+                doc.text('Asset Allocation', 15, y);
+                y += 2;
+                // Pie chart center and radius
+                const cx = 45, cy = y + 25, r = 20;
+                let total = clientData.assets.reduce((sum, a) => sum + a.value, 0);
+                let startAngle = 0;
+                const colors = ['#222', '#888', '#ccc', '#444', '#aaa'];
+                clientData.assets.forEach((asset, i) => {
+                    const value = asset.value;
+                    const angle = (value / total) * 2 * Math.PI;
+                    doc.setFillColor(colors[i % colors.length]);
+                    doc.sector(cx, cy, r, startAngle, startAngle + angle, 'F');
+                    startAngle += angle;
+                });
+                // Legend
+                let legendY = cy - r;
+                clientData.assets.forEach((asset, i) => {
+                    doc.setFillColor(colors[i % colors.length]);
+                    doc.rect(cx + r + 10, legendY, 5, 5, 'F');
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.text(asset.name, cx + r + 17, legendY + 4);
+                    legendY += 7;
+                });
+                y = cy + r + 10;
+            }
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(14);
             doc.text('Financial Goals', 15, y);

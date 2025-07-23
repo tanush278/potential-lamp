@@ -1876,12 +1876,41 @@
             </div>
         </header>
 
-        <!-- Compact Navigation -->
-        <div class="compact-nav">
-          <div class="compact-tab active" onclick="showMainSection('client-data')"><i class="fas fa-user-edit"></i> Client</div>
-          <div class="compact-tab" onclick="showMainSection('investment-advisory')"><i class="fas fa-chart-line"></i> Advisory</div>
-          <div class="compact-tab" onclick="showMainSection('analytics-reports')"><i class="fas fa-analytics"></i> Reports</div>
-          <div class="compact-tab" onclick="showMainSection('financial-tools')"><i class="fas fa-tools"></i> Financial Tools</div>
+        <!-- Main Navigation Row -->
+        <div class="compact-nav" id="main-nav">
+          <div class="compact-tab" id="tab-client" onclick="showMainSection('client-data')"><i class="fas fa-user-edit"></i> Client</div>
+          <div class="compact-tab" id="tab-advisory" onclick="showMainSection('investment-advisory')"><i class="fas fa-chart-line"></i> Advisory</div>
+          <div class="compact-tab" id="tab-reports" onclick="showMainSection('analytics-reports')"><i class="fas fa-analytics"></i> Reports</div>
+          <div class="compact-tab" id="tab-tools" onclick="showMainSection('financial-tools')"><i class="fas fa-tools"></i> Financial Tools</div>
+        </div>
+        <!-- Sub Navigation Rows (only one visible at a time) -->
+        <div id="subnav-client-data" class="compact-nav" style="display:none;">
+          <div class="compact-tab" onclick="showSubSection('personality', this)"><i class="fas fa-brain"></i> Assessment</div>
+          <div class="compact-tab" onclick="showSubSection('profile', this)"><i class="fas fa-id-card"></i> Basic Info</div>
+          <div class="compact-tab" onclick="showSubSection('financial', this)"><i class="fas fa-wallet"></i> Financial Status</div>
+          <div class="compact-tab" onclick="showSubSection('networth', this)"><i class="fas fa-calculator"></i> Net Worth</div>
+          <div class="compact-tab" onclick="showSubSection('goals', this)"><i class="fas fa-bullseye"></i> Goals & Insurance</div>
+          <div class="compact-tab" onclick="showSubSection('risk', this)"><i class="fas fa-chart-area"></i> Risk Profile</div>
+        </div>
+        <div id="subnav-investment-advisory" class="compact-nav" style="display:none;">
+          <div class="compact-tab" onclick="showSubSection('recommendations', this)"><i class="fas fa-lightbulb"></i> Investment Plan</div>
+          <div class="compact-tab" onclick="showSubSection('portfolio', this)"><i class="fas fa-pie-chart"></i> Portfolio Analysis</div>
+          <div class="compact-tab" onclick="showSubSection('sip', this)"><i class="fas fa-calendar-check"></i> SIP Calculator</div>
+          <div class="compact-tab" onclick="showSubSection('tax', this)"><i class="fas fa-receipt"></i> Tax Planning</div>
+          <div class="compact-tab" onclick="showSubSection('retirement', this)"><i class="fas fa-umbrella"></i> Retirement</div>
+          <div class="compact-tab" onclick="showSubSection('comparison', this)"><i class="fas fa-balance-scale"></i> Product Compare</div>
+        </div>
+        <div id="subnav-analytics-reports" class="compact-nav" style="display:none;">
+          <div class="compact-tab" onclick="showSubSection('analytics', this)"><i class="fas fa-chart-bar"></i> Analytics</div>
+          <div class="compact-tab" onclick="showSubSection('reports', this)"><i class="fas fa-file-alt"></i> Reports</div>
+          <div class="compact-tab" onclick="showSubSection('summary', this)"><i class="fas fa-clipboard-list"></i> Executive Summary</div>
+          <div class="compact-tab" onclick="showSubSection('alerts', this)"><i class="fas fa-bell"></i> Smart Alerts</div>
+        </div>
+        <div id="subnav-financial-tools" class="compact-nav" style="display:none;">
+          <div class="compact-tab" onclick="showSubSection('loan-calculator', this)"><i class="fas fa-home"></i> Loan Calculator</div>
+          <div class="compact-tab" onclick="showSubSection('budget-planner', this)"><i class="fas fa-chart-pie"></i> Budget Planner</div>
+          <div class="compact-tab" onclick="showSubSection('investment-tracker', this)"><i class="fas fa-trending-up"></i> Investment Tracker</div>
+          <div class="compact-tab" onclick="showSubSection('financial-calendar', this)"><i class="fas fa-calendar-alt"></i> Financial Calendar</div>
         </div>
 
         <!-- Sections Container -->
@@ -3726,21 +3755,20 @@
         }
 
         function showMainSection(section) {
-            // Hide all sub-nav groups
-            document.querySelectorAll('[id$="-subnav"]').forEach(nav => nav.style.display = 'none');
-            
-            // Show selected sub-nav
-            document.getElementById(section + '-subnav').style.display = 'flex';
-            
-            // Update main navigation
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Show first sub-section of the selected main section
-            const firstSubBtn = document.querySelector(`#${section}-subnav .sub-nav-btn`);
-            if (firstSubBtn) {
-                firstSubBtn.click();
-            }
+            // Hide all subnavs
+            document.querySelectorAll('[id^="subnav-"]').forEach(el => el.style.display = 'none');
+            // Remove active from all main tabs
+            document.querySelectorAll('.compact-nav#main-nav .compact-tab').forEach(tab => tab.classList.remove('active'));
+            // Show the right subnav
+            if (section === 'client-data') document.getElementById('subnav-client-data').style.display = 'flex';
+            if (section === 'investment-advisory') document.getElementById('subnav-investment-advisory').style.display = 'flex';
+            if (section === 'analytics-reports') document.getElementById('subnav-analytics-reports').style.display = 'flex';
+            if (section === 'financial-tools') document.getElementById('subnav-financial-tools').style.display = 'flex';
+            // Set active main tab
+            document.getElementById('tab-' + section.replace(/-.*/, '')).classList.add('active');
+            // Show main section as before
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById(section).style.display = 'block';
         }
 
         function showSubSection(section, element) {

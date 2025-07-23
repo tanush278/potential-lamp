@@ -404,6 +404,12 @@
                 </a>
             </div>
             <div class="nav-item">
+                <a class="nav-link" onclick="showSection('assessment')">
+                    <i class="fas fa-clipboard-check nav-icon"></i>
+                    <span>Risk Assessment</span>
+                </a>
+            </div>
+            <div class="nav-item">
                 <a class="nav-link" onclick="showSection('goals')">
                     <i class="fas fa-target nav-icon"></i>
                     <span>Financial Goals</span>
@@ -531,6 +537,21 @@
                 <button class="btn btn-primary" onclick="saveProfile()">
                     <i class="fas fa-save"></i> Save Profile
                 </button>
+                
+                <div style="margin-top: 30px; padding: 20px; border: 1px solid #333; border-radius: 10px;">
+                    <h3><i class="fas fa-upload"></i> Import/Export Profile</h3>
+                    <p style="color: #aaa;">Save your profile or load from a file</p>
+                    
+                    <div style="margin: 15px 0;">
+                        <button class="btn btn-secondary" onclick="exportProfile()">
+                            <i class="fas fa-download"></i> Export Profile
+                        </button>
+                        <input type="file" id="profile-file-input" accept=".json" style="display: none;" onchange="importProfile(event)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('profile-file-input').click()">
+                            <i class="fas fa-upload"></i> Import Profile
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
 

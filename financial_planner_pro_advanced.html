@@ -4741,59 +4741,428 @@
 
         // Placeholder functions for features to be implemented
         function addAsset() {
-            showAlert('Asset management feature is being enhanced. Coming soon!', 'info');
+            const asset = {
+                id: Date.now(),
+                type: document.getElementById('asset-type').value,
+                name: document.getElementById('asset-name').value,
+                value: parseFloat(document.getElementById('asset-value').value)
+            };
+            clientData.assets.push(asset);
+            updateAssetsList();
+            updateNetWorth();
+            document.getElementById('asset-form').reset();
+            autoSave && autoSave();
         }
 
         function updateAssetsList() {
-            // Placeholder for asset list update
+            const container = document.getElementById('assets-list');
+            if (!container) return;
+            container.innerHTML = '';
+            (clientData.assets || []).forEach(asset => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${asset.name}</div>
+                        <div class="item-details">${asset.type} - ₹${formatCurrency(asset.value)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editAsset(${asset.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteAsset(${asset.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+            updateAssetChart && updateAssetChart();
+        }
+
+        function deleteAsset(id) {
+            if (confirm('Are you sure you want to delete this asset?')) {
+                clientData.assets = clientData.assets.filter(asset => asset.id !== id);
+                updateAssetsList();
+                updateNetWorth();
+                autoSave && autoSave();
+            }
+        }
+
+        function editAsset(id) {
+            const asset = clientData.assets.find(a => a.id === id);
+            if (asset) {
+                document.getElementById('asset-type').value = asset.type;
+                document.getElementById('asset-name').value = asset.name;
+                document.getElementById('asset-value').value = asset.value;
+                deleteAsset(id);
+            }
         }
 
         function addLoan() {
-            showAlert('Loan management feature is being enhanced. Coming soon!', 'info');
+            const loan = {
+                id: Date.now(),
+                type: document.getElementById('loan-type').value,
+                amount: parseFloat(document.getElementById('loan-amount').value),
+                rate: parseFloat(document.getElementById('loan-rate').value),
+                tenure: parseFloat(document.getElementById('loan-tenure').value)
+            };
+            clientData.loans.push(loan);
+            updateLoansList();
+            updateNetWorth();
+            document.getElementById('loan-form').reset();
+            autoSave && autoSave();
         }
 
         function updateLoansList() {
-            // Placeholder for loan list update
+            const container = document.getElementById('loans-list');
+            if (!container) return;
+            container.innerHTML = '';
+            (clientData.loans || []).forEach(loan => {
+                const totalInterest = calculateTotalInterest(loan.amount, loan.rate, loan.tenure);
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${loan.type} Loan</div>
+                        <div class="item-details">
+                            Amount: ₹${formatCurrency(loan.amount)} | Rate: ${loan.rate}% | 
+                            Tenure: ${loan.tenure} years | Total Interest: ₹${formatCurrency(totalInterest)}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editLoan(${loan.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteLoan(${loan.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function deleteLoan(id) {
+            if (confirm('Are you sure you want to delete this loan?')) {
+                clientData.loans = clientData.loans.filter(loan => loan.id !== id);
+                updateLoansList();
+                updateNetWorth();
+                autoSave && autoSave();
+            }
+        }
+
+        function editLoan(id) {
+            const loan = clientData.loans.find(l => l.id === id);
+            if (loan) {
+                document.getElementById('loan-type').value = loan.type;
+                document.getElementById('loan-amount').value = loan.amount;
+                document.getElementById('loan-rate').value = loan.rate;
+                document.getElementById('loan-tenure').value = loan.tenure;
+                deleteLoan(id);
+            }
+        }
+
+        function calculateTotalInterest(principal, rate, tenure) {
+            const monthlyRate = rate / 12 / 100;
+            const months = tenure * 12;
+            const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+            return (emi * months) - principal;
         }
 
         function updateNetWorth() {
-            // Placeholder for net worth calculation
+            const totalAssets = (clientData.assets || []).reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = (clientData.loans || []).reduce((sum, loan) => sum + loan.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+            document.getElementById('total-assets').textContent = '₹' + formatCurrency(totalAssets);
+            document.getElementById('total-liabilities').textContent = '₹' + formatCurrency(totalLiabilities);
+            document.getElementById('net-worth').textContent = '₹' + formatCurrency(netWorth);
+        }
+
+        function updateAssetChart() {
+            const ctx = document.getElementById('asset-chart');
+            if (!ctx) return;
+            if (window.charts && window.charts.assetChart) {
+                window.charts.assetChart.destroy();
+            }
+            const assetTypes = {};
+            (clientData.assets || []).forEach(asset => {
+                if (!assetTypes[asset.type]) {
+                    assetTypes[asset.type] = 0;
+                }
+                assetTypes[asset.type] += asset.value;
+            });
+            const labels = Object.keys(assetTypes);
+            const data = Object.values(assetTypes);
+            const colors = ['#fff', '#ccc', '#888', '#444', '#222'];
+            if (labels.length === 0) {
+                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+                return;
+            }
+            window.charts = window.charts || {};
+            window.charts.assetChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#333'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function addGoal() {
-            showAlert('Goal management feature is being enhanced. Coming soon!', 'info');
+            const todayAmount = parseFloat(document.getElementById('goal-amount').value);
+            const timeframe = parseFloat(document.getElementById('goal-timeframe').value);
+            const inflationRate = parseFloat(document.getElementById('goal-inflation').value) / 100;
+            const futureValue = todayAmount * Math.pow(1 + inflationRate, timeframe);
+            const goal = {
+                id: Date.now(),
+                name: document.getElementById('goal-name').value,
+                todayAmount: todayAmount,
+                futureAmount: futureValue,
+                timeframe: timeframe,
+                inflationRate: inflationRate * 100,
+                priority: document.getElementById('goal-priority').value,
+                progress: 0
+            };
+            clientData.goals.push(goal);
+            updateGoalsList();
+            document.getElementById('goal-form').reset();
+            document.getElementById('goal-inflation').value = 6;
+            autoSave && autoSave();
         }
 
         function updateGoalsList() {
-            // Placeholder for goals list update
+            const container = document.getElementById('goals-list');
+            if (!container) return;
+            container.innerHTML = '';
+            (clientData.goals || []).forEach(goal => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${goal.name}</div>
+                        <div class="item-details">
+                            Today's Value: ₹${formatCurrency(goal.todayAmount)} | 
+                            Future Value: ₹${formatCurrency(goal.futureAmount)} | 
+                            Timeframe: ${goal.timeframe} years | 
+                            Priority: ${goal.priority}
+                        </div>
+                        <div class="item-details" style="margin-top: 5px;">
+                            Inflation Rate: ${goal.inflationRate}% | 
+                            Required Monthly SIP: ₹${formatCurrency(calculateRequiredSIP(goal.futureAmount, goal.timeframe))}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editGoal(${goal.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteGoal(${goal.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function deleteGoal(id) {
+            if (confirm('Are you sure you want to delete this goal?')) {
+                clientData.goals = clientData.goals.filter(goal => goal.id !== id);
+                updateGoalsList();
+                autoSave && autoSave();
+            }
+        }
+
+        function editGoal(id) {
+            const goal = clientData.goals.find(g => g.id === id);
+            if (goal) {
+                document.getElementById('goal-name').value = goal.name;
+                document.getElementById('goal-amount').value = goal.todayAmount;
+                document.getElementById('goal-timeframe').value = goal.timeframe;
+                document.getElementById('goal-inflation').value = goal.inflationRate;
+                document.getElementById('goal-priority').value = goal.priority;
+                deleteGoal(id);
+            }
+        }
+
+        function calculateRequiredSIP(futureValue, years) {
+            const monthlyReturn = 0.12 / 12;
+            const months = years * 12;
+            return futureValue * monthlyReturn / (Math.pow(1 + monthlyReturn, months) - 1);
+        }
+
+        function calculateLifeInsurance() {
+            const familyExpenses = parseFloat(document.getElementById('family-expenses').value) || 0;
+            const outstandingLoans = parseFloat(document.getElementById('outstanding-loans').value) || 0;
+            const incomeYears = parseFloat(document.getElementById('income-years').value) || 10;
+            const lifeInsuranceNeed = (familyExpenses * incomeYears) + outstandingLoans;
+            clientData.insuranceProfile.lifeInsuranceNeed = lifeInsuranceNeed;
+            document.getElementById('insurance-results').style.display = 'block';
+            document.getElementById('insurance-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h4><i class="fas fa-calculator"></i> Life Insurance Calculation</h4>
+                    <div class="data-display">
+                        <div class="data-row">
+                            <span class="data-label">Family Annual Expenses:</span>
+                            <span class="data-value">₹${formatCurrency(familyExpenses)}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Income Replacement Years:</span>
+                            <span class="data-value">${incomeYears} years</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Outstanding Loans:</span>
+                            <span class="data-value">₹${formatCurrency(outstandingLoans)}</span>
+                        </div>
+                        <div class="data-row" style="border-top: 2px solid #17a2b8; font-weight: bold;">
+                            <span class="data-label">Recommended Life Insurance:</span>
+                            <span class="data-value">₹${formatCurrency(lifeInsuranceNeed)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateHealthInsurance() {
+            const familyExpenses = parseFloat(document.getElementById('family-expenses').value) || 0;
+            const healthInsuranceNeed = Math.max(500000, familyExpenses * 0.1);
+            clientData.insuranceProfile.healthInsuranceNeed = healthInsuranceNeed;
+            const existingContent = document.getElementById('insurance-results').innerHTML;
+            document.getElementById('insurance-results').style.display = 'block';
+            document.getElementById('insurance-results').innerHTML = existingContent + `
+                <div class="alert alert-info" style="margin-top: 15px;">
+                    <h4><i class="fas fa-calculator"></i> Health Insurance Calculation</h4>
+                    <div class="data-display">
+                        <div class="data-row">
+                            <span class="data-label">Family Annual Expenses:</span>
+                            <span class="data-value">₹${formatCurrency(familyExpenses)}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Calculation Method:</span>
+                            <span class="data-value">Max(₹5,00,000, 10% of annual expenses)</span>
+                        </div>
+                        <div class="data-row" style="border-top: 2px solid #17a2b8; font-weight: bold;">
+                            <span class="data-label">Recommended Health Insurance:</span>
+                            <span class="data-value">₹${formatCurrency(healthInsuranceNeed)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function saveInsuranceProfile() {
-            showAlert('Insurance profile feature is being enhanced. Coming soon!', 'info');
+            clientData.insuranceProfile = {
+                currentLifeInsurance: parseFloat(document.getElementById('current-life-insurance').value) || 0,
+                currentHealthInsurance: parseFloat(document.getElementById('current-health-insurance').value) || 0,
+                outstandingLoans: parseFloat(document.getElementById('outstanding-loans').value) || 0,
+                familyExpenses: parseFloat(document.getElementById('family-expenses').value) || 0,
+                incomeYears: parseFloat(document.getElementById('income-years').value) || 10,
+                lifeInsuranceNeed: clientData.insuranceProfile.lifeInsuranceNeed || 0,
+                healthInsuranceNeed: clientData.insuranceProfile.healthInsuranceNeed || 0
+            };
+            displayInsuranceInfo();
+            autoSave && autoSave();
         }
 
         function displayInsuranceInfo() {
-            // Placeholder for insurance info display
+            const info = clientData.insuranceProfile;
+            document.getElementById('insurance-form').style.display = 'none';
+            document.getElementById('saved-insurance-info').style.display = 'block';
+            document.getElementById('insurance-info-display').innerHTML = `
+                <div class="data-display">
+                    <div class="data-row">
+                        <span class="data-label">Current Life Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.currentLifeInsurance)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Current Health Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.currentHealthInsurance)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Recommended Life Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.lifeInsuranceNeed)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Recommended Health Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.healthInsuranceNeed)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Life Insurance Gap:</span>
+                        <span class="data-value">₹${formatCurrency(Math.max(0, info.lifeInsuranceNeed - info.currentLifeInsurance))}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Health Insurance Gap:</span>
+                        <span class="data-value">₹${formatCurrency(Math.max(0, info.healthInsuranceNeed - info.currentHealthInsurance))}</span>
+                    </div>
+                </div>
+            `;
         }
 
         function editInsuranceInfo() {
-            // Placeholder for insurance info editing
+            document.getElementById('insurance-form').style.display = 'block';
+            document.getElementById('saved-insurance-info').style.display = 'none';
         }
 
         function saveRiskProfile() {
-            showAlert('Risk profile feature is being enhanced. Coming soon!', 'info');
+            clientData.riskProfile = {
+                experience: document.getElementById('investment-experience').value,
+                tolerance: document.getElementById('risk-tolerance').value,
+                horizon: document.getElementById('investment-horizon').value,
+                monthlyInvestment: parseFloat(document.getElementById('monthly-investment').value)
+            };
+            displayRiskInfo();
+            autoSave && autoSave();
         }
 
         function displayRiskInfo() {
-            // Placeholder for risk info display
+            const info = clientData.riskProfile;
+            document.getElementById('risk-form').style.display = 'none';
+            document.getElementById('saved-risk-info').style.display = 'block';
+            document.getElementById('risk-info-display').innerHTML = `
+                <div class="data-display">
+                    <div class="data-row">
+                        <span class="data-label">Investment Experience:</span>
+                        <span class="data-value">${info.experience}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Risk Tolerance:</span>
+                        <span class="data-value">${info.tolerance}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Investment Horizon:</span>
+                        <span class="data-value">${info.horizon}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Monthly Investment Capacity:</span>
+                        <span class="data-value">₹${formatCurrency(info.monthlyInvestment)}</span>
+                    </div>
+                </div>
+            `;
         }
 
         function editRiskInfo() {
-            // Placeholder for risk info editing
+            document.getElementById('risk-form').style.display = 'block';
+            document.getElementById('saved-risk-info').style.display = 'none';
         }
 
         function updateAllCharts() {
-            showAlert('Advanced analytics and charts are being enhanced. Coming soon!', 'info');
+            updateAssetChart && updateAssetChart();
+            // Add more chart updates as needed
         }
 
         function generateDetailedReport() {

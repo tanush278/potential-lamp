@@ -15,6 +15,45 @@
     <canvas id="investment-report-pie"></canvas>
   </div>
 </div>
+<!-- Add Investment Report tab to navigation -->
+<nav class="main-nav">
+  <div class="container">
+    <div class="nav-buttons">
+      <button class="nav-btn active" onclick="showMainSection('client-data')">
+        <i class="fas fa-user-edit"></i> Client Data
+      </button>
+      <button class="nav-btn" onclick="showMainSection('investment-advisory')">
+        <i class="fas fa-chart-line"></i> Investment Advisory
+      </button>
+      <button class="nav-btn" onclick="showMainSection('analytics-reports')">
+        <i class="fas fa-analytics"></i> Analytics & Reports
+      </button>
+      <button class="nav-btn" onclick="showMainSection('investment-report')">
+        <i class="fas fa-chart-pie"></i> Investment Report
+      </button>
+      <button class="nav-btn" onclick="showMainSection('advanced-tools')">
+        <i class="fas fa-tools"></i> Advanced Tools
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Add Investment Report section -->
+<main class="container">
+  <section id="investment-report" class="section" style="display:none;">
+    <div class="section-header">
+      <h2 class="section-title"><i class="fas fa-chart-pie"></i> Investment Report</h2>
+      <p class="section-subtitle">See your real asset allocation and investment summary below.</p>
+    </div>
+    <div class="card">
+      <h3 style="text-align:center;">Asset Allocation</h3>
+      <div style="max-width:400px;margin:24px auto;">
+        <canvas id="investment-asset-pie"></canvas>
+      </div>
+      <div id="investment-summary" style="text-align:center;margin-top:24px;"></div>
+    </div>
+  </section>
+</main>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   if (window.Chart) {
@@ -35,4 +74,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+function showMainSection(section) {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.getElementById(section).style.display = 'block';
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  const navBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(section));
+  if (navBtn) navBtn.classList.add('active');
+  if (section === 'investment-report') renderInvestmentReport();
+}
+function renderInvestmentReport() {
+  // Example: Use real asset data if available
+  const assets = (window.clientData && window.clientData.assets) ? window.clientData.assets : [
+    {type:'Stocks', name:'Stocks', value:400000},
+    {type:'Bonds', name:'Bonds', value:250000},
+    {type:'Gold', name:'Gold', value:150000},
+    {type:'Real Estate', name:'Real Estate', value:200000}
+  ];
+  const ctx = document.getElementById('investment-asset-pie').getContext('2d');
+  if (window.investmentPieChart) window.investmentPieChart.destroy();
+  window.investmentPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: assets.map(a => a.name),
+      datasets: [{
+        data: assets.map(a => a.value),
+        backgroundColor: ['#4bc0c0','#36a2eb','#ffce56','#9966ff','#ff6384','#b0b8c9'],
+      }]
+    },
+    options: {
+      plugins: { legend: { labels: { color: '#fff' } } },
+      responsive: true
+    }
+  });
+  // Summary
+  const total = assets.reduce((sum, a) => sum + a.value, 0);
+  let summary = `<b>Total Investments:</b> ₹${total.toLocaleString()}<br><br>`;
+  summary += assets.map(a => `${a.name}: ₹${a.value.toLocaleString()} (${((a.value/total)*100).toFixed(1)}%)`).join('<br>');
+  document.getElementById('investment-summary').innerHTML = summary;
+}
 </script>

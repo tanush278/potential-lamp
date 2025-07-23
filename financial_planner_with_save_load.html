@@ -2107,3 +2107,1271 @@
     </div>
 
     <script>
+        // Global Variables
+        let currentProfileId = null;
+        let clientData = {
+            profileInfo: {},
+            basicInfo: {},
+            financialStatus: {},
+            assets: [],
+            loans: [],
+            goals: [],
+            insuranceProfile: {},
+            riskProfile: {},
+            assessmentResults: {}
+        };
+
+        let assessmentQuestions = [
+            {
+                question: "How do you react to market volatility?",
+                options: [
+                    { text: "I panic and want to sell immediately", score: 1 },
+                    { text: "I feel uncomfortable but hold on", score: 2 },
+                    { text: "I see it as a buying opportunity", score: 3 },
+                    { text: "I'm completely comfortable with fluctuations", score: 4 }
+                ]
+            },
+            {
+                question: "What's your primary investment goal?",
+                options: [
+                    { text: "Capital preservation", score: 1 },
+                    { text: "Steady income generation", score: 2 },
+                    { text: "Long-term wealth creation", score: 3 },
+                    { text: "Maximum returns regardless of risk", score: 4 }
+                ]
+            },
+            {
+                question: "If your investment lost 20% in a year, you would:",
+                options: [
+                    { text: "Sell everything immediately", score: 1 },
+                    { text: "Reduce your investment amount", score: 2 },
+                    { text: "Continue with the same strategy", score: 3 },
+                    { text: "Invest more to average down", score: 4 }
+                ]
+            },
+            {
+                question: "What percentage of your income can you invest?",
+                options: [
+                    { text: "Less than 10%", score: 1 },
+                    { text: "10-20%", score: 2 },
+                    { text: "20-30%", score: 3 },
+                    { text: "More than 30%", score: 4 }
+                ]
+            },
+            {
+                question: "How important is liquidity for your investments?",
+                options: [
+                    { text: "Extremely important - need immediate access", score: 1 },
+                    { text: "Somewhat important - occasional access needed", score: 2 },
+                    { text: "Not very important - can wait a few years", score: 3 },
+                    { text: "Not important at all - long-term commitment", score: 4 }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedAnswers = [];
+        let charts = {};
+        let isChatbotOpen = false;
+
+        // Profile Management Functions
+        function loadProfiles() {
+            const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+            const profilesContainer = document.getElementById('profiles-container');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const savedProfiles = document.getElementById('saved-profiles');
+
+            if (Object.keys(profiles).length === 0) {
+                welcomeMessage.style.display = 'block';
+                savedProfiles.style.display = 'none';
+            } else {
+                welcomeMessage.style.display = 'none';
+                savedProfiles.style.display = 'block';
+                
+                profilesContainer.innerHTML = '';
+                
+                Object.entries(profiles).forEach(([id, profile]) => {
+                    const profileCard = document.createElement('div');
+                    profileCard.className = 'profile-item';
+                    profileCard.innerHTML = `
+                        <div class="profile-item-info">
+                            <h4>${profile.profileInfo.name || 'Unnamed Profile'}</h4>
+                            <p>Created: ${new Date(profile.profileInfo.createdDate).toLocaleDateString()}</p>
+                            <p>Last Modified: ${new Date(profile.profileInfo.lastModified).toLocaleDateString()}</p>
+                        </div>
+                        <div class="profile-item-actions">
+                            <button class="btn btn-primary btn-small" onclick="loadProfile('${id}')">
+                                <i class="fas fa-folder-open"></i> Open
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="deleteProfile('${id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    `;
+                    profilesContainer.appendChild(profileCard);
+                });
+            }
+        }
+
+        function createNewProfile() {
+            currentProfileId = null;
+            clientData = {
+                profileInfo: {},
+                basicInfo: {},
+                financialStatus: {},
+                assets: [],
+                loans: [],
+                goals: [],
+                insuranceProfile: {},
+                riskProfile: {},
+                assessmentResults: {}
+            };
+            
+            document.getElementById('profile-management').style.display = 'none';
+            document.getElementById('cover-page').style.display = 'flex';
+        }
+
+        function loadProfile(profileId) {
+            const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+            const profile = profiles[profileId];
+            
+            if (profile) {
+                currentProfileId = profileId;
+                clientData = profile;
+                
+                document.getElementById('profile-management').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                
+                loadClientData();
+                updateHeaderProfileInfo();
+            }
+        }
+
+        function deleteProfile(profileId) {
+            if (confirm('Are you sure you want to delete this profile? This action cannot be undone.')) {
+                const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+                delete profiles[profileId];
+                localStorage.setItem('financialPlannerProfiles', JSON.stringify(profiles));
+                loadProfiles();
+                showAlert('Profile deleted successfully!', 'success');
+            }
+        }
+
+        function goBackToProfiles() {
+            document.getElementById('profile-management').style.display = 'flex';
+            document.getElementById('cover-page').style.display = 'none';
+            document.getElementById('main-app').style.display = 'none';
+            loadProfiles();
+        }
+
+        // Navigation Functions
+        function startPersonalityAssessment() {
+            document.getElementById('cover-page').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            showMainSection('client-data');
+            showSubSection('personality');
+            loadAssessmentQuestion();
+        }
+
+        function startClientProfiling() {
+            document.getElementById('cover-page').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            showMainSection('client-data');
+            showSubSection('profile');
+        }
+
+        function showMainSection(section) {
+            // Hide all sub-nav groups
+            document.querySelectorAll('[id$="-subnav"]').forEach(nav => nav.style.display = 'none');
+            
+            // Show selected sub-nav
+            document.getElementById(section + '-subnav').style.display = 'flex';
+            
+            // Update main navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show first sub-section of the selected main section
+            const firstSubBtn = document.querySelector(`#${section}-subnav .sub-nav-btn`);
+            if (firstSubBtn) {
+                firstSubBtn.click();
+            }
+        }
+
+        function showSubSection(section, element) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(section).classList.add('active');
+
+            // Update sub-navigation
+            document.querySelectorAll('.sub-nav-btn').forEach(btn => btn.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            // Auto-save when switching sections
+            if (currentProfileId) {
+                autoSave();
+            }
+        }
+
+        function autoSave() {
+            clientData.profileInfo.lastModified = new Date().toISOString();
+            const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+            profiles[currentProfileId] = clientData;
+            localStorage.setItem('financialPlannerProfiles', JSON.stringify(profiles));
+        }
+
+        // Assessment Functions
+        function loadAssessmentQuestion() {
+            if (currentQuestion >= assessmentQuestions.length) {
+                completeAssessment();
+                return;
+            }
+
+            const question = assessmentQuestions[currentQuestion];
+            document.getElementById('question-number').textContent = `Question ${currentQuestion + 1} of ${assessmentQuestions.length}`;
+            document.getElementById('question-text').textContent = question.question;
+
+            const optionsContainer = document.getElementById('question-options');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option-btn';
+                optionBtn.textContent = option.text;
+                optionBtn.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionBtn);
+            });
+
+            // Update progress bar
+            const progress = ((currentQuestion) / assessmentQuestions.length) * 100;
+            document.getElementById('assessment-progress').style.width = progress + '%';
+
+            // Show/hide navigation buttons
+            document.getElementById('prev-btn').style.display = currentQuestion > 0 ? 'inline-flex' : 'none';
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function selectOption(optionIndex) {
+            // Remove previous selection
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            // Add selection to clicked option
+            event.target.classList.add('selected');
+            
+            // Store answer
+            selectedAnswers[currentQuestion] = {
+                questionIndex: currentQuestion,
+                optionIndex: optionIndex,
+                score: assessmentQuestions[currentQuestion].options[optionIndex].score
+            };
+
+            // Show next button
+            document.getElementById('next-btn').style.display = 'inline-flex';
+        }
+
+        function nextQuestion() {
+            if (selectedAnswers[currentQuestion]) {
+                currentQuestion++;
+                loadAssessmentQuestion();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadAssessmentQuestion();
+                
+                // Restore previous selection
+                if (selectedAnswers[currentQuestion]) {
+                    const optionBtns = document.querySelectorAll('.option-btn');
+                    optionBtns[selectedAnswers[currentQuestion].optionIndex].classList.add('selected');
+                    document.getElementById('next-btn').style.display = 'inline-flex';
+                }
+            }
+        }
+
+        function completeAssessment() {
+            // Calculate total score
+            const totalScore = selectedAnswers.reduce((sum, answer) => sum + answer.score, 0);
+            const averageScore = totalScore / assessmentQuestions.length;
+
+            let personalityType, description;
+
+            if (averageScore <= 1.5) {
+                personalityType = "Conservative Investor";
+                description = "You prefer stability and capital preservation. Focus on fixed deposits, bonds, and conservative mutual funds with steady returns.";
+            } else if (averageScore <= 2.5) {
+                personalityType = "Moderate Investor";
+                description = "You seek balanced growth with moderate risk. A mix of equity and debt funds would suit your investment style.";
+            } else if (averageScore <= 3.5) {
+                personalityType = "Growth Investor";
+                description = "You're comfortable with higher risk for better returns. Equity mutual funds and stocks align with your investment goals.";
+            } else {
+                personalityType = "Aggressive Investor";
+                description = "You're willing to take high risks for maximum returns. Focus on equity funds, stocks, and emerging market investments.";
+            }
+
+            // Store results
+            clientData.assessmentResults = {
+                personalityType: personalityType,
+                description: description,
+                score: averageScore
+            };
+
+            // Display results
+            document.getElementById('assessment-questions').style.display = 'none';
+            document.getElementById('assessment-results').style.display = 'block';
+            document.getElementById('personality-type').textContent = personalityType;
+            document.getElementById('personality-description').textContent = description;
+
+            // Update progress bar to 100%
+            document.getElementById('assessment-progress').style.width = '100%';
+        }
+
+        function proceedToClientProfiling() {
+            showSubSection('profile', document.querySelector('[onclick="showSubSection(\'profile\', this)"]'));
+        }
+
+        // Utility Functions
+        function formatCurrency(amount) {
+            if (amount >= 10000000) {
+                return (amount / 10000000).toFixed(2) + ' Cr';
+            } else if (amount >= 100000) {
+                return (amount / 100000).toFixed(2) + ' L';
+            } else if (amount >= 1000) {
+                return (amount / 1000).toFixed(0) + 'K';
+            }
+            return Math.round(amount).toString();
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                min-width: 300px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+                <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit; font-size: 1.2em; cursor: pointer;">&times;</button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Chatbot Functions
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbot-window');
+            isChatbotOpen = !isChatbotOpen;
+            chatbotWindow.style.display = isChatbotOpen ? 'block' : 'none';
+        }
+
+        function sendChatbotMessage() {
+            const input = document.getElementById('chatbot-input');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+
+            // Add user message to chat
+            addChatbotMessage('user', message);
+            
+            // Clear input
+            input.value = '';
+
+            // Simulate bot response
+            setTimeout(() => {
+                const response = generateBotResponse(message);
+                addChatbotMessage('bot', response);
+            }, 1000);
+        }
+
+        function addChatbotMessage(sender, message) {
+            const messagesContainer = document.getElementById('chatbot-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = message;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateBotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('sip') || lowerMessage.includes('investment')) {
+                return "SIP is a great way to build wealth over time. Based on your risk profile, I recommend starting with ₹" + formatCurrency(clientData.riskProfile.monthlyInvestment || 10000) + " monthly. Would you like me to show you some fund recommendations?";
+            }
+            
+            if (lowerMessage.includes('retirement')) {
+                return "Retirement planning is crucial! Based on your current age and expenses, you should aim to accumulate a corpus that can provide 25-30 times your annual expenses. Have you calculated your retirement needs using our retirement calculator?";
+            }
+            
+            return "That's a great question! I can help you with investment advice, retirement planning, tax saving strategies, and more. Feel free to ask me about specific areas of financial planning.";
+        }
+
+        function handleChatbotEnter(event) {
+            if (event.key === 'Enter') {
+                sendChatbotMessage();
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfiles();
+            
+            // Add event listeners for forms
+            document.getElementById('basic-info-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveBasicInfo();
+            });
+            
+            document.getElementById('financial-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveFinancialStatus();
+            });
+            
+            document.getElementById('asset-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addAsset();
+            });
+            
+            document.getElementById('loan-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addLoan();
+            });
+            
+            document.getElementById('goal-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addGoal();
+            });
+            
+            document.getElementById('insurance-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveInsuranceProfile();
+            });
+            
+            document.getElementById('risk-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveRiskProfile();
+            });
+            
+            document.getElementById('sip-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateSIPReturns();
+            });
+            
+            document.getElementById('tax-planning-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateTaxSavingPlan();
+            });
+            
+            document.getElementById('retirement-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateRetirement();
+            });
+            
+            document.getElementById('save-profile-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveProfile();
+            });
+        });
+
+        // Basic Info Functions
+        function saveBasicInfo() {
+            clientData.basicInfo = {
+                name: document.getElementById('client-name').value,
+                age: document.getElementById('client-age').value,
+                occupation: document.getElementById('client-occupation').value,
+                maritalStatus: document.getElementById('marital-status').value,
+                dependents: document.getElementById('dependents').value,
+                city: document.getElementById('client-city').value
+            };
+
+            displayBasicInfo();
+            autoSave();
+        }
+
+        function displayBasicInfo() {
+            const info = clientData.basicInfo;
+            document.getElementById('basic-info-form').style.display = 'none';
+            document.getElementById('saved-basic-info').style.display = 'block';
+            
+            document.getElementById('basic-info-display').innerHTML = `
+                <div class="data-display">
+                    <div class="data-row">
+                        <span class="data-label">Name:</span>
+                        <span class="data-value">${info.name}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Age:</span>
+                        <span class="data-value">${info.age} years</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Occupation:</span>
+                        <span class="data-value">${info.occupation}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Marital Status:</span>
+                        <span class="data-value">${info.maritalStatus}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Dependents:</span>
+                        <span class="data-value">${info.dependents}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">City:</span>
+                        <span class="data-value">${info.city}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editBasicInfo() {
+            document.getElementById('basic-info-form').style.display = 'block';
+            document.getElementById('saved-basic-info').style.display = 'none';
+        }
+
+        // Financial Status Functions
+        function saveFinancialStatus() {
+            clientData.financialStatus = {
+                monthlyIncome: parseFloat(document.getElementById('monthly-income').value),
+                monthlyExpenses: parseFloat(document.getElementById('monthly-expenses').value),
+                currentSavings: parseFloat(document.getElementById('current-savings').value),
+                annualIncome: parseFloat(document.getElementById('annual-income').value)
+            };
+
+            displayFinancialInfo();
+            autoSave();
+        }
+
+        function displayFinancialInfo() {
+            const info = clientData.financialStatus;
+            const savingsRate = info.monthlyIncome > 0 ? ((info.monthlyIncome - info.monthlyExpenses) / info.monthlyIncome * 100).toFixed(1) : 0;
+            
+            document.getElementById('financial-form').style.display = 'none';
+            document.getElementById('saved-financial-info').style.display = 'block';
+            
+            document.getElementById('financial-info-display').innerHTML = `
+                <div class="data-display">
+                    <div class="data-row">
+                        <span class="data-label">Monthly Income:</span>
+                        <span class="data-value">₹${formatCurrency(info.monthlyIncome)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Monthly Expenses:</span>
+                        <span class="data-value">₹${formatCurrency(info.monthlyExpenses)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Monthly Savings:</span>
+                        <span class="data-value">₹${formatCurrency(info.monthlyIncome - info.monthlyExpenses)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Savings Rate:</span>
+                        <span class="data-value">${savingsRate}%</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Current Savings:</span>
+                        <span class="data-value">₹${formatCurrency(info.currentSavings)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Annual Income:</span>
+                        <span class="data-value">₹${formatCurrency(info.annualIncome)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editFinancialInfo() {
+            document.getElementById('financial-form').style.display = 'block';
+            document.getElementById('saved-financial-info').style.display = 'none';
+        }
+
+        // Asset Management Functions
+        function addAsset() {
+            const asset = {
+                id: Date.now(),
+                type: document.getElementById('asset-type').value,
+                name: document.getElementById('asset-name').value,
+                value: parseFloat(document.getElementById('asset-value').value)
+            };
+
+            clientData.assets.push(asset);
+            updateAssetsList();
+            updateNetWorth();
+            
+            // Reset form
+            document.getElementById('asset-form').reset();
+            autoSave();
+        }
+
+        function updateAssetsList() {
+            const container = document.getElementById('assets-list');
+            container.innerHTML = '';
+
+            clientData.assets.forEach(asset => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${asset.name}</div>
+                        <div class="item-details">${asset.type} - ₹${formatCurrency(asset.value)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editAsset(${asset.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteAsset(${asset.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            updateAssetChart();
+        }
+
+        function deleteAsset(id) {
+            if (confirm('Are you sure you want to delete this asset?')) {
+                clientData.assets = clientData.assets.filter(asset => asset.id !== id);
+                updateAssetsList();
+                updateNetWorth();
+                autoSave();
+            }
+        }
+
+        function editAsset(id) {
+            const asset = clientData.assets.find(a => a.id === id);
+            if (asset) {
+                document.getElementById('asset-type').value = asset.type;
+                document.getElementById('asset-name').value = asset.name;
+                document.getElementById('asset-value').value = asset.value;
+                
+                // Remove the asset temporarily for editing
+                deleteAsset(id);
+            }
+        }
+
+        // Loan Management Functions
+        function addLoan() {
+            const loan = {
+                id: Date.now(),
+                type: document.getElementById('loan-type').value,
+                amount: parseFloat(document.getElementById('loan-amount').value),
+                rate: parseFloat(document.getElementById('loan-rate').value),
+                tenure: parseFloat(document.getElementById('loan-tenure').value)
+            };
+
+            clientData.loans.push(loan);
+            updateLoansList();
+            updateNetWorth();
+            
+            // Reset form
+            document.getElementById('loan-form').reset();
+            autoSave();
+        }
+
+        function updateLoansList() {
+            const container = document.getElementById('loans-list');
+            container.innerHTML = '';
+
+            clientData.loans.forEach(loan => {
+                const totalInterest = calculateTotalInterest(loan.amount, loan.rate, loan.tenure);
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${loan.type} Loan</div>
+                        <div class="item-details">
+                            Amount: ₹${formatCurrency(loan.amount)} | Rate: ${loan.rate}% | 
+                            Tenure: ${loan.tenure} years | Total Interest: ₹${formatCurrency(totalInterest)}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editLoan(${loan.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteLoan(${loan.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function deleteLoan(id) {
+            if (confirm('Are you sure you want to delete this loan?')) {
+                clientData.loans = clientData.loans.filter(loan => loan.id !== id);
+                updateLoansList();
+                updateNetWorth();
+                autoSave();
+            }
+        }
+
+        function editLoan(id) {
+            const loan = clientData.loans.find(l => l.id === id);
+            if (loan) {
+                document.getElementById('loan-type').value = loan.type;
+                document.getElementById('loan-amount').value = loan.amount;
+                document.getElementById('loan-rate').value = loan.rate;
+                document.getElementById('loan-tenure').value = loan.tenure;
+                
+                // Remove the loan temporarily for editing
+                deleteLoan(id);
+            }
+        }
+
+        function calculateTotalInterest(principal, rate, tenure) {
+            const monthlyRate = rate / 12 / 100;
+            const months = tenure * 12;
+            const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+            return (emi * months) - principal;
+        }
+
+        // Net Worth Functions
+        function updateNetWorth() {
+            const totalAssets = clientData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            const totalLiabilities = clientData.loans.reduce((sum, loan) => sum + loan.amount, 0);
+            const netWorth = totalAssets - totalLiabilities;
+
+            document.getElementById('total-assets').textContent = '₹' + formatCurrency(totalAssets);
+            document.getElementById('total-liabilities').textContent = '₹' + formatCurrency(totalLiabilities);
+            document.getElementById('net-worth').textContent = '₹' + formatCurrency(netWorth);
+        }
+
+        function updateAssetChart() {
+            const ctx = document.getElementById('asset-chart');
+            if (!ctx) return;
+
+            // Destroy existing chart
+            if (charts.assetChart) {
+                charts.assetChart.destroy();
+            }
+
+            // Group assets by type
+            const assetTypes = {};
+            clientData.assets.forEach(asset => {
+                if (!assetTypes[asset.type]) {
+                    assetTypes[asset.type] = 0;
+                }
+                assetTypes[asset.type] += asset.value;
+            });
+
+            const labels = Object.keys(assetTypes);
+            const data = Object.values(assetTypes);
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+
+            if (labels.length === 0) {
+                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+                return;
+            }
+
+            charts.assetChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#333'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Goals Management Functions
+        function addGoal() {
+            const todayAmount = parseFloat(document.getElementById('goal-amount').value);
+            const timeframe = parseFloat(document.getElementById('goal-timeframe').value);
+            const inflationRate = parseFloat(document.getElementById('goal-inflation').value) / 100;
+            
+            // Calculate inflation-adjusted future value
+            const futureValue = todayAmount * Math.pow(1 + inflationRate, timeframe);
+
+            const goal = {
+                id: Date.now(),
+                name: document.getElementById('goal-name').value,
+                todayAmount: todayAmount,
+                futureAmount: futureValue,
+                timeframe: timeframe,
+                inflationRate: inflationRate * 100,
+                priority: document.getElementById('goal-priority').value,
+                progress: 0
+            };
+
+            clientData.goals.push(goal);
+            updateGoalsList();
+            
+            // Reset form
+            document.getElementById('goal-form').reset();
+            document.getElementById('goal-inflation').value = 6; // Reset to default
+            autoSave();
+        }
+
+        function updateGoalsList() {
+            const container = document.getElementById('goals-list');
+            container.innerHTML = '';
+
+            clientData.goals.forEach(goal => {
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${goal.name}</div>
+                        <div class="item-details">
+                            Today's Value: ₹${formatCurrency(goal.todayAmount)} | 
+                            Future Value: ₹${formatCurrency(goal.futureAmount)} | 
+                            Timeframe: ${goal.timeframe} years | 
+                            Priority: ${goal.priority}
+                        </div>
+                        <div class="item-details" style="margin-top: 5px;">
+                            Inflation Rate: ${goal.inflationRate}% | 
+                            Required Monthly SIP: ₹${formatCurrency(calculateRequiredSIP(goal.futureAmount, goal.timeframe))}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editGoal(${goal.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-small btn-danger" onclick="deleteGoal(${goal.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function deleteGoal(id) {
+            if (confirm('Are you sure you want to delete this goal?')) {
+                clientData.goals = clientData.goals.filter(goal => goal.id !== id);
+                updateGoalsList();
+                autoSave();
+            }
+        }
+
+        function editGoal(id) {
+            const goal = clientData.goals.find(g => g.id === id);
+            if (goal) {
+                document.getElementById('goal-name').value = goal.name;
+                document.getElementById('goal-amount').value = goal.todayAmount;
+                document.getElementById('goal-timeframe').value = goal.timeframe;
+                document.getElementById('goal-inflation').value = goal.inflationRate;
+                document.getElementById('goal-priority').value = goal.priority;
+                
+                // Remove the goal temporarily for editing
+                deleteGoal(id);
+            }
+        }
+
+        function calculateRequiredSIP(futureValue, years) {
+            const monthlyReturn = 0.12 / 12; // Assuming 12% annual return
+            const months = years * 12;
+            return futureValue * monthlyReturn / (Math.pow(1 + monthlyReturn, months) - 1);
+        }
+
+        // Insurance Functions
+        function calculateLifeInsurance() {
+            const familyExpenses = parseFloat(document.getElementById('family-expenses').value) || 0;
+            const outstandingLoans = parseFloat(document.getElementById('outstanding-loans').value) || 0;
+            const incomeYears = parseFloat(document.getElementById('income-years').value) || 10;
+            
+            const lifeInsuranceNeed = (familyExpenses * incomeYears) + outstandingLoans;
+            
+            clientData.insuranceProfile.lifeInsuranceNeed = lifeInsuranceNeed;
+            
+            document.getElementById('insurance-results').style.display = 'block';
+            document.getElementById('insurance-results').innerHTML = `
+                <div class="alert alert-info">
+                    <h4><i class="fas fa-calculator"></i> Life Insurance Calculation</h4>
+                    <div class="data-display">
+                        <div class="data-row">
+                            <span class="data-label">Family Annual Expenses:</span>
+                            <span class="data-value">₹${formatCurrency(familyExpenses)}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Income Replacement Years:</span>
+                            <span class="data-value">${incomeYears} years</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Outstanding Loans:</span>
+                            <span class="data-value">₹${formatCurrency(outstandingLoans)}</span>
+                        </div>
+                        <div class="data-row" style="border-top: 2px solid #17a2b8; font-weight: bold;">
+                            <span class="data-label">Recommended Life Insurance:</span>
+                            <span class="data-value">₹${formatCurrency(lifeInsuranceNeed)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateHealthInsurance() {
+            const familyExpenses = parseFloat(document.getElementById('family-expenses').value) || 0;
+            const healthInsuranceNeed = Math.max(500000, familyExpenses * 0.1); // Minimum 5 lakhs or 10% of annual expenses
+            
+            clientData.insuranceProfile.healthInsuranceNeed = healthInsuranceNeed;
+            
+            const existingContent = document.getElementById('insurance-results').innerHTML;
+            document.getElementById('insurance-results').style.display = 'block';
+            document.getElementById('insurance-results').innerHTML = existingContent + `
+                <div class="alert alert-info" style="margin-top: 15px;">
+                    <h4><i class="fas fa-calculator"></i> Health Insurance Calculation</h4>
+                    <div class="data-display">
+                        <div class="data-row">
+                            <span class="data-label">Family Annual Expenses:</span>
+                            <span class="data-value">₹${formatCurrency(familyExpenses)}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Calculation Method:</span>
+                            <span class="data-value">Max(₹5,00,000, 10% of annual expenses)</span>
+                        </div>
+                        <div class="data-row" style="border-top: 2px solid #17a2b8; font-weight: bold;">
+                            <span class="data-label">Recommended Health Insurance:</span>
+                            <span class="data-value">₹${formatCurrency(healthInsuranceNeed)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveInsuranceProfile() {
+            clientData.insuranceProfile = {
+                currentLifeInsurance: parseFloat(document.getElementById('current-life-insurance').value) || 0,
+                currentHealthInsurance: parseFloat(document.getElementById('current-health-insurance').value) || 0,
+                outstandingLoans: parseFloat(document.getElementById('outstanding-loans').value) || 0,
+                familyExpenses: parseFloat(document.getElementById('family-expenses').value) || 0,
+                incomeYears: parseFloat(document.getElementById('income-years').value) || 10,
+                lifeInsuranceNeed: clientData.insuranceProfile.lifeInsuranceNeed || 0,
+                healthInsuranceNeed: clientData.insuranceProfile.healthInsuranceNeed || 0
+            };
+
+            displayInsuranceInfo();
+            autoSave();
+        }
+
+        function displayInsuranceInfo() {
+            const info = clientData.insuranceProfile;
+            document.getElementById('insurance-form').style.display = 'none';
+            document.getElementById('saved-insurance-info').style.display = 'block';
+            
+            document.getElementById('insurance-info-display').innerHTML = `
+                <div class="data-display">
+                    <div class="data-row">
+                        <span class="data-label">Current Life Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.currentLifeInsurance)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Current Health Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.currentHealthInsurance)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Recommended Life Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.lifeInsuranceNeed)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Recommended Health Insurance:</span>
+                        <span class="data-value">₹${formatCurrency(info.healthInsuranceNeed)}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Life Insurance Gap:</span>
+                        <span class="data-value">₹${formatCurrency(Math.max(0, info.lifeInsuranceNeed - info.currentLifeInsurance))}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Health Insurance Gap:</span>
+                        <span class="data-value">₹${formatCurrency(Math.max(0, info.healthInsuranceNeed - info.currentHealthInsurance))}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editInsuranceInfo() {
+            document.getElementById('insurance-form').style.display = 'block';
+            document.getElementById('saved-insurance-info').style.display = 'none';
+        }
+
+        // Risk Profile Functions
+        function saveRiskProfile() {
+            clientData.riskProfile = {
+                experience: document.getElementById('investment-experience').value,
+                tolerance: document.getElementById('risk-tolerance').value,
+                horizon: document.getElementById('investment-horizon').value,
+                monthlyInvestment: parseFloat(document.getElementById('monthly-investment').value)
+            };
+
+            displayRiskInfo();
+            autoSave();
+        }
+
+        function displayRiskInfo() {
+            const info = clientData.riskProfile;
+            document.getElementById('risk-form').style.display = 'none';
+            document.getElementById('saved-risk-info').style.display = 'block';
+            
+            document.getElementById('risk-info-display').innerHTML = `
+                <div class="data-display">
+                    <div class="data-row">
+                        <span class="data-label">Investment Experience:</span>
+                        <span class="data-value">${info.experience}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Risk Tolerance:</span>
+                        <span class="data-value">${info.tolerance}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Investment Horizon:</span>
+                        <span class="data-value">${info.horizon}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Monthly Investment Capacity:</span>
+                        <span class="data-value">₹${formatCurrency(info.monthlyInvestment)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editRiskInfo() {
+            document.getElementById('risk-form').style.display = 'block';
+            document.getElementById('saved-risk-info').style.display = 'none';
+        }
+
+        // Placeholder functions for features not fully implemented
+        function generateInvestmentPlan() {
+            showAlert('Investment plan generated! This is a demo feature.', 'info');
+        }
+
+        function analyzePortfolio() {
+            showAlert('Portfolio analysis completed! This is a demo feature.', 'info');
+        }
+
+        function generateRebalancingPlan() {
+            showAlert('Rebalancing plan generated! This is a demo feature.', 'info');
+        }
+
+        function calculateSIPReturns() {
+            showAlert('SIP returns calculated! This is a demo feature.', 'info');
+        }
+
+        function generateTaxSavingPlan() {
+            showAlert('Tax saving plan generated! This is a demo feature.', 'info');
+        }
+
+        function calculateRetirement() {
+            showAlert('Retirement plan calculated! This is a demo feature.', 'info');
+        }
+
+        function generateSmartComparison() {
+            showAlert('Smart comparison generated! This is a demo feature.', 'info');
+        }
+
+        function updateAllCharts() {
+            showAlert('Analytics updated! This is a demo feature.', 'info');
+        }
+
+        function generateDetailedReport() {
+            showAlert('Detailed report generated! This is a demo feature.', 'info');
+        }
+
+        function downloadDetailedReport() {
+            showAlert('PDF download initiated! This is a demo feature.', 'info');
+        }
+
+        function generateInvestmentReport() {
+            showAlert('Investment report generated! This is a demo feature.', 'info');
+        }
+
+        function downloadInvestmentReport() {
+            showAlert('Investment report PDF download initiated! This is a demo feature.', 'info');
+        }
+
+        function generateActionPlan() {
+            showAlert('Action plan generated! This is a demo feature.', 'info');
+        }
+
+        function downloadActionPlan() {
+            showAlert('Action plan PDF download initiated! This is a demo feature.', 'info');
+        }
+
+        function generateExecutiveSummary() {
+            showAlert('Executive summary generated! This is a demo feature.', 'info');
+        }
+
+        function downloadExecutiveSummary() {
+            showAlert('Executive summary PDF download initiated! This is a demo feature.', 'info');
+        }
+
+        // Modal Functions
+        function showExportModal() {
+            document.getElementById('export-modal').classList.add('active');
+        }
+
+        function closeExportModal() {
+            document.getElementById('export-modal').classList.remove('active');
+        }
+
+        function showImportModal() {
+            document.getElementById('import-modal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.remove('active');
+        }
+
+        function closeSaveModal() {
+            document.getElementById('save-profile-modal').classList.remove('active');
+        }
+
+        function exportData(format) {
+            if (format === 'json') {
+                const dataStr = JSON.stringify(clientData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `financial_data_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                showAlert('Data exported successfully!', 'success');
+                closeExportModal();
+            } else if (format === 'pdf') {
+                showAlert('PDF export initiated! This is a demo feature.', 'info');
+                closeExportModal();
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        clientData = { ...clientData, ...importedData };
+                        loadClientData();
+                        showAlert('Data imported successfully!', 'success');
+                        closeImportModal();
+                    } catch (error) {
+                        showAlert('Error reading file. Please check the format.', 'danger');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function saveProfile() {
+            const profileName = document.getElementById('profile-name').value.trim();
+            
+            if (!profileName) {
+                showAlert('Please enter a profile name', 'danger');
+                return;
+            }
+
+            const profileId = Date.now().toString();
+            const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+            
+            clientData.profileInfo = {
+                name: profileName,
+                description: document.getElementById('profile-description').value,
+                createdDate: new Date().toISOString(),
+                lastModified: new Date().toISOString()
+            };
+
+            profiles[profileId] = clientData;
+            localStorage.setItem('financialPlannerProfiles', JSON.stringify(profiles));
+            
+            currentProfileId = profileId;
+            closeSaveModal();
+            showAlert(`Profile "${profileName}" saved successfully!`, 'success');
+            updateHeaderProfileInfo();
+        }
+
+        function saveCurrentProfile() {
+            if (currentProfileId) {
+                autoSave();
+                showAlert('Profile updated successfully!', 'success');
+            } else {
+                document.getElementById('save-profile-modal').classList.add('active');
+            }
+        }
+
+        function updateHeaderProfileInfo() {
+            const profileInfo = clientData.profileInfo;
+            const nameElement = document.getElementById('current-profile-name');
+            
+            if (profileInfo && profileInfo.name) {
+                nameElement.textContent = profileInfo.name;
+            } else {
+                nameElement.textContent = 'Unsaved Profile';
+            }
+        }
+
+        function loadClientData() {
+            // Update all form fields with current data
+            if (clientData.basicInfo.name) {
+                document.getElementById('client-name').value = clientData.basicInfo.name;
+                document.getElementById('client-age').value = clientData.basicInfo.age;
+                document.getElementById('client-occupation').value = clientData.basicInfo.occupation;
+                document.getElementById('marital-status').value = clientData.basicInfo.maritalStatus;
+                document.getElementById('dependents').value = clientData.basicInfo.dependents;
+                document.getElementById('client-city').value = clientData.basicInfo.city;
+                displayBasicInfo();
+            }
+
+            if (clientData.financialStatus.monthlyIncome) {
+                document.getElementById('monthly-income').value = clientData.financialStatus.monthlyIncome;
+                document.getElementById('monthly-expenses').value = clientData.financialStatus.monthlyExpenses;
+                document.getElementById('current-savings').value = clientData.financialStatus.currentSavings;
+                document.getElementById('annual-income').value = clientData.financialStatus.annualIncome;
+                displayFinancialInfo();
+            }
+
+            if (clientData.riskProfile.experience) {
+                document.getElementById('investment-experience').value = clientData.riskProfile.experience;
+                document.getElementById('risk-tolerance').value = clientData.riskProfile.tolerance;
+                document.getElementById('investment-horizon').value = clientData.riskProfile.horizon;
+                document.getElementById('monthly-investment').value = clientData.riskProfile.monthlyInvestment;
+                displayRiskInfo();
+            }
+
+            if (clientData.insuranceProfile.currentLifeInsurance) {
+                document.getElementById('current-life-insurance').value = clientData.insuranceProfile.currentLifeInsurance;
+                document.getElementById('current-health-insurance').value = clientData.insuranceProfile.currentHealthInsurance;
+                document.getElementById('outstanding-loans').value = clientData.insuranceProfile.outstandingLoans;
+                document.getElementById('family-expenses').value = clientData.insuranceProfile.familyExpenses;
+                document.getElementById('income-years').value = clientData.insuranceProfile.incomeYears;
+                displayInsuranceInfo();
+            }
+
+            // Update lists
+            updateAssetsList();
+            updateLoansList();
+            updateGoalsList();
+            updateNetWorth();
+            updateHeaderProfileInfo();
+        }
+    </script>
+</body>
+</html>

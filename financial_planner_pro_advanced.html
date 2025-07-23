@@ -7069,6 +7069,2745 @@
             showReportPreview(summaryContent, 'Executive Summary');
         }
 
+        // 1. Investment Advisory Section Functions
+        function generateAdvancedInvestmentPlan() {
+            if (!validateInvestmentPlanData()) {
+                showAlert('Please complete your risk profile and financial status first', 'warning');
+                return;
+            }
+
+            const investmentPlan = createPersonalizedInvestmentPlan();
+            displayInvestmentPlan(investmentPlan);
+        }
+
+        function validateInvestmentPlanData() {
+            return clientData.riskProfile && clientData.financialStatus && clientData.financialStatus.monthlyIncome;
+        }
+
+        function createPersonalizedInvestmentPlan() {
+            const riskProfile = clientData.riskProfile;
+            const financialStatus = clientData.financialStatus;
+            const monthlyInvestment = riskProfile.monthlyInvestment || (financialStatus.monthlySavings * 0.7);
+            
+            // Asset allocation based on risk profile
+            const allocations = getAssetAllocation(riskProfile.riskScore);
+            
+            // Specific fund recommendations
+            const fundRecommendations = getFundRecommendations(riskProfile, allocations);
+            
+            // Investment timeline and targets
+            const investmentTargets = calculateInvestmentTargets(monthlyInvestment, allocations);
+
+            return {
+                allocations,
+                fundRecommendations,
+                investmentTargets,
+                monthlyInvestment,
+                riskLevel: getRiskLevel(riskProfile.riskScore),
+                investmentHorizon: riskProfile.horizon
+            };
+        }
+
+        function getAssetAllocation(riskScore) {
+            if (riskScore <= 4) {
+                return { equity: 20, debt: 70, gold: 5, international: 0, alternative: 5 };
+            } else if (riskScore <= 8) {
+                return { equity: 50, debt: 35, gold: 5, international: 5, alternative: 5 };
+            } else if (riskScore <= 12) {
+                return { equity: 70, debt: 15, gold: 5, international: 7, alternative: 3 };
+            } else {
+                return { equity: 80, debt: 5, gold: 3, international: 10, alternative: 2 };
+            }
+        }
+
+        function getFundRecommendations(riskProfile, allocations) {
+            const recommendations = [];
+
+            // Equity recommendations
+            if (allocations.equity > 0) {
+                if (riskProfile.experience === 'beginner') {
+                    recommendations.push({
+                        category: 'Large Cap Equity',
+                        allocation: allocations.equity * 0.7,
+                        funds: ['Axis Bluechip Fund', 'Mirae Asset Large Cap Fund', 'Canara Robeco Bluechip Equity Fund'],
+                        rationale: 'Stable large companies for conservative equity exposure'
+                    });
+                    recommendations.push({
+                        category: 'Index Fund',
+                        allocation: allocations.equity * 0.3,
+                        funds: ['UTI Nifty Index Fund', 'HDFC Index Fund Nifty 50', 'ICICI Prudential Nifty Index Fund'],
+                        rationale: 'Low-cost broad market exposure'
+                    });
+                } else {
+                    recommendations.push({
+                        category: 'Large Cap Equity',
+                        allocation: allocations.equity * 0.5,
+                        funds: ['Axis Bluechip Fund', 'Mirae Asset Large Cap Fund', 'Canara Robeco Bluechip Equity Fund'],
+                        rationale: 'Core equity holdings for stability'
+                    });
+                    recommendations.push({
+                        category: 'Mid Cap Equity',
+                        allocation: allocations.equity * 0.3,
+                        funds: ['Axis Midcap Fund', 'HDFC Mid-Cap Opportunities Fund', 'DSP Midcap Fund'],
+                        rationale: 'Higher growth potential with mid-cap exposure'
+                    });
+                    recommendations.push({
+                        category: 'Small Cap Equity',
+                        allocation: allocations.equity * 0.2,
+                        funds: ['Axis Small Cap Fund', 'SBI Small Cap Fund', 'DSP Small Cap Fund'],
+                        rationale: 'Maximum growth potential for long-term wealth creation'
+                    });
+                }
+            }
+
+            // Debt recommendations
+            if (allocations.debt > 0) {
+                recommendations.push({
+                    category: 'Corporate Bond Fund',
+                    allocation: allocations.debt * 0.6,
+                    funds: ['HDFC Corporate Bond Fund', 'ICICI Prudential Corporate Bond Fund', 'Axis Corporate Debt Fund'],
+                    rationale: 'Higher yields with moderate credit risk'
+                });
+                recommendations.push({
+                    category: 'Government Securities',
+                    allocation: allocations.debt * 0.4,
+                    funds: ['SBI Magnum Gilt Fund', 'HDFC Gilt Fund', 'UTI Gilt Fund'],
+                    rationale: 'Safe government backing with interest rate sensitivity'
+                });
+            }
+
+            // Gold recommendations
+            if (allocations.gold > 0) {
+                recommendations.push({
+                    category: 'Gold ETF',
+                    allocation: allocations.gold,
+                    funds: ['HDFC Gold ETF', 'ICICI Prudential Gold ETF', 'Axis Gold ETF'],
+                    rationale: 'Hedge against inflation and currency devaluation'
+                });
+            }
+
+            // International recommendations
+            if (allocations.international > 0) {
+                recommendations.push({
+                    category: 'International Equity',
+                    allocation: allocations.international,
+                    funds: ['Motilal Oswal Nasdaq 100 ETF', 'HDFC International Fund', 'Franklin India Feeder Franklin US Opportunities Fund'],
+                    rationale: 'Geographic diversification and exposure to global markets'
+                });
+            }
+
+            return recommendations;
+        }
+
+        function calculateInvestmentTargets(monthlyInvestment, allocations) {
+            const targets = [];
+            
+            Object.entries(allocations).forEach(([category, percentage]) => {
+                if (percentage > 0) {
+                    const monthlyAmount = (monthlyInvestment * percentage) / 100;
+                    const annualAmount = monthlyAmount * 12;
+                    const fiveYearValue = calculateFutureValue(monthlyAmount, getExpectedReturn(category), 5);
+                    const tenYearValue = calculateFutureValue(monthlyAmount, getExpectedReturn(category), 10);
+                    
+                    targets.push({
+                        category: category.charAt(0).toUpperCase() + category.slice(1),
+                        monthlyAmount,
+                        annualAmount,
+                        fiveYearValue,
+                        tenYearValue,
+                        expectedReturn: getExpectedReturn(category)
+                    });
+                }
+            });
+            
+            return targets;
+        }
+
+        function getExpectedReturn(category) {
+            const returns = {
+                equity: 12,
+                debt: 7,
+                gold: 8,
+                international: 10,
+                alternative: 9
+            };
+            return returns[category] || 8;
+        }
+
+        function calculateFutureValue(monthlyAmount, annualReturn, years) {
+            const monthlyReturn = annualReturn / 12 / 100;
+            const months = years * 12;
+            return monthlyAmount * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+        }
+
+        function displayInvestmentPlan(plan) {
+            const resultsContainer = document.getElementById('investment-plan-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-magic"></i> Your Personalized Investment Strategy</h4>
+                        <p class="card-subtitle">Based on ${plan.riskLevel} risk profile and ${plan.investmentHorizon} investment horizon</p>
+                    </div>
+                    
+                    <!-- Asset Allocation Overview -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">💼 Recommended Asset Allocation</h5>
+                        <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                            ${Object.entries(plan.allocations).filter(([_, value]) => value > 0).map(([asset, percentage]) => `
+                                <div class="widget">
+                                    <div class="widget-icon">${getAssetIcon(asset)}</div>
+                                    <div class="widget-value">${percentage}%</div>
+                                    <div class="widget-label">${asset.charAt(0).toUpperCase() + asset.slice(1)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Monthly Investment Breakdown -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">💰 Monthly Investment Allocation (₹${formatCurrency(plan.monthlyInvestment)})</h5>
+                        <div class="data-display">
+                            ${plan.investmentTargets.map(target => `
+                                <div class="data-row">
+                                    <span class="data-label">${target.category}:</span>
+                                    <span class="data-value">₹${formatCurrency(target.monthlyAmount)} (${target.expectedReturn}% expected return)</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Fund Recommendations -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">🎯 Specific Fund Recommendations</h5>
+                        ${plan.fundRecommendations.map(rec => `
+                            <div style="background: var(--secondary-black); padding: 1.5rem; border-radius: var(--border-radius-md); margin: 1rem 0; border-left: 4px solid var(--accent-white);">
+                                <h6 style="color: var(--text-white); margin-bottom: 0.5rem;">${rec.category} (${rec.allocation}% allocation)</h6>
+                                <p style="color: var(--text-gray); margin-bottom: 1rem;">${rec.rationale}</p>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    ${rec.funds.map(fund => `<span style="background: var(--gradient-accent); color: var(--primary-black); padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.9rem;">${fund}</span>`).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Projected Returns -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📈 Projected Investment Growth</h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="background: var(--gradient-card); padding: 1.5rem; border-radius: var(--border-radius-md); text-align: center;">
+                                <h3 style="color: var(--success-green); font-size: 1.8rem; margin-bottom: 0.5rem;">₹${formatCurrency(plan.investmentTargets.reduce((sum, target) => sum + target.fiveYearValue, 0))}</h3>
+                                <p style="color: var(--text-gray);">5-Year Value</p>
+                            </div>
+                            <div style="background: var(--gradient-card); padding: 1.5rem; border-radius: var(--border-radius-md); text-align: center;">
+                                <h3 style="color: var(--info-blue); font-size: 1.8rem; margin-bottom: 0.5rem;">₹${formatCurrency(plan.investmentTargets.reduce((sum, target) => sum + target.tenYearValue, 0))}</h3>
+                                <p style="color: var(--text-gray);">10-Year Value</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Steps -->
+                    <div style="background: var(--success-green); background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success-green); border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: var(--success-green); margin-bottom: 1rem;"><i class="fas fa-tasks"></i> Next Steps</h6>
+                        <ol style="color: var(--success-green); margin: 0; padding-left: 1.5rem;">
+                            <li>Start with ${plan.riskLevel === 'Conservative' ? 'debt funds and large-cap equity' : 'core large-cap funds'}</li>
+                            <li>Set up systematic investment plans (SIPs) for chosen funds</li>
+                            <li>Review and rebalance portfolio every 6 months</li>
+                            <li>Increase investment amount by 10-15% annually</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getAssetIcon(asset) {
+            const icons = {
+                equity: '📈',
+                debt: '🏦',
+                gold: '🥇',
+                international: '🌍',
+                alternative: '💎'
+            };
+            return icons[asset] || '📊';
+        }
+
+        function generateQuickRecommendations() {
+            if (!clientData.riskProfile || !clientData.financialStatus) {
+                showAlert('Please complete your risk profile and financial status first', 'warning');
+                return;
+            }
+
+            const quickRecs = generateQuickInvestmentRecommendations();
+            displayQuickRecommendations(quickRecs);
+        }
+
+        function generateQuickInvestmentRecommendations() {
+            const riskScore = clientData.riskProfile.riskScore;
+            const monthlyInvestment = clientData.riskProfile.monthlyInvestment || 5000;
+            
+            if (riskScore <= 4) {
+                return {
+                    type: 'Conservative Portfolio',
+                    funds: [
+                        { name: 'HDFC Corporate Bond Fund', allocation: 40, amount: monthlyInvestment * 0.4 },
+                        { name: 'Axis Bluechip Fund', allocation: 30, amount: monthlyInvestment * 0.3 },
+                        { name: 'HDFC Gold ETF', allocation: 20, amount: monthlyInvestment * 0.2 },
+                        { name: 'UTI Nifty Index Fund', allocation: 10, amount: monthlyInvestment * 0.1 }
+                    ],
+                    expectedReturn: 8.5,
+                    riskLevel: 'Low'
+                };
+            } else if (riskScore <= 8) {
+                return {
+                    type: 'Balanced Portfolio',
+                    funds: [
+                        { name: 'Axis Bluechip Fund', allocation: 30, amount: monthlyInvestment * 0.3 },
+                        { name: 'HDFC Mid-Cap Opportunities Fund', allocation: 25, amount: monthlyInvestment * 0.25 },
+                        { name: 'HDFC Corporate Bond Fund', allocation: 25, amount: monthlyInvestment * 0.25 },
+                        { name: 'UTI Nifty Index Fund', allocation: 15, amount: monthlyInvestment * 0.15 },
+                        { name: 'HDFC Gold ETF', allocation: 5, amount: monthlyInvestment * 0.05 }
+                    ],
+                    expectedReturn: 10.5,
+                    riskLevel: 'Moderate'
+                };
+            } else {
+                return {
+                    type: 'Growth Portfolio',
+                    funds: [
+                        { name: 'Axis Bluechip Fund', allocation: 25, amount: monthlyInvestment * 0.25 },
+                        { name: 'HDFC Mid-Cap Opportunities Fund', allocation: 25, amount: monthlyInvestment * 0.25 },
+                        { name: 'Axis Small Cap Fund', allocation: 20, amount: monthlyInvestment * 0.2 },
+                        { name: 'Motilal Oswal Nasdaq 100 ETF', allocation: 15, amount: monthlyInvestment * 0.15 },
+                        { name: 'HDFC Corporate Bond Fund', allocation: 10, amount: monthlyInvestment * 0.1 },
+                        { name: 'HDFC Gold ETF', allocation: 5, amount: monthlyInvestment * 0.05 }
+                    ],
+                    expectedReturn: 12.5,
+                    riskLevel: 'High'
+                };
+            }
+        }
+
+        function displayQuickRecommendations(recs) {
+            const resultsContainer = document.getElementById('investment-plan-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-bolt"></i> Quick Investment Recommendations</h4>
+                        <p class="card-subtitle">${recs.type} - ${recs.riskLevel} Risk | Expected Return: ${recs.expectedReturn}%</p>
+                    </div>
+                    
+                    <div class="data-display">
+                        ${recs.funds.map(fund => `
+                            <div class="data-row">
+                                <span class="data-label">${fund.name} (${fund.allocation}%):</span>
+                                <span class="data-value">₹${formatCurrency(fund.amount)}/month</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div style="background: var(--info-blue); background: rgba(0, 212, 255, 0.1); border: 1px solid var(--info-blue); border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: var(--info-blue); margin-bottom: 1rem;"><i class="fas fa-lightbulb"></i> Quick Start Guide</h6>
+                        <ul style="color: var(--info-blue); margin: 0; padding-left: 1.5rem;">
+                            <li>Start with top 2-3 funds from the list above</li>
+                            <li>Set up monthly SIPs for consistent investing</li>
+                            <li>Review and add more funds gradually</li>
+                            <li>Rebalance portfolio annually</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Portfolio Analysis Functions
+        function analyzeAdvancedPortfolio() {
+            if (!clientData.assets || clientData.assets.length === 0) {
+                showAlert('Please add your assets first to analyze your portfolio', 'warning');
+                return;
+            }
+
+            const portfolioAnalysis = performPortfolioAnalysis();
+            displayPortfolioAnalysis(portfolioAnalysis);
+        }
+
+        function performPortfolioAnalysis() {
+            const assets = clientData.assets;
+            const totalValue = assets.reduce((sum, asset) => sum + asset.value, 0);
+            
+            // Asset allocation analysis
+            const allocation = {};
+            assets.forEach(asset => {
+                allocation[asset.type] = (allocation[asset.type] || 0) + asset.value;
+            });
+
+            // Convert to percentages
+            const allocationPercentage = {};
+            Object.keys(allocation).forEach(type => {
+                allocationPercentage[type] = (allocation[type] / totalValue * 100).toFixed(1);
+            });
+
+            // Risk analysis
+            const riskAnalysis = calculatePortfolioRisk(allocationPercentage);
+            
+            // Performance projections
+            const projections = calculatePortfolioProjections(allocation);
+            
+            // Rebalancing recommendations
+            const rebalancingRecs = generateRebalancingRecommendations(allocationPercentage);
+
+            return {
+                totalValue,
+                allocation: allocationPercentage,
+                riskAnalysis,
+                projections,
+                rebalancingRecs
+            };
+        }
+
+        function calculatePortfolioRisk(allocation) {
+            const riskWeights = {
+                cash: 0.5,
+                stocks: 8.5,
+                property: 3.0,
+                gold: 4.0,
+                crypto: 12.0,
+                business: 6.0,
+                other: 3.0
+            };
+
+            let portfolioRisk = 0;
+            Object.entries(allocation).forEach(([type, percentage]) => {
+                portfolioRisk += (percentage / 100) * (riskWeights[type] || 3.0);
+            });
+
+            let riskLevel = 'Low';
+            if (portfolioRisk > 6) riskLevel = 'High';
+            else if (portfolioRisk > 3) riskLevel = 'Moderate';
+
+            return {
+                score: portfolioRisk.toFixed(1),
+                level: riskLevel,
+                volatility: (portfolioRisk * 1.5).toFixed(1)
+            };
+        }
+
+        function calculatePortfolioProjections(allocation) {
+            const expectedReturns = {
+                cash: 4,
+                stocks: 12,
+                property: 8,
+                gold: 6,
+                crypto: 15,
+                business: 10,
+                other: 7
+            };
+
+            let expectedReturn = 0;
+            let totalValue = Object.values(allocation).reduce((sum, value) => sum + value, 0);
+
+            Object.entries(allocation).forEach(([type, value]) => {
+                const weight = value / totalValue;
+                expectedReturn += weight * (expectedReturns[type] || 7);
+            });
+
+            const oneYear = totalValue * (1 + expectedReturn / 100);
+            const threeYear = totalValue * Math.pow(1 + expectedReturn / 100, 3);
+            const fiveYear = totalValue * Math.pow(1 + expectedReturn / 100, 5);
+
+            return {
+                expectedReturn: expectedReturn.toFixed(1),
+                oneYear,
+                threeYear,
+                fiveYear
+            };
+        }
+
+        function generateRebalancingRecommendations(currentAllocation) {
+            const recommendations = [];
+            
+            // Check for over-concentration
+            Object.entries(currentAllocation).forEach(([type, percentage]) => {
+                if (percentage > 40 && type !== 'property') {
+                    recommendations.push(`⚠️ Over-concentrated in ${type} (${percentage}%) - Consider diversifying`);
+                }
+            });
+
+            // Check for missing asset classes
+            if (!currentAllocation.stocks || currentAllocation.stocks < 10) {
+                recommendations.push("📈 Consider adding equity exposure for growth potential");
+            }
+            
+            if (!currentAllocation.cash || currentAllocation.cash < 5) {
+                recommendations.push("💰 Maintain some liquid cash for emergencies");
+            }
+
+            if (!currentAllocation.gold || currentAllocation.gold < 3) {
+                recommendations.push("🥇 Consider small gold allocation for inflation hedge");
+            }
+
+            if (recommendations.length === 0) {
+                recommendations.push("✅ Portfolio appears well-balanced across asset classes");
+            }
+
+            return recommendations;
+        }
+
+        function displayPortfolioAnalysis(analysis) {
+            const resultsContainer = document.getElementById('portfolio-analysis-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-search-plus"></i> Portfolio Analysis Report</h4>
+                        <p class="card-subtitle">Total Portfolio Value: ₹${formatCurrency(analysis.totalValue)}</p>
+                    </div>
+                    
+                    <!-- Portfolio Overview -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Current Asset Allocation</h5>
+                        <div class="data-display">
+                            ${Object.entries(analysis.allocation).map(([type, percentage]) => `
+                                <div class="data-row">
+                                    <span class="data-label">${getAssetIcon(type)} ${type.charAt(0).toUpperCase() + type.slice(1)}:</span>
+                                    <span class="data-value">${percentage}%</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Risk Analysis -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">⚖️ Risk Analysis</h5>
+                        <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="widget">
+                                <div class="widget-icon">📊</div>
+                                <div class="widget-value">${analysis.riskAnalysis.score}</div>
+                                <div class="widget-label">Risk Score</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">📈</div>
+                                <div class="widget-value">${analysis.riskAnalysis.level}</div>
+                                <div class="widget-label">Risk Level</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">📉</div>
+                                <div class="widget-value">${analysis.riskAnalysis.volatility}%</div>
+                                <div class="widget-label">Expected Volatility</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Projections -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📈 Performance Projections</h5>
+                        <div style="background: var(--gradient-card); padding: 2rem; border-radius: var(--border-radius-md);">
+                            <p style="color: var(--text-gray); margin-bottom: 1rem;">Expected Annual Return: <strong style="color: var(--success-green);">${analysis.projections.expectedReturn}%</strong></p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div style="text-align: center;">
+                                    <h6 style="color: var(--text-white); margin-bottom: 0.5rem;">1 Year</h6>
+                                    <p style="color: var(--success-green); font-size: 1.2rem; font-weight: 600;">₹${formatCurrency(analysis.projections.oneYear)}</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <h6 style="color: var(--text-white); margin-bottom: 0.5rem;">3 Years</h6>
+                                    <p style="color: var(--success-green); font-size: 1.2rem; font-weight: 600;">₹${formatCurrency(analysis.projections.threeYear)}</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <h6 style="color: var(--text-white); margin-bottom: 0.5rem;">5 Years</h6>
+                                    <p style="color: var(--success-green); font-size: 1.2rem; font-weight: 600;">₹${formatCurrency(analysis.projections.fiveYear)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rebalancing Recommendations -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">🎯 Rebalancing Recommendations</h5>
+                        <div style="background: var(--info-blue); background: rgba(0, 212, 255, 0.1); border: 1px solid var(--info-blue); border-radius: var(--border-radius-md); padding: 1.5rem;">
+                            ${analysis.rebalancingRecs.map(rec => `<p style="color: var(--info-blue); margin: 0.5rem 0;">${rec}</p>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateRebalancingPlan() {
+            if (!clientData.assets || clientData.assets.length === 0) {
+                showAlert('Please add your assets first to generate rebalancing plan', 'warning');
+                return;
+            }
+
+            const rebalancingPlan = createRebalancingPlan();
+            displayRebalancingPlan(rebalancingPlan);
+        }
+
+        function createRebalancingPlan() {
+            const idealAllocation = getIdealAllocation();
+            const currentAllocation = getCurrentAllocation();
+            const totalValue = clientData.assets.reduce((sum, asset) => sum + asset.value, 0);
+            
+            const rebalancingActions = [];
+            
+            Object.keys(idealAllocation).forEach(assetType => {
+                const idealAmount = totalValue * idealAllocation[assetType] / 100;
+                const currentAmount = (currentAllocation[assetType] || 0) * totalValue / 100;
+                const difference = idealAmount - currentAmount;
+                
+                if (Math.abs(difference) > totalValue * 0.02) { // 2% threshold
+                    const action = difference > 0 ? 'Buy' : 'Sell';
+                    rebalancingActions.push({
+                        assetType,
+                        action,
+                        amount: Math.abs(difference),
+                        currentPercentage: currentAllocation[assetType] || 0,
+                        targetPercentage: idealAllocation[assetType]
+                    });
+                }
+            });
+
+            return {
+                idealAllocation,
+                currentAllocation,
+                rebalancingActions,
+                totalValue
+            };
+        }
+
+        function getIdealAllocation() {
+            if (clientData.riskProfile) {
+                return getAssetAllocation(clientData.riskProfile.riskScore);
+            }
+            // Default balanced allocation
+            return { equity: 60, debt: 30, gold: 5, international: 5 };
+        }
+
+        function getCurrentAllocation() {
+            const assets = clientData.assets;
+            const totalValue = assets.reduce((sum, asset) => sum + asset.value, 0);
+            const allocation = {};
+            
+            assets.forEach(asset => {
+                const mappedType = mapAssetType(asset.type);
+                allocation[mappedType] = (allocation[mappedType] || 0) + (asset.value / totalValue * 100);
+            });
+            
+            return allocation;
+        }
+
+        function mapAssetType(type) {
+            const mapping = {
+                'stocks': 'equity',
+                'cash': 'debt',
+                'property': 'equity',
+                'crypto': 'alternative',
+                'business': 'equity'
+            };
+            return mapping[type] || 'debt';
+        }
+
+        function displayRebalancingPlan(plan) {
+            const resultsContainer = document.getElementById('portfolio-analysis-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-balance-scale"></i> Portfolio Rebalancing Plan</h4>
+                        <p class="card-subtitle">Optimize your portfolio allocation</p>
+                    </div>
+                    
+                    ${plan.rebalancingActions.length > 0 ? `
+                        <div style="margin: 2rem 0;">
+                            <h5 style="color: var(--text-white); margin-bottom: 1rem;">🎯 Recommended Actions</h5>
+                            <div class="data-display">
+                                ${plan.rebalancingActions.map(action => `
+                                    <div class="data-row">
+                                        <span class="data-label">${action.action} ${action.assetType.charAt(0).toUpperCase() + action.assetType.slice(1)}:</span>
+                                        <span class="data-value">₹${formatCurrency(action.amount)} (${action.currentPercentage.toFixed(1)}% → ${action.targetPercentage}%)</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="background: var(--success-green); background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success-green); border-radius: var(--border-radius-md); padding: 1.5rem; margin: 2rem 0;">
+                            <h6 style="color: var(--success-green); margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Portfolio is Well Balanced</h6>
+                            <p style="color: var(--success-green); margin: 0;">Your current allocation is close to the recommended target. No major rebalancing needed at this time.</p>
+                        </div>
+                    `}
+
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Target vs Current Allocation</h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                            ${Object.entries(plan.idealAllocation).map(([type, target]) => {
+                                const current = plan.currentAllocation[type] || 0;
+                                return `
+                                    <div style="background: var(--gradient-card); padding: 1rem; border-radius: var(--border-radius-md); text-align: center;">
+                                        <h6 style="color: var(--text-white); margin-bottom: 0.5rem;">${type.charAt(0).toUpperCase() + type.slice(1)}</h6>
+                                        <p style="color: var(--text-gray); font-size: 0.9rem;">Current: ${current.toFixed(1)}%</p>
+                                        <p style="color: var(--success-green); font-weight: 600;">Target: ${target}%</p>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function performRiskAnalysis() {
+            if (!clientData.assets || clientData.assets.length === 0) {
+                showAlert('Please add your assets first to perform risk analysis', 'warning');
+                return;
+            }
+
+            const riskAnalysis = calculateDetailedRiskAnalysis();
+            displayRiskAnalysis(riskAnalysis);
+        }
+
+        function calculateDetailedRiskAnalysis() {
+            const assets = clientData.assets;
+            const totalValue = assets.reduce((sum, asset) => sum + asset.value, 0);
+            
+            // Calculate Value at Risk (VaR)
+            const var95 = calculateVaR(assets, totalValue, 0.95);
+            const var99 = calculateVaR(assets, totalValue, 0.99);
+            
+            // Diversification analysis
+            const diversificationScore = calculateDiversificationScore(assets);
+            
+            // Stress test scenarios
+            const stressTests = performStressTests(assets, totalValue);
+            
+            return {
+                var95,
+                var99,
+                diversificationScore,
+                stressTests
+            };
+        }
+
+        function calculateVaR(assets, totalValue, confidence) {
+            const volatilities = {
+                cash: 0.02,
+                stocks: 0.20,
+                property: 0.15,
+                gold: 0.18,
+                crypto: 0.60,
+                business: 0.25,
+                other: 0.15
+            };
+            
+            let portfolioVolatility = 0;
+            assets.forEach(asset => {
+                const weight = asset.value / totalValue;
+                const vol = volatilities[asset.type] || 0.15;
+                portfolioVolatility += weight * vol;
+            });
+            
+            // Simplified VaR calculation
+            const zScore = confidence === 0.95 ? 1.645 : 2.326;
+            return totalValue * portfolioVolatility * zScore;
+        }
+
+        function calculateDiversificationScore(assets) {
+            const assetTypes = [...new Set(assets.map(asset => asset.type))];
+            const maxPossibleTypes = 7; // cash, stocks, property, gold, crypto, business, other
+            
+            // Base score from number of asset types
+            let score = (assetTypes.length / maxPossibleTypes) * 50;
+            
+            // Concentration penalty
+            const totalValue = assets.reduce((sum, asset) => sum + asset.value, 0);
+            const concentrationPenalty = assets.reduce((penalty, asset) => {
+                const weight = asset.value / totalValue;
+                if (weight > 0.4) penalty += (weight - 0.4) * 100;
+                return penalty;
+            }, 0);
+            
+            score = Math.max(0, score - concentrationPenalty);
+            return Math.min(100, score);
+        }
+
+        function performStressTests(assets, totalValue) {
+            const scenarios = {
+                'Market Crash': { stocks: -0.3, property: -0.2, crypto: -0.5, business: -0.25 },
+                'Inflation Spike': { cash: -0.1, debt: -0.15, gold: 0.2, property: 0.1 },
+                'Economic Recession': { stocks: -0.25, business: -0.3, property: -0.15, cash: 0.02 }
+            };
+            
+            const results = {};
+            
+            Object.entries(scenarios).forEach(([scenarioName, impacts]) => {
+                let newValue = 0;
+                assets.forEach(asset => {
+                    const impact = impacts[asset.type] || 0;
+                    newValue += asset.value * (1 + impact);
+                });
+                
+                results[scenarioName] = {
+                    newValue,
+                    loss: totalValue - newValue,
+                    lossPercentage: ((totalValue - newValue) / totalValue * 100).toFixed(1)
+                };
+            });
+            
+            return results;
+        }
+
+        function displayRiskAnalysis(analysis) {
+            const resultsContainer = document.getElementById('portfolio-analysis-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-exclamation-triangle"></i> Comprehensive Risk Analysis</h4>
+                        <p class="card-subtitle">Understand your portfolio's risk exposure</p>
+                    </div>
+                    
+                    <!-- Risk Metrics -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Risk Metrics</h5>
+                        <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="widget">
+                                <div class="widget-icon">⚠️</div>
+                                <div class="widget-value">₹${formatCurrency(analysis.var95)}</div>
+                                <div class="widget-label">VaR (95% confidence)</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">🚨</div>
+                                <div class="widget-value">₹${formatCurrency(analysis.var99)}</div>
+                                <div class="widget-label">VaR (99% confidence)</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">🎯</div>
+                                <div class="widget-value">${analysis.diversificationScore.toFixed(0)}/100</div>
+                                <div class="widget-label">Diversification Score</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stress Test Results -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">🧪 Stress Test Scenarios</h5>
+                        <div class="data-display">
+                            ${Object.entries(analysis.stressTests).map(([scenario, result]) => `
+                                <div class="data-row">
+                                    <span class="data-label">${scenario}:</span>
+                                    <span class="data-value" style="color: ${result.loss > 0 ? 'var(--error-red)' : 'var(--success-green)'};">
+                                        ${result.loss > 0 ? '-' : '+'}₹${formatCurrency(Math.abs(result.loss))} (${result.lossPercentage}%)
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Risk Management Recommendations -->
+                    <div style="background: var(--warning-orange); background: rgba(255, 159, 67, 0.1); border: 1px solid var(--warning-orange); border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: var(--warning-orange); margin-bottom: 1rem;"><i class="fas fa-shield-alt"></i> Risk Management Recommendations</h6>
+                        <ul style="color: var(--warning-orange); margin: 0; padding-left: 1.5rem;">
+                            ${analysis.diversificationScore < 50 ? '<li>Improve diversification across asset classes</li>' : ''}
+                            ${analysis.var95 > (clientData.assets.reduce((sum, asset) => sum + asset.value, 0) * 0.15) ? '<li>Consider reducing portfolio volatility</li>' : ''}
+                            <li>Maintain emergency fund separate from investments</li>
+                            <li>Review and rebalance portfolio quarterly</li>
+                            <li>Consider hedging strategies for large positions</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 2. Retirement Planning Calculator
+        function calculateAdvancedRetirement() {
+            const currentAge = parseFloat(document.getElementById('current-age').value);
+            const retirementAge = parseFloat(document.getElementById('retirement-age').value);
+            const currentIncome = parseFloat(document.getElementById('retirement-current-income').value);
+            const currentSavings = parseFloat(document.getElementById('retirement-current-savings').value);
+            const monthlyContribution = parseFloat(document.getElementById('retirement-monthly-contribution').value);
+            const expectedLifespan = parseFloat(document.getElementById('expected-lifespan').value);
+            const inflationRate = parseFloat(document.getElementById('retirement-inflation').value) / 100;
+            const expectedReturn = parseFloat(document.getElementById('retirement-return').value) / 100;
+            const incomeReplacement = parseFloat(document.getElementById('income-replacement').value) / 100;
+
+            if (!currentAge || !retirementAge || !currentIncome) {
+                showAlert('Please fill in all required fields', 'warning');
+                return;
+            }
+
+            const retirementPlan = calculateRetirementPlan({
+                currentAge,
+                retirementAge,
+                currentIncome,
+                currentSavings: currentSavings || 0,
+                monthlyContribution: monthlyContribution || 0,
+                expectedLifespan: expectedLifespan || 80,
+                inflationRate,
+                expectedReturn,
+                incomeReplacement
+            });
+
+            displayRetirementPlan(retirementPlan);
+        }
+
+        function calculateRetirementPlan(params) {
+            const yearsToRetirement = params.retirementAge - params.currentAge;
+            const retirementYears = params.expectedLifespan - params.retirementAge;
+            
+            // Calculate future value of current savings
+            const futureValueCurrentSavings = params.currentSavings * Math.pow(1 + params.expectedReturn, yearsToRetirement);
+            
+            // Calculate future value of monthly contributions
+            const monthlyReturn = params.expectedReturn / 12;
+            const months = yearsToRetirement * 12;
+            const futureValueContributions = params.monthlyContribution * 
+                ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+            
+            // Total savings at retirement
+            const totalSavingsAtRetirement = futureValueCurrentSavings + futureValueContributions;
+            
+            // Required income at retirement (inflation adjusted)
+            const requiredAnnualIncomeAtRetirement = params.currentIncome * params.incomeReplacement * 
+                Math.pow(1 + params.inflationRate, yearsToRetirement);
+            
+            // Required corpus using 4% withdrawal rule (adjusted for inflation)
+            const requiredCorpus = requiredAnnualIncomeAtRetirement * 25;
+            
+            // Shortfall/surplus
+            const shortfall = requiredCorpus - totalSavingsAtRetirement;
+            
+            // Additional monthly investment needed to bridge shortfall
+            let additionalMonthlyInvestment = 0;
+            if (shortfall > 0) {
+                additionalMonthlyInvestment = shortfall / 
+                    ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+            }
+
+            // Monte Carlo simulation for success probability
+            const successProbability = calculateRetirementSuccessProbability(
+                totalSavingsAtRetirement, 
+                requiredAnnualIncomeAtRetirement, 
+                retirementYears,
+                params.expectedReturn,
+                params.inflationRate
+            );
+
+            return {
+                yearsToRetirement,
+                retirementYears,
+                totalSavingsAtRetirement,
+                requiredCorpus,
+                requiredAnnualIncomeAtRetirement,
+                shortfall,
+                additionalMonthlyInvestment: Math.max(0, additionalMonthlyInvestment),
+                successProbability,
+                currentAge: params.currentAge,
+                retirementAge: params.retirementAge,
+                monthlyContribution: params.monthlyContribution
+            };
+        }
+
+        function calculateRetirementSuccessProbability(corpus, annualIncome, years, expectedReturn, inflationRate) {
+            // Simplified Monte Carlo simulation
+            let successfulRuns = 0;
+            const simulations = 1000;
+            
+            for (let i = 0; i < simulations; i++) {
+                let remainingCorpus = corpus;
+                let currentAnnualIncome = annualIncome;
+                
+                for (let year = 0; year < years; year++) {
+                    // Random return variation (±3% from expected)
+                    const randomReturn = expectedReturn + (Math.random() - 0.5) * 0.06;
+                    
+                    // Withdraw required income
+                    remainingCorpus -= currentAnnualIncome;
+                    
+                    // Apply return to remaining corpus
+                    remainingCorpus *= (1 + randomReturn);
+                    
+                    // Adjust income for inflation
+                    currentAnnualIncome *= (1 + inflationRate);
+                    
+                    // If corpus is depleted, this run failed
+                    if (remainingCorpus <= 0) break;
+                }
+                
+                if (remainingCorpus > 0) successfulRuns++;
+            }
+            
+            return (successfulRuns / simulations * 100).toFixed(1);
+        }
+
+        function displayRetirementPlan(plan) {
+            const resultsContainer = document.getElementById('retirement-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-calendar-check"></i> Your Retirement Plan Analysis</h4>
+                        <p class="card-subtitle">${plan.yearsToRetirement} years to retirement | ${plan.retirementYears} years in retirement</p>
+                    </div>
+                    
+                    <!-- Key Metrics -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Key Retirement Metrics</h5>
+                        <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="widget">
+                                <div class="widget-icon">💰</div>
+                                <div class="widget-value">₹${formatCurrency(plan.totalSavingsAtRetirement)}</div>
+                                <div class="widget-label">Projected Savings</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">🎯</div>
+                                <div class="widget-value">₹${formatCurrency(plan.requiredCorpus)}</div>
+                                <div class="widget-label">Required Corpus</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">📈</div>
+                                <div class="widget-value">${plan.successProbability}%</div>
+                                <div class="widget-label">Success Probability</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shortfall Analysis -->
+                    ${plan.shortfall > 0 ? `
+                        <div style="background: var(--warning-orange); background: rgba(255, 159, 67, 0.1); border: 1px solid var(--warning-orange); border-radius: var(--border-radius-md); padding: 1.5rem; margin: 2rem 0;">
+                            <h6 style="color: var(--warning-orange); margin-bottom: 1rem;"><i class="fas fa-exclamation-triangle"></i> Retirement Shortfall Detected</h6>
+                            <div class="data-display" style="background: transparent;">
+                                <div class="data-row" style="border: none;">
+                                    <span class="data-label" style="color: var(--warning-orange);">Shortfall Amount:</span>
+                                    <span class="data-value" style="color: var(--warning-orange);">₹${formatCurrency(plan.shortfall)}</span>
+                                </div>
+                                <div class="data-row" style="border: none;">
+                                    <span class="data-label" style="color: var(--warning-orange);">Additional Monthly Investment Needed:</span>
+                                    <span class="data-value" style="color: var(--warning-orange);">₹${formatCurrency(plan.additionalMonthlyInvestment)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="background: var(--success-green); background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success-green); border-radius: var(--border-radius-md); padding: 1.5rem; margin: 2rem 0;">
+                            <h6 style="color: var(--success-green); margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Retirement Goal on Track</h6>
+                            <p style="color: var(--success-green); margin: 0;">Congratulations! Your current savings plan is sufficient to meet your retirement goals. Surplus: ₹${formatCurrency(Math.abs(plan.shortfall))}</p>
+                        </div>
+                    `}
+
+                    <!-- Income Replacement Analysis -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">💸 Retirement Income Analysis</h5>
+                        <div class="data-display">
+                            <div class="data-row">
+                                <span class="data-label">Required Annual Income at Retirement:</span>
+                                <span class="data-value">₹${formatCurrency(plan.requiredAnnualIncomeAtRetirement)}</span>
+                            </div>
+                            <div class="data-row">
+                                <span class="data-label">Monthly Income from Corpus (4% rule):</span>
+                                <span class="data-value">₹${formatCurrency(plan.totalSavingsAtRetirement * 0.04 / 12)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div style="background: var(--info-blue); background: rgba(0, 212, 255, 0.1); border: 1px solid var(--info-blue); border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: var(--info-blue); margin-bottom: 1rem;"><i class="fas fa-lightbulb"></i> Retirement Planning Recommendations</h6>
+                        <ul style="color: var(--info-blue); margin: 0; padding-left: 1.5rem;">
+                            ${plan.successProbability < 70 ? '<li>Consider increasing monthly contributions to improve success probability</li>' : ''}
+                            ${plan.additionalMonthlyInvestment > 0 ? `<li>Increase monthly investment by ₹${formatCurrency(plan.additionalMonthlyInvestment)} to bridge the shortfall</li>` : ''}
+                            <li>Review and rebalance portfolio annually to maintain target allocation</li>
+                            <li>Consider healthcare inflation and long-term care costs</li>
+                            <li>Explore tax-efficient retirement accounts like EPF, PPF, and NPS</li>
+                            ${plan.yearsToRetirement > 20 ? '<li>Focus on equity investments for better long-term growth</li>' : '<li>Gradually shift to conservative investments as retirement approaches</li>'}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 3. Advanced Tax Planning Calculator
+        function generateAdvancedTaxPlan() {
+            const annualIncome = parseFloat(document.getElementById('tax-annual-income').value);
+            const currentInvestments = parseFloat(document.getElementById('tax-current-investments').value) || 0;
+            const houseLoanInterest = parseFloat(document.getElementById('house-loan-interest').value) || 0;
+            const medicalInsurance = parseFloat(document.getElementById('medical-insurance').value) || 0;
+            const donationsCharity = parseFloat(document.getElementById('donations-charity').value) || 0;
+            const age = parseFloat(document.getElementById('taxpayer-age').value) || 30;
+
+            if (!annualIncome) {
+                showAlert('Please enter your annual income', 'warning');
+                return;
+            }
+
+            const taxPlan = calculateTaxOptimization({
+                annualIncome,
+                currentInvestments,
+                houseLoanInterest,
+                medicalInsurance,
+                donationsCharity,
+                age
+            });
+
+            displayTaxPlan(taxPlan);
+        }
+
+        function calculateTaxOptimization(params) {
+            const income = params.annualIncome;
+            const isSenior = params.age >= 60;
+            
+            // Basic exemption limit
+            const basicExemption = isSenior ? 300000 : 250000;
+            
+            // Calculate current tax liability
+            const currentTaxableIncome = Math.max(0, income - basicExemption - params.currentInvestments - 
+                params.houseLoanInterest - params.medicalInsurance - params.donationsCharity);
+            const currentTax = calculateIncomeTax(currentTaxableIncome, isSenior);
+            
+            // Calculate optimized tax plan
+            const optimizations = generateTaxOptimizations(params);
+            const totalOptimizedDeductions = optimizations.reduce((sum, opt) => sum + opt.amount, 0);
+            const optimizedTaxableIncome = Math.max(0, income - basicExemption - totalOptimizedDeductions);
+            const optimizedTax = calculateIncomeTax(optimizedTaxableIncome, isSenior);
+            
+            const taxSavings = currentTax - optimizedTax;
+            
+            return {
+                currentTaxableIncome,
+                currentTax,
+                optimizedTaxableIncome,
+                optimizedTax,
+                taxSavings,
+                optimizations,
+                basicExemption,
+                totalOptimizedDeductions
+            };
+        }
+
+        function calculateIncomeTax(taxableIncome, isSenior) {
+            if (taxableIncome <= 0) return 0;
+            
+            let tax = 0;
+            const slabs = isSenior ? 
+                [[300000, 0], [500000, 0.05], [1000000, 0.20], [Infinity, 0.30]] :
+                [[250000, 0], [500000, 0.05], [1000000, 0.20], [Infinity, 0.30]];
+            
+            let remainingIncome = taxableIncome;
+            let previousSlab = 0;
+            
+            for (const [slabLimit, rate] of slabs) {
+                const taxableInThisSlab = Math.min(remainingIncome, slabLimit - previousSlab);
+                tax += taxableInThisSlab * rate;
+                remainingIncome -= taxableInThisSlab;
+                
+                if (remainingIncome <= 0) break;
+                previousSlab = slabLimit;
+            }
+            
+            // Add cess (4%)
+            tax *= 1.04;
+            
+            return tax;
+        }
+
+        function generateTaxOptimizations(params) {
+            const optimizations = [];
+            const maxDeductions = {
+                '80C': 150000,
+                '80D': params.age >= 60 ? 50000 : 25000,
+                '80CCD1B': 50000,
+                '80E': 200000,
+                '80G': Math.min(params.annualIncome * 0.1, 100000),
+                '24B': 200000,
+                '80EEA': 150000
+            };
+            
+            // Section 80C optimizations
+            const current80C = params.currentInvestments;
+            if (current80C < maxDeductions['80C']) {
+                const additional80C = maxDeductions['80C'] - current80C;
+                optimizations.push({
+                    section: '80C',
+                    description: 'ELSS Mutual Funds, PPF, EPF',
+                    amount: additional80C,
+                    currentAmount: current80C,
+                    maxLimit: maxDeductions['80C'],
+                    taxBenefit: additional80C * 0.3
+                });
+            }
+            
+            // Section 80D optimizations
+            if (params.medicalInsurance < maxDeductions['80D']) {
+                const additional80D = maxDeductions['80D'] - params.medicalInsurance;
+                optimizations.push({
+                    section: '80D',
+                    description: 'Health Insurance Premium',
+                    amount: additional80D,
+                    currentAmount: params.medicalInsurance,
+                    maxLimit: maxDeductions['80D'],
+                    taxBenefit: additional80D * 0.3
+                });
+            }
+            
+            // Section 80CCD(1B) - NPS
+            optimizations.push({
+                section: '80CCD(1B)',
+                description: 'National Pension System (NPS)',
+                amount: maxDeductions['80CCD1B'],
+                currentAmount: 0,
+                maxLimit: maxDeductions['80CCD1B'],
+                taxBenefit: maxDeductions['80CCD1B'] * 0.3
+            });
+            
+            // Section 24(B) - Home loan interest
+            if (params.houseLoanInterest < maxDeductions['24B']) {
+                const additionalHomeLoan = Math.min(50000, maxDeductions['24B'] - params.houseLoanInterest);
+                if (additionalHomeLoan > 0) {
+                    optimizations.push({
+                        section: '24(B)',
+                        description: 'Home Loan Interest (Self-Occupied)',
+                        amount: additionalHomeLoan,
+                        currentAmount: params.houseLoanInterest,
+                        maxLimit: 200000,
+                        taxBenefit: additionalHomeLoan * 0.3
+                    });
+                }
+            }
+            
+            // Section 80G - Donations
+            if (params.donationsCharity < maxDeductions['80G']) {
+                const additionalDonations = Math.min(25000, maxDeductions['80G'] - params.donationsCharity);
+                optimizations.push({
+                    section: '80G',
+                    description: 'Donations to Charity',
+                    amount: additionalDonations,
+                    currentAmount: params.donationsCharity,
+                    maxLimit: maxDeductions['80G'],
+                    taxBenefit: additionalDonations * 0.5 // 50% deduction for most donations
+                });
+            }
+            
+            return optimizations.filter(opt => opt.amount > 0);
+        }
+
+        function displayTaxPlan(plan) {
+            const resultsContainer = document.getElementById('tax-optimization-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-calculator"></i> Advanced Tax Optimization Plan</h4>
+                        <p class="card-subtitle">Potential Tax Savings: ₹${formatCurrency(plan.taxSavings)}</p>
+                    </div>
+                    
+                    <!-- Tax Comparison -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Tax Liability Comparison</h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                            <div style="background: var(--error-red); background: rgba(255, 99, 132, 0.1); border: 1px solid var(--error-red); border-radius: var(--border-radius-md); padding: 1.5rem; text-align: center;">
+                                <h6 style="color: var(--error-red); margin-bottom: 1rem;">Current Tax</h6>
+                                <p style="color: var(--error-red); font-size: 1.5rem; font-weight: 600; margin: 0;">₹${formatCurrency(plan.currentTax)}</p>
+                                <p style="color: var(--text-gray); font-size: 0.9rem;">Taxable: ₹${formatCurrency(plan.currentTaxableIncome)}</p>
+                            </div>
+                            <div style="background: var(--success-green); background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success-green); border-radius: var(--border-radius-md); padding: 1.5rem; text-align: center;">
+                                <h6 style="color: var(--success-green); margin-bottom: 1rem;">Optimized Tax</h6>
+                                <p style="color: var(--success-green); font-size: 1.5rem; font-weight: 600; margin: 0;">₹${formatCurrency(plan.optimizedTax)}</p>
+                                <p style="color: var(--text-gray); font-size: 0.9rem;">Taxable: ₹${formatCurrency(plan.optimizedTaxableIncome)}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tax Saving Opportunities -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">💡 Tax Saving Opportunities</h5>
+                        <div class="data-display">
+                            ${plan.optimizations.map(opt => `
+                                <div class="data-row">
+                                    <span class="data-label">
+                                        ${opt.section} - ${opt.description}:
+                                        <br><small style="color: var(--text-gray);">Current: ₹${formatCurrency(opt.currentAmount)} | Max: ₹${formatCurrency(opt.maxLimit)}</small>
+                                    </span>
+                                    <span class="data-value">
+                                        ₹${formatCurrency(opt.amount)}
+                                        <br><small style="color: var(--success-green);">Saves: ₹${formatCurrency(opt.taxBenefit)}</small>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Investment Recommendations -->
+                    <div style="background: var(--info-blue); background: rgba(0, 212, 255, 0.1); border: 1px solid var(--info-blue); border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: var(--info-blue); margin-bottom: 1rem;"><i class="fas fa-piggy-bank"></i> Recommended Tax-Saving Investments</h6>
+                        <ul style="color: var(--info-blue); margin: 0; padding-left: 1.5rem;">
+                            <li><strong>ELSS Mutual Funds</strong> - 3-year lock-in, potential for high returns</li>
+                            <li><strong>Public Provident Fund (PPF)</strong> - 15-year lock-in, tax-free returns</li>
+                            <li><strong>National Pension System (NPS)</strong> - Additional ₹50,000 deduction under 80CCD(1B)</li>
+                            <li><strong>Health Insurance</strong> - Covers medical emergencies while saving tax</li>
+                            <li><strong>Term Life Insurance</strong> - Financial protection for family</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Plan -->
+                    <div style="background: var(--success-green); background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success-green); border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: var(--success-green); margin-bottom: 1rem;"><i class="fas fa-tasks"></i> Implementation Action Plan</h6>
+                        <ol style="color: var(--success-green); margin: 0; padding-left: 1.5rem;">
+                            <li>Maximize Section 80C investments (₹1.5 lakh limit)</li>
+                            <li>Start NPS investment for additional ₹50,000 deduction</li>
+                            <li>Ensure adequate health insurance coverage</li>
+                            <li>Consider home loan for additional interest deduction</li>
+                            <li>Plan charitable donations for Section 80G benefits</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 4. Advanced Loan Calculator
+        function calculateLoanDetails() {
+            const loanAmount = parseFloat(document.getElementById('loan-amount').value);
+            const interestRate = parseFloat(document.getElementById('loan-interest-rate').value);
+            const loanTenure = parseFloat(document.getElementById('loan-tenure').value);
+            const loanType = document.getElementById('loan-type').value;
+            const processingFee = parseFloat(document.getElementById('processing-fee').value) || 0;
+
+            if (!loanAmount || !interestRate || !loanTenure) {
+                showAlert('Please fill in all required loan details', 'warning');
+                return;
+            }
+
+            const loanDetails = calculateAdvancedLoanMetrics({
+                principal: loanAmount,
+                annualRate: interestRate / 100,
+                tenureYears: loanTenure,
+                loanType,
+                processingFee
+            });
+
+            displayLoanDetails(loanDetails);
+        }
+
+        function calculateAdvancedLoanMetrics(params) {
+            const { principal, annualRate, tenureYears, loanType, processingFee } = params;
+            const monthlyRate = annualRate / 12;
+            const totalMonths = tenureYears * 12;
+            
+            // Calculate EMI using standard formula
+            const emi = principal * (monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / 
+                        (Math.pow(1 + monthlyRate, totalMonths) - 1);
+            
+            // Calculate total payment and interest
+            const totalPayment = emi * totalMonths;
+            const totalInterest = totalPayment - principal;
+            
+            // Calculate effective interest rate including processing fee
+            const totalCost = totalPayment + processingFee;
+            const effectiveRate = ((totalCost / principal) ** (1 / tenureYears) - 1) * 100;
+            
+            // Generate amortization schedule
+            const amortizationSchedule = generateAmortizationSchedule(principal, monthlyRate, totalMonths, emi);
+            
+            // Calculate prepayment scenarios
+            const prepaymentAnalysis = calculatePrepaymentScenarios(principal, monthlyRate, totalMonths, emi);
+            
+            // Calculate loan affordability metrics
+            const affordabilityMetrics = calculateAffordabilityMetrics(emi, loanType);
+
+            return {
+                emi,
+                totalPayment,
+                totalInterest,
+                effectiveRate,
+                processingFee,
+                amortizationSchedule,
+                prepaymentAnalysis,
+                affordabilityMetrics,
+                principal,
+                tenureYears,
+                annualRate: annualRate * 100
+            };
+        }
+
+        function generateAmortizationSchedule(principal, monthlyRate, totalMonths, emi) {
+            const schedule = [];
+            let remainingPrincipal = principal;
+            let cumulativeInterest = 0;
+            let cumulativePrincipal = 0;
+            
+            for (let month = 1; month <= Math.min(totalMonths, 12); month++) { // Show first year only
+                const interestPayment = remainingPrincipal * monthlyRate;
+                const principalPayment = emi - interestPayment;
+                remainingPrincipal -= principalPayment;
+                cumulativeInterest += interestPayment;
+                cumulativePrincipal += principalPayment;
+                
+                schedule.push({
+                    month,
+                    emi: emi,
+                    principalPayment,
+                    interestPayment,
+                    remainingPrincipal,
+                    cumulativeInterest,
+                    cumulativePrincipal
+                });
+            }
+            
+            return schedule;
+        }
+
+        function calculatePrepaymentScenarios(principal, monthlyRate, totalMonths, emi) {
+            const scenarios = [10000, 50000, 100000];
+            const prepaymentResults = [];
+            
+            scenarios.forEach(prepaymentAmount => {
+                if (prepaymentAmount < principal) {
+                    const newPrincipal = principal - prepaymentAmount;
+                    const newTotalMonths = Math.log(1 + (newPrincipal * monthlyRate) / emi) / Math.log(1 + monthlyRate);
+                    const newTotalPayment = emi * newTotalMonths;
+                    const savedAmount = (emi * totalMonths) - (newTotalPayment + prepaymentAmount);
+                    const savedTime = totalMonths - newTotalMonths;
+                    
+                    prepaymentResults.push({
+                        prepaymentAmount,
+                        newTenureMonths: Math.ceil(newTotalMonths),
+                        savedAmount,
+                        savedTimeMonths: Math.floor(savedTime),
+                        roi: (savedAmount / prepaymentAmount * 100).toFixed(1)
+                    });
+                }
+            });
+            
+            return prepaymentResults;
+        }
+
+        function calculateAffordabilityMetrics(emi, loanType) {
+            // Suggested income multiples based on loan type
+            const incomeMultiples = {
+                'home': 3.5,
+                'car': 5,
+                'personal': 6,
+                'education': 4
+            };
+            
+            const suggestedMinIncome = emi * (incomeMultiples[loanType] || 5);
+            const emiToIncomeRatio = 30; // 30% max recommended
+            
+            return {
+                suggestedMinIncome,
+                maxRecommendedEmi: suggestedMinIncome * (emiToIncomeRatio / 100),
+                affordabilityRating: emi <= (suggestedMinIncome * 0.3) ? 'Good' : 
+                                   emi <= (suggestedMinIncome * 0.4) ? 'Moderate' : 'High Risk'
+            };
+        }
+
+        function displayLoanDetails(details) {
+            const resultsContainer = document.getElementById('loan-calculator-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-calculator"></i> Comprehensive Loan Analysis</h4>
+                        <p class="card-subtitle">Loan Amount: ₹${formatCurrency(details.principal)} | Tenure: ${details.tenureYears} years</p>
+                    </div>
+                    
+                    <!-- Key Loan Metrics -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Key Loan Metrics</h5>
+                        <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="widget">
+                                <div class="widget-icon">💰</div>
+                                <div class="widget-value">₹${formatCurrency(details.emi)}</div>
+                                <div class="widget-label">Monthly EMI</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">📈</div>
+                                <div class="widget-value">₹${formatCurrency(details.totalInterest)}</div>
+                                <div class="widget-label">Total Interest</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">💸</div>
+                                <div class="widget-value">₹${formatCurrency(details.totalPayment)}</div>
+                                <div class="widget-label">Total Payment</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">⚖️</div>
+                                <div class="widget-value">${details.effectiveRate.toFixed(2)}%</div>
+                                <div class="widget-label">Effective Rate</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Affordability Analysis -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">🎯 Affordability Analysis</h5>
+                        <div style="background: var(--gradient-card); padding: 1.5rem; border-radius: var(--border-radius-md);">
+                            <div class="data-display" style="background: transparent;">
+                                <div class="data-row" style="border: none;">
+                                    <span class="data-label">Suggested Minimum Income:</span>
+                                    <span class="data-value">₹${formatCurrency(details.affordabilityMetrics.suggestedMinIncome)}</span>
+                                </div>
+                                <div class="data-row" style="border: none;">
+                                    <span class="data-label">Affordability Rating:</span>
+                                    <span class="data-value" style="color: ${details.affordabilityMetrics.affordabilityRating === 'Good' ? 'var(--success-green)' : 
+                                        details.affordabilityMetrics.affordabilityRating === 'Moderate' ? 'var(--warning-orange)' : 'var(--error-red)'};">
+                                        ${details.affordabilityMetrics.affordabilityRating}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prepayment Analysis -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">⚡ Prepayment Benefits Analysis</h5>
+                        <div class="data-display">
+                            ${details.prepaymentAnalysis.map(scenario => `
+                                <div class="data-row">
+                                    <span class="data-label">
+                                        Prepay ₹${formatCurrency(scenario.prepaymentAmount)}:
+                                        <br><small style="color: var(--text-gray);">Save ${scenario.savedTimeMonths} months</small>
+                                    </span>
+                                    <span class="data-value">
+                                        Save ₹${formatCurrency(scenario.savedAmount)}
+                                        <br><small style="color: var(--success-green);">ROI: ${scenario.roi}%</small>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- First Year Amortization -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📋 First Year Payment Breakdown</h5>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; color: var(--text-white);">
+                                <thead style="background: var(--secondary-black); position: sticky; top: 0;">
+                                    <tr>
+                                        <th style="padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--accent-white);">Month</th>
+                                        <th style="padding: 0.75rem; text-align: right; border-bottom: 1px solid var(--accent-white);">Principal</th>
+                                        <th style="padding: 0.75rem; text-align: right; border-bottom: 1px solid var(--accent-white);">Interest</th>
+                                        <th style="padding: 0.75rem; text-align: right; border-bottom: 1px solid var(--accent-white);">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${details.amortizationSchedule.map(row => `
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                            <td style="padding: 0.5rem;">${row.month}</td>
+                                            <td style="padding: 0.5rem; text-align: right;">₹${formatCurrency(row.principalPayment)}</td>
+                                            <td style="padding: 0.5rem; text-align: right;">₹${formatCurrency(row.interestPayment)}</td>
+                                            <td style="padding: 0.5rem; text-align: right;">₹${formatCurrency(row.remainingPrincipal)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div style="background: var(--info-blue); background: rgba(0, 212, 255, 0.1); border: 1px solid var(--info-blue); border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: var(--info-blue); margin-bottom: 1rem;"><i class="fas fa-lightbulb"></i> Loan Management Tips</h6>
+                        <ul style="color: var(--info-blue); margin: 0; padding-left: 1.5rem;">
+                            <li>Consider prepaying to reduce total interest cost</li>
+                            <li>Ensure EMI doesn't exceed 40% of monthly income</li>
+                            <li>Compare rates from multiple lenders before finalizing</li>
+                            <li>Factor in processing fees and other charges</li>
+                            <li>Consider loan insurance for financial protection</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 5. Budget Planner Functions
+        function addBudgetItem() {
+            const category = document.getElementById('budget-category').value;
+            const description = document.getElementById('budget-description').value;
+            const amount = parseFloat(document.getElementById('budget-amount').value);
+            const type = document.getElementById('budget-type').value;
+
+            if (!category || !description || !amount) {
+                showAlert('Please fill in all budget fields', 'warning');
+                return;
+            }
+
+            if (!clientData.budget) {
+                clientData.budget = { income: [], expenses: [] };
+            }
+
+            const budgetItem = {
+                id: Date.now(),
+                category,
+                description,
+                amount,
+                type,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            clientData.budget[type].push(budgetItem);
+            saveClientData();
+            
+            // Clear form
+            document.getElementById('budget-category').value = '';
+            document.getElementById('budget-description').value = '';
+            document.getElementById('budget-amount').value = '';
+
+            displayBudgetOverview();
+            showAlert('Budget item added successfully!', 'success');
+        }
+
+        function displayBudgetOverview() {
+            const budgetContainer = document.getElementById('budget-overview');
+            
+            if (!clientData.budget || (!clientData.budget.income.length && !clientData.budget.expenses.length)) {
+                budgetContainer.innerHTML = `
+                    <div class="card" style="margin-top: 2rem;">
+                        <div class="card-header">
+                            <h4 class="card-title"><i class="fas fa-chart-pie"></i> Budget Overview</h4>
+                            <p class="card-subtitle">No budget data available. Add some items to get started.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalIncome = clientData.budget.income.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpenses = clientData.budget.expenses.reduce((sum, item) => sum + item.amount, 0);
+            const netAmount = totalIncome - totalExpenses;
+            
+            // Group expenses by category
+            const expensesByCategory = {};
+            clientData.budget.expenses.forEach(item => {
+                expensesByCategory[item.category] = (expensesByCategory[item.category] || 0) + item.amount;
+            });
+
+            // Calculate expense percentages
+            const expensePercentages = {};
+            Object.keys(expensesByCategory).forEach(category => {
+                expensePercentages[category] = ((expensesByCategory[category] / totalExpenses) * 100).toFixed(1);
+            });
+
+            budgetContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-chart-pie"></i> Budget Overview</h4>
+                        <p class="card-subtitle">Monthly Budget Analysis</p>
+                    </div>
+                    
+                    <!-- Budget Summary -->
+                    <div style="margin: 2rem 0;">
+                        <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="widget">
+                                <div class="widget-icon">💰</div>
+                                <div class="widget-value">₹${formatCurrency(totalIncome)}</div>
+                                <div class="widget-label">Total Income</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">💸</div>
+                                <div class="widget-value">₹${formatCurrency(totalExpenses)}</div>
+                                <div class="widget-label">Total Expenses</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">${netAmount >= 0 ? '💚' : '🔴'}</div>
+                                <div class="widget-value" style="color: ${netAmount >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">₹${formatCurrency(Math.abs(netAmount))}</div>
+                                <div class="widget-label">${netAmount >= 0 ? 'Surplus' : 'Deficit'}</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">📊</div>
+                                <div class="widget-value">${totalExpenses > 0 ? ((totalExpenses / totalIncome) * 100).toFixed(1) : 0}%</div>
+                                <div class="widget-label">Expense Ratio</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expense Breakdown -->
+                    ${Object.keys(expensesByCategory).length > 0 ? `
+                        <div style="margin: 2rem 0;">
+                            <h5 style="color: var(--text-white); margin-bottom: 1rem;">📋 Expense Breakdown by Category</h5>
+                            <div class="data-display">
+                                ${Object.entries(expensesByCategory).map(([category, amount]) => `
+                                    <div class="data-row">
+                                        <span class="data-label">${category.charAt(0).toUpperCase() + category.slice(1)}:</span>
+                                        <span class="data-value">₹${formatCurrency(amount)} (${expensePercentages[category]}%)</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Recent Transactions -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📝 Recent Transactions</h5>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            ${[...clientData.budget.income, ...clientData.budget.expenses]
+                                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                .slice(0, 10)
+                                .map(item => `
+                                    <div style="background: var(--secondary-black); padding: 1rem; border-radius: var(--border-radius-sm); margin: 0.5rem 0; display: flex; justify-content: between; align-items: center;">
+                                        <div>
+                                            <h6 style="color: var(--text-white); margin: 0 0 0.25rem 0;">${item.description}</h6>
+                                            <p style="color: var(--text-gray); margin: 0; font-size: 0.9rem;">${item.category} • ${item.date}</p>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <p style="margin: 0; font-weight: 600; color: ${item.type === 'income' ? 'var(--success-green)' : 'var(--error-red)'};">
+                                                ${item.type === 'income' ? '+' : '-'}₹${formatCurrency(item.amount)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Budget Analysis -->
+                    <div style="background: ${netAmount >= 0 ? 'var(--success-green)' : 'var(--warning-orange)'}; background: ${netAmount >= 0 ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 159, 67, 0.1)'}; border: 1px solid ${netAmount >= 0 ? 'var(--success-green)' : 'var(--warning-orange)'}; border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: ${netAmount >= 0 ? 'var(--success-green)' : 'var(--warning-orange)'}; margin-bottom: 1rem;">
+                            <i class="fas fa-chart-line"></i> Budget Analysis
+                        </h6>
+                        <div style="color: ${netAmount >= 0 ? 'var(--success-green)' : 'var(--warning-orange)'};">
+                            ${netAmount >= 0 ? 
+                                `<p>✅ Great job! You have a surplus of ₹${formatCurrency(netAmount)}. Consider investing this amount for future growth.</p>` :
+                                `<p>⚠️ You have a deficit of ₹${formatCurrency(Math.abs(netAmount))}. Review your expenses and look for areas to reduce spending.</p>`
+                            }
+                            <p style="margin-top: 1rem; font-weight: 600;">
+                                Budget Health Score: ${totalIncome > 0 ? (netAmount >= 0 ? '85/100 - Excellent' : totalExpenses / totalIncome <= 1.1 ? '70/100 - Good' : '45/100 - Needs Improvement') : '0/100 - No Data'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateBudgetReport() {
+            if (!clientData.budget || (!clientData.budget.income.length && !clientData.budget.expenses.length)) {
+                showAlert('No budget data available to generate report', 'warning');
+                return;
+            }
+
+            const budgetAnalysis = analyzeBudgetData();
+            displayBudgetReport(budgetAnalysis);
+        }
+
+        function analyzeBudgetData() {
+            const income = clientData.budget.income;
+            const expenses = clientData.budget.expenses;
+            
+            const totalIncome = income.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
+            
+            // Analyze spending patterns
+            const categoryAnalysis = {};
+            const monthlyTrends = {};
+            
+            expenses.forEach(expense => {
+                // Category analysis
+                if (!categoryAnalysis[expense.category]) {
+                    categoryAnalysis[expense.category] = { total: 0, count: 0, average: 0 };
+                }
+                categoryAnalysis[expense.category].total += expense.amount;
+                categoryAnalysis[expense.category].count += 1;
+                
+                // Monthly trends
+                const month = expense.date.substring(0, 7); // YYYY-MM
+                if (!monthlyTrends[month]) {
+                    monthlyTrends[month] = { income: 0, expenses: 0 };
+                }
+                monthlyTrends[month].expenses += expense.amount;
+            });
+            
+            income.forEach(incomeItem => {
+                const month = incomeItem.date.substring(0, 7);
+                if (!monthlyTrends[month]) {
+                    monthlyTrends[month] = { income: 0, expenses: 0 };
+                }
+                monthlyTrends[month].income += incomeItem.amount;
+            });
+            
+            // Calculate averages
+            Object.keys(categoryAnalysis).forEach(category => {
+                categoryAnalysis[category].average = categoryAnalysis[category].total / categoryAnalysis[category].count;
+            });
+            
+            // Generate recommendations
+            const recommendations = generateBudgetRecommendations(totalIncome, totalExpenses, categoryAnalysis);
+            
+            return {
+                totalIncome,
+                totalExpenses,
+                netAmount: totalIncome - totalExpenses,
+                categoryAnalysis,
+                monthlyTrends,
+                recommendations
+            };
+        }
+
+        function generateBudgetRecommendations(totalIncome, totalExpenses, categoryAnalysis) {
+            const recommendations = [];
+            const expenseRatio = totalExpenses / totalIncome;
+            
+            // General budget recommendations
+            if (expenseRatio > 0.9) {
+                recommendations.push({
+                    type: 'warning',
+                    title: 'High Expense Ratio',
+                    description: 'Your expenses are consuming more than 90% of your income. Consider reducing discretionary spending.'
+                });
+            }
+            
+            if (expenseRatio < 0.7) {
+                recommendations.push({
+                    type: 'success',
+                    title: 'Great Savings Rate',
+                    description: 'You\'re saving more than 30% of your income. Consider investing the surplus for long-term growth.'
+                });
+            }
+            
+            // Category-specific recommendations
+            Object.entries(categoryAnalysis).forEach(([category, data]) => {
+                const categoryPercentage = (data.total / totalExpenses) * 100;
+                
+                if (category === 'entertainment' && categoryPercentage > 15) {
+                    recommendations.push({
+                        type: 'info',
+                        title: 'Entertainment Spending',
+                        description: `Entertainment expenses are ${categoryPercentage.toFixed(1)}% of total expenses. Consider reducing to 10-15%.`
+                    });
+                }
+                
+                if (category === 'food' && categoryPercentage > 25) {
+                    recommendations.push({
+                        type: 'info',
+                        title: 'Food Expenses',
+                        description: `Food expenses are ${categoryPercentage.toFixed(1)}% of total expenses. Look for opportunities to cook at home more.`
+                    });
+                }
+            });
+            
+            return recommendations;
+        }
+
+        function displayBudgetReport(analysis) {
+            const reportContainer = document.getElementById('budget-overview');
+            
+            reportContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-chart-bar"></i> Comprehensive Budget Report</h4>
+                        <p class="card-subtitle">Financial Performance Analysis</p>
+                    </div>
+                    
+                    <!-- Summary Metrics -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Financial Summary</h5>
+                        <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="widget">
+                                <div class="widget-icon">💰</div>
+                                <div class="widget-value">₹${formatCurrency(analysis.totalIncome)}</div>
+                                <div class="widget-label">Total Income</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">💸</div>
+                                <div class="widget-value">₹${formatCurrency(analysis.totalExpenses)}</div>
+                                <div class="widget-label">Total Expenses</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">${analysis.netAmount >= 0 ? '💚' : '🔴'}</div>
+                                <div class="widget-value" style="color: ${analysis.netAmount >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">₹${formatCurrency(Math.abs(analysis.netAmount))}</div>
+                                <div class="widget-label">${analysis.netAmount >= 0 ? 'Net Surplus' : 'Net Deficit'}</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">📈</div>
+                                <div class="widget-value">${((analysis.totalExpenses / analysis.totalIncome) * 100).toFixed(1)}%</div>
+                                <div class="widget-label">Expense Ratio</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Analysis -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">🏷️ Category-wise Analysis</h5>
+                        <div class="data-display">
+                            ${Object.entries(analysis.categoryAnalysis).map(([category, data]) => `
+                                <div class="data-row">
+                                    <span class="data-label">
+                                        ${category.charAt(0).toUpperCase() + category.slice(1)}:
+                                        <br><small style="color: var(--text-gray);">${data.count} transactions • Avg: ₹${formatCurrency(data.average)}</small>
+                                    </span>
+                                    <span class="data-value">
+                                        ₹${formatCurrency(data.total)}
+                                        <br><small style="color: var(--text-gray);">${((data.total / analysis.totalExpenses) * 100).toFixed(1)}% of expenses</small>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Monthly Trends -->
+                    ${Object.keys(analysis.monthlyTrends).length > 1 ? `
+                        <div style="margin: 2rem 0;">
+                            <h5 style="color: var(--text-white); margin-bottom: 1rem;">📈 Monthly Trends</h5>
+                            <div class="data-display">
+                                ${Object.entries(analysis.monthlyTrends).map(([month, data]) => `
+                                    <div class="data-row">
+                                        <span class="data-label">${month}:</span>
+                                        <span class="data-value">
+                                            Income: ₹${formatCurrency(data.income)} | Expenses: ₹${formatCurrency(data.expenses)}
+                                            <br><small style="color: ${data.income - data.expenses >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">
+                                                Net: ${data.income - data.expenses >= 0 ? '+' : ''}₹${formatCurrency(data.income - data.expenses)}
+                                            </small>
+                                        </span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Recommendations -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">💡 Budget Recommendations</h5>
+                        ${analysis.recommendations.map(rec => `
+                            <div style="background: ${rec.type === 'warning' ? 'rgba(255, 159, 67, 0.1)' : rec.type === 'success' ? 'rgba(0, 255, 136, 0.1)' : 'rgba(0, 212, 255, 0.1)'}; 
+                                        border: 1px solid ${rec.type === 'warning' ? 'var(--warning-orange)' : rec.type === 'success' ? 'var(--success-green)' : 'var(--info-blue)'}; 
+                                        border-radius: var(--border-radius-md); padding: 1rem; margin: 1rem 0;">
+                                <h6 style="color: ${rec.type === 'warning' ? 'var(--warning-orange)' : rec.type === 'success' ? 'var(--success-green)' : 'var(--info-blue)'}; margin-bottom: 0.5rem;">
+                                    ${rec.title}
+                                </h6>
+                                <p style="color: ${rec.type === 'warning' ? 'var(--warning-orange)' : rec.type === 'success' ? 'var(--success-green)' : 'var(--info-blue)'}; margin: 0;">
+                                    ${rec.description}
+                                </p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 6. Investment Tracker Functions
+        function addInvestment() {
+            const investmentName = document.getElementById('investment-name').value;
+            const investmentType = document.getElementById('investment-type').value;
+            const investmentAmount = parseFloat(document.getElementById('investment-amount').value);
+            const purchaseDate = document.getElementById('purchase-date').value;
+            const currentValue = parseFloat(document.getElementById('current-value').value);
+
+            if (!investmentName || !investmentType || !investmentAmount || !purchaseDate) {
+                showAlert('Please fill in all required investment fields', 'warning');
+                return;
+            }
+
+            if (!clientData.investments) {
+                clientData.investments = [];
+            }
+
+            const investment = {
+                id: Date.now(),
+                name: investmentName,
+                type: investmentType,
+                amount: investmentAmount,
+                purchaseDate,
+                currentValue: currentValue || investmentAmount,
+                addedDate: new Date().toISOString().split('T')[0]
+            };
+
+            clientData.investments.push(investment);
+            saveClientData();
+            
+            // Clear form
+            document.getElementById('investment-name').value = '';
+            document.getElementById('investment-amount').value = '';
+            document.getElementById('current-value').value = '';
+            document.getElementById('purchase-date').value = '';
+
+            displayInvestmentPortfolio();
+            showAlert('Investment added successfully!', 'success');
+        }
+
+        function displayInvestmentPortfolio() {
+            const portfolioContainer = document.getElementById('investment-portfolio');
+            
+            if (!clientData.investments || clientData.investments.length === 0) {
+                portfolioContainer.innerHTML = `
+                    <div class="card" style="margin-top: 2rem;">
+                        <div class="card-header">
+                            <h4 class="card-title"><i class="fas fa-chart-line"></i> Investment Portfolio</h4>
+                            <p class="card-subtitle">No investments added yet. Add some to track your portfolio.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalInvestment = clientData.investments.reduce((sum, inv) => sum + inv.amount, 0);
+            const totalCurrentValue = clientData.investments.reduce((sum, inv) => sum + inv.currentValue, 0);
+            const totalGains = totalCurrentValue - totalInvestment;
+            const totalReturn = ((totalGains / totalInvestment) * 100).toFixed(2);
+
+            // Group by investment type
+            const investmentsByType = {};
+            clientData.investments.forEach(inv => {
+                if (!investmentsByType[inv.type]) {
+                    investmentsByType[inv.type] = { count: 0, invested: 0, current: 0 };
+                }
+                investmentsByType[inv.type].count++;
+                investmentsByType[inv.type].invested += inv.amount;
+                investmentsByType[inv.type].current += inv.currentValue;
+            });
+
+            portfolioContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-chart-line"></i> Investment Portfolio Tracker</h4>
+                        <p class="card-subtitle">Track and analyze your investment performance</p>
+                    </div>
+                    
+                    <!-- Portfolio Summary -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Portfolio Summary</h5>
+                        <div class="widgets-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                            <div class="widget">
+                                <div class="widget-icon">💰</div>
+                                <div class="widget-value">₹${formatCurrency(totalInvestment)}</div>
+                                <div class="widget-label">Total Invested</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">📈</div>
+                                <div class="widget-value">₹${formatCurrency(totalCurrentValue)}</div>
+                                <div class="widget-label">Current Value</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">${totalGains >= 0 ? '🟢' : '🔴'}</div>
+                                <div class="widget-value" style="color: ${totalGains >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">
+                                    ${totalGains >= 0 ? '+' : ''}₹${formatCurrency(totalGains)}
+                                </div>
+                                <div class="widget-label">Total Gains/Loss</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon">📊</div>
+                                <div class="widget-value" style="color: ${totalGains >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">
+                                    ${totalReturn > 0 ? '+' : ''}${totalReturn}%
+                                </div>
+                                <div class="widget-label">Total Return</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Investment Type Breakdown -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">🏷️ Portfolio by Asset Type</h5>
+                        <div class="data-display">
+                            ${Object.entries(investmentsByType).map(([type, data]) => {
+                                const gains = data.current - data.invested;
+                                const returns = ((gains / data.invested) * 100).toFixed(1);
+                                return `
+                                    <div class="data-row">
+                                        <span class="data-label">
+                                            ${type.charAt(0).toUpperCase() + type.slice(1)}:
+                                            <br><small style="color: var(--text-gray);">${data.count} investments</small>
+                                        </span>
+                                        <span class="data-value">
+                                            ₹${formatCurrency(data.current)}
+                                            <br><small style="color: ${gains >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">
+                                                ${gains >= 0 ? '+' : ''}₹${formatCurrency(gains)} (${returns}%)
+                                            </small>
+                                        </span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Individual Investments -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📋 Individual Investments</h5>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            ${clientData.investments.sort((a, b) => new Date(b.addedDate) - new Date(a.addedDate)).map(inv => {
+                                const gains = inv.currentValue - inv.amount;
+                                const returns = ((gains / inv.amount) * 100).toFixed(1);
+                                const daysSincePurchase = Math.floor((new Date() - new Date(inv.purchaseDate)) / (1000 * 60 * 60 * 24));
+                                return `
+                                    <div style="background: var(--secondary-black); padding: 1.5rem; border-radius: var(--border-radius-md); margin: 1rem 0; border-left: 4px solid ${gains >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                                            <div>
+                                                <h6 style="color: var(--text-white); margin: 0 0 0.25rem 0;">${inv.name}</h6>
+                                                <p style="color: var(--text-gray); margin: 0; font-size: 0.9rem;">${inv.type} • Purchased: ${inv.purchaseDate}</p>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <p style="margin: 0; font-weight: 600; color: ${gains >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">
+                                                    ${gains >= 0 ? '+' : ''}₹${formatCurrency(gains)}
+                                                </p>
+                                                <p style="margin: 0; font-size: 0.9rem; color: ${gains >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">
+                                                    ${returns}% return
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                                            <div>
+                                                <span style="color: var(--text-gray);">Invested:</span>
+                                                <span style="color: var(--text-white); font-weight: 600;">₹${formatCurrency(inv.amount)}</span>
+                                            </div>
+                                            <div>
+                                                <span style="color: var(--text-gray);">Current:</span>
+                                                <span style="color: var(--text-white); font-weight: 600;">₹${formatCurrency(inv.currentValue)}</span>
+                                            </div>
+                                            <div>
+                                                <span style="color: var(--text-gray);">Duration:</span>
+                                                <span style="color: var(--text-white); font-weight: 600;">${daysSincePurchase} days</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Performance Analysis -->
+                    <div style="background: ${totalGains >= 0 ? 'var(--success-green)' : 'var(--warning-orange)'}; background: ${totalGains >= 0 ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 159, 67, 0.1)'}; border: 1px solid ${totalGains >= 0 ? 'var(--success-green)' : 'var(--warning-orange)'}; border-radius: var(--border-radius-md); padding: 1.5rem; margin-top: 2rem;">
+                        <h6 style="color: ${totalGains >= 0 ? 'var(--success-green)' : 'var(--warning-orange)'}; margin-bottom: 1rem;">
+                            <i class="fas fa-chart-line"></i> Portfolio Performance Analysis
+                        </h6>
+                        <div style="color: ${totalGains >= 0 ? 'var(--success-green)' : 'var(--warning-orange)'};">
+                            <p>
+                                ${totalGains >= 0 ? 
+                                    `🎉 Excellent! Your portfolio has gained ₹${formatCurrency(totalGains)} (${totalReturn}% return). Your investment strategy is working well.` :
+                                    `📉 Your portfolio is currently down by ₹${formatCurrency(Math.abs(totalGains))} (${totalReturn}% loss). Consider reviewing your investment strategy or holding for long-term recovery.`
+                                }
+                            </p>
+                            <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                                <li>Diversification Score: ${Object.keys(investmentsByType).length >= 3 ? 'Good' : 'Needs Improvement'}</li>
+                                <li>Best Performing: ${getBestPerformingInvestment()}</li>
+                                <li>Portfolio Risk Level: ${calculatePortfolioRiskLevel()}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getBestPerformingInvestment() {
+            if (!clientData.investments || clientData.investments.length === 0) return 'N/A';
+            
+            let bestInvestment = clientData.investments[0];
+            let bestReturn = (bestInvestment.currentValue - bestInvestment.amount) / bestInvestment.amount;
+            
+            clientData.investments.forEach(inv => {
+                const returns = (inv.currentValue - inv.amount) / inv.amount;
+                if (returns > bestReturn) {
+                    bestReturn = returns;
+                    bestInvestment = inv;
+                }
+            });
+            
+            return `${bestInvestment.name} (${(bestReturn * 100).toFixed(1)}%)`;
+        }
+
+        function calculatePortfolioRiskLevel() {
+            if (!clientData.investments || clientData.investments.length === 0) return 'N/A';
+            
+            const riskScores = {
+                'stocks': 8,
+                'mutualfunds': 6,
+                'bonds': 3,
+                'gold': 4,
+                'crypto': 10,
+                'realestate': 5,
+                'other': 5
+            };
+            
+            let totalRisk = 0;
+            let totalValue = 0;
+            
+            clientData.investments.forEach(inv => {
+                const risk = riskScores[inv.type] || 5;
+                totalRisk += risk * inv.currentValue;
+                totalValue += inv.currentValue;
+            });
+            
+            const avgRisk = totalRisk / totalValue;
+            
+            if (avgRisk <= 4) return 'Low Risk';
+            if (avgRisk <= 6) return 'Moderate Risk';
+            return 'High Risk';
+        }
+
+        // 7. Product Comparison Functions
+        function generateSmartComparison() {
+            const productType = document.getElementById('comparison-product-type').value;
+            const comparisonCriteria = document.getElementById('comparison-criteria').value;
+            const budgetRange = document.getElementById('budget-range').value;
+
+            if (!productType || !comparisonCriteria) {
+                showAlert('Please select product type and comparison criteria', 'warning');
+                return;
+            }
+
+            const comparisonData = generateProductComparison(productType, comparisonCriteria, budgetRange);
+            displayProductComparison(comparisonData);
+        }
+
+        function generateProductComparison(productType, criteria, budget) {
+            const products = getProductData(productType, budget);
+            const analysisResult = performComparativeAnalysis(products, criteria);
+            
+            return {
+                productType,
+                criteria,
+                budget,
+                products: analysisResult,
+                recommendation: generateRecommendation(analysisResult, criteria)
+            };
+        }
+
+        function getProductData(productType, budget) {
+            const productDatabase = {
+                'mutualfunds': [
+                    {
+                        name: 'Axis Bluechip Fund',
+                        category: 'Large Cap',
+                        returns1yr: 12.5,
+                        returns3yr: 15.2,
+                        returns5yr: 13.8,
+                        expenseRatio: 1.05,
+                        minInvestment: 5000,
+                        riskLevel: 'Moderate',
+                        rating: 4.5,
+                        aum: 45000
+                    },
+                    {
+                        name: 'HDFC Mid-Cap Opportunities Fund',
+                        category: 'Mid Cap',
+                        returns1yr: 18.3,
+                        returns3yr: 22.1,
+                        returns5yr: 16.7,
+                        expenseRatio: 1.25,
+                        minInvestment: 5000,
+                        riskLevel: 'High',
+                        rating: 4.2,
+                        aum: 32000
+                    },
+                    {
+                        name: 'HDFC Corporate Bond Fund',
+                        category: 'Debt',
+                        returns1yr: 7.2,
+                        returns3yr: 8.1,
+                        returns5yr: 7.8,
+                        expenseRatio: 0.45,
+                        minInvestment: 5000,
+                        riskLevel: 'Low',
+                        rating: 4.0,
+                        aum: 28000
+                    }
+                ],
+                'insurance': [
+                    {
+                        name: 'HDFC Life Term Insurance',
+                        category: 'Term Life',
+                        coverage: 1000000,
+                        premium: 12000,
+                        tenure: 30,
+                        claimRatio: 98.2,
+                        riskLevel: 'Low',
+                        rating: 4.3,
+                        features: ['Online policy', 'Quick claim settlement', '24/7 support']
+                    },
+                    {
+                        name: 'ICICI Prudential Health Insurance',
+                        category: 'Health',
+                        coverage: 500000,
+                        premium: 15000,
+                        tenure: 1,
+                        claimRatio: 95.8,
+                        riskLevel: 'Low',
+                        rating: 4.1,
+                        features: ['Cashless treatment', 'No room rent limit', 'Pre-post hospitalization']
+                    }
+                ],
+                'loans': [
+                    {
+                        name: 'HDFC Home Loan',
+                        category: 'Home Loan',
+                        interestRate: 8.5,
+                        processingFee: 0.25,
+                        maxTenure: 30,
+                        maxLoanAmount: 10000000,
+                        prepaymentPenalty: 'Nil after 6 months',
+                        rating: 4.4,
+                        features: ['Quick approval', 'Flexible EMI', 'Online tracking']
+                    },
+                    {
+                        name: 'SBI Personal Loan',
+                        category: 'Personal Loan',
+                        interestRate: 11.5,
+                        processingFee: 1.0,
+                        maxTenure: 6,
+                        maxLoanAmount: 2000000,
+                        prepaymentPenalty: '2% of outstanding',
+                        rating: 4.0,
+                        features: ['Minimal documentation', 'Quick disbursal', 'Competitive rates']
+                    }
+                ]
+            };
+
+            return productDatabase[productType] || [];
+        }
+
+        function performComparativeAnalysis(products, criteria) {
+            return products.map(product => {
+                let score = 0;
+                const factors = criteria.split(',');
+                
+                factors.forEach(factor => {
+                    switch(factor.trim()) {
+                        case 'returns':
+                            if (product.returns3yr) score += product.returns3yr * 2;
+                            break;
+                        case 'cost':
+                            if (product.expenseRatio) score += (2 - product.expenseRatio) * 10;
+                            if (product.processingFee) score += (2 - product.processingFee) * 5;
+                            break;
+                        case 'risk':
+                            const riskScores = { 'Low': 20, 'Moderate': 15, 'High': 10 };
+                            score += riskScores[product.riskLevel] || 10;
+                            break;
+                        case 'rating':
+                            if (product.rating) score += product.rating * 5;
+                            break;
+                        default:
+                            score += 10; // Base score
+                    }
+                });
+                
+                return {
+                    ...product,
+                    analysisScore: score.toFixed(1),
+                    recommendation: score > 50 ? 'Highly Recommended' : score > 30 ? 'Recommended' : 'Consider Alternatives'
+                };
+            }).sort((a, b) => b.analysisScore - a.analysisScore);
+        }
+
+        function generateRecommendation(products, criteria) {
+            if (products.length === 0) return 'No products available for comparison';
+            
+            const topProduct = products[0];
+            const recommendations = [];
+            
+            recommendations.push(`🏆 Top Pick: ${topProduct.name} with analysis score of ${topProduct.analysisScore}`);
+            
+            if (criteria.includes('returns')) {
+                const highestReturn = products.reduce((max, p) => p.returns3yr > max ? p.returns3yr : max, 0);
+                const bestReturns = products.find(p => p.returns3yr === highestReturn);
+                if (bestReturns && bestReturns.name !== topProduct.name) {
+                    recommendations.push(`📈 Best Returns: ${bestReturns.name} with ${bestReturns.returns3yr}% 3-year returns`);
+                }
+            }
+            
+            if (criteria.includes('cost')) {
+                const lowestCost = products.reduce((min, p) => {
+                    const cost = p.expenseRatio || p.processingFee || Infinity;
+                    return cost < min ? cost : min;
+                }, Infinity);
+                const cheapest = products.find(p => (p.expenseRatio || p.processingFee) === lowestCost);
+                if (cheapest && cheapest.name !== topProduct.name) {
+                    recommendations.push(`💰 Most Cost-Effective: ${cheapest.name}`);
+                }
+            }
+            
+            return recommendations;
+        }
+
+        function displayProductComparison(comparison) {
+            const resultsContainer = document.getElementById('product-comparison-results');
+            
+            resultsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-balance-scale"></i> Smart Product Comparison</h4>
+                        <p class="card-subtitle">${comparison.productType} comparison based on ${comparison.criteria}</p>
+                    </div>
+                    
+                    <!-- Recommendations -->
+                    <div style="background: var(--info-blue); background: rgba(0, 212, 255, 0.1); border: 1px solid var(--info-blue); border-radius: var(--border-radius-md); padding: 1.5rem; margin: 2rem 0;">
+                        <h6 style="color: var(--info-blue); margin-bottom: 1rem;"><i class="fas fa-trophy"></i> Smart Recommendations</h6>
+                        <ul style="color: var(--info-blue); margin: 0; padding-left: 1.5rem;">
+                            ${comparison.recommendation.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <!-- Product Comparison Table -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📊 Detailed Comparison</h5>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; color: var(--text-white); min-width: 800px;">
+                                <thead style="background: var(--secondary-black);">
+                                    <tr>
+                                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--accent-white);">Product</th>
+                                        <th style="padding: 1rem; text-align: center; border-bottom: 1px solid var(--accent-white);">Score</th>
+                                        <th style="padding: 1rem; text-align: center; border-bottom: 1px solid var(--accent-white);">Category</th>
+                                        <th style="padding: 1rem; text-align: center; border-bottom: 1px solid var(--accent-white);">Key Metrics</th>
+                                        <th style="padding: 1rem; text-align: center; border-bottom: 1px solid var(--accent-white);">Rating</th>
+                                        <th style="padding: 1rem; text-align: center; border-bottom: 1px solid var(--accent-white);">Recommendation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${comparison.products.map((product, index) => `
+                                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); ${index === 0 ? 'background: rgba(0, 255, 136, 0.05);' : ''}">
+                                            <td style="padding: 1rem;">
+                                                <div>
+                                                    <h6 style="margin: 0 0 0.25rem 0; color: var(--text-white);">${product.name}</h6>
+                                                    <p style="margin: 0; font-size: 0.9rem; color: var(--text-gray);">${product.riskLevel} Risk</p>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1rem; text-align: center;">
+                                                <span style="background: ${index === 0 ? 'var(--success-green)' : index === 1 ? 'var(--info-blue)' : 'var(--warning-orange)'}; color: var(--primary-black); padding: 0.25rem 0.5rem; border-radius: 15px; font-weight: 600;">
+                                                    ${product.analysisScore}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 1rem; text-align: center;">${product.category}</td>
+                                            <td style="padding: 1rem; text-align: center; font-size: 0.9rem;">
+                                                ${comparison.productType === 'mutualfunds' ? `
+                                                    3Y Return: ${product.returns3yr}%<br>
+                                                    Expense: ${product.expenseRatio}%
+                                                ` : comparison.productType === 'insurance' ? `
+                                                    Coverage: ₹${formatCurrency(product.coverage)}<br>
+                                                    Premium: ₹${formatCurrency(product.premium)}
+                                                ` : `
+                                                    Interest: ${product.interestRate}%<br>
+                                                    Processing: ${product.processingFee}%
+                                                `}
+                                            </td>
+                                            <td style="padding: 1rem; text-align: center;">
+                                                <span style="color: var(--success-green);">★${product.rating}</span>
+                                            </td>
+                                            <td style="padding: 1rem; text-align: center;">
+                                                <span style="color: ${product.recommendation === 'Highly Recommended' ? 'var(--success-green)' : product.recommendation === 'Recommended' ? 'var(--info-blue)' : 'var(--warning-orange)'}; font-weight: 600;">
+                                                    ${product.recommendation}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analysis -->
+                    ${comparison.products.length > 0 ? `
+                        <div style="margin: 2rem 0;">
+                            <h5 style="color: var(--text-white); margin-bottom: 1rem;">🔍 Winner Analysis: ${comparison.products[0].name}</h5>
+                            <div style="background: var(--gradient-card); padding: 1.5rem; border-radius: var(--border-radius-md);">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                                    ${comparison.productType === 'mutualfunds' ? `
+                                        <div>
+                                            <span style="color: var(--text-gray);">1-Year Return:</span>
+                                            <span style="color: var(--success-green); font-weight: 600;">${comparison.products[0].returns1yr}%</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: var(--text-gray);">3-Year Return:</span>
+                                            <span style="color: var(--success-green); font-weight: 600;">${comparison.products[0].returns3yr}%</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: var(--text-gray);">Expense Ratio:</span>
+                                            <span style="color: var(--text-white); font-weight: 600;">${comparison.products[0].expenseRatio}%</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: var(--text-gray);">AUM:</span>
+                                            <span style="color: var(--text-white); font-weight: 600;">₹${comparison.products[0].aum} Cr</span>
+                                        </div>
+                                    ` : comparison.productType === 'insurance' ? `
+                                        <div>
+                                            <span style="color: var(--text-gray);">Coverage:</span>
+                                            <span style="color: var(--success-green); font-weight: 600;">₹${formatCurrency(comparison.products[0].coverage)}</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: var(--text-gray);">Claim Ratio:</span>
+                                            <span style="color: var(--success-green); font-weight: 600;">${comparison.products[0].claimRatio}%</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: var(--text-gray);">Annual Premium:</span>
+                                            <span style="color: var(--text-white); font-weight: 600;">₹${formatCurrency(comparison.products[0].premium)}</span>
+                                        </div>
+                                    ` : `
+                                        <div>
+                                            <span style="color: var(--text-gray);">Interest Rate:</span>
+                                            <span style="color: var(--info-blue); font-weight: 600;">${comparison.products[0].interestRate}%</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: var(--text-gray);">Max Tenure:</span>
+                                            <span style="color: var(--text-white); font-weight: 600;">${comparison.products[0].maxTenure} years</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: var(--text-gray);">Processing Fee:</span>
+                                            <span style="color: var(--text-white); font-weight: 600;">${comparison.products[0].processingFee}%</span>
+                                        </div>
+                                    `}
+                                </div>
+                                
+                                ${comparison.products[0].features ? `
+                                    <div style="margin-top: 1rem;">
+                                        <h6 style="color: var(--text-white); margin-bottom: 0.5rem;">Key Features:</h6>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                            ${comparison.products[0].features.map(feature => `
+                                                <span style="background: var(--accent-white); color: var(--primary-black); padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.9rem;">
+                                                    ${feature}
+                                                </span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // 8. Financial Calendar and Alerts Functions
+        function loadFinancialCalendar() {
+            const calendarContainer = document.getElementById('financial-calendar');
+            const upcomingEvents = generateFinancialEvents();
+            
+            calendarContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-calendar-alt"></i> Financial Calendar</h4>
+                        <p class="card-subtitle">Important financial dates and reminders</p>
+                    </div>
+                    
+                    <!-- Upcoming Events -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">📅 Upcoming Financial Events</h5>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            ${upcomingEvents.map(event => `
+                                <div style="background: var(--secondary-black); padding: 1rem; border-radius: var(--border-radius-md); margin: 1rem 0; border-left: 4px solid ${event.priority === 'high' ? 'var(--error-red)' : event.priority === 'medium' ? 'var(--warning-orange)' : 'var(--info-blue)'};">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <div>
+                                            <h6 style="color: var(--text-white); margin: 0 0 0.25rem 0;">${event.title}</h6>
+                                            <p style="color: var(--text-gray); margin: 0 0 0.5rem 0; font-size: 0.9rem;">${event.description}</p>
+                                            <span style="background: ${event.priority === 'high' ? 'var(--error-red)' : event.priority === 'medium' ? 'var(--warning-orange)' : 'var(--info-blue)'}; color: var(--primary-black); padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.8rem; font-weight: 600;">
+                                                ${event.priority.toUpperCase()} PRIORITY
+                                            </span>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <p style="margin: 0; font-weight: 600; color: var(--accent-white);">${event.date}</p>
+                                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-gray);">${event.daysLeft} days left</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div style="margin: 2rem 0;">
+                        <h5 style="color: var(--text-white); margin-bottom: 1rem;">⚡ Quick Financial Actions</h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                            <button onclick="scheduleFinancialReview()" style="background: var(--gradient-accent); color: var(--primary-black); padding: 1rem; border: none; border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer;">
+                                📋 Schedule Portfolio Review
+                            </button>
+                            <button onclick="setTaxReminder()" style="background: var(--gradient-card); color: var(--text-white); padding: 1rem; border: 1px solid var(--accent-white); border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer;">
+                                🗓️ Set Tax Filing Reminder
+                            </button>
+                            <button onclick="addCustomEvent()" style="background: var(--info-blue); color: var(--primary-black); padding: 1rem; border: none; border-radius: var(--border-radius-md); font-weight: 600; cursor: pointer;">
+                                ➕ Add Custom Event
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateFinancialEvents() {
+            const events = [];
+            const today = new Date();
+            
+            // Tax filing deadline
+            const taxDeadline = new Date(today.getFullYear(), 6, 31); // July 31
+            if (taxDeadline < today) {
+                taxDeadline.setFullYear(today.getFullYear() + 1);
+            }
+            const taxDaysLeft = Math.ceil((taxDeadline - today) / (1000 * 60 * 60 * 24));
+            
+            events.push({
+                title: 'Income Tax Filing Deadline',
+                description: 'File your annual income tax return',
+                date: taxDeadline.toLocaleDateString(),
+                daysLeft: taxDaysLeft,
+                priority: taxDaysLeft <= 30 ? 'high' : taxDaysLeft <= 90 ? 'medium' : 'low'
+            });
+
+            // Investment review
+            const reviewDate = new Date(today);
+            reviewDate.setDate(today.getDate() + 90);
+            
+            events.push({
+                title: 'Quarterly Portfolio Review',
+                description: 'Review and rebalance your investment portfolio',
+                date: reviewDate.toLocaleDateString(),
+                daysLeft: 90,
+                priority: 'medium'
+            });
+
+            // Insurance premium
+            const insuranceDate = new Date(today);
+            insuranceDate.setMonth(today.getMonth() + 1);
+            
+            events.push({
+                title: 'Insurance Premium Due',
+                description: 'Renew your health and life insurance policies',
+                date: insuranceDate.toLocaleDateString(),
+                daysLeft: 30,
+                priority: 'high'
+            });
+
+            // Financial goal review
+            const goalReview = new Date(today.getFullYear(), 11, 31); // Dec 31
+            const goalDaysLeft = Math.ceil((goalReview - today) / (1000 * 60 * 60 * 24));
+            
+            events.push({
+                title: 'Annual Financial Goals Review',
+                description: 'Assess progress on financial goals and set new targets',
+                date: goalReview.toLocaleDateString(),
+                daysLeft: goalDaysLeft,
+                priority: goalDaysLeft <= 60 ? 'medium' : 'low'
+            });
+
+            return events.sort((a, b) => a.daysLeft - b.daysLeft);
+        }
+
+        function scheduleFinancialReview() {
+            showAlert('Portfolio review scheduled for next quarter!', 'success');
+        }
+
+        function setTaxReminder() {
+            showAlert('Tax filing reminder set for 30 days before deadline!', 'success');
+        }
+
+        function addCustomEvent() {
+            const eventName = prompt('Enter event name:');
+            if (eventName) {
+                showAlert(`Custom event "${eventName}" added to your financial calendar!`, 'success');
+                // In a real app, this would be saved to the client data
+            }
+        }
+
+        function refreshAlerts() {
+            const alertsContainer = document.getElementById('smart-alerts');
+            const alerts = generateSmartAlerts();
+            
+            alertsContainer.innerHTML = `
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h4 class="card-title"><i class="fas fa-bell"></i> Smart Financial Alerts</h4>
+                        <p class="card-subtitle">Personalized notifications and recommendations</p>
+                    </div>
+                    
+                    <div style="margin: 2rem 0;">
+                        ${alerts.map(alert => `
+                            <div style="background: ${alert.type === 'critical' ? 'rgba(255, 99, 132, 0.1)' : alert.type === 'warning' ? 'rgba(255, 159, 67, 0.1)' : alert.type === 'info' ? 'rgba(0, 212, 255, 0.1)' : 'rgba(0, 255, 136, 0.1)'}; 
+                                        border: 1px solid ${alert.type === 'critical' ? 'var(--error-red)' : alert.type === 'warning' ? 'var(--warning-orange)' : alert.type === 'info' ? 'var(--info-blue)' : 'var(--success-green)'}; 
+                                        border-radius: var(--border-radius-md); padding: 1rem; margin: 1rem 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <h6 style="color: ${alert.type === 'critical' ? 'var(--error-red)' : alert.type === 'warning' ? 'var(--warning-orange)' : alert.type === 'info' ? 'var(--info-blue)' : 'var(--success-green)'}; margin: 0 0 0.5rem 0;">
+                                            ${alert.icon} ${alert.title}
+                                        </h6>
+                                        <p style="color: ${alert.type === 'critical' ? 'var(--error-red)' : alert.type === 'warning' ? 'var(--warning-orange)' : alert.type === 'info' ? 'var(--info-blue)' : 'var(--success-green)'}; margin: 0;">
+                                            ${alert.message}
+                                        </p>
+                                    </div>
+                                    <button onclick="dismissAlert('${alert.id}')" style="background: none; border: 1px solid currentColor; color: ${alert.type === 'critical' ? 'var(--error-red)' : alert.type === 'warning' ? 'var(--warning-orange)' : alert.type === 'info' ? 'var(--info-blue)' : 'var(--success-green)'}; padding: 0.25rem 0.5rem; border-radius: var(--border-radius-sm); cursor: pointer; font-size: 0.8rem;">
+                                        Dismiss
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateSmartAlerts() {
+            const alerts = [];
+            
+            // Check if user has assets for portfolio rebalancing
+            if (clientData.assets && clientData.assets.length > 0) {
+                const totalValue = clientData.assets.reduce((sum, asset) => sum + asset.value, 0);
+                const stocksValue = clientData.assets.filter(asset => asset.type === 'stocks').reduce((sum, asset) => sum + asset.value, 0);
+                const stocksPercentage = (stocksValue / totalValue) * 100;
+                
+                if (stocksPercentage > 70) {
+                    alerts.push({
+                        id: 'portfolio_concentration',
+                        type: 'warning',
+                        icon: '⚠️',
+                        title: 'Portfolio Concentration Risk',
+                        message: `Your portfolio is ${stocksPercentage.toFixed(1)}% concentrated in stocks. Consider diversifying to reduce risk.`
+                    });
+                }
+            }
+
+            // Check for emergency fund
+            if (clientData.financialStatus && clientData.financialStatus.monthlyExpenses) {
+                const cashAssets = clientData.assets ? clientData.assets.filter(asset => asset.type === 'cash').reduce((sum, asset) => sum + asset.value, 0) : 0;
+                const emergencyFundMonths = cashAssets / clientData.financialStatus.monthlyExpenses;
+                
+                if (emergencyFundMonths < 3) {
+                    alerts.push({
+                        id: 'emergency_fund',
+                        type: 'critical',
+                        icon: '🚨',
+                        title: 'Low Emergency Fund',
+                        message: `You have only ${emergencyFundMonths.toFixed(1)} months of expenses in emergency fund. Aim for 6 months.`
+                    });
+                }
+            }
+
+            // Check for insurance coverage
+            if (clientData.insuranceNeeds && clientData.insuranceNeeds.lifeInsuranceNeeded > 0) {
+                alerts.push({
+                    id: 'insurance_gap',
+                    type: 'warning',
+                    icon: '🛡️',
+                    title: 'Insurance Coverage Gap',
+                    message: `You need ₹${formatCurrency(clientData.insuranceNeeds.lifeInsuranceNeeded)} life insurance coverage. Consider getting adequate protection.`
+                });
+            }
+
+            // Investment opportunity alert
+            if (clientData.financialStatus && clientData.financialStatus.monthlySavings > 10000) {
+                alerts.push({
+                    id: 'investment_opportunity',
+                    type: 'success',
+                    icon: '💡',
+                    title: 'Investment Opportunity',
+                    message: `You're saving ₹${formatCurrency(clientData.financialStatus.monthlySavings)} monthly. Consider systematic investment plans for wealth building.`
+                });
+            }
+
+            // Tax saving reminder
+            const currentMonth = new Date().getMonth();
+            if (currentMonth >= 10) { // Nov, Dec, Jan, Feb, Mar
+                alerts.push({
+                    id: 'tax_saving',
+                    type: 'info',
+                    icon: '📋',
+                    title: 'Tax Saving Reminder',
+                    message: 'Financial year ending soon! Review tax-saving investments under Section 80C before March 31st.'
+                });
+            }
+
+            return alerts;
+        }
+
+        function dismissAlert(alertId) {
+            showAlert('Alert dismissed', 'info');
+            refreshAlerts(); // Refresh to remove dismissed alert
+        }
+
+        function configureAlerts() {
+            const preferences = {
+                portfolioAlerts: document.getElementById('portfolio-alerts')?.checked || false,
+                taxReminders: document.getElementById('tax-reminders')?.checked || false,
+                investmentOpportunities: document.getElementById('investment-opportunities')?.checked || false,
+                insuranceReminders: document.getElementById('insurance-reminders')?.checked || false
+            };
+            
+            // Save preferences (in real app, this would be saved to backend)
+            localStorage.setItem('alertPreferences', JSON.stringify(preferences));
+            showAlert('Alert preferences saved successfully!', 'success');
+        }
+
         // Add CSS for typing indicator animation
         const typingCSS = `
             .typing-dots {

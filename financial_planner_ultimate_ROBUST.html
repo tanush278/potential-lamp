@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planner Pro - Robust Edition</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Load libraries with fallback handling -->
+    <script>
+        // Global flags to track which libraries loaded successfully
+        window.librariesLoaded = {
+            chartjs: false,
+            jspdf: false,
+            html2canvas: false,
+            aos: false
+        };
+        
+        // Safe library loading with error handling
+        function loadLibrary(src, name) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    window.librariesLoaded[name] = true;
+                    console.log(`✅ ${name} loaded successfully`);
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.warn(`⚠️ ${name} failed to load from ${src}`);
+                    resolve(); // Don't reject, just continue without this library
+                };
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Load all libraries with fallback handling
+        Promise.all([
+            loadLibrary('https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.js', 'chartjs'),
+            loadLibrary('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', 'jspdf'),
+            loadLibrary('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js', 'html2canvas'),
+            loadLibrary('https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js', 'aos')
+        ]).then(() => {
+            console.log('All library loading attempts completed');
+            console.log('Libraries status:', window.librariesLoaded);
+        });
+    </script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-black: #000000;
+            --secondary-black: #0a0a0a;
+            --card-black: #111111;
+            --border-gray: #333333;
+            --text-white: #ffffff;
+            --text-gray: #aaaaaa;
+            --accent-white: #ffffff;
+            --success-green: #00ff88;
+            --warning-orange: #ff9f43;
+            --error-red: #ff6b6b;
+            --info-blue: #00d4ff;
+            --gradient-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            --gradient-card: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
+            --gradient-accent: linear-gradient(90deg, #ffffff 0%, #e0e0e0 100%);
+            --shadow-light: 0 4px 20px rgba(255, 255, 255, 0.1);
+            --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.8);
+            --border-radius-sm: 8px;
+            --border-radius-md: 15px;
+            --border-radius-lg: 25px;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--primary-black);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Enhanced Container System - COMPLETELY FIXED */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container-fluid {
+            width: 100%;
+            padding: 0 1rem;
+            position: relative;
+        }
+
+        /* Modern Sidebar Navigation - ULTIMATE FIX */
+        .sidebar {
+            width: 280px;
+            background: var(--gradient-card);
+            border-right: 2px solid var(--border-gray);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1000;
+            transition: var(--transition-smooth);
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 1.5rem 1rem;
+            justify-content: center;
+        }
+
+        .sidebar-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar.collapsed .sidebar-logo {
+            display: none;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--text-white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* Navigation Styles */
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: var(--text-white);
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: var(--accent-white);
+        }
+
+        .nav-link.active {
+            color: var(--text-white);
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--accent-white);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent-white);
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+        }
+
+        .nav-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .nav-arrow {
+            transition: var(--transition-smooth);
+            font-size: 0.8rem;
+        }
+
+        .nav-item.expanded .nav-arrow {
+            transform: rotate(90deg);
+        }
+
+        .sidebar.collapsed .nav-arrow {
+            display: none;
+        }
+
+        /* Sub Navigation */
+        .nav-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item.expanded .nav-submenu {
+            max-height: 500px;
+        }
+
+        .nav-sublink {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 3rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .nav-sublink:hover {
+            color: var(--text-white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-sublink.active {
+            color: var(--text-white);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Content Area - ULTIMATE FIX */
+        .main-content {
+            margin-left: 280px;
+            width: calc(100vw - 280px);
+            min-height: 100vh;
+            transition: var(--transition-smooth);
+            position: relative;
+            z-index: 1;
+            background: var(--primary-black);
+            overflow-x: hidden;
+            flex: 1;
+            padding: 0;
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: 70px;
+            width: calc(100vw - 70px);
+        }
+
+        /* Premium Header - ULTIMATE FIX */
+        .app-header {
+            background: var(--gradient-card);
+            border-bottom: 2px solid var(--border-gray);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 500;
+            backdrop-filter: blur(20px);
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            left: 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .breadcrumb {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .profile-info-header {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: var(--primary-black);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-white);
+            border: 1px solid var(--border-gray);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-white);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition-smooth);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .card-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-subtitle {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-white);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border-gray);
+            border-radius: var(--border-radius-sm);
+            background: var(--card-black);
+            color: var(--text-white);
+            font-family: inherit;
+            transition: var(--transition-smooth);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-white);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border-gray);
+            border-radius: var(--border-radius-sm);
+            background: var(--card-black);
+            color: var(--text-white);
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        /* Section Styles */
+        .section {
+            position: relative;
+            z-index: 1;
+            background: var(--primary-black);
+            min-height: auto;
+            clear: both;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 2rem;
+            margin: 0;
+        }
+
+        .section.active {
+            display: block !important;
+        }
+
+        .section:not(.active) {
+            display: none !important;
+        }
+
+        /* Alert Styles */
+        .alert {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            min-width: 300px;
+            box-shadow: var(--shadow-heavy);
+            animation: slideInRight 0.3s ease;
+        }
+
+        .alert-success {
+            background: var(--success-green);
+        }
+
+        .alert-error {
+            background: var(--error-red);
+        }
+
+        .alert-warning {
+            background: var(--warning-orange);
+        }
+
+        .alert-info {
+            background: var(--info-blue);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile Styles */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99;
+            backdrop-filter: blur(3px);
+        }
+
+        /* RESPONSIVE FIXES - COMPLETELY OVERHAULED */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 150;
+                width: 280px;
+                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            
+            .mobile-overlay.active {
+                display: block;
+            }
+            
+            .app-header {
+                padding: 1rem;
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block !important;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .profile-info-header {
+                overflow-x: auto;
+                display: flex;
+                gap: 0.5rem;
+                width: 100%;
+                flex-wrap: nowrap;
+            }
+            
+            .btn {
+                white-space: nowrap;
+                font-size: 0.9rem;
+                padding: 0.75rem 1rem;
+            }
+            
+            .widgets-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .data-display .data-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .card {
+                margin: 1rem 0;
+                padding: 1.5rem 1rem;
+            }
+            
+            .section {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .card {
+                margin: 1rem 0;
+                padding: 1.5rem 1rem;
+            }
+            
+            .btn {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .sidebar {
+                width: 90%;
+            }
+        }
+
+        /* Library Status Indicator */
+        .library-status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            z-index: 9999;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Library Status Indicator -->
+    <div class="library-status" id="library-status">
+        Libraries Loading...
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay" onclick="closeMobileSidebar()"></div>
+
+    <!-- Modern Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">FinPro</div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="nav-menu">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="showSection('dashboard')">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" onclick="toggleNavItem(this)">
+                        <i class="fas fa-user nav-icon"></i>
+                        <span class="nav-text">Profile Management</span>
+                        <i class="fas fa-chevron-right nav-arrow"></i>
+                    </a>
+                    <div class="nav-submenu">
+                        <a class="nav-sublink" onclick="showSection('personality')">
+                            <i class="fas fa-brain"></i> Personality Assessment
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('profile')">
+                            <i class="fas fa-id-card"></i> Basic Information
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('financial')">
+                            <i class="fas fa-chart-line"></i> Financial Status
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('networth')">
+                            <i class="fas fa-balance-scale"></i> Net Worth
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('goals')">
+                            <i class="fas fa-target"></i> Financial Goals
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('risk')">
+                            <i class="fas fa-shield-alt"></i> Risk Assessment
+                        </a>
+                    </div>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" onclick="toggleNavItem(this)">
+                        <i class="fas fa-lightbulb nav-icon"></i>
+                        <span class="nav-text">AI Advisory</span>
+                        <i class="fas fa-chevron-right nav-arrow"></i>
+                    </a>
+                    <div class="nav-submenu">
+                        <a class="nav-sublink" onclick="showSection('recommendations')">
+                            <i class="fas fa-magic"></i> Investment Recommendations
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('portfolio')">
+                            <i class="fas fa-chart-pie"></i> Portfolio Analysis
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('sip')">
+                            <i class="fas fa-repeat"></i> SIP Calculator
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('tax')">
+                            <i class="fas fa-receipt"></i> Tax Planning
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('retirement')">
+                            <i class="fas fa-umbrella"></i> Retirement Planning
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('comparison')">
+                            <i class="fas fa-balance-scale"></i> Product Comparison
+                        </a>
+                    </div>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" onclick="toggleNavItem(this)">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <span class="nav-text">Analytics & Reports</span>
+                        <i class="fas fa-chevron-right nav-arrow"></i>
+                    </a>
+                    <div class="nav-submenu">
+                        <a class="nav-sublink" onclick="showSection('analytics')">
+                            <i class="fas fa-chart-area"></i> Advanced Analytics
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('reports')">
+                            <i class="fas fa-file-pdf"></i> Financial Reports
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('summary')">
+                            <i class="fas fa-clipboard-list"></i> Executive Summary
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('alerts')">
+                            <i class="fas fa-bell"></i> Alerts & Notifications
+                        </a>
+                    </div>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" onclick="toggleNavItem(this)">
+                        <i class="fas fa-tools nav-icon"></i>
+                        <span class="nav-text">Financial Tools</span>
+                        <i class="fas fa-chevron-right nav-arrow"></i>
+                    </a>
+                    <div class="nav-submenu">
+                        <a class="nav-sublink" onclick="showSection('loan-calculator')">
+                            <i class="fas fa-calculator"></i> Loan Calculator
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('budget-planner')">
+                            <i class="fas fa-chart-pie"></i> Budget Planner
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('investment-tracker')">
+                            <i class="fas fa-trending-up"></i> Investment Tracker
+                        </a>
+                        <a class="nav-sublink" onclick="showSection('financial-calendar')">
+                            <i class="fas fa-calendar-alt"></i> Financial Calendar
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display: none;">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span id="current-section-title">Dashboard</span>
+                    </div>
+                </div>
+                <div class="profile-info-header">
+                    <button class="btn btn-small btn-primary" onclick="testLibraries()">
+                        <i class="fas fa-check"></i> Test Libraries
+                    </button>
+                    <button class="btn btn-small btn-secondary" onclick="generateRobustPDF()">
+                        <i class="fas fa-file-pdf"></i> Generate PDF
+                    </button>
+                    <button class="btn btn-small btn-secondary" onclick="showLibraryStatus()">
+                        <i class="fas fa-info"></i> Library Status
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-home"></i>
+                        Financial Planner Pro - Robust Edition
+                    </h2>
+                    <p class="card-subtitle">Advanced financial planning with robust error handling</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                    <div class="card">
+                        <h3><i class="fas fa-shield-alt"></i> Robust Design</h3>
+                        <p>This version works even if external libraries fail to load.</p>
+                        <button class="btn btn-primary" onclick="testAllFeatures()">Test All Features</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-user"></i> Profile Setup</h3>
+                        <p>Complete your financial profile to get personalized recommendations.</p>
+                        <button class="btn btn-primary" onclick="showSection('profile')">Setup Profile</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-lightbulb"></i> Smart Recommendations</h3>
+                        <p>Get AI-powered investment and financial planning advice.</p>
+                        <button class="btn btn-primary" onclick="showSection('recommendations')">Get Recommendations</button>
+                    </div>
+                </div>
+                
+                <div id="dashboard-content">
+                    <h3>System Status</h3>
+                    <div id="system-status"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-user"></i>
+                        Profile Setup
+                    </h2>
+                    <p class="card-subtitle">Set up your financial profile</p>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Monthly Income</label>
+                    <input type="number" class="form-input" id="monthly-income" placeholder="Enter your monthly income">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Monthly Expenses</label>
+                    <input type="number" class="form-input" id="monthly-expenses" placeholder="Enter your monthly expenses">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Current Savings</label>
+                    <input type="number" class="form-input" id="current-savings" placeholder="Enter your current savings">
+                </div>
+                
+                <button class="btn btn-primary" onclick="saveRobustProfile()">Save Profile</button>
+            </div>
+        </section>
+
+        <!-- Recommendations Section -->
+        <section id="recommendations" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Investment Recommendations
+                    </h2>
+                    <p class="card-subtitle">Personalized investment advice</p>
+                </div>
+                
+                <button class="btn btn-primary" onclick="generateRobustRecommendations()">Generate Recommendations</button>
+                <div id="recommendations-content" style="margin-top: 2rem;"></div>
+            </div>
+        </section>
+
+        <!-- Other sections will be similar -->
+        <section id="reports" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-file-pdf"></i>
+                        Financial Reports
+                    </h2>
+                    <p class="card-subtitle">Generate comprehensive financial reports</p>
+                </div>
+                
+                <button class="btn btn-primary" onclick="generateRobustReport()">Generate Report</button>
+                <button class="btn btn-secondary" onclick="generateRobustPDF()">Download PDF</button>
+                <div id="report-content" style="margin-top: 2rem;"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Global variables
+        let clientData = {
+            monthlyIncome: 0,
+            monthlyExpenses: 0,
+            currentSavings: 0,
+            profile: {},
+            recommendations: []
+        };
+
+        // Library status checking
+        function showLibraryStatus() {
+            const status = document.getElementById('library-status');
+            let statusText = 'Library Status:\n';
+            
+            Object.keys(window.librariesLoaded).forEach(lib => {
+                const loaded = window.librariesLoaded[lib];
+                statusText += `${lib}: ${loaded ? '✅' : '❌'}\n`;
+            });
+            
+            status.textContent = statusText;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        // Safe alert function
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit; cursor: pointer; margin-left: 10px;">×</button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Navigation functions
+        function showSection(sectionId) {
+            try {
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+                
+                // Show selected section
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    
+                    // Update breadcrumb
+                    const titleElement = document.getElementById('current-section-title');
+                    if (titleElement) {
+                        titleElement.textContent = targetSection.querySelector('.card-title')?.textContent || sectionId;
+                    }
+                }
+
+                // Update navigation
+                document.querySelectorAll('.nav-link, .nav-sublink').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                const navLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+                if (navLink) {
+                    navLink.classList.add('active');
+                }
+
+                showAlert(`Switched to ${sectionId}`, 'info');
+            } catch (error) {
+                console.error('Error in showSection:', error);
+                showAlert('Error switching sections: ' + error.message, 'error');
+            }
+        }
+
+        function toggleNavItem(element) {
+            try {
+                const navItem = element.closest('.nav-item');
+                const isExpanded = navItem.classList.contains('expanded');
+                
+                // Close all other nav items
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('expanded');
+                });
+                
+                // Toggle current item
+                if (!isExpanded) {
+                    navItem.classList.add('expanded');
+                }
+            } catch (error) {
+                console.error('Error in toggleNavItem:', error);
+            }
+        }
+
+        function toggleSidebar() {
+            try {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobile-overlay');
+                const isOpen = sidebar.classList.contains('mobile-open');
+                
+                sidebar.classList.toggle('mobile-open', !isOpen);
+                overlay.classList.toggle('active', !isOpen);
+                document.body.style.overflow = !isOpen ? 'hidden' : '';
+            } catch (error) {
+                console.error('Error in toggleSidebar:', error);
+            }
+        }
+
+        function closeMobileSidebar() {
+            try {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobile-overlay');
+                
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            } catch (error) {
+                console.error('Error in closeMobileSidebar:', error);
+            }
+        }
+
+        // Data management
+        function saveClientData() {
+            try {
+                localStorage.setItem('financialPlannerRobust', JSON.stringify(clientData));
+                console.log('Data saved successfully');
+                return true;
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showAlert('Error saving data: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        function loadClientData() {
+            try {
+                const saved = localStorage.getItem('financialPlannerRobust');
+                if (saved) {
+                    clientData = { ...clientData, ...JSON.parse(saved) };
+                    console.log('Data loaded successfully');
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+            return false;
+        }
+
+        // Test functions
+        function testLibraries() {
+            showLibraryStatus();
+            showAlert('Library status displayed. Check console for details.', 'info');
+        }
+
+        function testAllFeatures() {
+            let passed = 0;
+            let total = 0;
+            
+            // Test basic functions
+            total++;
+            try {
+                showAlert('Testing basic functions...', 'info');
+                passed++;
+            } catch (e) { console.error('Basic functions failed:', e); }
+            
+            // Test data saving
+            total++;
+            try {
+                if (saveClientData()) passed++;
+            } catch (e) { console.error('Data saving failed:', e); }
+            
+            // Test section switching
+            total++;
+            try {
+                showSection('dashboard');
+                passed++;
+            } catch (e) { console.error('Section switching failed:', e); }
+            
+            showAlert(`Feature test complete: ${passed}/${total} passed`, passed === total ? 'success' : 'warning');
+        }
+
+        // Profile functions
+        function saveRobustProfile() {
+            try {
+                const income = parseFloat(document.getElementById('monthly-income').value) || 0;
+                const expenses = parseFloat(document.getElementById('monthly-expenses').value) || 0;
+                const savings = parseFloat(document.getElementById('current-savings').value) || 0;
+                
+                clientData.monthlyIncome = income;
+                clientData.monthlyExpenses = expenses;
+                clientData.currentSavings = savings;
+                
+                if (saveClientData()) {
+                    showAlert('Profile saved successfully!', 'success');
+                    updateSystemStatus();
+                } else {
+                    showAlert('Failed to save profile', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showAlert('Error saving profile: ' + error.message, 'error');
+            }
+        }
+
+        // Recommendations
+        function generateRobustRecommendations() {
+            try {
+                if (!clientData.monthlyIncome || !clientData.monthlyExpenses) {
+                    showAlert('Please set up your profile first', 'warning');
+                    showSection('profile');
+                    return;
+                }
+
+                const savings = clientData.monthlyIncome - clientData.monthlyExpenses;
+                const savingsRate = ((savings / clientData.monthlyIncome) * 100).toFixed(1);
+                
+                const recommendations = `
+                    <div class="card">
+                        <h3>Your Personalized Recommendations</h3>
+                        <p><strong>Monthly Savings:</strong> ₹${savings.toLocaleString()}</p>
+                        <p><strong>Savings Rate:</strong> ${savingsRate}%</p>
+                        
+                        <h4>Investment Recommendations:</h4>
+                        <ul>
+                            <li><strong>Emergency Fund:</strong> Build ₹${(clientData.monthlyExpenses * 6).toLocaleString()} (6 months expenses)</li>
+                            <li><strong>SIP Investment:</strong> Consider investing ₹${Math.floor(savings * 0.6).toLocaleString()} monthly in equity funds</li>
+                            <li><strong>Tax Saving:</strong> Use Section 80C benefits - invest ₹12,500 monthly in ELSS</li>
+                            <li><strong>Risk Profile:</strong> ${savingsRate > 20 ? 'Aggressive' : savingsRate > 10 ? 'Moderate' : 'Conservative'} investor</li>
+                        </ul>
+                        
+                        <h4>Next Steps:</h4>
+                        <ol>
+                            <li>Open a high-yield savings account for emergency fund</li>
+                            <li>Start SIP in diversified equity mutual funds</li>
+                            <li>Consider term insurance (10-12x annual income)</li>
+                            <li>Review and rebalance portfolio quarterly</li>
+                        </ol>
+                    </div>
+                `;
+                
+                document.getElementById('recommendations-content').innerHTML = recommendations;
+                clientData.recommendations = [{ type: 'investment', data: recommendations, date: new Date().toISOString() }];
+                saveClientData();
+                
+                showAlert('Recommendations generated successfully!', 'success');
+            } catch (error) {
+                console.error('Error generating recommendations:', error);
+                showAlert('Error generating recommendations: ' + error.message, 'error');
+            }
+        }
+
+        // Reports
+        function generateRobustReport() {
+            try {
+                if (!clientData.monthlyIncome) {
+                    showAlert('Please set up your profile first', 'warning');
+                    showSection('profile');
+                    return;
+                }
+
+                const savings = clientData.monthlyIncome - clientData.monthlyExpenses;
+                const savingsRate = ((savings / clientData.monthlyIncome) * 100).toFixed(1);
+                
+                const reportContent = `
+                    <div class="card">
+                        <h3>📊 Comprehensive Financial Report</h3>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                        <hr>
+                        
+                        <h4>Financial Summary</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div style="background: #111; padding: 1rem; border-radius: 8px;">
+                                <strong>Monthly Income</strong><br>
+                                ₹${clientData.monthlyIncome.toLocaleString()}
+                            </div>
+                            <div style="background: #111; padding: 1rem; border-radius: 8px;">
+                                <strong>Monthly Expenses</strong><br>
+                                ₹${clientData.monthlyExpenses.toLocaleString()}
+                            </div>
+                            <div style="background: #111; padding: 1rem; border-radius: 8px;">
+                                <strong>Monthly Savings</strong><br>
+                                ₹${savings.toLocaleString()}
+                            </div>
+                            <div style="background: #111; padding: 1rem; border-radius: 8px;">
+                                <strong>Savings Rate</strong><br>
+                                ${savingsRate}%
+                            </div>
+                        </div>
+                        
+                        <h4>Financial Health Analysis</h4>
+                        <ul>
+                            <li><strong>Savings Rate:</strong> ${savingsRate}% ${parseFloat(savingsRate) >= 20 ? '(Excellent)' : parseFloat(savingsRate) >= 10 ? '(Good)' : '(Needs Improvement)'}</li>
+                            <li><strong>Emergency Fund:</strong> ${clientData.currentSavings > (clientData.monthlyExpenses * 6) ? 'Adequate' : 'Build Further'}</li>
+                            <li><strong>Investment Readiness:</strong> ${savings > 0 ? 'Ready to invest' : 'Focus on expense reduction'}</li>
+                        </ul>
+                        
+                        <h4>Recommendations Summary</h4>
+                        <p>${clientData.recommendations.length > 0 ? 'Personalized recommendations generated' : 'Generate recommendations for detailed advice'}</p>
+                        
+                        <hr>
+                        <p><small>This report is generated by Financial Planner Pro - Robust Edition</small></p>
+                    </div>
+                `;
+                
+                document.getElementById('report-content').innerHTML = reportContent;
+                showAlert('Report generated successfully!', 'success');
+            } catch (error) {
+                console.error('Error generating report:', error);
+                showAlert('Error generating report: ' + error.message, 'error');
+            }
+        }
+
+        function generateRobustPDF() {
+            try {
+                if (window.librariesLoaded.jspdf && typeof window.jsPDF !== 'undefined') {
+                    // Use jsPDF if available
+                    const doc = new jsPDF();
+                    doc.setFontSize(16);
+                    doc.text('Financial Planning Report', 20, 30);
+                    doc.setFontSize(12);
+                    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50);
+                    doc.text(`Monthly Income: ₹${clientData.monthlyIncome.toLocaleString()}`, 20, 70);
+                    doc.text(`Monthly Expenses: ₹${clientData.monthlyExpenses.toLocaleString()}`, 20, 90);
+                    doc.text(`Monthly Savings: ₹${(clientData.monthlyIncome - clientData.monthlyExpenses).toLocaleString()}`, 20, 110);
+                    doc.save('Financial_Report_Robust.pdf');
+                    showAlert('PDF generated successfully with jsPDF!', 'success');
+                } else {
+                    // Fallback to print dialog
+                    const reportContent = document.getElementById('report-content');
+                    if (!reportContent || !reportContent.innerHTML.trim()) {
+                        showAlert('Please generate a report first', 'warning');
+                        return;
+                    }
+                    
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Financial Report</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+                                h1, h2, h3 { color: #000; }
+                                .card { border: 1px solid #ddd; padding: 20px; margin: 20px 0; }
+                            </style>
+                        </head>
+                        <body>
+                            ${reportContent.innerHTML}
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
+                    showAlert('Report opened for printing (jsPDF not available)', 'info');
+                }
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showAlert('Error generating PDF: ' + error.message, 'error');
+            }
+        }
+
+        function updateSystemStatus() {
+            try {
+                const statusDiv = document.getElementById('system-status');
+                if (!statusDiv) return;
+                
+                const libCount = Object.values(window.librariesLoaded).filter(Boolean).length;
+                const totalLibs = Object.keys(window.librariesLoaded).length;
+                
+                statusDiv.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div style="background: #111; padding: 1rem; border-radius: 8px;">
+                            <strong>Libraries Loaded</strong><br>
+                            ${libCount}/${totalLibs}
+                        </div>
+                        <div style="background: #111; padding: 1rem; border-radius: 8px;">
+                            <strong>Profile Status</strong><br>
+                            ${clientData.monthlyIncome ? 'Complete' : 'Incomplete'}
+                        </div>
+                        <div style="background: #111; padding: 1rem; border-radius: 8px;">
+                            <strong>Data Storage</strong><br>
+                            ${typeof Storage !== 'undefined' ? 'Available' : 'Not Available'}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error updating system status:', error);
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Financial Planner Pro - Robust Edition loaded');
+            
+            // Load saved data
+            loadClientData();
+            
+            // Update status
+            updateSystemStatus();
+            
+            // Show initial success message
+            setTimeout(() => {
+                showAlert('Financial Planner Pro - Robust Edition loaded successfully!', 'success');
+            }, 1000);
+            
+            // Initialize AOS if available
+            if (window.librariesLoaded.aos && typeof AOS !== 'undefined') {
+                try {
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-in-out',
+                        once: true,
+                        offset: 100
+                    });
+                } catch (error) {
+                    console.warn('AOS initialization failed:', error);
+                }
+            }
+        });
+
+        // Update status periodically
+        setInterval(updateSystemStatus, 10000);
+    </script>
+</body>
+</html>

@@ -458,7 +458,7 @@
         .app-header {
             background: var(--gradient-card);
             border-bottom: 2px solid var(--border-gray);
-            padding: 0.6rem 0; /* Standard comfortable header padding */
+            padding: 0.9rem 0; /* Original header padding - just slightly reduced */
             position: sticky;
             top: 0;
             z-index: 100;
@@ -474,12 +474,12 @@
         }
 
         .app-logo {
-            font-size: 1.1rem; /* Smaller logo font */
+            font-size: 1.4rem; /* Original logo font size */
             font-weight: 700;
             color: var(--text-white);
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.5rem;
         }
 
         .app-logo i {
@@ -511,45 +511,45 @@
         /* SUPER COMPACT Navigation - This is the key fix! */
         .main-nav, .sub-nav {
             background: var(--secondary-black);
-            border-bottom: 1px solid var(--border-gray);
-            padding: 0.6rem 0; /* Standard comfortable padding */
+            border-bottom: 2px solid var(--border-gray);
+            padding: 0.8rem 0; /* Original comfortable padding - just slightly reduced */
             position: sticky;
-            top: 55px; /* Adjusted for standard header */
+            top: 65px; /* Adjusted for original header */
             z-index: 99;
             backdrop-filter: blur(10px);
         }
 
         .nav-buttons, .sub-nav-buttons {
             display: flex;
-            gap: 0.4rem; /* Standard comfortable gap */
-            flex-wrap: nowrap;
-            justify-content: flex-start;
+            gap: 0.5rem; /* Original comfortable gap */
+            flex-wrap: wrap;
+            justify-content: center;
             overflow-x: auto;
-            padding: 0 0.5rem;
+            padding: 0 1rem;
             scrollbar-width: thin;
         }
 
         .nav-btn, .sub-nav-btn {
             background: var(--card-black);
             color: var(--text-white);
-            border: 1px solid var(--border-gray);
-            padding: 0.4rem 0.8rem; /* Standard professional padding */
+            border: 2px solid var(--border-gray);
+            padding: 0.6rem 1.2rem; /* Original comfortable padding - just slightly reduced */
             border-radius: var(--border-radius-sm);
             cursor: pointer;
             font-weight: 500;
-            font-size: 0.85rem; /* Standard readable font size */
+            font-size: 0.9rem; /* Original readable size */
             transition: var(--transition-smooth);
             position: relative;
             overflow: hidden;
             white-space: nowrap;
             flex-shrink: 0;
             min-width: fit-content;
-            line-height: 1.3;
+            line-height: 1.4;
         }
 
         .nav-btn i, .sub-nav-btn i {
-            font-size: 0.75rem; /* Standard icon size */
-            margin-right: 0.3rem;
+            font-size: 0.8rem; /* Original icon size */
+            margin-right: 0.4rem;
         }
 
         .nav-btn::before, .sub-nav-btn::before {
@@ -583,8 +583,8 @@
         /* COMPACT Section Layout */
         .section {
             display: none;
-            padding: 1rem 0; /* Standard comfortable padding */
-            min-height: calc(100vh - 140px); /* Adjusted for standard header/nav */
+            padding: 1.2rem 0; /* Original comfortable padding - just slightly reduced */
+            min-height: calc(100vh - 160px); /* Adjusted for original header/nav */
         }
 
         .section.active {

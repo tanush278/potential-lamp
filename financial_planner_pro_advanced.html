@@ -520,17 +520,41 @@
             border: 1px solid var(--border-gray);
         }
 
-        /* Advanced Navigation */
-        .main-nav, .sub-nav {
-            background: var(--secondary-black);
-            border-bottom: 1px solid var(--border-gray);
-            padding: 1rem 0;
-            position: sticky;
-            top: 64px; /* Height of header (approx 64px) */
-            z-index: 99;
-            backdrop-filter: blur(10px);
+        /* Navigation redesign: single compact row, smaller tabs, icons+short labels */
+        .main-nav, .sub-nav { display: none !important; }
+        .compact-nav {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 0.5rem;
+          background: var(--secondary-black);
+          border-bottom: 1px solid var(--border-gray);
+          padding: 0.5rem 0;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .compact-tab {
+          background: var(--card-black);
+          color: var(--text-white);
+          border: 1px solid var(--border-gray);
+          padding: 0.4rem 0.9rem;
+          border-radius: 12px;
+          font-size: 0.92rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          cursor: pointer;
+          transition: background 0.2s, color 0.2s;
+        }
+        .compact-tab.active, .compact-tab:hover {
+          background: var(--gradient-accent);
+          color: var(--primary-black);
+          border-color: var(--accent-white);
         }
 
+        /* Advanced Navigation */
         .nav-buttons, .sub-nav-buttons {
             display: flex;
             gap: 0.5rem;
@@ -1852,106 +1876,13 @@
             </div>
         </header>
 
-        <!-- Advanced Navigation -->
-        <nav class="main-nav">
-            <div class="container">
-                <div class="nav-buttons">
-                    <button class="nav-btn active" onclick="showMainSection('client-data')">
-                        <i class="fas fa-user-edit"></i> Client Data
-                    </button>
-                    <button class="nav-btn" onclick="showMainSection('investment-advisory')">
-                        <i class="fas fa-chart-line"></i> Investment Advisory
-                    </button>
-                    <button class="nav-btn" onclick="showMainSection('analytics-reports')">
-                        <i class="fas fa-analytics"></i> Analytics & Reports
-                    </button>
-                    <button class="nav-btn" onclick="showMainSection('advanced-tools')">
-                        <i class="fas fa-tools"></i> Advanced Tools
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Enhanced Sub Navigation -->
-        <nav class="sub-nav">
-            <div class="container">
-                <!-- Client Data Sub-nav -->
-                <div id="client-data-subnav" class="sub-nav-buttons">
-                    <button class="sub-nav-btn active" onclick="showSubSection('personality', this)">
-                        <i class="fas fa-brain"></i> Assessment
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('profile', this)">
-                        <i class="fas fa-id-card"></i> Basic Info
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('financial', this)">
-                        <i class="fas fa-wallet"></i> Financial Status
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('networth', this)">
-                        <i class="fas fa-calculator"></i> Net Worth
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('goals', this)">
-                        <i class="fas fa-bullseye"></i> Goals & Insurance
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('risk', this)">
-                        <i class="fas fa-chart-area"></i> Risk Profile
-                    </button>
-                </div>
-
-                <!-- Investment Advisory Sub-nav -->
-                <div id="investment-advisory-subnav" class="sub-nav-buttons" style="display: none;">
-                    <button class="sub-nav-btn active" onclick="showSubSection('recommendations', this)">
-                        <i class="fas fa-lightbulb"></i> Investment Plan
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('portfolio', this)">
-                        <i class="fas fa-pie-chart"></i> Portfolio Analysis
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('sip', this)">
-                        <i class="fas fa-calendar-check"></i> SIP Calculator
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('tax', this)">
-                        <i class="fas fa-receipt"></i> Tax Planning
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('retirement', this)">
-                        <i class="fas fa-umbrella"></i> Retirement
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('comparison', this)">
-                        <i class="fas fa-balance-scale"></i> Product Compare
-                    </button>
-                </div>
-
-                <!-- Analytics & Reports Sub-nav -->
-                <div id="analytics-reports-subnav" class="sub-nav-buttons" style="display: none;">
-                    <button class="sub-nav-btn active" onclick="showSubSection('analytics', this)">
-                        <i class="fas fa-chart-bar"></i> Analytics
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('reports', this)">
-                        <i class="fas fa-file-alt"></i> Reports
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('summary', this)">
-                        <i class="fas fa-clipboard-list"></i> Executive Summary
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('alerts', this)">
-                        <i class="fas fa-bell"></i> Smart Alerts
-                    </button>
-                </div>
-
-                <!-- Advanced Tools Sub-nav -->
-                <div id="advanced-tools-subnav" class="sub-nav-buttons" style="display: none;">
-                    <button class="sub-nav-btn active" onclick="showSubSection('loan-calculator', this)">
-                        <i class="fas fa-home"></i> Loan Calculator
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('budget-planner', this)">
-                        <i class="fas fa-chart-pie"></i> Budget Planner
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('investment-tracker', this)">
-                        <i class="fas fa-trending-up"></i> Investment Tracker
-                    </button>
-                    <button class="sub-nav-btn" onclick="showSubSection('financial-calendar', this)">
-                        <i class="fas fa-calendar-alt"></i> Financial Calendar
-                    </button>
-                </div>
-            </div>
-        </nav>
+        <!-- Compact Navigation -->
+        <div class="compact-nav">
+          <div class="compact-tab active" onclick="showMainSection('client-data')"><i class="fas fa-user-edit"></i> Client</div>
+          <div class="compact-tab" onclick="showMainSection('investment-advisory')"><i class="fas fa-chart-line"></i> Advisory</div>
+          <div class="compact-tab" onclick="showMainSection('analytics-reports')"><i class="fas fa-analytics"></i> Reports</div>
+          <div class="compact-tab" onclick="showMainSection('financial-tools')"><i class="fas fa-tools"></i> Financial Tools</div>
+        </div>
 
         <!-- Sections Container -->
         <main class="container">

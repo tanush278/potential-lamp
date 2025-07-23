@@ -6,3 +6,33 @@
     <title>Financial Planner Pro - Ultimate Edition</title>
     <!-- The rest of the content is copied from financial_planner_pro_advanced.html -->
 // ... (Paste the full content of financial_planner_pro_advanced.html here) ...
+</head>
+<body>
+<div style="background:#232b3e;color:#fff;padding:24px 0;text-align:center;font-size:1.3rem;">
+  <b>Investment Report (In Progress)</b><br>
+  <span style="font-size:1rem;color:#b0b8c9;">This section is being actively developed. Here is a sample chart to show progress:</span>
+  <div style="max-width:400px;margin:24px auto;">
+    <canvas id="investment-report-pie"></canvas>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.Chart) {
+    var ctx = document.getElementById('investment-report-pie').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Stocks', 'Bonds', 'Gold', 'Real Estate'],
+        datasets: [{
+          data: [40, 25, 15, 20],
+          backgroundColor: ['#4bc0c0','#36a2eb','#ffce56','#9966ff'],
+        }]
+      },
+      options: {
+        plugins: { legend: { labels: { color: '#fff' } } },
+        responsive: true
+      }
+    });
+  }
+});
+</script>

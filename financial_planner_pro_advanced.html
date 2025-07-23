@@ -13,25 +13,25 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     <style>
         :root {
-            --primary-black: #000000;
-            --secondary-black: #0a0a0a;
-            --card-black: #111111;
-            --border-gray: #333333;
-            --text-white: #ffffff;
-            --text-gray: #aaaaaa;
+            --primary-black: #111216; /* Slightly softer black */
+            --secondary-black: #18191d; /* Slightly lighter for contrast */
+            --card-black: #1c1d22; /* Lighter for cards */
+            --border-gray: #2a2b2f; /* Softer border */
+            --text-white: #f7f7f7; /* Softer white */
+            --text-gray: #cccccc; /* Lighter gray for text */
             --accent-white: #ffffff;
             --success-green: #00ff88;
             --warning-orange: #ff9f43;
             --error-red: #ff6b6b;
             --info-blue: #00d4ff;
-            --gradient-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
-            --gradient-card: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
-            --gradient-accent: linear-gradient(90deg, #ffffff 0%, #e0e0e0 100%);
-            --shadow-light: 0 4px 20px rgba(255, 255, 255, 0.1);
-            --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.8);
-            --border-radius-sm: 8px;
-            --border-radius-md: 15px;
-            --border-radius-lg: 25px;
+            --gradient-primary: linear-gradient(135deg, #18191d 0%, #111216 100%);
+            --gradient-card: linear-gradient(145deg, #23242a 0%, #18191d 100%);
+            --gradient-accent: linear-gradient(90deg, #f7f7f7 0%, #cccccc 100%);
+            --shadow-light: 0 4px 24px rgba(255,255,255,0.04);
+            --shadow-heavy: 0 20px 60px rgba(0,0,0,0.7);
+            --border-radius-sm: 10px;
+            --border-radius-md: 18px;
+            --border-radius-lg: 30px;
             --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
@@ -49,7 +49,7 @@
             line-height: 1.6;
             overflow-x: hidden;
             scroll-behavior: smooth;
-            font-size: 17px; /* Professional, readable size */
+            font-size: 17px;
         }
 
         /* Enhanced Container System */
@@ -82,27 +82,18 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
-            animation: backgroundPulse 8s ease-in-out infinite;
-        }
-
-        @keyframes backgroundPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            background: linear-gradient(120deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            z-index: 0;
         }
 
         .profile-card {
             background: var(--gradient-card);
-            border: 2px solid var(--border-gray);
+            border: 1.5px solid var(--border-gray);
             border-radius: var(--border-radius-lg);
-            padding: 2.5rem; /* Comfortable, not oversized */
+            padding: 2.5rem 2rem 2rem 2rem;
             max-width: 900px;
             width: 98%;
             position: relative;
-            backdrop-filter: blur(20px);
             box-shadow: var(--shadow-heavy);
             z-index: 2;
             animation: slideInUp 1s ease-out;
@@ -139,7 +130,7 @@
 
         .profile-header h1 {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
             font-weight: 800;
             margin-bottom: 1rem;
             background: var(--gradient-accent);
@@ -151,7 +142,7 @@
         }
 
         .profile-header .subtitle {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--text-gray);
             font-weight: 400;
             margin-bottom: 0.5rem;
@@ -161,19 +152,20 @@
             font-size: 1rem;
             color: var(--text-gray);
             font-style: italic;
-            opacity: 0.8;
+            opacity: 0.7;
         }
 
         /* Enhanced Welcome Section */
         .welcome-section {
             text-align: center;
             margin: 2rem 0 3rem;
-            padding: 2rem;
-            background: var(--gradient-card);
+            padding: 2rem 1.5rem;
+            background: var(--card-black);
             border-radius: var(--border-radius-md);
             border: 1px solid var(--border-gray);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-light);
         }
 
         .welcome-section::before {
@@ -193,14 +185,14 @@
         }
 
         .welcome-section h3 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
             color: var(--text-white);
         }
 
         .welcome-section p {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--text-gray);
             line-height: 1.7;
             max-width: 600px;
@@ -283,10 +275,10 @@
         /* Enhanced Action Buttons */
         .action-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 1.2rem;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 2rem;
+            margin-top: 2.2rem;
         }
 
         /* Stunning Cover Page */
@@ -307,39 +299,32 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%);
-            animation: coverAnimation 12s ease-in-out infinite;
-        }
-
-        @keyframes coverAnimation {
-            0%, 100% { transform: rotate(0deg) scale(1); }
-            33% { transform: rotate(1deg) scale(1.02); }
-            66% { transform: rotate(-1deg) scale(0.98); }
+            background: linear-gradient(120deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+            z-index: 0;
         }
 
         .cover-content {
-            max-width: 800px;
+            max-width: 700px;
             text-align: center;
-            padding: 2rem;
+            padding: 2.5rem 1.5rem;
             position: relative;
             z-index: 2;
+            background: var(--card-black);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-light);
         }
 
         .app-title {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(3rem, 8vw, 6rem);
+            font-size: clamp(2.5rem, 6vw, 4rem);
             font-weight: 900;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             background: var(--gradient-accent);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.03em;
             line-height: 1;
-            animation: titleGlow 3s ease-in-out infinite;
         }
 
         @keyframes titleGlow {
@@ -348,7 +333,7 @@
         }
 
         .app-subtitle {
-            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-size: 1.2rem;
             color: var(--text-gray);
             margin-bottom: 2rem;
             font-weight: 400;
@@ -439,9 +424,9 @@
         }
 
         .btn-secondary {
-            background: var(--gradient-card);
+            background: var(--card-black);
             color: var(--text-white);
-            border: 2px solid var(--border-gray);
+            border: 1.5px solid var(--border-gray);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 

@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planner Pro - Advanced Financial Planning Platform</title>
+    
+    <!-- External Resources -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #000000;
+            --secondary-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --accent-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --border-color: #444444;
+            --hover-bg: #3d3d3d;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Cover Page Styles */
+        #cover-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            position: relative;
+        }
+
+        .cover-content {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--accent-color), #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Main App Styles */
+        #main-app {
+            display: none;
+            min-height: 100vh;
+            background: var(--primary-bg);
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Navigation Styles */
+        .main-nav {
+            background: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .sub-nav {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 0;
+            display: none;
+        }
+
+        .sub-nav.active {
+            display: block;
+        }
+
+        .sub-nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .sub-nav-btn {
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .sub-nav-btn:hover, .sub-nav-btn.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Section Styles */
+        .section {
+            display: none;
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--accent-color), #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* Assessment Styles */
+        .assessment-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--secondary-bg);
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #00d4ff);
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .question-number {
+            color: var(--accent-color);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            background: var(--secondary-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent-color);
+            background: rgba(0, 123, 255, 0.1);
+        }
+
+        .option-btn.selected {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .question-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Results Styles */
+        .results-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .personality-result {
+            background: linear-gradient(135deg, var(--accent-color), #00d4ff);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .personality-type {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .personality-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Analytics Styles */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* Dashboard Widgets */
+        .dashboard-widgets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .widget {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .widget:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .widget-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .widget-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .widget-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Lists */
+        .item-list {
+            margin-bottom: 2rem;
+        }
+
+        .list-item {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-meta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .chatbot-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message.user {
+            background: var(--accent-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot {
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chatbot-input {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .chatbot-input button {
+            padding: 0.75rem 1rem;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* New Phase Features Styles */
+        .smart-feature {
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 212, 255, 0.1));
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .automation-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+
+        .alert-item {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .recommendation-card {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(0, 123, 255, 0.1));
+            border: 1px solid var(--success-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .risk-meter {
+            width: 100%;
+            height: 20px;
+            background: var(--secondary-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .risk-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .risk-low { background: var(--success-color); }
+        .risk-medium { background: var(--warning-color); }
+        .risk-high { background: var(--danger-color); }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: var(--secondary-bg);
+            font-weight: 600;
+        }
+
+        .highlight-cell {
+            background: rgba(0, 123, 255, 0.1);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-buttons, .sub-nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-btn, .sub-nav-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .chatbot-window {
+                width: 90vw;
+                right: 5vw;
+                left: 5vw;
+            }
+
+            .dashboard-widgets {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                min-width: 300px;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .p-1 { padding: 0.5rem; }
+        .p-2 { padding: 1rem; }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div id="cover-page">
+        <div class="cover-content">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                Financial Planner Pro
+            </div>
+            <p class="tagline">
+                Advanced AI-Powered Financial Planning Platform
+                <span class="feature-badge">8 Smart Phases</span>
+            </p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="startPersonalityAssessment()">
+                    <i class="fas fa-brain"></i>
+                    Start Smart Assessment
+                </button>
+                <button class="btn btn-secondary" onclick="startClientProfiling()">
+                    <i class="fas fa-user"></i>
+                    Skip to Profiling
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="header-logo">
+                        <i class="fas fa-chart-line"></i>
+                        Financial Planner Pro
+                        <span class="feature-badge">AI Enhanced</span>
+                    </div>
+                    <div class="header-actions">
+                        <div class="automation-status">
+                            <div class="status-indicator"></div>
+                            <span>Smart Analytics Active</span>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="goBackToCover()">
+                            <i class="fas fa-home"></i>
+                            Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Navigation -->
+        <nav class="main-nav">
+            <div class="container">
+                <div class="nav-buttons">
+                    <button class="nav-btn active" onclick="showMainSection('client-data')">
+                        <i class="fas fa-user-circle"></i>
+                        Client Data & Assessment
+                    </button>
+                    <button class="nav-btn" onclick="showMainSection('investment-advisory')">
+                        <i class="fas fa-chart-pie"></i>
+                        Smart Investment Advisory
+                    </button>
+                    <button class="nav-btn" onclick="showMainSection('analytics-reports')">
+                        <i class="fas fa-analytics"></i>
+                        AI Analytics & Reports
+                    </button>
+                    <button class="nav-btn" onclick="showMainSection('automation-center')">
+                        <i class="fas fa-robot"></i>
+                        Automation Center
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sub Navigation for Client Data -->
+        <div id="client-data-nav" class="sub-nav active">
+            <div class="container">
+                <div class="sub-nav-buttons">
+                    <button class="sub-nav-btn active" onclick="showSubSection('personality')">
+                        <i class="fas fa-brain"></i>
+                        AI Personality Assessment
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('profile')">
+                        <i class="fas fa-user"></i>
+                        Basic Profile
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('financial')">
+                        <i class="fas fa-wallet"></i>
+                        Financial Status
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('networth')">
+                        <i class="fas fa-calculator"></i>
+                        Smart Net Worth
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('goals')">
+                        <i class="fas fa-bullseye"></i>
+                        Goal Tracker
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('risk')">
+                        <i class="fas fa-shield-alt"></i>
+                        Risk Analyzer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub Navigation for Investment Advisory -->
+        <div id="investment-advisory-nav" class="sub-nav">
+            <div class="container">
+                <div class="sub-nav-buttons">
+                    <button class="sub-nav-btn active" onclick="showSubSection('recommendations')">
+                        <i class="fas fa-lightbulb"></i>
+                        AI Recommendations
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('portfolio')">
+                        <i class="fas fa-briefcase"></i>
+                        Portfolio Optimizer
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('sip')">
+                        <i class="fas fa-coins"></i>
+                        Smart SIP Planner
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('tax')">
+                        <i class="fas fa-receipt"></i>
+                        Tax Optimizer
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('retirement')">
+                        <i class="fas fa-piggy-bank"></i>
+                        Retirement Planner
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('comparison')">
+                        <i class="fas fa-balance-scale"></i>
+                        Product Comparator
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub Navigation for Analytics & Reports -->
+        <div id="analytics-reports-nav" class="sub-nav">
+            <div class="container">
+                <div class="sub-nav-buttons">
+                    <button class="sub-nav-btn active" onclick="showSubSection('analytics')">
+                        <i class="fas fa-chart-bar"></i>
+                        Real-time Analytics
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('reports')">
+                        <i class="fas fa-file-alt"></i>
+                        Smart Reports
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('summary')">
+                        <i class="fas fa-clipboard-list"></i>
+                        Executive Summary
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('alerts')">
+                        <i class="fas fa-bell"></i>
+                        Smart Alerts
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub Navigation for Automation Center -->
+        <div id="automation-center-nav" class="sub-nav">
+            <div class="container">
+                <div class="sub-nav-buttons">
+                    <button class="sub-nav-btn active" onclick="showSubSection('data-sync')">
+                        <i class="fas fa-sync"></i>
+                        Auto Data Sync
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('monitoring')">
+                        <i class="fas fa-eye"></i>
+                        Portfolio Monitor
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('rebalancing')">
+                        <i class="fas fa-adjust"></i>
+                        Auto Rebalancing
+                    </button>
+                    <button class="sub-nav-btn" onclick="showSubSection('notifications')">
+                        <i class="fas fa-bell-slash"></i>
+                        Smart Notifications
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Container -->
+        <main class="container">
+            <!-- AI Personality Assessment Section -->
+            <section id="personality" class="section active">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-brain"></i>
+                        AI-Powered Financial Personality Assessment
+                        <span class="feature-badge">Phase 1: Smart Assessment</span>
+                    </h2>
+                    <p class="section-subtitle">
+                        Our advanced AI analyzes your responses to create a personalized financial profile
+                    </p>
+                </div>
+
+                <div class="assessment-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="assessment-progress" style="width: 0%"></div>
+                    </div>
+
+                    <div id="assessment-questions">
+                        <div class="question-card">
+                            <div class="question-number">Question 1 of 10</div>
+                            <div class="question-text" id="current-question">
+                                Loading assessment...
+                            </div>
+                            <div class="options-grid" id="question-options">
+                                <!-- Options will be loaded dynamically -->
+                            </div>
+                            <div class="question-nav">
+                                <button class="btn btn-secondary" id="prev-btn" onclick="previousQuestion()" disabled>
+                                    <i class="fas fa-arrow-left"></i>
+                                    Previous
+                                </button>
+                                <div id="question-counter">1 / 10</div>
+                                <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled>
+                                    Next
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="assessment-results" class="results-container" style="display: none;">
+                        <div class="personality-result">
+                            <div class="personality-type" id="personality-type">
+                                <!-- Results will be displayed here -->
+                            </div>
+                            <div class="personality-description" id="personality-description">
+                                <!-- Description will be displayed here -->
+                            </div>
+                            <button class="btn btn-primary" onclick="proceedToClientProfiling()">
+                                <i class="fas fa-arrow-right"></i>
+                                Continue to Profile Setup
+                            </button>
+                        </div>
+
+                        <div class="smart-feature">
+                            <h4><i class="fas fa-robot"></i> AI Insights</h4>
+                            <div id="ai-insights">
+                                <!-- AI-generated insights will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Basic Client Profile Section -->
+            <section id="profile" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Smart Client Profile
+                        <span class="feature-badge">Phase 2: Data Collection</span>
+                    </h2>
+                    <p class="section-subtitle">
+                        Enhanced profile with AI-powered data validation and suggestions
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-user-circle"></i>
+                            Personal Information
+                        </h3>
+                        <div class="automation-status">
+                            <div class="status-indicator"></div>
+                            <span>Auto-validation active</span>
+                        </div>
+                    </div>
+
+                    <form class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-input" id="client-name" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" class="form-input" id="client-email" placeholder="your.email@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" id="client-phone" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-input" id="client-dob">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Occupation</label>
+                            <input type="text" class="form-input" id="client-occupation" placeholder="Your profession">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-input" id="client-city" placeholder="Your city">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Marital Status</label>
+                            <select class="form-select" id="marital-status">
+                                <option value="">Select Status</option>
+                                <option value="single">Single</option>
+                                <option value="married">Married</option>
+                                <option value="divorced">Divorced</option>
+                                <option value="widowed">Widowed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Number of Dependents</label>
+                            <input type="number" class="form-input" id="dependents" placeholder="0" min="0">
+                        </div>
+                    </form>
+
+                    <div class="smart-feature">
+                        <h4><i class="fas fa-lightbulb"></i> Smart Suggestions</h4>
+                        <div id="profile-suggestions">
+                            <p><i class="fas fa-info-circle"></i> Based on your age and occupation, we recommend reviewing your risk profile annually.</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="saveBasicInfo()">
+                            <i class="fas fa-save"></i>
+                            Save Profile Information
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Financial Status Section -->
+            <section id="financial" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-wallet"></i>
+                        Smart Financial Status
+                        <span class="feature-badge">Phase 3: Financial Analysis</span>
+                    </h2>
+                    <p class="section-subtitle">
+                        AI-powered income and expense analysis with real-time insights
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line"></i>
+                            Income & Expense Tracker
+                        </h3>
+                        <div class="automation-status">
+                            <div class="status-indicator"></div>
+                            <span>Auto-categorization enabled</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Monthly Gross Income *</label>
+                            <input type="number" class="form-input" id="monthly-income" placeholder="₹ 100,000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Monthly Expenses *</label>
+                            <input type="number" class="form-input" id="monthly-expenses" placeholder="₹ 60,000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Savings</label>
+                            <input type="number" class="form-input" id="current-savings" placeholder="₹ 500,000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Monthly Investment</label>
+                            <input type="number" class="form-input" id="monthly-investment" placeholder="₹ 25,000" min="0">
+                        </div>
+                    </div>
+
+                    <div class="smart-feature">
+                        <h4><i class="fas fa-robot"></i> AI Financial Health Check</h4>
+                        <div id="financial-health-score">
+                            <div class="dashboard-widgets">
+                                <div class="widget">
+                                    <div class="widget-icon"><i class="fas fa-heartbeat"></i></div>
+                                    <div class="widget-value" id="health-score">--</div>
+                                    <div class="widget-label">Financial Health Score</div>
+                                </div>
+                                <div class="widget">
+                                    <div class="widget-icon"><i class="fas fa-percentage"></i></div>
+                                    <div class="widget-value" id="savings-rate">--</div>
+                                    <div class="widget-label">Savings Rate</div>
+                                </div>
+                                <div class="widget">
+                                    <div class="widget-icon"><i class="fas fa-calendar-alt"></i></div>
+                                    <div class="widget-value" id="emergency-months">--</div>
+                                    <div class="widget-label">Emergency Fund (Months)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="saveFinancialStatus()">
+                            <i class="fas fa-calculator"></i>
+                            Analyze Financial Status
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Smart Net Worth Calculator -->
+            <section id="networth" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-calculator"></i>
+                        AI-Powered Net Worth Calculator
+                        <span class="feature-badge">Phase 4: Asset Analysis</span>
+                    </h2>
+                    <p class="section-subtitle">
+                        Comprehensive asset tracking with market value updates and growth projections
+                    </p>
+                </div>
+
+                <!-- Net Worth Summary -->
+                <div class="dashboard-widgets">
+                    <div class="widget">
+                        <div class="widget-icon"><i class="fas fa-coins"></i></div>
+                        <div class="widget-value" id="total-assets">₹ 0</div>
+                        <div class="widget-label">Total Assets</div>
+                    </div>
+                    <div class="widget">
+                        <div class="widget-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="widget-value" id="total-liabilities">₹ 0</div>
+                        <div class="widget-label">Total Liabilities</div>
+                    </div>
+                    <div class="widget">
+                        <div class="widget-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="widget-value" id="net-worth">₹ 0</div>
+                        <div class="widget-label">Net Worth</div>
+                    </div>
+                    <div class="widget">
+                        <div class="widget-icon"><i class="fas fa-trending-up"></i></div>
+                        <div class="widget-value" id="growth-rate">0%</div>
+                        <div class="widget-label">Projected Growth</div>
+                    </div>
+                </div>
+
+                <!-- Assets Management -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-building"></i>
+                            Smart Asset Manager
+                        </h3>
+                        <div class="automation-status">
+                            <div class="status-indicator"></div>
+                            <span>Market value tracking active</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Asset Type</label>
+                            <select class="form-select" id="asset-type">
+                                <option value="">Select Asset Type</option>
+                                <option value="property">Real Estate</option>
+                                <option value="investment">Investments</option>
+                                <option value="cash">Cash & Bank</option>
+                                <option value="vehicle">Vehicles</option>
+                                <option value="jewelry">Jewelry & Gold</option>
+                                <option value="other">Other Assets</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Asset Name</label>
+                            <input type="text" class="form-input" id="asset-name" placeholder="e.g., Primary Residence">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Value (₹)</label>
+                            <input type="number" class="form-input" id="asset-value" placeholder="5000000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Purchase Date</label>
+                            <input type="date" class="form-input" id="asset-date">
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-3">
+                        <button class="btn btn-primary" onclick="addAsset()">
+                            <i class="fas fa-plus"></i>
+                            Add Asset
+                        </button>
+                    </div>
+
+                    <div id="assets-list" class="item-list">
+                        <!-- Assets will be listed here -->
+                    </div>
+                </div>
+
+                <!-- Liabilities Management -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-credit-card"></i>
+                            Smart Liability Tracker
+                        </h3>
+                        <div class="automation-status">
+                            <div class="status-indicator"></div>
+                            <span>EMI tracking active</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Loan Type</label>
+                            <select class="form-select" id="loan-type">
+                                <option value="">Select Loan Type</option>
+                                <option value="home">Home Loan</option>
+                                <option value="personal">Personal Loan</option>
+                                <option value="vehicle">Vehicle Loan</option>
+                                <option value="credit-card">Credit Card</option>
+                                <option value="education">Education Loan</option>
+                                <option value="other">Other Loans</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Lender Name</label>
+                            <input type="text" class="form-input" id="lender-name" placeholder="e.g., HDFC Bank">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Outstanding Amount (₹)</label>
+                            <input type="number" class="form-input" id="loan-amount" placeholder="2500000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Interest Rate (%)</label>
+                            <input type="number" class="form-input" id="interest-rate" placeholder="8.5" min="0" max="30" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Monthly EMI (₹)</label>
+                            <input type="number" class="form-input" id="monthly-emi" placeholder="25000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Remaining Tenure (Years)</label>
+                            <input type="number" class="form-input" id="remaining-tenure" placeholder="15" min="0" max="50">
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-3">
+                        <button class="btn btn-primary" onclick="addLoan()">
+                            <i class="fas fa-plus"></i>
+                            Add Liability
+                        </button>
+                    </div>
+
+                    <div id="loans-list" class="item-list">
+                        <!-- Loans will be listed here -->
+                    </div>
+                </div>
+
+                <div class="smart-feature">
+                    <h4><i class="fas fa-chart-pie"></i> AI Asset Allocation Analysis</h4>
+                    <div class="analytics-grid">
+                        <div class="chart-container">
+                            <h5 class="chart-title">Asset Distribution</h5>
+                            <canvas id="asset-pie-chart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h5 class="chart-title">Debt Analysis</h5>
+                            <canvas id="debt-bar-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Smart Goal Tracker -->
+            <section id="goals" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-bullseye"></i>
+                        AI-Powered Goal Tracker
+                        <span class="feature-badge">Phase 5: Goal Optimization</span>
+                    </h2>
+                    <p class="section-subtitle">
+                        Smart goal planning with AI-powered timeline optimization and progress tracking
+                    </p>
+                </div>
+
+                <!-- Financial Goals -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-target"></i>
+                            Smart Financial Goals
+                        </h3>
+                        <div class="automation-status">
+                            <div class="status-indicator"></div>
+                            <span>Progress tracking active</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Goal Type</label>
+                            <select class="form-select" id="goal-type">
+                                <option value="">Select Goal Type</option>
+                                <option value="retirement">Retirement Planning</option>
+                                <option value="child-education">Child Education</option>
+                                <option value="marriage">Marriage/Wedding</option>
+                                <option value="house">House Purchase</option>
+                                <option value="vacation">Dream Vacation</option>
+                                <option value="business">Business/Startup</option>
+                                <option value="emergency">Emergency Fund</option>
+                                <option value="other">Other Goals</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Goal Description</label>
+                            <input type="text" class="form-input" id="goal-description" placeholder="e.g., Child's Engineering Education">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Amount (₹)</label>
+                            <input type="number" class="form-input" id="goal-amount" placeholder="2500000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Date</label>
+                            <input type="date" class="form-input" id="goal-date">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Savings (₹)</label>
+                            <input type="number" class="form-input" id="goal-current" placeholder="250000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority Level</label>
+                            <select class="form-select" id="goal-priority">
+                                <option value="">Select Priority</option>
+                                <option value="high">High Priority</option>
+                                <option value="medium">Medium Priority</option>
+                                <option value="low">Low Priority</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-3">
+                        <button class="btn btn-primary" onclick="addGoal()">
+                            <i class="fas fa-plus"></i>
+                            Add Financial Goal
+                        </button>
+                    </div>
+
+                    <div id="goals-list" class="item-list">
+                        <!-- Goals will be listed here -->
+                    </div>
+                </div>
+
+                <!-- Insurance Planning -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-shield-alt"></i>
+                            Smart Insurance Planner
+                        </h3>
+                        <div class="automation-status">
+                            <div class="status-indicator"></div>
+                            <span>Coverage analysis active</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Current Life Insurance Coverage (₹)</label>
+                            <input type="number" class="form-input" id="life-insurance" placeholder="5000000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Health Insurance Coverage (₹)</label>
+                            <input type="number" class="form-input" id="health-insurance" placeholder="1000000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Annual Premium - Life (₹)</label>
+                            <input type="number" class="form-input" id="life-premium" placeholder="50000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Annual Premium - Health (₹)</label>
+                            <input type="number" class="form-input" id="health-premium" placeholder="25000" min="0">
+                        </div>
+                    </div>
+
+                    <div class="smart-feature">
+                        <h4><i class="fas fa-calculator"></i> AI Insurance Needs Analysis</h4>
+                        <div class="dashboard-widgets">
+                            <div class="widget">
+                                <div class="widget-icon"><i class="fas fa-heart"></i></div>
+                                <div class="widget-value" id="recommended-life">₹ --</div>
+                                <div class="widget-label">Recommended Life Cover</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon"><i class="fas fa-plus-square"></i></div>
+                                <div class="widget-value" id="recommended-health">₹ --</div>
+                                <div class="widget-label">Recommended Health Cover</div>
+                            </div>
+                            <div class="widget">
+                                <div class="widget-icon"><i class="fas fa-gap"></i></div>
+                                <div class="widget-value" id="coverage-gap">₹ --</div>
+                                <div class="widget-label">Coverage Gap</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="calculateInsuranceNeeds()">
+                            <i class="fas fa-calculator"></i>
+                            Calculate Insurance Needs
+                        </button>
+                    </div>
+                </div>
+
+                <div class="smart-feature">
+                    <h4><i class="fas fa-chart-line"></i> Goal Progress Visualization</h4>
+                    <div class="chart-container">
+                        <h5 class="chart-title">Goal Achievement Timeline</h5>
+                        <canvas id="goal-progress-chart"></canvas>
+                    </div>
+                </div>
+            </section>

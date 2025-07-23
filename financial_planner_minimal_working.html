@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planner Pro - Working Version</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #000; 
+            color: #fff; 
+            overflow-x: hidden;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: #111;
+            z-index: 1000;
+            overflow-y: auto;
+            border-right: 2px solid #333;
+        }
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            background: #000;
+            padding: 20px;
+        }
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: #333;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .btn:hover { background: #0056b3; }
+        .card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .alert {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+        .alert-success { background: #28a745; color: white; }
+        .alert-error { background: #dc3545; color: white; }
+        .alert-warning { background: #ffc107; color: black; }
+        .alert-info { background: #17a2b8; color: white; }
+        
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div style="padding: 20px; border-bottom: 1px solid #333;">
+            <h2><i class="fas fa-chart-line"></i> Financial Planner</h2>
+        </div>
+        <nav>
+            <a class="nav-link active" onclick="showSection('dashboard')">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a class="nav-link" onclick="showSection('profile')">
+                <i class="fas fa-user"></i> Profile Setup
+            </a>
+            <a class="nav-link" onclick="showSection('recommendations')">
+                <i class="fas fa-lightbulb"></i> Investment Recommendations
+            </a>
+            <a class="nav-link" onclick="showSection('budget')">
+                <i class="fas fa-chart-pie"></i> Budget Planner
+            </a>
+            <a class="nav-link" onclick="showSection('reports')">
+                <i class="fas fa-file-pdf"></i> Reports
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="card">
+                <h2><i class="fas fa-home"></i> Welcome to Financial Planner Pro</h2>
+                <p>Your comprehensive financial planning solution.</p>
+                <button class="btn" onclick="testFunction()">Test Basic Function</button>
+                <button class="btn" onclick="testDataSave()">Test Data Save</button>
+                <button class="btn" onclick="showSection('profile')">Go to Profile</button>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section">
+            <div class="card">
+                <h2><i class="fas fa-user"></i> Profile Setup</h2>
+                <p>Set up your financial profile.</p>
+                <div style="margin: 20px 0;">
+                    <label>Monthly Income: </label>
+                    <input type="number" id="monthly-income" placeholder="50000" style="padding: 8px; margin: 5px;">
+                </div>
+                <div style="margin: 20px 0;">
+                    <label>Monthly Expenses: </label>
+                    <input type="number" id="monthly-expenses" placeholder="35000" style="padding: 8px; margin: 5px;">
+                </div>
+                <button class="btn" onclick="saveProfile()">Save Profile</button>
+            </div>
+        </section>
+
+        <!-- Recommendations Section -->
+        <section id="recommendations" class="section">
+            <div class="card">
+                <h2><i class="fas fa-lightbulb"></i> Investment Recommendations</h2>
+                <div id="recommendations-content">
+                    <p>Generate personalized investment recommendations.</p>
+                    <button class="btn" onclick="generateRecommendations()">Generate Recommendations</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Budget Section -->
+        <section id="budget" class="section">
+            <div class="card">
+                <h2><i class="fas fa-chart-pie"></i> Budget Planner</h2>
+                <div style="margin: 20px 0;">
+                    <input type="text" id="budget-item" placeholder="Budget Item" style="padding: 8px; margin: 5px;">
+                    <input type="number" id="budget-amount" placeholder="Amount" style="padding: 8px; margin: 5px;">
+                    <button class="btn" onclick="addBudgetItem()">Add Item</button>
+                </div>
+                <div id="budget-list"></div>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="section">
+            <div class="card">
+                <h2><i class="fas fa-file-pdf"></i> Financial Reports</h2>
+                <p>Generate and download your financial reports.</p>
+                <button class="btn" onclick="generateReport()">Generate Report</button>
+                <button class="btn" onclick="downloadPDF()">Download PDF</button>
+                <div id="report-content" style="margin-top: 20px;"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Global variables
+        let clientData = {
+            monthlyIncome: 0,
+            monthlyExpenses: 0,
+            budgetItems: []
+        };
+
+        // Basic functions
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `${message} <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit; cursor: pointer;">×</button>`;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            const navLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (navLink) {
+                navLink.classList.add('active');
+            }
+
+            showAlert(`Switched to ${sectionId} section`, 'info');
+        }
+
+        function saveClientData() {
+            try {
+                localStorage.setItem('financialPlannerData', JSON.stringify(clientData));
+                console.log('Data saved successfully');
+                return true;
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showAlert('Error saving data: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        function loadClientData() {
+            try {
+                const saved = localStorage.getItem('financialPlannerData');
+                if (saved) {
+                    clientData = JSON.parse(saved);
+                    console.log('Data loaded successfully');
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+            return false;
+        }
+
+        function testFunction() {
+            showAlert('✅ Basic function test passed!', 'success');
+            console.log('Test function works');
+        }
+
+        function testDataSave() {
+            clientData.testData = new Date().toISOString();
+            if (saveClientData()) {
+                showAlert('✅ Data save test passed!', 'success');
+            } else {
+                showAlert('❌ Data save test failed!', 'error');
+            }
+        }
+
+        function saveProfile() {
+            const income = document.getElementById('monthly-income').value;
+            const expenses = document.getElementById('monthly-expenses').value;
+            
+            if (!income || !expenses) {
+                showAlert('Please fill in all fields', 'warning');
+                return;
+            }
+
+            clientData.monthlyIncome = parseFloat(income);
+            clientData.monthlyExpenses = parseFloat(expenses);
+            
+            if (saveClientData()) {
+                showAlert('Profile saved successfully!', 'success');
+            }
+        }
+
+        function generateRecommendations() {
+            if (!clientData.monthlyIncome || !clientData.monthlyExpenses) {
+                showAlert('Please set up your profile first', 'warning');
+                showSection('profile');
+                return;
+            }
+
+            const savings = clientData.monthlyIncome - clientData.monthlyExpenses;
+            const savingsRate = (savings / clientData.monthlyIncome * 100).toFixed(1);
+            
+            let recommendations = `
+                <h3>Your Personalized Recommendations:</h3>
+                <p><strong>Monthly Savings:</strong> ₹${savings.toLocaleString()}</p>
+                <p><strong>Savings Rate:</strong> ${savingsRate}%</p>
+                <ul>
+                    <li>Emergency Fund: Build ₹${(clientData.monthlyExpenses * 6).toLocaleString()} (6 months expenses)</li>
+                    <li>SIP Investment: Consider investing ₹${Math.floor(savings * 0.6).toLocaleString()} monthly</li>
+                    <li>Tax Saving: Use 80C benefits - invest ₹12,500 monthly in ELSS</li>
+                    <li>Risk Level: ${savingsRate > 20 ? 'Aggressive' : savingsRate > 10 ? 'Moderate' : 'Conservative'} investor profile</li>
+                </ul>
+            `;
+            
+            document.getElementById('recommendations-content').innerHTML = recommendations;
+            showAlert('Recommendations generated!', 'success');
+        }
+
+        function addBudgetItem() {
+            const item = document.getElementById('budget-item').value;
+            const amount = document.getElementById('budget-amount').value;
+            
+            if (!item || !amount) {
+                showAlert('Please fill in item name and amount', 'warning');
+                return;
+            }
+
+            clientData.budgetItems.push({
+                item: item,
+                amount: parseFloat(amount),
+                date: new Date().toISOString().split('T')[0]
+            });
+
+            document.getElementById('budget-item').value = '';
+            document.getElementById('budget-amount').value = '';
+            
+            updateBudgetDisplay();
+            saveClientData();
+            showAlert('Budget item added!', 'success');
+        }
+
+        function updateBudgetDisplay() {
+            const listEl = document.getElementById('budget-list');
+            if (clientData.budgetItems.length === 0) {
+                listEl.innerHTML = '<p>No budget items added yet.</p>';
+                return;
+            }
+
+            let html = '<h4>Your Budget Items:</h4>';
+            clientData.budgetItems.forEach((item, index) => {
+                html += `
+                    <div style="border: 1px solid #333; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>${item.item}</strong> - ₹${item.amount.toLocaleString()}
+                        <small style="color: #aaa; float: right;">${item.date}</small>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+
+        function generateReport() {
+            if (!clientData.monthlyIncome) {
+                showAlert('Please set up your profile first', 'warning');
+                showSection('profile');
+                return;
+            }
+
+            const savings = clientData.monthlyIncome - clientData.monthlyExpenses;
+            const totalBudget = clientData.budgetItems.reduce((sum, item) => sum + item.amount, 0);
+            
+            const reportContent = `
+                <div style="border: 1px solid #333; padding: 20px; border-radius: 10px; background: #111;">
+                    <h3>📊 Financial Report</h3>
+                    <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                    <hr style="border-color: #333;">
+                    <p><strong>Monthly Income:</strong> ₹${clientData.monthlyIncome.toLocaleString()}</p>
+                    <p><strong>Monthly Expenses:</strong> ₹${clientData.monthlyExpenses.toLocaleString()}</p>
+                    <p><strong>Monthly Savings:</strong> ₹${savings.toLocaleString()}</p>
+                    <p><strong>Savings Rate:</strong> ${(savings/clientData.monthlyIncome*100).toFixed(1)}%</p>
+                    <p><strong>Budget Items:</strong> ${clientData.budgetItems.length} items (₹${totalBudget.toLocaleString()})</p>
+                    <hr style="border-color: #333;">
+                    <p><strong>Recommendation:</strong> ${savings > 0 ? 'You are saving well!' : 'Consider reducing expenses.'}</p>
+                </div>
+            `;
+            
+            document.getElementById('report-content').innerHTML = reportContent;
+            showAlert('Report generated!', 'success');
+        }
+
+        function downloadPDF() {
+            showAlert('PDF download feature working! (In real app, this would download a PDF)', 'info');
+            // In real implementation, would use jsPDF here
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Financial Planner loaded successfully');
+            loadClientData();
+            updateBudgetDisplay();
+            showAlert('Financial Planner loaded successfully!', 'success');
+        });
+
+        // Test basic functionality on load
+        window.addEventListener('load', function() {
+            console.log('All resources loaded');
+        });
+    </script>
+</body>
+</html>

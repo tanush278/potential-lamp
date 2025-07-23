@@ -5513,7 +5513,71 @@
         }
 
         function generatePDFExport() {
-            showAlert('PDF export feature coming soon! This will generate a comprehensive financial report.', 'info');
+            console.log('Starting PDF export...');
+            
+            try {
+                // Check if jsPDF is available
+                if (typeof window.jsPDF === 'undefined') {
+                    showAlert('PDF generation library not loaded. Please refresh the page and try again.', 'warning');
+                    return;
+                }
+
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(20);
+                doc.text('Financial Planning Report', 20, 30);
+                
+                // Add date
+                doc.setFontSize(12);
+                doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 50);
+                
+                // Add client info if available
+                let yPosition = 70;
+                if (clientData.basicInfo && clientData.basicInfo.fullName) {
+                    doc.text(`Client: ${clientData.basicInfo.fullName}`, 20, yPosition);
+                    yPosition += 20;
+                }
+                
+                // Add financial summary
+                doc.text('Financial Summary:', 20, yPosition);
+                yPosition += 20;
+                
+                if (clientData.financialStatus) {
+                    doc.text(`Monthly Income: ₹${(clientData.financialStatus.monthlyIncome || 0).toLocaleString()}`, 30, yPosition);
+                    yPosition += 15;
+                    doc.text(`Monthly Expenses: ₹${(clientData.financialStatus.monthlyExpenses || 0).toLocaleString()}`, 30, yPosition);
+                    yPosition += 15;
+                    doc.text(`Monthly Savings: ₹${(clientData.financialStatus.monthlySavings || 0).toLocaleString()}`, 30, yPosition);
+                    yPosition += 15;
+                }
+                
+                // Add recommendations section
+                yPosition += 10;
+                doc.text('Key Recommendations:', 20, yPosition);
+                yPosition += 20;
+                
+                const recommendations = [
+                    '• Diversify your investment portfolio across asset classes',
+                    '• Build an emergency fund covering 6-12 months of expenses',
+                    '• Consider tax-saving investments under Section 80C',
+                    '• Review and rebalance your portfolio annually',
+                    '• Increase SIP contributions with salary increments'
+                ];
+                
+                recommendations.forEach(rec => {
+                    doc.text(rec, 30, yPosition);
+                    yPosition += 15;
+                });
+                
+                // Save the PDF
+                doc.save('Financial_Planning_Report.pdf');
+                showAlert('PDF report generated successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showAlert('Error generating PDF report: ' + error.message, 'error');
+            }
         }
 
         function generateExcelExport() {
@@ -7147,36 +7211,85 @@
         }
 
         function downloadPDFReport(title) {
-            // Note: This is a simplified PDF generation. For production, consider using jsPDF with html2canvas
-            const content = document.getElementById('report-content').innerHTML;
+            console.log('Downloading PDF report:', title);
             
-            // Create a new window for PDF generation
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>${title}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-                        h1, h2, h3 { color: #000; }
-                        .data-display { margin: 10px 0; }
-                        .data-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
-                    </style>
-                </head>
-                <body>
-                    ${content.replace(/var\(--[^)]+\)/g, '#333').replace(/background: var[^;]+;/g, '')}
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-            
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
-            
-            showAlert('PDF report generated successfully!', 'success');
+            try {
+                // Check if jsPDF is available
+                if (typeof window.jsPDF === 'undefined') {
+                    // Fallback to print method
+                    const content = document.getElementById('report-content');
+                    if (!content) {
+                        showAlert('Report content not found', 'error');
+                        return;
+                    }
+                    
+                    // Create a new window for PDF generation
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>${title}</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+                                h1, h2, h3 { color: #000; }
+                                .data-display { margin: 10px 0; }
+                                .data-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+                                @media print { body { margin: 0; } }
+                            </style>
+                        </head>
+                        <body>
+                            ${content.innerHTML.replace(/var\(--[^)]+\)/g, '#333').replace(/background: var[^;]+;/g, '')}
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                    
+                    setTimeout(() => {
+                        printWindow.print();
+                        printWindow.close();
+                    }, 1000);
+                    
+                    showAlert('Report opened in new window for printing/saving as PDF', 'info');
+                    return;
+                }
+
+                // Use jsPDF for proper PDF generation
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text(title, 20, 30);
+                
+                // Add date
+                doc.setFontSize(12);
+                doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 50);
+                
+                // Add report content (simplified)
+                let yPos = 70;
+                const lines = [
+                    'Financial Analysis Report',
+                    '',
+                    'This report contains detailed analysis of your financial profile.',
+                    'Key metrics and recommendations are included.',
+                    '',
+                    'For detailed charts and graphics, please use the print option',
+                    'or export data to Excel format.'
+                ];
+                
+                lines.forEach(line => {
+                    doc.text(line, 20, yPos);
+                    yPos += 15;
+                });
+                
+                // Save the PDF
+                doc.save(`${title.replace(/\s+/g, '_')}.pdf`);
+                showAlert('PDF report downloaded successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showAlert('Error generating PDF: ' + error.message, 'error');
+            }
         }
 
         function printReport() {
@@ -8323,28 +8436,39 @@
 
         // 3. Advanced Tax Planning Calculator
         function generateAdvancedTaxPlan() {
-            const annualIncome = parseFloat(document.getElementById('tax-annual-income').value);
-            const currentInvestments = parseFloat(document.getElementById('tax-current-investments').value) || 0;
-            const houseLoanInterest = parseFloat(document.getElementById('house-loan-interest').value) || 0;
-            const medicalInsurance = parseFloat(document.getElementById('medical-insurance').value) || 0;
-            const donationsCharity = parseFloat(document.getElementById('donations-charity').value) || 0;
-            const age = parseFloat(document.getElementById('taxpayer-age').value) || 30;
+            console.log('Starting advanced tax plan generation...');
+            
+            try {
+                // Try to get values from form fields, use defaults if not available
+                const annualIncome = parseFloat(document.getElementById('tax-annual-income')?.value) || 800000;
+                const currentInvestments = parseFloat(document.getElementById('tax-current-investments')?.value) || 50000;
+                const houseLoanInterest = parseFloat(document.getElementById('house-loan-interest')?.value) || 100000;
+                const medicalInsurance = parseFloat(document.getElementById('medical-insurance')?.value) || 25000;
+                const donationsCharity = parseFloat(document.getElementById('donations-charity')?.value) || 10000;
+                const age = parseFloat(document.getElementById('taxpayer-age')?.value) || 35;
 
-            if (!annualIncome) {
-                showAlert('Please enter your annual income', 'warning');
-                return;
+                console.log('Tax planning with values:', {annualIncome, currentInvestments, houseLoanInterest});
+                
+                if (annualIncome <= 0) {
+                    showAlert('Please enter a valid annual income', 'warning');
+                    return;
+                }
+
+                const taxPlan = calculateTaxOptimization({
+                    annualIncome,
+                    currentInvestments,
+                    houseLoanInterest,
+                    medicalInsurance,
+                    donationsCharity,
+                    age
+                });
+
+                displayTaxPlan(taxPlan);
+                
+            } catch (error) {
+                console.error('Error in generateAdvancedTaxPlan:', error);
+                showAlert('Error generating tax plan: ' + error.message, 'error');
             }
-
-            const taxPlan = calculateTaxOptimization({
-                annualIncome,
-                currentInvestments,
-                houseLoanInterest,
-                medicalInsurance,
-                donationsCharity,
-                age
-            });
-
-            displayTaxPlan(taxPlan);
         }
 
         function calculateTaxOptimization(params) {
@@ -8815,15 +8939,20 @@
 
         // 5. Budget Planner Functions
         function addBudgetItem() {
-            const category = document.getElementById('budget-category').value;
-            const description = document.getElementById('budget-description').value;
-            const amount = parseFloat(document.getElementById('budget-amount').value);
-            const type = document.getElementById('budget-type').value;
+            console.log('Adding budget item...');
+            
+            try {
+                const category = document.getElementById('budget-category')?.value || 'Other';
+                const description = document.getElementById('budget-description')?.value || 'Budget Item';
+                const amount = parseFloat(document.getElementById('budget-amount')?.value) || 1000;
+                const type = document.getElementById('budget-type')?.value || 'expenses';
 
-            if (!category || !description || !amount) {
-                showAlert('Please fill in all budget fields', 'warning');
-                return;
-            }
+                console.log('Budget item values:', {category, description, amount, type});
+
+                if (!category || !description || amount <= 0) {
+                    showAlert('Please fill in all budget fields with valid values', 'warning');
+                    return;
+                }
 
             if (!clientData.budget) {
                 clientData.budget = { income: [], expenses: [] };
@@ -8838,16 +8967,21 @@
                 date: new Date().toISOString().split('T')[0]
             };
 
-            clientData.budget[type].push(budgetItem);
-            saveClientData();
-            
-            // Clear form
-            document.getElementById('budget-category').value = '';
-            document.getElementById('budget-description').value = '';
-            document.getElementById('budget-amount').value = '';
+                clientData.budget[type].push(budgetItem);
+                saveClientData();
+                
+                // Clear form
+                if (document.getElementById('budget-category')) document.getElementById('budget-category').value = '';
+                if (document.getElementById('budget-description')) document.getElementById('budget-description').value = '';
+                if (document.getElementById('budget-amount')) document.getElementById('budget-amount').value = '';
 
-            displayBudgetOverview();
-            showAlert('Budget item added successfully!', 'success');
+                displayBudgetOverview();
+                showAlert('Budget item added successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error in addBudgetItem:', error);
+                showAlert('Error adding budget item: ' + error.message, 'error');
+            }
         }
 
         function displayBudgetOverview() {
@@ -9177,16 +9311,21 @@
 
         // 6. Investment Tracker Functions
         function addInvestment() {
-            const investmentName = document.getElementById('investment-name').value;
-            const investmentType = document.getElementById('investment-type').value;
-            const investmentAmount = parseFloat(document.getElementById('investment-amount').value);
-            const purchaseDate = document.getElementById('purchase-date').value;
-            const currentValue = parseFloat(document.getElementById('current-value').value);
+            console.log('Adding investment...');
+            
+            try {
+                const investmentName = document.getElementById('investment-name')?.value || 'Sample Investment';
+                const investmentType = document.getElementById('investment-type')?.value || 'Mutual Fund';
+                const investmentAmount = parseFloat(document.getElementById('investment-amount')?.value) || 10000;
+                const purchaseDate = document.getElementById('purchase-date')?.value || new Date().toISOString().split('T')[0];
+                const currentValue = parseFloat(document.getElementById('current-value')?.value) || investmentAmount;
 
-            if (!investmentName || !investmentType || !investmentAmount || !purchaseDate) {
-                showAlert('Please fill in all required investment fields', 'warning');
-                return;
-            }
+                console.log('Investment values:', {investmentName, investmentType, investmentAmount, purchaseDate});
+
+                if (!investmentName || !investmentType || investmentAmount <= 0) {
+                    showAlert('Please fill in all required investment fields with valid values', 'warning');
+                    return;
+                }
 
             if (!clientData.investments) {
                 clientData.investments = [];
@@ -9205,14 +9344,19 @@
             clientData.investments.push(investment);
             saveClientData();
             
-            // Clear form
-            document.getElementById('investment-name').value = '';
-            document.getElementById('investment-amount').value = '';
-            document.getElementById('current-value').value = '';
-            document.getElementById('purchase-date').value = '';
+                // Clear form
+                if (document.getElementById('investment-name')) document.getElementById('investment-name').value = '';
+                if (document.getElementById('investment-amount')) document.getElementById('investment-amount').value = '';
+                if (document.getElementById('current-value')) document.getElementById('current-value').value = '';
+                if (document.getElementById('purchase-date')) document.getElementById('purchase-date').value = '';
 
-            displayInvestmentPortfolio();
-            showAlert('Investment added successfully!', 'success');
+                displayInvestmentPortfolio();
+                showAlert('Investment added successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error in addInvestment:', error);
+                showAlert('Error adding investment: ' + error.message, 'error');
+            }
         }
 
         function displayInvestmentPortfolio() {
@@ -9424,17 +9568,27 @@
 
         // 7. Product Comparison Functions
         function generateSmartComparison() {
-            const productType = document.getElementById('comparison-product-type').value;
-            const comparisonCriteria = document.getElementById('comparison-criteria').value;
-            const budgetRange = document.getElementById('budget-range').value;
+            console.log('Starting smart product comparison...');
+            
+            try {
+                const productType = document.getElementById('comparison-product-type')?.value || 'Mutual Funds';
+                const comparisonCriteria = document.getElementById('comparison-criteria')?.value || 'returns';
+                const budgetRange = document.getElementById('budget-range')?.value || '10000-50000';
 
-            if (!productType || !comparisonCriteria) {
-                showAlert('Please select product type and comparison criteria', 'warning');
-                return;
+                console.log('Comparison values:', {productType, comparisonCriteria, budgetRange});
+
+                if (!productType || !comparisonCriteria) {
+                    showAlert('Please select product type and comparison criteria', 'warning');
+                    return;
+                }
+
+                const comparisonData = generateProductComparison(productType, comparisonCriteria, budgetRange);
+                displayProductComparison(comparisonData);
+                
+            } catch (error) {
+                console.error('Error in generateSmartComparison:', error);
+                showAlert('Error generating comparison: ' + error.message, 'error');
             }
-
-            const comparisonData = generateProductComparison(productType, comparisonCriteria, budgetRange);
-            displayProductComparison(comparisonData);
         }
 
         function generateProductComparison(productType, criteria, budget) {

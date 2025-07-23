@@ -4749,7 +4749,390 @@
         }
 
         function generateExecutiveSummary() {
-            showAlert('AI-powered executive summary is being enhanced. Coming soon!', 'info');
+            const summaryContent = generateReportContent('executive');
+            showReportPreview(summaryContent, 'Executive Summary');
+        }
+
+        // ALL MISSING FUNCTIONS IMPLEMENTATION - COMPLETE RESTORATION
+
+        // 1. Investment Advisory Functions
+        function generateAdvancedInvestmentPlan() {
+            if (!clientData.riskProfile || !clientData.financialStatus) {
+                showAlert('Please complete your risk profile and financial status first', 'warning');
+                return;
+            }
+
+            const investmentPlan = createPersonalizedInvestmentPlan();
+            displayInvestmentPlan(investmentPlan);
+        }
+
+        function createPersonalizedInvestmentPlan() {
+            const riskProfile = clientData.riskProfile;
+            const financialStatus = clientData.financialStatus;
+            const monthlyInvestment = riskProfile.monthlyInvestment || (financialStatus.monthlySavings * 0.7);
+            
+            const allocations = getAssetAllocation(riskProfile.riskScore);
+            const fundRecommendations = getFundRecommendations(riskProfile, allocations);
+            const investmentTargets = calculateInvestmentTargets(monthlyInvestment, allocations);
+
+            return {
+                allocations, fundRecommendations, investmentTargets, monthlyInvestment,
+                riskLevel: getRiskLevel(riskProfile.riskScore), investmentHorizon: riskProfile.horizon
+            };
+        }
+
+        function getAssetAllocation(riskScore) {
+            if (riskScore <= 4) return { equity: 20, debt: 70, gold: 5, international: 0, alternative: 5 };
+            else if (riskScore <= 8) return { equity: 50, debt: 35, gold: 5, international: 5, alternative: 5 };
+            else if (riskScore <= 12) return { equity: 70, debt: 15, gold: 5, international: 7, alternative: 3 };
+            else return { equity: 80, debt: 5, gold: 3, international: 10, alternative: 2 };
+        }
+
+        function calculateInvestmentTargets(monthlyInvestment, allocations) {
+            const targets = [];
+            Object.entries(allocations).forEach(([category, percentage]) => {
+                if (percentage > 0) {
+                    const monthlyAmount = (monthlyInvestment * percentage) / 100;
+                    const fiveYearValue = calculateFutureValue(monthlyAmount, getExpectedReturn(category), 5);
+                    const tenYearValue = calculateFutureValue(monthlyAmount, getExpectedReturn(category), 10);
+                    targets.push({
+                        category: category.charAt(0).toUpperCase() + category.slice(1),
+                        monthlyAmount, fiveYearValue, tenYearValue, expectedReturn: getExpectedReturn(category)
+                    });
+                }
+            });
+            return targets;
+        }
+
+        function getExpectedReturn(category) {
+            const returns = { equity: 12, debt: 7, gold: 8, international: 10, alternative: 9 };
+            return returns[category] || 8;
+        }
+
+        function calculateFutureValue(monthlyAmount, annualReturn, years) {
+            const monthlyReturn = annualReturn / 12 / 100;
+            const months = years * 12;
+            return monthlyAmount * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+        }
+
+        function displayInvestmentPlan(plan) {
+            const resultsContainer = document.getElementById('investment-plan-results');
+            resultsContainer.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-magic"></i> Personalized Investment Strategy</h4>
+                        <p>Based on ${plan.riskLevel} risk profile</p>
+                    </div>
+                    <div style="margin: 2rem 0;">
+                        <h5>💼 Asset Allocation</h5>
+                        <div class="widgets-grid">
+                            ${Object.entries(plan.allocations).filter(([_, value]) => value > 0).map(([asset, percentage]) => `
+                                <div class="widget">
+                                    <div class="widget-value">${percentage}%</div>
+                                    <div class="widget-label">${asset.charAt(0).toUpperCase() + asset.slice(1)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div style="margin: 2rem 0;">
+                        <h5>💰 Monthly Investment: ₹${formatCurrency(plan.monthlyInvestment)}</h5>
+                        <div class="data-display">
+                            ${plan.investmentTargets.map(target => `
+                                <div class="data-row">
+                                    <span class="data-label">${target.category}:</span>
+                                    <span class="data-value">₹${formatCurrency(target.monthlyAmount)} (${target.expectedReturn}% return)</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 2. Retirement Planning
+        function calculateAdvancedRetirement() {
+            const currentAge = parseFloat(document.getElementById('current-age').value);
+            const retirementAge = parseFloat(document.getElementById('retirement-age').value);
+            const currentIncome = parseFloat(document.getElementById('retirement-current-income').value);
+            const currentSavings = parseFloat(document.getElementById('retirement-current-savings').value) || 0;
+            const monthlyContribution = parseFloat(document.getElementById('retirement-monthly-contribution').value) || 0;
+            const expectedLifespan = parseFloat(document.getElementById('expected-lifespan').value) || 80;
+            const inflationRate = parseFloat(document.getElementById('retirement-inflation').value) / 100 || 0.06;
+            const expectedReturn = parseFloat(document.getElementById('retirement-return').value) / 100 || 0.1;
+            const incomeReplacement = parseFloat(document.getElementById('income-replacement').value) / 100 || 0.7;
+
+            if (!currentAge || !retirementAge || !currentIncome) {
+                showAlert('Please fill required fields', 'warning');
+                return;
+            }
+
+            const retirementPlan = calculateRetirementPlan({
+                currentAge, retirementAge, currentIncome, currentSavings, monthlyContribution,
+                expectedLifespan, inflationRate, expectedReturn, incomeReplacement
+            });
+
+            displayRetirementPlan(retirementPlan);
+        }
+
+        function calculateRetirementPlan(params) {
+            const yearsToRetirement = params.retirementAge - params.currentAge;
+            const futureValueCurrentSavings = params.currentSavings * Math.pow(1 + params.expectedReturn, yearsToRetirement);
+            const monthlyReturn = params.expectedReturn / 12;
+            const months = yearsToRetirement * 12;
+            const futureValueContributions = params.monthlyContribution * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+            const totalSavingsAtRetirement = futureValueCurrentSavings + futureValueContributions;
+            const requiredAnnualIncomeAtRetirement = params.currentIncome * params.incomeReplacement * Math.pow(1 + params.inflationRate, yearsToRetirement);
+            const requiredCorpus = requiredAnnualIncomeAtRetirement * 25;
+            const shortfall = requiredCorpus - totalSavingsAtRetirement;
+
+            return {
+                yearsToRetirement, totalSavingsAtRetirement, requiredCorpus, shortfall,
+                requiredAnnualIncomeAtRetirement, currentAge: params.currentAge, retirementAge: params.retirementAge
+            };
+        }
+
+        function displayRetirementPlan(plan) {
+            const resultsContainer = document.getElementById('retirement-results');
+            resultsContainer.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-calendar-check"></i> Retirement Plan Analysis</h4>
+                        <p>${plan.yearsToRetirement} years to retirement</p>
+                    </div>
+                    <div class="widgets-grid">
+                        <div class="widget">
+                            <div class="widget-value">₹${formatCurrency(plan.totalSavingsAtRetirement)}</div>
+                            <div class="widget-label">Projected Savings</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-value">₹${formatCurrency(plan.requiredCorpus)}</div>
+                            <div class="widget-label">Required Corpus</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-value" style="color: ${plan.shortfall > 0 ? 'var(--error-red)' : 'var(--success-green)'};">
+                                ${plan.shortfall > 0 ? '-' : '+'}₹${formatCurrency(Math.abs(plan.shortfall))}
+                            </div>
+                            <div class="widget-label">${plan.shortfall > 0 ? 'Shortfall' : 'Surplus'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 3. Tax Planning
+        function generateAdvancedTaxPlan() {
+            const annualIncome = parseFloat(document.getElementById('tax-annual-income').value);
+            const currentInvestments = parseFloat(document.getElementById('tax-current-investments').value) || 0;
+            const age = parseFloat(document.getElementById('taxpayer-age').value) || 30;
+
+            if (!annualIncome) {
+                showAlert('Please enter annual income', 'warning');
+                return;
+            }
+
+            const taxPlan = calculateTaxOptimization({ annualIncome, currentInvestments, age });
+            displayTaxPlan(taxPlan);
+        }
+
+        function calculateTaxOptimization(params) {
+            const basicExemption = params.age >= 60 ? 300000 : 250000;
+            const currentTaxableIncome = Math.max(0, params.annualIncome - basicExemption - params.currentInvestments);
+            const currentTax = calculateIncomeTax(currentTaxableIncome, params.age >= 60);
+            
+            const optimizations = generateTaxOptimizations(params);
+            const totalOptimizedDeductions = optimizations.reduce((sum, opt) => sum + opt.amount, 0);
+            const optimizedTaxableIncome = Math.max(0, params.annualIncome - basicExemption - totalOptimizedDeductions);
+            const optimizedTax = calculateIncomeTax(optimizedTaxableIncome, params.age >= 60);
+            
+            return { currentTax, optimizedTax, taxSavings: currentTax - optimizedTax, optimizations };
+        }
+
+        function calculateIncomeTax(taxableIncome, isSenior) {
+            if (taxableIncome <= 0) return 0;
+            let tax = 0;
+            const slabs = isSenior ? 
+                [[300000, 0], [500000, 0.05], [1000000, 0.20], [Infinity, 0.30]] :
+                [[250000, 0], [500000, 0.05], [1000000, 0.20], [Infinity, 0.30]];
+            
+            let remainingIncome = taxableIncome;
+            let previousSlab = 0;
+            
+            for (const [slabLimit, rate] of slabs) {
+                const taxableInThisSlab = Math.min(remainingIncome, slabLimit - previousSlab);
+                tax += taxableInThisSlab * rate;
+                remainingIncome -= taxableInThisSlab;
+                if (remainingIncome <= 0) break;
+                previousSlab = slabLimit;
+            }
+            return tax * 1.04; // Add cess
+        }
+
+        function generateTaxOptimizations(params) {
+            const optimizations = [];
+            const maxDeductions = { '80C': 150000, '80D': params.age >= 60 ? 50000 : 25000, '80CCD1B': 50000 };
+            
+            if (params.currentInvestments < maxDeductions['80C']) {
+                const additional80C = maxDeductions['80C'] - params.currentInvestments;
+                optimizations.push({
+                    section: '80C', description: 'ELSS, PPF, EPF', amount: additional80C,
+                    taxBenefit: additional80C * 0.3
+                });
+            }
+            
+            optimizations.push({
+                section: '80CCD(1B)', description: 'NPS', amount: maxDeductions['80CCD1B'],
+                taxBenefit: maxDeductions['80CCD1B'] * 0.3
+            });
+            
+            return optimizations.filter(opt => opt.amount > 0);
+        }
+
+        function displayTaxPlan(plan) {
+            const resultsContainer = document.getElementById('tax-optimization-results');
+            resultsContainer.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-calculator"></i> Tax Optimization Plan</h4>
+                        <p>Potential Savings: ₹${formatCurrency(plan.taxSavings)}</p>
+                    </div>
+                    <div class="data-display">
+                        <div class="data-row">
+                            <span class="data-label">Current Tax:</span>
+                            <span class="data-value">₹${formatCurrency(plan.currentTax)}</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Optimized Tax:</span>
+                            <span class="data-value">₹${formatCurrency(plan.optimizedTax)}</span>
+                        </div>
+                    </div>
+                    <h5>Tax Saving Opportunities:</h5>
+                    <div class="data-display">
+                        ${plan.optimizations.map(opt => `
+                            <div class="data-row">
+                                <span class="data-label">${opt.section} - ${opt.description}:</span>
+                                <span class="data-value">₹${formatCurrency(opt.amount)} (Saves: ₹${formatCurrency(opt.taxBenefit)})</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 4. Loan Calculator
+        function calculateLoanDetails() {
+            const loanAmount = parseFloat(document.getElementById('loan-amount').value);
+            const interestRate = parseFloat(document.getElementById('loan-interest-rate').value);
+            const loanTenure = parseFloat(document.getElementById('loan-tenure').value);
+
+            if (!loanAmount || !interestRate || !loanTenure) {
+                showAlert('Please fill all loan details', 'warning');
+                return;
+            }
+
+            const loanDetails = calculateAdvancedLoanMetrics({
+                principal: loanAmount, annualRate: interestRate / 100, tenureYears: loanTenure
+            });
+
+            displayLoanDetails(loanDetails);
+        }
+
+        function calculateAdvancedLoanMetrics(params) {
+            const monthlyRate = params.annualRate / 12;
+            const totalMonths = params.tenureYears * 12;
+            const emi = params.principal * (monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / (Math.pow(1 + monthlyRate, totalMonths) - 1);
+            const totalPayment = emi * totalMonths;
+            const totalInterest = totalPayment - params.principal;
+
+            return { emi, totalPayment, totalInterest, principal: params.principal, tenureYears: params.tenureYears };
+        }
+
+        function displayLoanDetails(details) {
+            const resultsContainer = document.getElementById('loan-calculator-results');
+            resultsContainer.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-calculator"></i> Loan Analysis</h4>
+                        <p>Loan: ₹${formatCurrency(details.principal)} | Tenure: ${details.tenureYears} years</p>
+                    </div>
+                    <div class="widgets-grid">
+                        <div class="widget">
+                            <div class="widget-value">₹${formatCurrency(details.emi)}</div>
+                            <div class="widget-label">Monthly EMI</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-value">₹${formatCurrency(details.totalInterest)}</div>
+                            <div class="widget-label">Total Interest</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-value">₹${formatCurrency(details.totalPayment)}</div>
+                            <div class="widget-label">Total Payment</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 5. Budget Functions
+        function addBudgetItem() {
+            const category = document.getElementById('budget-category').value;
+            const description = document.getElementById('budget-description').value;
+            const amount = parseFloat(document.getElementById('budget-amount').value);
+            const type = document.getElementById('budget-type').value;
+
+            if (!category || !description || !amount) {
+                showAlert('Please fill all budget fields', 'warning');
+                return;
+            }
+
+            if (!clientData.budget) clientData.budget = { income: [], expenses: [] };
+
+            clientData.budget[type].push({
+                id: Date.now(), category, description, amount, type,
+                date: new Date().toISOString().split('T')[0]
+            });
+
+            saveClientData();
+            document.getElementById('budget-category').value = '';
+            document.getElementById('budget-description').value = '';
+            document.getElementById('budget-amount').value = '';
+            displayBudgetOverview();
+            showAlert('Budget item added!', 'success');
+        }
+
+        function displayBudgetOverview() {
+            const budgetContainer = document.getElementById('budget-overview');
+            if (!clientData.budget || (!clientData.budget.income.length && !clientData.budget.expenses.length)) {
+                budgetContainer.innerHTML = '<div class="card"><h4>No budget data. Add items to get started.</h4></div>';
+                return;
+            }
+
+            const totalIncome = clientData.budget.income.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpenses = clientData.budget.expenses.reduce((sum, item) => sum + item.amount, 0);
+            const netAmount = totalIncome - totalExpenses;
+
+            budgetContainer.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-chart-pie"></i> Budget Overview</h4>
+                    </div>
+                    <div class="widgets-grid">
+                        <div class="widget">
+                            <div class="widget-value">₹${formatCurrency(totalIncome)}</div>
+                            <div class="widget-label">Total Income</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-value">₹${formatCurrency(totalExpenses)}</div>
+                            <div class="widget-label">Total Expenses</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-value" style="color: ${netAmount >= 0 ? 'var(--success-green)' : 'var(--error-red)'};">
+                                ₹${formatCurrency(Math.abs(netAmount))}
+                            </div>
+                            <div class="widget-label">${netAmount >= 0 ? 'Surplus' : 'Deficit'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // Add CSS for typing indicator animation

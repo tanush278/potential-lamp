@@ -1815,26 +1815,26 @@
                         </div>
                         
                         <!-- Regime Information -->
-                        <div id="regime-info" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div id="regime-info" style="background: var(--card-black); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-gray);">
                             <div id="old-regime-info" style="display: block;">
-                                <h4 style="color: #2c5aa0; margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> Old Tax Regime (FY 2024-25)</h4>
-                                <p style="margin: 0; color: #666; line-height: 1.5;">
+                                <h4 style="color: var(--accent-gold); margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> Old Tax Regime (FY 2024-25)</h4>
+                                <p style="margin: 0; color: var(--text-gray); line-height: 1.5;">
                                     <strong>Benefits:</strong> Claim deductions under 80C (₹1.5L), 80D (₹25K-75K), HRA, home loan interest, etc.<br>
                                     <strong>Tax Slabs:</strong> 0% up to ₹2.5L, 5% (₹2.5L-5L), 20% (₹5L-10L), 30% (above ₹10L)<br>
                                     <strong>Best for:</strong> Those with significant investments and deductions
                                 </p>
                             </div>
                             <div id="new-regime-info" style="display: none;">
-                                <h4 style="color: #28a745; margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> New Tax Regime (FY 2024-25)</h4>
-                                <p style="margin: 0; color: #666; line-height: 1.5;">
+                                <h4 style="color: var(--accent-gold); margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> New Tax Regime (FY 2024-25)</h4>
+                                <p style="margin: 0; color: var(--text-gray); line-height: 1.5;">
                                     <strong>Benefits:</strong> Lower tax rates, higher standard deduction (₹75K for salaried), no tax up to ₹7L income<br>
                                     <strong>Tax Slabs:</strong> 0% up to ₹3L, 5% (₹3L-6L), 10% (₹6L-9L), 15% (₹9L-12L), 20% (₹12L-15L), 30% (above ₹15L)<br>
                                     <strong>Best for:</strong> Those with lower deductions or simpler tax filing
                                 </p>
                             </div>
                             <div id="compare-regime-info" style="display: none;">
-                                <h4 style="color: #ffc107; margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> Tax Regime Comparison</h4>
-                                <p style="margin: 0; color: #666; line-height: 1.5;">
+                                <h4 style="color: var(--accent-gold); margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> Tax Regime Comparison</h4>
+                                <p style="margin: 0; color: var(--text-gray); line-height: 1.5;">
                                     <strong>Analysis:</strong> Compare both regimes to find which saves more tax based on your income and deductions<br>
                                     <strong>Recommendation:</strong> System will automatically suggest the better option for your situation<br>
                                     <strong>Note:</strong> You can switch between regimes annually (except for business income taxpayers)
@@ -7128,15 +7128,15 @@
                         </div>
                     </div>
                     
-                    <div class="card" style="background: #f8f9fa; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <h4 style="color: #1f2937; text-align: center; margin-bottom: 20px; font-size: 18px; font-weight: 600;">
+                    <div class="card" style="background: var(--card-black); border: 1px solid var(--border-gray); box-shadow: var(--shadow-light);">
+                        <h4 style="color: var(--text-white); text-align: center; margin-bottom: 20px; font-size: 18px; font-weight: 600;">
                             Tax Regime Comparison Result
                         </h4>
                         <div style="text-align: center; margin-bottom: 20px;">
-                            <div style="background: #f3f4f6; color: #1f2937; padding: 20px; border-radius: 8px; display: inline-block; min-width: 350px; border: 2px solid #e5e7eb;">
-                                <div style="font-size: 14px; margin-bottom: 8px; color: #6b7280;">Recommended Choice</div>
-                                <div style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #1f2937;">${betterRegime} Tax Regime</div>
-                                <div style="font-size: 16px; color: #374151;">Saves ₹${savingsAmount.toLocaleString('en-IN')} annually</div>
+                            <div style="background: var(--card-black); color: var(--text-white); padding: 20px; border-radius: 8px; display: inline-block; min-width: 350px; border: 2px solid var(--accent-gold);">
+                                <div style="font-size: 14px; margin-bottom: 8px; color: var(--text-gray);">Recommended Choice</div>
+                                <div style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--accent-gold);">${betterRegime} Tax Regime</div>
+                                <div style="font-size: 16px; color: var(--text-white);">Saves ₹${savingsAmount.toLocaleString('en-IN')} annually</div>
                             </div>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
@@ -7244,22 +7244,22 @@
                 const percentage = ((slab.amount / taxData.tax) * 100).toFixed(1);
                 const progressWidth = Math.max(percentage, 5); // Minimum 5% width for visibility
                 
-                // Clean professional color scheme
-                const colors = ['#1f2937', '#374151', '#4b5563', '#6b7280', '#9ca3af', '#d1d5db'];
+                                                // Dark theme accent colors
+                                const colors = ['#ffd700', '#ffffff', '#c0c0c0', '#666666', '#aaaaaa', '#e0e0e0'];
                 const bgColor = colors[index % colors.length];
                 
-                html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin-bottom: 8px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid ${bgColor};">
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600; color: #1f2937; font-size: 14px;">${slab.slab}</div>
-                            <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">Rate: ${slab.rate}</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 600; color: #1f2937; font-size: 14px;">₹${Math.round(slab.amount).toLocaleString('en-IN')}</div>
-                            <div style="font-size: 12px; color: #6b7280;">${percentage}% of tax</div>
-                        </div>
-                    </div>
-                `;
+                                                html += `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin-bottom: 8px; background: var(--card-black); border-radius: 6px; border-left: 3px solid ${bgColor};">
+                                        <div style="flex: 1;">
+                                            <div style="font-weight: 600; color: var(--text-white); font-size: 14px;">${slab.slab}</div>
+                                            <div style="font-size: 12px; color: var(--text-gray); margin-top: 2px;">Rate: ${slab.rate}</div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-weight: 600; color: var(--accent-gold); font-size: 14px;">₹${Math.round(slab.amount).toLocaleString('en-IN')}</div>
+                                            <div style="font-size: 12px; color: var(--text-gray);">${percentage}% of tax</div>
+                                        </div>
+                                    </div>
+                                `;
             });
             
             html += '</div>';
@@ -7284,16 +7284,16 @@
                     datasets: [{
                         label: 'Income Tax',
                         data: [oldRegimeTax.totalTax, newRegimeTax.totalTax],
-                        backgroundColor: ['#e5e7eb', '#d1d5db'],
-                        borderColor: ['#9ca3af', '#6b7280'],
+                        backgroundColor: ['#ffd700', '#ffffff'],
+                        borderColor: ['#ffd700', '#ffffff'],
                         borderWidth: 1,
                         borderRadius: 4,
                         borderSkipped: false
                     }, {
                         label: 'Health & Education Cess',
                         data: [oldRegimeTax.cess, newRegimeTax.cess],
-                        backgroundColor: ['#f3f4f6', '#e5e7eb'],
-                        borderColor: ['#d1d5db', '#9ca3af'],
+                        backgroundColor: ['#c0c0c0', '#aaaaaa'],
+                        borderColor: ['#c0c0c0', '#aaaaaa'],
                         borderWidth: 1,
                         borderRadius: 4,
                         borderSkipped: false
@@ -7311,7 +7311,7 @@
                                 size: 14,
                                 weight: '600'
                             },
-                            color: '#374151'
+                            color: '#ffffff'
                         },
                         legend: {
                             display: true,
@@ -7320,7 +7320,7 @@
                                 font: {
                                     size: 12
                                 },
-                                color: '#6b7280'
+                                color: '#aaaaaa'
                             }
                         },
                         tooltip: {
@@ -7341,7 +7341,7 @@
                                 display: false
                             },
                             ticks: {
-                                color: '#6b7280',
+                                color: '#aaaaaa',
                                 font: {
                                     size: 12
                                 }
@@ -7351,10 +7351,10 @@
                             stacked: true,
                             beginAtZero: true,
                             grid: {
-                                color: '#f3f4f6'
+                                color: '#333333'
                             },
                             ticks: {
-                                color: '#6b7280',
+                                color: '#aaaaaa',
                                 font: {
                                     size: 12
                                 },
@@ -7388,23 +7388,23 @@
             // Create a simple summary table instead of oversized chart
             const summaryDiv = document.createElement('div');
             summaryDiv.innerHTML = `
-                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-top: 20px;">
-                    <h4 style="margin: 0 0 15px 0; color: #1f2937; font-size: 16px;">Salary Breakdown Summary</h4>
+                <div style="background: var(--card-black); border-radius: 8px; padding: 20px; margin-top: 20px; border: 1px solid var(--border-gray);">
+                    <h4 style="margin: 0 0 15px 0; color: var(--text-white); font-size: 16px;">Salary Breakdown Summary</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center;">
-                        <div style="background: white; padding: 15px; border-radius: 6px; border-top: 3px solid #10b981;">
-                            <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Take-home</div>
-                            <div style="font-size: 18px; font-weight: 600; color: #1f2937;">₹${Math.round(takeHome).toLocaleString('en-IN')}</div>
-                            <div style="font-size: 12px; color: #10b981;">${((takeHome / grossSalary) * 100).toFixed(1)}%</div>
+                        <div style="background: var(--primary-black); padding: 15px; border-radius: 6px; border-top: 3px solid var(--accent-gold);">
+                            <div style="font-size: 14px; color: var(--text-gray); margin-bottom: 5px;">Take-home</div>
+                            <div style="font-size: 18px; font-weight: 600; color: var(--accent-gold);">₹${Math.round(takeHome).toLocaleString('en-IN')}</div>
+                            <div style="font-size: 12px; color: var(--text-white);">${((takeHome / grossSalary) * 100).toFixed(1)}%</div>
                         </div>
-                        <div style="background: white; padding: 15px; border-radius: 6px; border-top: 3px solid #ef4444;">
-                            <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Income Tax</div>
-                            <div style="font-size: 18px; font-weight: 600; color: #1f2937;">₹${Math.round(taxData.totalTax).toLocaleString('en-IN')}</div>
-                            <div style="font-size: 12px; color: #ef4444;">${((taxData.totalTax / grossSalary) * 100).toFixed(1)}%</div>
+                        <div style="background: var(--primary-black); padding: 15px; border-radius: 6px; border-top: 3px solid #ff6b6b;">
+                            <div style="font-size: 14px; color: var(--text-gray); margin-bottom: 5px;">Income Tax</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #ff6b6b;">₹${Math.round(taxData.totalTax).toLocaleString('en-IN')}</div>
+                            <div style="font-size: 12px; color: var(--text-white);">${((taxData.totalTax / grossSalary) * 100).toFixed(1)}%</div>
                         </div>
-                        <div style="background: white; padding: 15px; border-radius: 6px; border-top: 3px solid #f59e0b;">
-                            <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Cess</div>
-                            <div style="font-size: 18px; font-weight: 600; color: #1f2937;">₹${Math.round(taxData.cess).toLocaleString('en-IN')}</div>
-                            <div style="font-size: 12px; color: #f59e0b;">${((taxData.cess / grossSalary) * 100).toFixed(1)}%</div>
+                        <div style="background: var(--primary-black); padding: 15px; border-radius: 6px; border-top: 3px solid #ffffff;">
+                            <div style="font-size: 14px; color: var(--text-gray); margin-bottom: 5px;">Cess</div>
+                            <div style="font-size: 18px; font-weight: 600; color: var(--text-white);">₹${Math.round(taxData.cess).toLocaleString('en-IN')}</div>
+                            <div style="font-size: 12px; color: var(--text-white);">${((taxData.cess / grossSalary) * 100).toFixed(1)}%</div>
                         </div>
                     </div>
                 </div>
@@ -7497,17 +7497,17 @@
                 priority: 'low'
             });
             
-            let html = '<div class="card" style="margin-top: 20px;"><h4 style="color: #333; margin-bottom: 15px;">Tax Saving Recommendations</h4>';
+            let html = '<div class="card" style="margin-top: 20px;"><h4 style="color: var(--text-white); margin-bottom: 15px;">Tax Saving Recommendations</h4>';
             
             recommendations.forEach(rec => {
                 const priorityColor = rec.priority === 'high' ? '#dc3545' : rec.priority === 'medium' ? '#ffc107' : '#28a745';
                 html += `
-                    <div style="border-left: 4px solid ${priorityColor}; padding: 15px; margin-bottom: 15px; background: #f8f9fa; border-radius: 0 8px 8px 0;">
+                                            <div style="border-left: 4px solid ${priorityColor}; padding: 15px; margin-bottom: 15px; background: var(--card-black); border-radius: 0 8px 8px 0;">
                         <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 5px;">
-                            <strong style="color: #333;">${rec.title}</strong>
+                            <strong style="color: var(--text-white);">${rec.title}</strong>
                             <span style="background: ${priorityColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; text-transform: uppercase;">${rec.priority}</span>
                         </div>
-                        <p style="margin: 0; color: #666; line-height: 1.4;">${rec.description}</p>
+                        <p style="margin: 0; color: var(--text-gray); line-height: 1.4;">${rec.description}</p>
                     </div>
                 `;
             });
@@ -8314,7 +8314,7 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.5 - Fixed Font Colors & Chart Sizing</span>
+                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.6 - Dark Theme Consistency Fixed</span>
             <span>•</span>
                             <span>Last Updated: Dec 24, 2024 - 11:30 UTC</span>
             <span>•</span>

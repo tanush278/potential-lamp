@@ -9064,81 +9064,76 @@
         }
         
         function validateUserData() {
-            const missingFields = [];
-            
             console.log('VALIDATION DEBUG - Checking user data...');
             
-            // MUCH MORE FLEXIBLE VALIDATION - Only check essentials
+            // SUPER MINIMAL VALIDATION - Just need ANY data
             
-            // 1. Age check - Multiple possible fields
+            // Check if user has entered ANYTHING at all
             const age = document.getElementById('current-age')?.value || 
-                       document.getElementById('client-age')?.value ||
                        document.getElementById('insurance-age')?.value;
-            
-            // 2. Income check  
             const income = document.getElementById('monthly-income')?.value;
+            const savings = document.getElementById('current-savings')?.value;
+            const anyNumberInput = document.querySelector('input[type="number"]')?.value;
             
-            console.log('Basic check - Age:', age, 'Income:', income);
+            console.log('Minimal check - Age:', age, 'Income:', income, 'Savings:', savings, 'Any number:', anyNumberInput);
             
-            // Only require age OR income (not both)
-            if (!age && !income) {
-                missingFields.push('Enter either your Age or Monthly Income');
+            // If user has entered ANY financial data, allow recommendations
+            if (age || income || savings || anyNumberInput) {
+                console.log('VALIDATION PASSED - User has some data');
+                return { isValid: true, missingFields: [] };
             }
             
-            // 3. Risk Assessment - VERY FLEXIBLE
-            const riskData = localStorage.getItem('riskAssessmentData');
-            const riskQuestions = document.querySelectorAll('input[name^="risk"]:checked').length;
-            const hasAnyRiskInput = document.querySelector('input[type="radio"]:checked') || 
-                                   document.querySelector('select')?.value ||
-                                   riskQuestions > 0;
-            
-            console.log('Risk check - localStorage:', !!riskData, 'Questions:', riskQuestions, 'Any input:', !!hasAnyRiskInput);
-            
-            // Accept if ANY risk-related input exists
-            if (!riskData && riskQuestions < 1 && !hasAnyRiskInput) {
-                missingFields.push('Complete at least part of Risk Assessment');
-            }
-            
-            // 4. Goals - SUPER FLEXIBLE
-            const goalsData = localStorage.getItem('financialGoals');
-            const hasGoals = document.querySelector('input[type="number"]')?.value ||
-                            document.getElementById('retirement-goal')?.value ||
-                            document.getElementById('home-goal')?.value ||
-                            document.getElementById('education-goal')?.value ||
-                            document.getElementById('sip-amount')?.value ||
-                            document.getElementById('investment-amount')?.value;
-            
-            console.log('Goals check - localStorage:', !!goalsData, 'Has any goal:', !!hasGoals);
-            
-            // Accept if ANY financial goal exists
-            if (!goalsData && !hasGoals) {
-                missingFields.push('Set at least one Financial Goal or Investment Amount');
-            }
-            
-            // 5. Financial Status - VERY FLEXIBLE
-            const currentSavings = document.getElementById('current-savings')?.value ||
-                                 document.getElementById('savings-amount')?.value ||
-                                 document.getElementById('current-assets')?.value;
-            
-            const monthlyExpenses = document.getElementById('monthly-expenses')?.value ||
-                                  document.getElementById('current-monthly-expenses')?.value;
-            
-            console.log('Financial check - Savings:', currentSavings, 'Expenses:', monthlyExpenses);
-            
-            // Accept if EITHER savings OR expenses exists
-            if (!currentSavings && !monthlyExpenses) {
-                missingFields.push('Enter either Current Savings or Monthly Expenses');
-            }
-            
-            console.log('FLEXIBLE VALIDATION RESULT:', {
-                isValid: missingFields.length === 0,
-                missingFields: missingFields
-            });
-            
+            // Only show error if literally NO data entered
+            console.log('VALIDATION FAILED - No data at all');
             return {
-                isValid: missingFields.length === 0,
-                missingFields: missingFields
+                isValid: false,
+                missingFields: ['Enter any basic information (age, income, or savings) to get recommendations']
             };
+        }
+        
+        // BYPASS VALIDATION - Generate recommendations anyway
+        function generateRecommendationsWithoutValidation() {
+            console.log('BYPASSING VALIDATION - Generating recommendations with minimal data');
+            
+            // Create dummy data for missing fields
+            const userProfile = {
+                age: document.getElementById('current-age')?.value || 30,
+                income: document.getElementById('monthly-income')?.value || 50000,
+                dependents: 2
+            };
+            
+            const riskProfile = { level: 'moderate', score: 50 };
+            const goals = { retirement: 10000000, emergency: 500000 };
+            const financialStatus = {
+                savings: document.getElementById('current-savings')?.value || 100000,
+                expenses: 35000
+            };
+            
+            // Hide validation error
+            document.getElementById('smart-recommendations-summary').innerHTML = `
+                <div style="background: rgba(255, 193, 7, 0.1); border: 2px solid #FFC107; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="color: #FFC107; margin-bottom: 1rem;">
+                        <i class="fas fa-info-circle"></i> Basic Recommendations Generated
+                    </h3>
+                    <p style="color: var(--text-gray); margin: 0;">
+                        Generated with minimal data. Complete your profile for more accurate recommendations.
+                    </p>
+                </div>
+            `;
+            
+            // Generate recommendations with dummy data
+            generateMutualFundsRecommendations(userProfile, riskProfile, goals, financialStatus);
+            generateInsuranceRecommendations(userProfile, goals, financialStatus);
+            generateLoanRecommendations(userProfile, financialStatus);
+            generateInvestmentRecommendations(userProfile, riskProfile, goals, financialStatus);
+            
+            // Show all recommendation sections
+            document.querySelectorAll('.comparison-content').forEach(content => {
+                const recommendationsDiv = content.querySelector('[id$="-recommendations"]');
+                if (recommendationsDiv) {
+                    recommendationsDiv.style.display = 'block';
+                }
+            });
         }
         
         function showValidationError(missingFields) {
@@ -9165,6 +9160,9 @@
                             </button>
                             <button onclick="showSection('goals')" style="padding: 0.8rem 1.5rem; background: var(--accent-silver); color: var(--primary-black); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
                                 <i class="fas fa-bullseye"></i> Set Goals
+                            </button>
+                            <button onclick="generateRecommendationsWithoutValidation()" style="padding: 0.8rem 1.5rem; background: #FF6B6B; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                                <i class="fas fa-forward"></i> Skip & Generate Anyway
                             </button>
                         </div>
                     </div>

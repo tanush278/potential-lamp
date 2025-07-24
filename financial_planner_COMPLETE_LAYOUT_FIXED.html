@@ -9986,68 +9986,68 @@
                 </div>
 
                 <!-- Comparison Cards -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
                     <!-- Future Values Section -->
-                    <div style="background: rgba(255,107,107,0.1); border-radius: 12px; border: 1px solid rgba(255,107,107,0.3); padding: 1.5rem;">
-                        <h4 style="color: #FF6B6B; margin-bottom: 1rem; text-align: center; font-size: 16px;">FUTURE VALUES (At Retirement)</h4>
-                        <div style="margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                                <span style="color: var(--text-gray); font-size: 0.9rem;">Required Corpus:</span>
-                                <span style="color: var(--text-white); font-weight: 600;">₹${((data.requiredCorpusFuture || 0)/10000000).toFixed(1)}Cr</span>
+                    <div style="background: rgba(255,107,107,0.1); border-radius: 12px; border: 1px solid rgba(255,107,107,0.3); padding: 2rem;">
+                        <h4 style="color: #FF6B6B; margin-bottom: 1.5rem; text-align: center; font-size: 18px; font-weight: 600;">FUTURE VALUES (At Retirement)</h4>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.8rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <span style="color: var(--text-gray); font-size: 1rem;">Required Corpus:</span>
+                                <span style="color: var(--text-white); font-weight: 700; font-size: 1.1rem;">₹${((data.requiredCorpusFuture || 0)/10000000).toFixed(1)}Cr</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                                <span style="color: var(--text-gray); font-size: 0.9rem;">Accumulated Corpus:</span>
-                                <span style="color: var(--accent-gold); font-weight: 600;">₹${((data.accumulatedCorpusFuture || 0)/10000000).toFixed(1)}Cr</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.8rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <span style="color: var(--text-gray); font-size: 1rem;">Accumulated Corpus:</span>
+                                <span style="color: var(--accent-gold); font-weight: 700; font-size: 1.1rem;">₹${((data.accumulatedCorpusFuture || 0)/10000000).toFixed(1)}Cr</span>
                             </div>
-                            <div style="border-top: 1px solid #333; padding-top: 0.8rem; margin-top: 1rem;">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: #FF6B6B; font-weight: 600;">Adequacy:</span>
-                                    <span style="color: ${(data.adequacyFuture || 0) >= 100 ? '#4CAF50' : '#FF6B6B'}; font-weight: 700; font-size: 1.1rem;">${Math.round(data.adequacyFuture || 0)}%</span>
+                            <div style="border-top: 2px solid #333; padding-top: 1rem; margin-top: 1.5rem; text-align: center;">
+                                <div style="margin-bottom: 0.5rem;">
+                                    <span style="color: #FF6B6B; font-weight: 600; font-size: 1rem;">ADEQUACY RATIO</span>
                                 </div>
+                                <div style="font-size: 2rem; font-weight: 800; color: ${(data.adequacyFuture || 0) >= 100 ? '#4CAF50' : '#FF6B6B'};">${Math.round(data.adequacyFuture || 0)}%</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Present Values Section -->
-                    <div style="background: rgba(0,150,255,0.1); border-radius: 12px; border: 1px solid rgba(0,150,255,0.3); padding: 1.5rem;">
-                        <h4 style="color: #0096FF; margin-bottom: 1rem; text-align: center; font-size: 16px;">TODAY'S VALUES (Present Worth)</h4>
-                        <div style="margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                                <span style="color: var(--text-gray); font-size: 0.9rem;">Required Corpus:</span>
-                                <span style="color: var(--text-white); font-weight: 600;">₹${((data.requiredCorpusPresent || 0)/10000000).toFixed(1)}Cr</span>
+                    <div style="background: rgba(0,150,255,0.1); border-radius: 12px; border: 1px solid rgba(0,150,255,0.3); padding: 2rem;">
+                        <h4 style="color: #0096FF; margin-bottom: 1.5rem; text-align: center; font-size: 18px; font-weight: 600;">TODAY'S VALUES (Present Worth)</h4>
+                        <div style="margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.8rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <span style="color: var(--text-gray); font-size: 1rem;">Required Corpus:</span>
+                                <span style="color: var(--text-white); font-weight: 700; font-size: 1.1rem;">₹${((data.requiredCorpusPresent || 0)/10000000).toFixed(1)}Cr</span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                                <span style="color: var(--text-gray); font-size: 0.9rem;">Accumulated Corpus:</span>
-                                <span style="color: #0096FF; font-weight: 600;">₹${((data.accumulatedCorpusPresent || 0)/10000000).toFixed(1)}Cr</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.8rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                <span style="color: var(--text-gray); font-size: 1rem;">Accumulated Corpus:</span>
+                                <span style="color: #0096FF; font-weight: 700; font-size: 1.1rem;">₹${((data.accumulatedCorpusPresent || 0)/10000000).toFixed(1)}Cr</span>
                             </div>
-                            <div style="border-top: 1px solid #333; padding-top: 0.8rem; margin-top: 1rem;">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: #0096FF; font-weight: 600;">Adequacy:</span>
-                                    <span style="color: ${(data.adequacyPresent || 0) >= 100 ? '#4CAF50' : '#FF6B6B'}; font-weight: 700; font-size: 1.1rem;">${Math.round(data.adequacyPresent || 0)}%</span>
+                            <div style="border-top: 2px solid #333; padding-top: 1rem; margin-top: 1.5rem; text-align: center;">
+                                <div style="margin-bottom: 0.5rem;">
+                                    <span style="color: #0096FF; font-weight: 600; font-size: 1rem;">ADEQUACY RATIO</span>
                                 </div>
+                                <div style="font-size: 2rem; font-weight: 800; color: ${(data.adequacyPresent || 0) >= 100 ? '#4CAF50' : '#FF6B6B'};">${Math.round(data.adequacyPresent || 0)}%</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Key Insights Section -->
-                <div style="background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h4 style="color: var(--accent-white); margin-bottom: 1rem; text-align: center; font-size: 16px;">KEY INSIGHTS</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                        <div style="text-align: center; padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 8px;">
-                            <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem;">YEARS TO RETIREMENT</div>
-                            <div style="font-size: 1.6rem; font-weight: bold; color: var(--accent-gold);">${data.yearsToRetirement || 0}</div>
-                            <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">Age ${data.currentAge || 0} to ${data.retirementAge || 0}</div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); padding: 2rem; margin-bottom: 2rem;">
+                    <h4 style="color: var(--accent-white); margin-bottom: 1.5rem; text-align: center; font-size: 18px; font-weight: 600;">KEY INSIGHTS</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                        <div style="text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.1); border-radius: 10px; border: 1px solid rgba(255,215,0,0.2);">
+                            <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.8rem; font-weight: 600;">YEARS TO RETIREMENT</div>
+                            <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem;">${data.yearsToRetirement || 0}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-gray);">Age ${data.currentAge || 0} to ${data.retirementAge || 0}</div>
                         </div>
-                        <div style="text-align: center; padding: 1rem; background: rgba(255,107,107,0.1); border-radius: 8px;">
-                            <div style="font-size: 0.8rem; color: #FF6B6B; margin-bottom: 0.5rem;">INFLATION IMPACT</div>
-                            <div style="font-size: 1.6rem; font-weight: bold; color: #FF6B6B;">-${Math.round(data.inflationImpactAccumulated || 0)}%</div>
-                            <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">Purchasing Power Loss</div>
+                        <div style="text-align: center; padding: 1.5rem; background: rgba(255,107,107,0.1); border-radius: 10px; border: 1px solid rgba(255,107,107,0.2);">
+                            <div style="font-size: 0.9rem; color: #FF6B6B; margin-bottom: 0.8rem; font-weight: 600;">INFLATION IMPACT</div>
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #FF6B6B; margin-bottom: 0.5rem;">-${Math.round(data.inflationImpactAccumulated || 0)}%</div>
+                            <div style="font-size: 0.8rem; color: var(--text-gray);">Purchasing Power Loss</div>
                         </div>
                     </div>
-                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid #0096FF;">
-                        <p style="color: var(--text-gray); margin: 0; font-size: 14px; line-height: 1.4;">
-                            <strong style="color: #0096FF;">Understanding the Numbers:</strong> 
+                    <div style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(0,0,0,0.3); border-radius: 10px; border-left: 4px solid #0096FF;">
+                        <p style="color: var(--text-gray); margin: 0; font-size: 15px; line-height: 1.5;">
+                            <strong style="color: #0096FF; font-size: 16px;">Understanding the Numbers:</strong> 
                             Future values show what you'll have at retirement time, while present values show the equivalent purchasing power in today's money. 
                             Both adequacy percentages should be similar, confirming our calculations account for inflation properly.
                         </p>

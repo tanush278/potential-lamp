@@ -1037,6 +1037,8 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             margin: 2rem 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .form-group {
@@ -1058,6 +1060,7 @@
 
         .form-input, .form-select {
             width: 100%;
+            max-width: 100%;
             padding: 1rem 1.25rem;
             background: var(--secondary-black);
             border: 2px solid var(--border-gray);
@@ -1066,6 +1069,7 @@
             font-size: 1rem;
             transition: var(--transition-smooth);
             font-family: inherit;
+            box-sizing: border-box;
         }
 
         .form-input:focus, .form-select:focus {

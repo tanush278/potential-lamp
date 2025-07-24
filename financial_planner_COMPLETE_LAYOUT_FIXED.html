@@ -5551,6 +5551,8 @@
             let sipValue = 0; // Track SIP growth separately
             
             for (let i = 0; i <= months; i++) {
+                let lumpsumThisMonth = 0; // Track lumpsum amount for this month
+                
                 // Add monthly SIP (except at month 0)
                 if (i > 0) {
                     totalInvested += monthlySIP;
@@ -5568,8 +5570,14 @@
                         if (lumpsumMonth === i) {
                             totalInvested += lumpsum.amount;
                             lumpsumValue += lumpsum.amount; // Add to lumpsum tracking
+                            lumpsumThisMonth += lumpsum.amount; // Track for marker
                         }
                     });
+                }
+                
+                // Include initial lumpsum marker at month 0
+                if (i === 0 && initialLumpsum > 0) {
+                    lumpsumThisMonth = initialLumpsum;
                 }
                 
                 // Calculate growth - lumpsum grows every month
@@ -5588,7 +5596,8 @@
                     month: i,
                     invested: totalInvested,
                     nominalValue: nominalValue,
-                    realValue: realValue
+                    realValue: realValue,
+                    lumpsumAmount: lumpsumThisMonth // Store lumpsum amount for this month
                 });
             }
             
@@ -5660,6 +5669,21 @@
                             borderDash: [5, 5],
                             pointRadius: 0,
                             pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Lumpsum Investments',
+                            data: chartData.map(d => d.lumpsumAmount > 0 ? d.nominalValue : null),
+                            borderColor: '#00ff88',
+                            backgroundColor: '#00ff88',
+                            borderWidth: 0,
+                            fill: false,
+                            pointRadius: chartData.map(d => d.lumpsumAmount > 0 ? 8 : 0),
+                            pointHoverRadius: chartData.map(d => d.lumpsumAmount > 0 ? 12 : 0),
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointBackgroundColor: '#00ff88',
+                            showLine: false, // Don't draw lines, only points
+                            spanGaps: false
                         }
                     ]
                 },
@@ -5713,16 +5737,30 @@
                                     const nominalReturn = invested > 0 ? ((nominalGains / invested) * 100) : 0;
                                     const realReturn = invested > 0 ? ((realGains / invested) * 100) : 0;
                                     
-                                    return [
+                                    // Check if this point has a lumpsum investment
+                                    const lumpsumAmount = chartData[dataIndex]?.lumpsumAmount || 0;
+                                    
+                                    let tooltipLines = [
                                         `Amount Invested: ₹${Math.round(invested).toLocaleString('en-IN')}`,
                                         `Nominal Value: ₹${Math.round(nominalValue).toLocaleString('en-IN')}`,
                                         `Real Value: ₹${Math.round(realValue).toLocaleString('en-IN')}`,
-                                        ``,
+                                        ``
+                                    ];
+                                    
+                                    // Add lumpsum information if present
+                                    if (lumpsumAmount > 0) {
+                                        tooltipLines.push(`Lumpsum Investment: ₹${Math.round(lumpsumAmount).toLocaleString('en-IN')}`);
+                                        tooltipLines.push(``);
+                                    }
+                                    
+                                    tooltipLines.push(
                                         `Nominal Gains: ₹${Math.round(nominalGains).toLocaleString('en-IN')} (${nominalReturn.toFixed(1)}%)`,
                                         `Real Gains: ₹${Math.round(realGains).toLocaleString('en-IN')} (${realReturn.toFixed(1)}%)`,
                                         ``,
                                         `Inflation Impact: ₹${Math.round(nominalValue - realValue).toLocaleString('en-IN')}`
-                                    ];
+                                    );
+                                    
+                                    return tooltipLines;
                                 },
                                 label: function(context) {
                                     // Return empty string since we're showing everything in beforeBody
@@ -6486,7 +6524,7 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <span style="color: var(--accent-gold);">Financial Planner Pro v4.4 - Complete Lumpsum Tracking</span>
+                            <span style="color: var(--accent-gold);">Financial Planner Pro v4.5 - Lumpsum Chart Markers</span>
             <span>•</span>
                             <span>Last Updated: Dec 24, 2024 - 11:30 UTC</span>
             <span>•</span>

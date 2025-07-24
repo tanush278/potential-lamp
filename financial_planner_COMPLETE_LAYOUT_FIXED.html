@@ -6990,12 +6990,11 @@
                 // Calculate tax based on regime
                 let taxCalculation;
                 if (selectedRegime === 'compare') {
-                    const oldRegimeTax = calculateTaxByRegime(taxableIncome, 'old');
-                    const newRegimeTax = calculateTaxByRegime(grossSalary, 'new'); // New regime uses gross salary
+                    const oldRegimeTax = calculateTaxByRegime(grossSalary, 'old');
+                    const newRegimeTax = calculateTaxByRegime(grossSalary, 'new');
                     taxCalculation = { oldRegime: oldRegimeTax, newRegime: newRegimeTax, comparison: true };
                 } else {
-                    const income = selectedRegime === 'new' ? grossSalary : taxableIncome;
-                    taxCalculation = calculateTaxByRegime(income, selectedRegime);
+                    taxCalculation = calculateTaxByRegime(grossSalary, selectedRegime);
                 }
                 
                 // Display results using new Part 2 functions
@@ -7185,7 +7184,7 @@
                         <!-- Winner Announcement -->
                         <div style="text-align: center; margin-bottom: 2.5rem;">
                             <div style="background: linear-gradient(135deg, var(--accent-gold), #ffed4a); color: #000; padding: 1.5rem; border-radius: 12px; display: inline-block; min-width: 400px; box-shadow: 0 8px 32px rgba(255,215,0,0.3);">
-                                <div style="font-size: 14px; margin-bottom: 8px; font-weight: 500; opacity: 0.8;">🏆 Recommended Choice</div>
+                                <div style="font-size: 14px; margin-bottom: 8px; font-weight: 500; opacity: 0.8;">Recommended Choice</div>
                                 <div style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">${betterRegime} Tax Regime</div>
                                 <div style="font-size: 18px; font-weight: 600;">Annual Savings: ₹${savingsAmount.toLocaleString('en-IN')}</div>
                             </div>
@@ -7203,7 +7202,6 @@
                                         <i class="fas fa-university" style="font-size: 24px; color: ${betterRegime === 'Old' ? 'var(--accent-gold)' : '#a0aec0'};"></i>
                                     </div>
                                     <h3 style="color: var(--text-white); font-size: 18px; font-weight: 600; margin: 0;">Old Tax Regime</h3>
-                                    <p style="color: var(--text-gray); font-size: 12px; margin: 4px 0 0;">With Deductions</p>
                                 </div>
                                 
                                 <!-- Tax Breakdown -->
@@ -7242,7 +7240,6 @@
                                         <i class="fas fa-coins" style="font-size: 24px; color: ${betterRegime === 'New' ? 'var(--accent-gold)' : '#a0aec0'};"></i>
                                     </div>
                                     <h3 style="color: var(--text-white); font-size: 18px; font-weight: 600; margin: 0;">New Tax Regime</h3>
-                                    <p style="color: var(--text-gray); font-size: 12px; margin: 4px 0 0;">Lower Rates, No Deductions</p>
                                 </div>
                                 
                                 <!-- Tax Breakdown -->
@@ -7276,15 +7273,15 @@
                         <!-- Key Metrics Row -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
                             <div style="text-align: center; background: rgba(255,215,0,0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,215,0,0.3);">
-                                <div style="color: var(--accent-gold); font-size: 14px; margin-bottom: 8px; font-weight: 500;">💰 Annual Savings</div>
+                                <div style="color: var(--accent-gold); font-size: 14px; margin-bottom: 8px; font-weight: 500;">Annual Savings</div>
                                 <div style="color: var(--accent-gold); font-size: 24px; font-weight: 700;">₹${savingsAmount.toLocaleString('en-IN')}</div>
                             </div>
                             <div style="text-align: center; background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid #333;">
-                                <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px; font-weight: 500;">📅 Monthly Savings</div>
+                                <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px; font-weight: 500;">Monthly Savings</div>
                                 <div style="color: var(--text-white); font-size: 24px; font-weight: 700;">₹${Math.round(savingsAmount/12).toLocaleString('en-IN')}</div>
                             </div>
                             <div style="text-align: center; background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid #333;">
-                                <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px; font-weight: 500;">📊 Tax Difference</div>
+                                <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px; font-weight: 500;">Tax Difference</div>
                                 <div style="color: var(--text-white); font-size: 24px; font-weight: 700;">${Math.abs(((oldRegimeTax.totalTaxWithCess - newRegimeTax.totalTaxWithCess) / grossSalary) * 100).toFixed(2)}%</div>
                             </div>
                         </div>
@@ -7300,57 +7297,59 @@
                 const effectiveRate = ((taxData.totalTaxWithCess / grossSalary) * 100).toFixed(2);
                 
                 resultsDiv.innerHTML = `
-                    <div class="card">
-                        <h4 style="color: #333; margin-bottom: 20px;">${selectedRegime === 'old' ? 'Old' : 'New'} Tax Regime Results</h4>
+                    <div style="background: var(--card-black); border-radius: 12px; padding: 2rem; border: 1px solid var(--border-gray);">
+                        <h4 style="color: var(--text-white); margin-bottom: 2rem; text-align: center; font-size: 20px;">${selectedRegime === 'old' ? 'Old' : 'New'} Tax Regime Results</h4>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                            <div>
-                                <div style="margin-bottom: 10px;">
-                                    <span>Gross Salary:</span>
-                                    <span style="float: right;"><strong>₹${grossSalary.toLocaleString('en-IN')}</strong></span>
+                        <div style="background: var(--primary-black); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #333;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <div>
+                                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Income Details</h5>
+                                    <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                        <span>Gross Salary:</span>
+                                        <span style="float: right; color: var(--text-white); font-weight: 600;">₹${grossSalary.toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                        <span>Standard Deduction:</span>
+                                        <span style="float: right; color: var(--accent-gold); font-weight: 600;">₹${taxData.standardDeduction.toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                        <span>Taxable Income:</span>
+                                        <span style="float: right; color: var(--text-white); font-weight: 600;">₹${Math.round(taxData.taxableIncome).toLocaleString('en-IN')}</span>
+                                    </div>
                                 </div>
-                                <div style="margin-bottom: 10px;">
-                                    <span>Standard Deduction:</span>
-                                    <span style="float: right;"><strong>₹${taxData.standardDeduction.toLocaleString('en-IN')}</strong></span>
-                                </div>
-                                <div style="margin-bottom: 10px;">
-                                    <span>Taxable Income:</span>
-                                    <span style="float: right;"><strong>₹${Math.round(taxData.taxableIncome).toLocaleString('en-IN')}</strong></span>
-                                </div>
-                            </div>
-                            <div>
-                                <div style="margin-bottom: 10px;">
-                                    <span>Income Tax:</span>
-                                    <span style="float: right;"><strong>₹${Math.round(taxData.totalTax).toLocaleString('en-IN')}</strong></span>
-                                </div>
-                                <div style="margin-bottom: 10px;">
-                                    <span>Health & Education Cess:</span>
-                                    <span style="float: right;"><strong>₹${Math.round(taxData.cess).toLocaleString('en-IN')}</strong></span>
-                                </div>
-                                <div style="border-top: 2px solid #ddd; padding-top: 10px;">
-                                    <span><strong>Total Tax:</strong></span>
-                                    <span style="float: right;"><strong>₹${Math.round(taxData.totalTaxWithCess).toLocaleString('en-IN')}</strong></span>
+                                <div>
+                                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Tax Calculation</h5>
+                                    <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                        <span>Income Tax:</span>
+                                        <span style="float: right; color: #ff6b6b; font-weight: 600;">₹${Math.round(taxData.totalTax).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                        <span>Health & Education Cess:</span>
+                                        <span style="float: right; color: var(--text-white); font-weight: 600;">₹${Math.round(taxData.cess).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div style="padding: 12px; background: rgba(255,107,107,0.1); border-radius: 8px; margin-top: 12px;">
+                                        <span style="color: var(--text-white); font-weight: 700;">Total Tax:</span>
+                                        <span style="float: right; color: #ff6b6b; font-weight: 700; font-size: 18px;">₹${Math.round(taxData.totalTaxWithCess).toLocaleString('en-IN')}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
-                            <div style="font-size: 18px; margin-bottom: 5px;">
-                                <strong>Effective Tax Rate: ${effectiveRate}%</strong>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                            <div style="text-align: center; background: rgba(255,215,0,0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,215,0,0.3);">
+                                <div style="color: var(--accent-gold); font-size: 14px; margin-bottom: 8px; font-weight: 500;">Effective Tax Rate</div>
+                                <div style="color: var(--accent-gold); font-size: 24px; font-weight: 700;">${effectiveRate}%</div>
                             </div>
-                            <div style="color: #666;">
-                                Take-home Salary: ₹${Math.round(grossSalary - taxData.totalTaxWithCess).toLocaleString('en-IN')}
+                            <div style="text-align: center; background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid #333;">
+                                <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px; font-weight: 500;">Take-home Salary</div>
+                                <div style="color: var(--text-white); font-size: 24px; font-weight: 700;">₹${Math.round(grossSalary - taxData.totalTaxWithCess).toLocaleString('en-IN')}</div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="card" style="margin-top: 20px;">
-                        <h4 style="color: #333; margin-bottom: 15px;">Tax Slab Breakdown</h4>
-                        <div id="tax-slab-breakdown"></div>
-                    </div>
-                    
-                    <div style="margin-top: 30px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                        <canvas id="tax-breakdown-chart" style="max-height: 250px;"></canvas>
+                        
+                        <div style="background: var(--primary-black); border-radius: 12px; padding: 1.5rem; border: 1px solid #333;">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Tax Slab Breakdown</h5>
+                            <div id="tax-slab-breakdown"></div>
+                        </div>
                     </div>
                 `;
                 
@@ -8432,6 +8431,201 @@
                 alert('Error saving snapshot: ' + error.message);
             }
         }
+
+        // Capital Gains Tax Calculator Functions
+        function calculateCapitalGains() {
+            try {
+                const assetType = document.getElementById('asset-type')?.value || 'equity-mutual-funds';
+                const purchaseDate = document.getElementById('purchase-date')?.value;
+                const saleDate = document.getElementById('sale-date')?.value;
+                const purchasePrice = parseFloat(document.getElementById('purchase-price')?.value) || 0;
+                const salePrice = parseFloat(document.getElementById('sale-price')?.value) || 0;
+                const improvementCost = parseFloat(document.getElementById('improvement-cost')?.value) || 0;
+
+                if (!purchaseDate || !saleDate || purchasePrice === 0 || salePrice === 0) {
+                    document.getElementById('capital-gains-results').style.display = 'none';
+                    return;
+                }
+
+                const purchase = new Date(purchaseDate);
+                const sale = new Date(saleDate);
+                const holdingPeriod = Math.floor((sale - purchase) / (1000 * 60 * 60 * 24 * 30)); // months
+
+                const isLongTerm = determineIsLongTerm(assetType, holdingPeriod);
+                const capitalGain = salePrice - purchasePrice - improvementCost;
+                
+                if (capitalGain <= 0) {
+                    displayCapitalGainsResults({
+                        capitalGain: capitalGain,
+                        taxableGain: 0,
+                        tax: 0,
+                        isLongTerm: isLongTerm,
+                        holdingPeriod: holdingPeriod,
+                        assetType: assetType,
+                        isLoss: true
+                    });
+                    return;
+                }
+
+                const taxResult = calculateCapitalGainsTax(capitalGain, assetType, isLongTerm);
+                
+                displayCapitalGainsResults({
+                    capitalGain: capitalGain,
+                    taxableGain: taxResult.taxableGain,
+                    tax: taxResult.tax,
+                    isLongTerm: isLongTerm,
+                    holdingPeriod: holdingPeriod,
+                    assetType: assetType,
+                    isLoss: false,
+                    exemption: taxResult.exemption
+                });
+
+            } catch (error) {
+                console.error('Error calculating capital gains:', error);
+            }
+        }
+
+        function determineIsLongTerm(assetType, holdingPeriodMonths) {
+            switch (assetType) {
+                case 'real-estate':
+                    return holdingPeriodMonths > 24;
+                case 'equity-mutual-funds':
+                case 'gold':
+                    return holdingPeriodMonths > 12;
+                case 'debt-mutual-funds':
+                    return holdingPeriodMonths > 36;
+                case 'crypto':
+                    return false; // Always short term
+                default:
+                    return holdingPeriodMonths > 12;
+            }
+        }
+
+        function calculateCapitalGainsTax(capitalGain, assetType, isLongTerm) {
+            let tax = 0;
+            let exemption = 0;
+            let taxableGain = capitalGain;
+
+            if (isLongTerm) {
+                switch (assetType) {
+                    case 'equity-mutual-funds':
+                        exemption = Math.min(capitalGain, 100000); // 1L exemption
+                        taxableGain = Math.max(0, capitalGain - exemption);
+                        tax = taxableGain * 0.10; // 10% tax
+                        break;
+                    case 'debt-mutual-funds':
+                        tax = capitalGain * 0.20; // 20% with indexation benefit
+                        break;
+                    case 'real-estate':
+                        tax = capitalGain * 0.20; // 20% with indexation
+                        break;
+                    case 'gold':
+                        tax = capitalGain * 0.20; // 20% with indexation
+                        break;
+                    default:
+                        tax = capitalGain * 0.20;
+                }
+            } else {
+                // Short term - taxed as per income tax slabs
+                // For simplicity, using 30% (highest slab)
+                tax = capitalGain * 0.30;
+            }
+
+            return {
+                tax: tax,
+                taxableGain: taxableGain,
+                exemption: exemption
+            };
+        }
+
+        function displayCapitalGainsResults(result) {
+            const resultsDiv = document.getElementById('capital-gains-results');
+            if (!resultsDiv) return;
+
+            const gainType = result.isLongTerm ? 'Long Term Capital Gains (LTCG)' : 'Short Term Capital Gains (STCG)';
+            const holdingText = `${Math.floor(result.holdingPeriod)} months`;
+
+            resultsDiv.innerHTML = `
+                <div style="background: var(--card-black); border-radius: 12px; padding: 2rem; border: 1px solid var(--border-gray);">
+                    <h4 style="color: var(--text-white); margin-bottom: 1.5rem; text-align: center; font-size: 18px;">Capital Gains Tax Calculation</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border: 1px solid #333;">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Investment Details</h5>
+                            <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                <span>Asset Type:</span>
+                                <span style="float: right; color: var(--text-white); font-weight: 600;">${result.assetType.replace('-', ' ').toUpperCase()}</span>
+                            </div>
+                            <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                <span>Holding Period:</span>
+                                <span style="float: right; color: var(--text-white); font-weight: 600;">${holdingText}</span>
+                            </div>
+                            <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                <span>Gain Type:</span>
+                                <span style="float: right; color: ${result.isLongTerm ? 'var(--accent-gold)' : '#ff6b6b'}; font-weight: 600;">${result.isLongTerm ? 'LTCG' : 'STCG'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border: 1px solid #333;">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Tax Calculation</h5>
+                            <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                <span>Capital Gain:</span>
+                                <span style="float: right; color: ${result.isLoss ? '#ff6b6b' : 'var(--text-white)'}; font-weight: 600;">₹${Math.round(Math.abs(result.capitalGain)).toLocaleString('en-IN')}</span>
+                            </div>
+                            ${result.exemption > 0 ? `
+                            <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                <span>Exemption:</span>
+                                <span style="float: right; color: var(--accent-gold); font-weight: 600;">₹${Math.round(result.exemption).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="margin-bottom: 8px; color: var(--text-gray);">
+                                <span>Taxable Gain:</span>
+                                <span style="float: right; color: var(--text-white); font-weight: 600;">₹${Math.round(result.taxableGain).toLocaleString('en-IN')}</span>
+                            </div>
+                            ` : ''}
+                            <div style="padding: 12px; background: rgba(255,107,107,0.1); border-radius: 8px; margin-top: 12px;">
+                                <span style="color: var(--text-white); font-weight: 700;">Tax Liability:</span>
+                                <span style="float: right; color: #ff6b6b; font-weight: 700; font-size: 18px;">₹${Math.round(result.tax).toLocaleString('en-IN')}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+            
+            // Update optimization tips
+            updateCapitalGainsTips(result);
+        }
+
+        function updateCapitalGainsTips(result) {
+            const tipsDiv = document.getElementById('optimization-tips');
+            if (!tipsDiv) return;
+
+            let tips = [];
+
+            if (!result.isLongTerm && !result.isLoss) {
+                tips.push("Consider holding the asset for a longer period to qualify for LTCG tax rates, which are generally lower.");
+            }
+
+            if (result.assetType === 'equity-mutual-funds' && result.isLongTerm) {
+                tips.push("LTCG on equity has a ₹1,00,000 annual exemption. Plan your sales to utilize this exemption effectively.");
+            }
+
+            if (result.isLoss) {
+                tips.push("Capital losses can be offset against capital gains. Consider tax loss harvesting strategies.");
+                tips.push("Short-term losses can be offset against both STCG and LTCG, while LTCG losses can only offset LTCG.");
+            }
+
+            tips.push("Consider staggering your asset sales across financial years to optimize tax liability.");
+            tips.push("Maintain proper documentation of purchase price, sale price, and improvement costs for tax filing.");
+
+            tipsDiv.innerHTML = tips.map(tip => `<div style="margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--accent-gold); color: var(--text-gray);">${tip}</div>`).join('');
+        }
+
+        function addAssetForCapitalGains() {
+            // Placeholder for multiple assets functionality
+            alert('Multiple assets calculator will be implemented in the next update.');
+        }
     </script>
 
     <!-- Version Footer -->
@@ -8449,7 +8643,7 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.7 - Professional Tax Comparison Design</span>
+                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.8 - Fixed Tax Calculations & Capital Gains</span>
             <span>•</span>
                             <span>Last Updated: Dec 24, 2024 - 11:30 UTC</span>
             <span>•</span>

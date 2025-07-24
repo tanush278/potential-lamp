@@ -379,7 +379,7 @@
             font-weight: 400;
         }
 
-        /* CARDS */
+        /* ENHANCED CARDS WITH ANIMATIONS */
         .card {
             background: var(--gradient-card);
             border: 1px solid var(--border-gray);
@@ -390,11 +390,70 @@
             transition: var(--transition-smooth);
             width: 100%;
             box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
         }
 
         .card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px) scale(1.02);
             box-shadow: var(--shadow-heavy);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        /* ENHANCED BUTTONS */
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: width 0.3s, height 0.3s;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn > * {
+            position: relative;
+            z-index: 1;
         }
 
         /* FORM ELEMENTS */
@@ -1163,44 +1222,111 @@
                 <!-- SIP Calculator Section -->
                 <section id="sip" class="section">
                     <div class="section-header">
-                        <h1 class="section-title">SIP Calculator</h1>
-                        <p class="section-subtitle">Calculate your Systematic Investment Plan returns</p>
+                        <h1 class="section-title">Advanced SIP Calculator</h1>
+                        <p class="section-subtitle">Calculate your Systematic Investment Plan with inflation adjustment and visual analysis</p>
                     </div>
                     
                     <div class="card">
                         <h3>SIP Investment Calculator</h3>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>Monthly Investment</label>
-                                <input type="number" class="form-input" id="sip-amount" placeholder="Enter monthly SIP amount">
+                                <label>Monthly Investment (₹)</label>
+                                <input type="number" class="form-input" id="sip-amount" placeholder="Enter monthly SIP amount" value="5000">
                             </div>
                             <div class="form-group">
                                 <label>Investment Period (Years)</label>
-                                <input type="number" class="form-input" id="sip-period" placeholder="Enter investment period">
+                                <input type="number" class="form-input" id="sip-period" placeholder="Enter investment period" value="10">
                             </div>
                             <div class="form-group">
-                                <label>Expected Return (%)</label>
-                                <input type="number" class="form-input" id="sip-return" placeholder="Enter expected annual return">
+                                <label>Expected Annual Return (%)</label>
+                                <input type="number" class="form-input" id="sip-return" placeholder="Enter expected annual return" value="12" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Expected Inflation Rate (%)</label>
+                                <input type="number" class="form-input" id="inflation-rate" placeholder="Enter expected inflation" value="6" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Annual SIP Increase (%)</label>
+                                <input type="number" class="form-input" id="sip-increase" placeholder="Annual SIP increment" value="10" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Calculation Type</label>
+                                <select class="form-select" id="calc-type">
+                                    <option value="standard">Standard SIP</option>
+                                    <option value="step-up">Step-up SIP</option>
+                                    <option value="lumpsum">SIP + Lumpsum</option>
+                                </select>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="calculateSIP()">
-                            <i class="fas fa-calculator"></i> Calculate SIP
+                        
+                        <div id="lumpsum-inputs" class="form-grid" style="display: none; margin-top: 1rem;">
+                            <div class="form-group">
+                                <label>Initial Lumpsum Investment (₹)</label>
+                                <input type="number" class="form-input" id="lumpsum-amount" placeholder="Enter lumpsum amount" value="100000">
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="calculateAdvancedSIP()">
+                            <i class="fas fa-chart-line"></i> Calculate Advanced SIP
                         </button>
-                        <div id="sip-results" class="results-section" style="display: none; margin-top: 2rem;">
-                            <h4>SIP Calculation Results</h4>
-                            <div class="results-grid">
-                                <div class="result-item">
-                                    <span class="result-label">Total Investment:</span>
-                                    <span class="result-value" id="sip-total-investment">₹0</span>
-                                </div>
-                                <div class="result-item">
-                                    <span class="result-label">Maturity Amount:</span>
-                                    <span class="result-value" id="sip-maturity-amount">₹0</span>
-                                </div>
-                                <div class="result-item">
-                                    <span class="result-label">Total Gains:</span>
-                                    <span class="result-value" id="sip-total-gains">₹0</span>
-                                </div>
+                    </div>
+
+                    <div id="sip-results" class="card" style="display: none; margin-top: 2rem;">
+                        <h3>SIP Analysis Results</h3>
+                        
+                        <!-- Results Summary -->
+                        <div class="results-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                            <div class="result-card" style="background: rgba(0,255,136,0.1); border: 1px solid var(--success-green); border-radius: 8px; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 0.9rem; color: var(--success-green); margin-bottom: 0.5rem;">Total Investment</div>
+                                <div id="total-investment" style="font-size: 1.8rem; font-weight: bold; color: var(--success-green);">₹0</div>
+                            </div>
+                            <div class="result-card" style="background: rgba(0,212,255,0.1); border: 1px solid var(--info-blue); border-radius: 8px; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 0.9rem; color: var(--info-blue); margin-bottom: 0.5rem;">Nominal Value</div>
+                                <div id="nominal-value" style="font-size: 1.8rem; font-weight: bold; color: var(--info-blue);">₹0</div>
+                            </div>
+                            <div class="result-card" style="background: rgba(255,159,67,0.1); border: 1px solid var(--warning-orange); border-radius: 8px; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 0.9rem; color: var(--warning-orange); margin-bottom: 0.5rem;">Real Value (Inflation Adjusted)</div>
+                                <div id="real-value" style="font-size: 1.8rem; font-weight: bold; color: var(--warning-orange);">₹0</div>
+                            </div>
+                            <div class="result-card" style="background: rgba(255,255,255,0.1); border: 1px solid var(--accent-white); border-radius: 8px; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem;">Total Returns</div>
+                                <div id="total-returns" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-white);">₹0</div>
+                            </div>
+                        </div>
+
+                        <!-- Chart Container -->
+                        <div style="margin: 2rem 0;">
+                            <h4 style="margin-bottom: 1rem;">SIP Growth Visualization</h4>
+                            <div style="position: relative; height: 400px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem;">
+                                <canvas id="sipChart" width="800" height="400"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Breakdown -->
+                        <div id="detailed-breakdown" style="margin-top: 2rem;">
+                            <h4>Year-wise Breakdown</h4>
+                            <div style="max-height: 300px; overflow-y: auto; margin-top: 1rem;">
+                                <table id="breakdown-table" style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="background: rgba(255,255,255,0.1); position: sticky; top: 0;">
+                                            <th style="padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border-gray);">Year</th>
+                                            <th style="padding: 0.8rem; text-align: right; border-bottom: 1px solid var(--border-gray);">Investment</th>
+                                            <th style="padding: 0.8rem; text-align: right; border-bottom: 1px solid var(--border-gray);">Nominal Value</th>
+                                            <th style="padding: 0.8rem; text-align: right; border-bottom: 1px solid var(--border-gray);">Real Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="breakdown-body">
+                                        <!-- Will be populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Investment Insights -->
+                        <div id="investment-insights" style="margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <h4>Investment Insights</h4>
+                            <div id="insights-content">
+                                <!-- Will be populated by JS -->
                             </div>
                         </div>
                     </div>

@@ -1369,8 +1369,17 @@
                         <h3>SIP Investment Calculator</h3>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>Monthly Investment (₹)</label>
-                                <input type="number" class="form-input" id="sip-amount" placeholder="Enter monthly SIP amount" value="5000">
+                                <label>SIP Frequency</label>
+                                <select class="form-select" id="sip-frequency" onchange="updateSIPLabels()">
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="semi-annually">Semi-Annually</option>
+                                    <option value="annually">Annually</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label id="sip-amount-label">Monthly Investment (₹)</label>
+                                <input type="number" class="form-input" id="sip-amount" placeholder="Enter SIP amount" value="5000">
                             </div>
                             <div class="form-group">
                                 <label>Investment Period (Years)</label>
@@ -2274,6 +2283,35 @@
 
         // Advanced SIP Calculator Functions
         let sipChart = null;
+        
+        function updateSIPLabels() {
+            const frequency = document.getElementById('sip-frequency').value;
+            const label = document.getElementById('sip-amount-label');
+            const input = document.getElementById('sip-amount');
+            
+            switch(frequency) {
+                case 'monthly':
+                    label.textContent = 'Monthly Investment (₹)';
+                    input.placeholder = 'Enter monthly SIP amount';
+                    input.value = '5000';
+                    break;
+                case 'quarterly':
+                    label.textContent = 'Quarterly Investment (₹)';
+                    input.placeholder = 'Enter quarterly SIP amount';
+                    input.value = '15000';
+                    break;
+                case 'semi-annually':
+                    label.textContent = 'Semi-Annual Investment (₹)';
+                    input.placeholder = 'Enter semi-annual SIP amount';
+                    input.value = '30000';
+                    break;
+                case 'annually':
+                    label.textContent = 'Annual Investment (₹)';
+                    input.placeholder = 'Enter annual SIP amount';
+                    input.value = '60000';
+                    break;
+            }
+        }
 
         // Show/hide lumpsum inputs based on calculation type
         document.addEventListener('DOMContentLoaded', function() {
@@ -2308,13 +2346,14 @@
             const sipIncrease = parseFloat(document.getElementById('sip-increase').value) || 0;
             const calcType = document.getElementById('calc-type').value;
             const lumpsumAmount = parseFloat(document.getElementById('lumpsum-amount').value) || 0;
+            const frequency = document.getElementById('sip-frequency').value;
 
             if (!amount || !period || !rate) {
                 alert('Please fill all required SIP calculation fields');
                 return;
             }
 
-            const calculations = performAdvancedSIPCalculation(amount, period, rate, inflationRate, sipIncrease, calcType, lumpsumAmount);
+            const calculations = performAdvancedSIPCalculation(amount, period, rate, inflationRate, sipIncrease, calcType, lumpsumAmount, frequency);
             displaySIPResults(calculations);
             createSIPChart(calculations.yearlyData);
             createYearlyBreakdown(calculations.yearlyData);
@@ -2322,7 +2361,18 @@
             generateStrategyInsights(calculations, calcType, amount, period, sipIncrease, lumpsumAmount);
         }
 
-        function performAdvancedSIPCalculation(monthlyAmount, years, annualRate, inflationRate, stepUpRate, calcType, lumpsumAmount) {
+        function performAdvancedSIPCalculation(sipAmount, years, annualRate, inflationRate, stepUpRate, calcType, lumpsumAmount, frequency) {
+            // Convert to monthly equivalent for calculations
+            const frequencyMultiplier = {
+                'monthly': 1,
+                'quarterly': 3,
+                'semi-annually': 6,
+                'annually': 12
+            };
+            
+            const monthsPerInstallment = frequencyMultiplier[frequency];
+            const monthlyAmount = sipAmount / monthsPerInstallment;
+            
             const monthlyRate = annualRate / 12 / 100;
             const inflationMonthlyRate = inflationRate / 12 / 100;
             const stepUpMonthlyRate = stepUpRate / 12 / 100;
@@ -2345,16 +2395,22 @@
                     yearInvestment += lumpsumAmount;
                 }
                 
-                // Calculate monthly SIPs for the year
+                // Calculate SIPs for the year based on frequency
                 for (let month = 1; month <= 12; month++) {
-                    // Adjust SIP amount for step-up
-                    if (calcType === 'step-up' && month === 1 && year > 1) {
-                        currentMonthlyAmount = currentMonthlyAmount * (1 + stepUpRate / 100);
-                    }
+                    // Compound monthly
+                    yearEndValue = yearEndValue * (1 + monthlyRate);
                     
-                    yearEndValue = yearEndValue * (1 + monthlyRate) + currentMonthlyAmount;
-                    yearInvestment += currentMonthlyAmount;
-                    totalInvestment += currentMonthlyAmount;
+                    // Add SIP investment based on frequency
+                    if (month % monthsPerInstallment === 0) {
+                        // Adjust SIP amount for step-up (at the beginning of each year)
+                        if (calcType === 'step-up' && month === monthsPerInstallment && year > 1) {
+                            sipAmount = sipAmount * (1 + stepUpRate / 100);
+                        }
+                        
+                        yearEndValue += sipAmount;
+                        yearInvestment += sipAmount;
+                        totalInvestment += sipAmount;
+                    }
                 }
                 
                 nominalValue = yearEndValue;

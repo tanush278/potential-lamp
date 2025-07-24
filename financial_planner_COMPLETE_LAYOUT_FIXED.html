@@ -1192,36 +1192,169 @@
                     </div>
                 </section>
 
-                <!-- Goals Section -->
+                <!-- Goals & Insurance Section -->
                 <section id="goals" class="section">
                     <div class="section-header">
-                        <h1 class="section-title">Financial Goals</h1>
-                        <p class="section-subtitle">Define your short-term and long-term financial objectives</p>
+                        <h1 class="section-title">Goals & Insurance Planning</h1>
+                        <p class="section-subtitle">Set intelligent financial goals with inflation adjustment and comprehensive insurance planning</p>
                     </div>
                     
+                    <!-- Goal Setting -->
                     <div class="card">
-                        <h3>Set Your Financial Goals</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Emergency Fund Target</label>
-                                <input type="number" class="form-input" placeholder="Target amount">
+                        <div class="card-header">
+                            <h3 class="card-title">Smart Goal Planning</h3>
+                            <p class="card-subtitle">Create and track your financial goals with inflation adjustment</p>
+                        </div>
+                        
+                        <form id="goal-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Goal Name</label>
+                                    <input type="text" id="goal-name" class="form-input" placeholder="e.g., Dream Home, Child's Education" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Goal Category</label>
+                                    <select id="goal-category" class="form-input">
+                                        <option value="lifestyle">Lifestyle</option>
+                                        <option value="education">Education</option>
+                                        <option value="property">Property</option>
+                                        <option value="business">Business</option>
+                                        <option value="retirement">Retirement</option>
+                                        <option value="emergency">Emergency</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Target Amount (₹ today's value)</label>
+                                    <input type="number" id="goal-amount" class="form-input" placeholder="Enter amount in current value" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Time Frame (Years)</label>
+                                    <input type="number" id="goal-timeframe" class="form-input" min="1" max="50" placeholder="Years to achieve goal" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Expected Inflation Rate (%)</label>
+                                    <input type="number" id="goal-inflation" class="form-input" value="6" min="0" max="20" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Priority Level</label>
+                                    <select id="goal-priority" class="form-input" required>
+                                        <option value="">Select Priority</option>
+                                        <option value="critical">Critical</option>
+                                        <option value="high">High</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Current Progress (₹)</label>
+                                    <input type="number" id="goal-progress" class="form-input" min="0" placeholder="Amount already saved">
+                                </div>
+                                <div class="form-group">
+                                    <label>Expected Return Rate (%)</label>
+                                    <input type="number" id="goal-return" class="form-input" value="12" min="0" max="30" step="0.1">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Retirement Fund Target</label>
-                                <input type="number" class="form-input" placeholder="Target amount">
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-primary" onclick="calculateGoal()">Calculate Goal</button>
+                                <button type="button" class="btn btn-secondary" onclick="addGoal()">Add Goal</button>
                             </div>
-                            <div class="form-group">
-                                <label>House Purchase Target</label>
-                                <input type="number" class="form-input" placeholder="Target amount">
-                            </div>
-                            <div class="form-group">
-                                <label>Children's Education Fund</label>
-                                <input type="number" class="form-input" placeholder="Target amount">
+                        </form>
+                        
+                        <!-- Goal Calculation Results -->
+                        <div id="goal-results" style="display: none; margin-top: 2rem;">
+                            <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Goal Analysis</h4>
+                            <div class="results-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem; text-transform: uppercase;">Future Value</div>
+                                    <div id="goal-future-value" style="font-size: 1.6rem; font-weight: bold; color: var(--accent-white);">₹0</div>
+                                </div>
+                                <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem; text-transform: uppercase;">Monthly SIP Required</div>
+                                    <div id="goal-monthly-sip" style="font-size: 1.6rem; font-weight: bold; color: var(--accent-gold);">₹0</div>
+                                </div>
+                                <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem; text-transform: uppercase;">Total Investment</div>
+                                    <div id="goal-total-investment" style="font-size: 1.6rem; font-weight: bold; color: var(--accent-white);">₹0</div>
+                                </div>
+                                <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem; text-transform: uppercase;">Gap Amount</div>
+                                    <div id="goal-gap" style="font-size: 1.6rem; font-weight: bold; color: var(--accent-silver);">₹0</div>
+                                </div>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="saveGoals()">
-                            <i class="fas fa-bullseye"></i> Save Goals
-                        </button>
+                    </div>
+
+                    <!-- Goals List -->
+                    <div class="card" style="margin-top: 2rem;">
+                        <h3>Your Financial Goals</h3>
+                        <div id="goals-list">
+                            <div style="text-align: center; color: var(--text-gray); padding: 2rem;">
+                                No goals added yet. Create your first financial goal above.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Insurance Planning -->
+                    <div class="card" style="margin-top: 2rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">Insurance Planning</h3>
+                            <p class="card-subtitle">Calculate your insurance needs for comprehensive coverage</p>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Current Age</label>
+                                <input type="number" id="insurance-age" class="form-input" min="18" max="100" placeholder="Your current age" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Annual Income (₹)</label>
+                                <input type="number" id="insurance-income" class="form-input" placeholder="Your annual income" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Number of Dependents</label>
+                                <input type="number" id="insurance-dependents" class="form-input" min="0" placeholder="Number of dependents" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Outstanding Loans (₹)</label>
+                                <input type="number" id="insurance-loans" class="form-input" min="0" placeholder="Total outstanding loans">
+                            </div>
+                            <div class="form-group">
+                                <label>Current Liquid Assets (₹)</label>
+                                <input type="number" id="insurance-assets" class="form-input" min="0" placeholder="Savings and investments">
+                            </div>
+                            <div class="form-group">
+                                <label>Years of Coverage Needed</label>
+                                <input type="number" id="insurance-years" class="form-input" min="5" max="40" placeholder="Years of coverage" required>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="calculateInsurance()">Calculate Insurance Need</button>
+                        
+                        <!-- Insurance Results -->
+                        <div id="insurance-results" style="display: none; margin-top: 2rem;">
+                            <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Insurance Analysis</h4>
+                            <div class="results-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                                <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem; text-transform: uppercase;">Recommended Life Cover</div>
+                                    <div id="insurance-life-cover" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-gold);">₹0</div>
+                                </div>
+                                <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem; text-transform: uppercase;">Health Insurance</div>
+                                    <div id="insurance-health-cover" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-white);">₹0</div>
+                                </div>
+                                <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem; text-transform: uppercase;">Estimated Premium</div>
+                                    <div id="insurance-premium" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-silver);">₹0</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Insurance Breakdown -->
+                            <div id="insurance-breakdown" style="margin-top: 2rem;">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -1668,6 +1801,13 @@
                         lumpsumInputs.style.display = 'none';
                     }
                 });
+            }
+            
+            // Load saved goals
+            const savedGoals = localStorage.getItem('userGoals');
+            if (savedGoals) {
+                userGoals = JSON.parse(savedGoals);
+                displayGoals();
             }
         });
 
@@ -2140,6 +2280,302 @@
             } else {
                 alert('Please fill all EMI calculation fields');
             }
+        }
+
+        // Goals & Insurance Functions
+        let userGoals = [];
+
+        function calculateGoal() {
+            const goalName = document.getElementById('goal-name').value;
+            const goalAmount = parseFloat(document.getElementById('goal-amount').value) || 0;
+            const timeframe = parseFloat(document.getElementById('goal-timeframe').value) || 0;
+            const inflationRate = parseFloat(document.getElementById('goal-inflation').value) || 0;
+            const currentProgress = parseFloat(document.getElementById('goal-progress').value) || 0;
+            const expectedReturn = parseFloat(document.getElementById('goal-return').value) || 0;
+
+            if (!goalName || !goalAmount || !timeframe) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            // Calculate future value with inflation
+            const futureValue = goalAmount * Math.pow(1 + inflationRate/100, timeframe);
+            
+            // Calculate current progress future value
+            const progressFutureValue = currentProgress * Math.pow(1 + expectedReturn/100, timeframe);
+            
+            // Calculate gap amount
+            const gapAmount = Math.max(0, futureValue - progressFutureValue);
+            
+            // Calculate monthly SIP required for gap
+            const monthlyRate = expectedReturn / 12 / 100;
+            const months = timeframe * 12;
+            let monthlySIP = 0;
+            
+            if (gapAmount > 0 && monthlyRate > 0) {
+                monthlySIP = gapAmount * monthlyRate / (Math.pow(1 + monthlyRate, months) - 1);
+            }
+            
+            // Calculate total investment needed
+            const totalInvestment = monthlySIP * months;
+
+            // Display results
+            document.getElementById('goal-future-value').textContent = `₹${Math.round(futureValue).toLocaleString('en-IN')}`;
+            document.getElementById('goal-monthly-sip').textContent = `₹${Math.round(monthlySIP).toLocaleString('en-IN')}`;
+            document.getElementById('goal-total-investment').textContent = `₹${Math.round(totalInvestment).toLocaleString('en-IN')}`;
+            document.getElementById('goal-gap').textContent = `₹${Math.round(gapAmount).toLocaleString('en-IN')}`;
+            
+            document.getElementById('goal-results').style.display = 'block';
+        }
+
+        function addGoal() {
+            const goalName = document.getElementById('goal-name').value;
+            const goalCategory = document.getElementById('goal-category').value;
+            const goalAmount = parseFloat(document.getElementById('goal-amount').value) || 0;
+            const timeframe = parseFloat(document.getElementById('goal-timeframe').value) || 0;
+            const inflationRate = parseFloat(document.getElementById('goal-inflation').value) || 0;
+            const priority = document.getElementById('goal-priority').value;
+            const currentProgress = parseFloat(document.getElementById('goal-progress').value) || 0;
+            const expectedReturn = parseFloat(document.getElementById('goal-return').value) || 0;
+
+            if (!goalName || !goalAmount || !timeframe || !priority) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            // Calculate goal metrics
+            const futureValue = goalAmount * Math.pow(1 + inflationRate/100, timeframe);
+            const progressFutureValue = currentProgress * Math.pow(1 + expectedReturn/100, timeframe);
+            const gapAmount = Math.max(0, futureValue - progressFutureValue);
+            
+            const monthlyRate = expectedReturn / 12 / 100;
+            const months = timeframe * 12;
+            let monthlySIP = 0;
+            
+            if (gapAmount > 0 && monthlyRate > 0) {
+                monthlySIP = gapAmount * monthlyRate / (Math.pow(1 + monthlyRate, months) - 1);
+            }
+
+            const goal = {
+                id: Date.now(),
+                name: goalName,
+                category: goalCategory,
+                amount: goalAmount,
+                timeframe: timeframe,
+                inflationRate: inflationRate,
+                priority: priority,
+                currentProgress: currentProgress,
+                expectedReturn: expectedReturn,
+                futureValue: futureValue,
+                monthlySIP: monthlySIP,
+                gapAmount: gapAmount
+            };
+
+            userGoals.push(goal);
+            displayGoals();
+            clearGoalForm();
+            
+            // Save to localStorage
+            localStorage.setItem('userGoals', JSON.stringify(userGoals));
+        }
+
+        function displayGoals() {
+            const goalsList = document.getElementById('goals-list');
+            
+            if (userGoals.length === 0) {
+                goalsList.innerHTML = '<div style="text-align: center; color: var(--text-gray); padding: 2rem;">No goals added yet. Create your first financial goal above.</div>';
+                return;
+            }
+
+            let goalsHTML = '';
+            userGoals.forEach(goal => {
+                const priorityColor = {
+                    'critical': 'var(--accent-gold)',
+                    'high': 'var(--accent-white)',
+                    'medium': 'var(--accent-silver)',
+                    'low': 'var(--text-gray)'
+                };
+
+                const progressPercentage = ((goal.currentProgress / goal.amount) * 100).toFixed(1);
+
+                goalsHTML += `
+                    <div class="goal-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid ${priorityColor[goal.priority]}; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <h4 style="color: var(--accent-white); margin: 0 0 0.5rem 0;">${goal.name}</h4>
+                                <div style="color: var(--text-gray); font-size: 0.9rem; text-transform: capitalize;">${goal.category} • ${goal.priority} Priority</div>
+                            </div>
+                            <button onclick="removeGoal(${goal.id})" style="background: none; border: none; color: var(--text-gray); cursor: pointer; font-size: 1.2rem;" title="Remove Goal">×</button>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <div style="color: var(--text-gray); font-size: 0.8rem;">Target (Today's Value)</div>
+                                <div style="color: var(--accent-white); font-weight: bold;">₹${goal.amount.toLocaleString('en-IN')}</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-gray); font-size: 0.8rem;">Future Value</div>
+                                <div style="color: var(--accent-gold); font-weight: bold;">₹${Math.round(goal.futureValue).toLocaleString('en-IN')}</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-gray); font-size: 0.8rem;">Time Frame</div>
+                                <div style="color: var(--accent-white); font-weight: bold;">${goal.timeframe} years</div>
+                            </div>
+                            <div>
+                                <div style="color: var(--text-gray); font-size: 0.8rem;">Monthly SIP</div>
+                                <div style="color: var(--accent-gold); font-weight: bold;">₹${Math.round(goal.monthlySIP).toLocaleString('en-IN')}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Progress: ${progressPercentage}%</span>
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">₹${goal.currentProgress.toLocaleString('en-IN')} / ₹${goal.amount.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="background: var(--border-gray); border-radius: 10px; height: 8px; overflow: hidden;">
+                                <div style="background: ${priorityColor[goal.priority]}; height: 100%; width: ${Math.min(progressPercentage, 100)}%; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            goalsList.innerHTML = goalsHTML;
+        }
+
+        function removeGoal(goalId) {
+            userGoals = userGoals.filter(goal => goal.id !== goalId);
+            displayGoals();
+            localStorage.setItem('userGoals', JSON.stringify(userGoals));
+        }
+
+        function clearGoalForm() {
+            document.getElementById('goal-form').reset();
+            document.getElementById('goal-inflation').value = '6';
+            document.getElementById('goal-return').value = '12';
+            document.getElementById('goal-results').style.display = 'none';
+        }
+
+        function calculateInsurance() {
+            const age = parseFloat(document.getElementById('insurance-age').value) || 0;
+            const income = parseFloat(document.getElementById('insurance-income').value) || 0;
+            const dependents = parseFloat(document.getElementById('insurance-dependents').value) || 0;
+            const loans = parseFloat(document.getElementById('insurance-loans').value) || 0;
+            const assets = parseFloat(document.getElementById('insurance-assets').value) || 0;
+            const coverageYears = parseFloat(document.getElementById('insurance-years').value) || 0;
+
+            if (!age || !income || coverageYears === 0) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            // Life Insurance Calculation (Human Life Value Method + Income Replacement)
+            const incomeReplacement = income * coverageYears;
+            const dependentFactor = 1 + (dependents * 0.3); // 30% additional for each dependent
+            const inflationAdjustment = 1.06; // 6% inflation adjustment
+            
+            let lifeCover = (incomeReplacement * dependentFactor * inflationAdjustment) + loans - assets;
+            lifeCover = Math.max(lifeCover, income * 10); // Minimum 10x annual income
+            
+            // Age factor adjustment
+            if (age < 30) lifeCover *= 1.2;
+            else if (age > 50) lifeCover *= 0.8;
+
+            // Health Insurance Calculation
+            let healthCover = 500000; // Base amount
+            if (dependents > 0) healthCover += dependents * 300000;
+            if (age > 45) healthCover *= 1.5;
+            if (income > 1000000) healthCover = Math.max(healthCover, income * 0.5);
+
+            // Premium Estimation (rough calculation)
+            const lifeInsurancePremium = (lifeCover * 0.01 * (age / 30)) / 12; // Monthly
+            const healthInsurancePremium = (healthCover * 0.015) / 12; // Monthly
+            const totalPremium = lifeInsurancePremium + healthInsurancePremium;
+
+            // Display results
+            document.getElementById('insurance-life-cover').textContent = `₹${Math.round(lifeCover).toLocaleString('en-IN')}`;
+            document.getElementById('insurance-health-cover').textContent = `₹${Math.round(healthCover).toLocaleString('en-IN')}`;
+            document.getElementById('insurance-premium').textContent = `₹${Math.round(totalPremium).toLocaleString('en-IN')}/month`;
+
+            // Generate breakdown
+            generateInsuranceBreakdown(lifeCover, healthCover, lifeInsurancePremium, healthInsurancePremium, income, dependents, loans, assets);
+            
+            document.getElementById('insurance-results').style.display = 'block';
+        }
+
+        function generateInsuranceBreakdown(lifeCover, healthCover, lifePremium, healthPremium, income, dependents, loans, assets) {
+            const breakdown = document.getElementById('insurance-breakdown');
+            
+            breakdown.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-white); margin-bottom: 1.5rem;">Insurance Analysis Breakdown</h5>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                        <div>
+                            <h6 style="color: var(--accent-gold); margin-bottom: 1rem;">Life Insurance Components</h6>
+                            <div style="space-y: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-gray);">
+                                    <span style="color: var(--text-gray);">Income Replacement (${income > 0 ? Math.round(lifeCover / income) : 0}x annual income)</span>
+                                    <span style="color: var(--accent-white);">₹${Math.round(income * 10).toLocaleString('en-IN')}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-gray);">
+                                    <span style="color: var(--text-gray);">Outstanding Loans</span>
+                                    <span style="color: var(--accent-white);">₹${loans.toLocaleString('en-IN')}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-gray);">
+                                    <span style="color: var(--text-gray);">Dependent Factor (${dependents} dependents)</span>
+                                    <span style="color: var(--accent-white)">${((1 + dependents * 0.3) * 100).toFixed(0)}%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-gray);">
+                                    <span style="color: var(--text-gray);">Less: Liquid Assets</span>
+                                    <span style="color: var(--accent-silver);">-₹${assets.toLocaleString('en-IN')}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; font-weight: bold;">
+                                    <span style="color: var(--accent-gold);">Recommended Life Cover</span>
+                                    <span style="color: var(--accent-gold);">₹${Math.round(lifeCover).toLocaleString('en-IN')}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Health Insurance & Premiums</h6>
+                            <div style="space-y: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-gray);">
+                                    <span style="color: var(--text-gray);">Base Health Coverage</span>
+                                    <span style="color: var(--accent-white);">₹5,00,000</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-gray);">
+                                    <span style="color: var(--text-gray);">Family Coverage (${dependents} members)</span>
+                                    <span style="color: var(--accent-white);">₹${(dependents * 300000).toLocaleString('en-IN')}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-gray);">
+                                    <span style="color: var(--text-gray);">Life Insurance Premium</span>
+                                    <span style="color: var(--accent-silver);">₹${Math.round(lifePremium).toLocaleString('en-IN')}/month</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-gray);">
+                                    <span style="color: var(--text-gray);">Health Insurance Premium</span>
+                                    <span style="color: var(--accent-silver);">₹${Math.round(healthPremium).toLocaleString('en-IN')}/month</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; font-weight: bold;">
+                                    <span style="color: var(--accent-white);">Total Monthly Premium</span>
+                                    <span style="color: var(--accent-white);">₹${Math.round(lifePremium + healthPremium).toLocaleString('en-IN')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,215,0,0.05); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
+                        <h6 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Insurance Recommendations</h6>
+                        <ul style="color: var(--text-gray); line-height: 1.6; margin: 0; padding-left: 1.5rem;">
+                            <li>Consider term life insurance for maximum coverage at lowest cost</li>
+                            <li>${dependents > 0 ? 'Include family floater health insurance for dependents' : 'Individual health insurance is sufficient for now'}</li>
+                            <li>Review coverage annually or on major life events</li>
+                            <li>Maintain emergency fund alongside insurance coverage</li>
+                            ${income > 1000000 ? '<li>Consider additional critical illness coverage given higher income</li>' : ''}
+                        </ul>
+                    </div>
+                </div>
+            `;
         }
 
         // Save functions (placeholders)

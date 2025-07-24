@@ -4089,6 +4089,17 @@
             const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 6;
             const realCAGR = ((1 + nominalCAGR/100) / (1 + inflationRate/100) - 1) * 100;
             
+            // Debug logging
+            console.log('Portfolio Analysis Debug:', {
+                startDate: data.startDate,
+                months, years,
+                nominalCAGR: nominalCAGR.toFixed(2),
+                inflationRate,
+                realCAGR: realCAGR.toFixed(2),
+                totalValue: data.totalValue,
+                totalInvested: data.totalInvested
+            });
+            
             // Calculate inflation-adjusted returns
             const inflationAdjustedValue = data.totalInvested * Math.pow(1 + inflationRate/100, years);
             const realReturns = data.totalValue - inflationAdjustedValue;
@@ -4926,9 +4937,9 @@
                 riskDescription = "You prefer safety and capital preservation over growth. You're comfortable with lower returns in exchange for stability.";
                 portfolioRecommendation = {
                     equity: 20,
-                    debt: 70,
-                    gold: 5,
-                    cash: 5
+                    debt: 60,
+                    gold: 10,
+                    cash: 10
                 };
                 investmentOptions = [
                     "Fixed Deposits and Savings Accounts",
@@ -4942,8 +4953,8 @@
                 riskDescription = "You seek steady growth with minimal risk. You're willing to accept slight volatility for better returns than pure conservative investments.";
                 portfolioRecommendation = {
                     equity: 35,
-                    debt: 55,
-                    gold: 5,
+                    debt: 50,
+                    gold: 10,
                     cash: 5
                 };
                 investmentOptions = [
@@ -4973,10 +4984,10 @@
                 riskCategory = "Moderate Aggressive";
                 riskDescription = "You're focused on long-term wealth creation and can handle significant market volatility. You prioritize growth over stability.";
                 portfolioRecommendation = {
-                    equity: 70,
-                    debt: 20,
-                    gold: 5,
-                    cash: 5
+                    equity: 65,
+                    debt: 25,
+                    gold: 7,
+                    cash: 3
                 };
                 investmentOptions = [
                     "Mid Cap and Small Cap Funds",
@@ -4989,8 +5000,8 @@
                 riskCategory = "Aggressive";
                 riskDescription = "You're a high-risk, high-reward investor seeking maximum growth. You can handle significant volatility and losses for potential high returns.";
                 portfolioRecommendation = {
-                    equity: 85,
-                    debt: 10,
+                    equity: 80,
+                    debt: 15,
                     gold: 3,
                     cash: 2
                 };
@@ -5016,6 +5027,9 @@
             };
             
             localStorage.setItem('clientData', JSON.stringify(clientData));
+            
+            // Refresh Investment Recommendations with new risk profile
+            loadInvestmentRecommendations();
             
             // Display results
             document.getElementById('risk-assessment').style.display = 'none';

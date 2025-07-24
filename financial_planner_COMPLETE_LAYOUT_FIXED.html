@@ -8806,32 +8806,46 @@
 
         function analyzeUserProfile() {
             // This would normally read from profile section
-            // For demo, using sample data
-            return {
-                age: 30,
-                income: 100000,
-                family: 'married',
-                experience: 'intermediate'
-            };
+            // For demo, creating varied profiles based on time
+            const profiles = [
+                { age: 25, income: 50000, family: 'single', experience: 'beginner' },
+                { age: 30, income: 100000, family: 'married', experience: 'intermediate' },
+                { age: 35, income: 150000, family: 'married_kids', experience: 'experienced' },
+                { age: 45, income: 200000, family: 'married_kids', experience: 'expert' },
+                { age: 55, income: 250000, family: 'married', experience: 'expert' }
+            ];
+            
+            // Rotate through profiles to show different recommendations
+            const profileIndex = Math.floor(Date.now() / 10000) % profiles.length;
+            return profiles[profileIndex];
         }
 
         function analyzeRiskProfile() {
             // This would normally read from risk assessment section
-            return {
-                riskScore: 'medium',
-                timeHorizon: 'long',
-                lossTolerance: 15
-            };
+            const riskProfiles = [
+                { riskScore: 'high', timeHorizon: 'long', lossTolerance: 25 },      // Young aggressive
+                { riskScore: 'medium', timeHorizon: 'long', lossTolerance: 15 },    // Balanced
+                { riskScore: 'medium', timeHorizon: 'medium', lossTolerance: 12 },  // Conservative growth
+                { riskScore: 'low', timeHorizon: 'medium', lossTolerance: 8 },      // Pre-retirement
+                { riskScore: 'low', timeHorizon: 'short', lossTolerance: 5 }        // Near retirement
+            ];
+            
+            const profileIndex = Math.floor(Date.now() / 10000) % riskProfiles.length;
+            return riskProfiles[profileIndex];
         }
 
         function analyzeGoals() {
             // This would normally read from goals section
-            return {
-                primary: 'retirement',
-                secondary: 'house',
-                timeframe: 25,
-                amount: 50000000
-            };
+            const goalProfiles = [
+                { primary: 'house', secondary: 'car', timeframe: 5, amount: 5000000 },        // Young house buyer
+                { primary: 'retirement', secondary: 'house', timeframe: 25, amount: 50000000 }, // Mid-career
+                { primary: 'child_education', secondary: 'retirement', timeframe: 15, amount: 20000000 }, // Parent
+                { primary: 'retirement', secondary: 'child_marriage', timeframe: 10, amount: 30000000 }, // Pre-retirement
+                { primary: 'wealth_preservation', secondary: 'legacy', timeframe: 5, amount: 10000000 }  // Near retirement
+            ];
+            
+            const profileIndex = Math.floor(Date.now() / 10000) % goalProfiles.length;
+            return goalProfiles[profileIndex];
         }
 
         function analyzeFinancialStatus() {
@@ -8861,26 +8875,100 @@
         function generateMutualFundsRecommendations(profile, risk, goals, financial) {
             const recommendedFunds = [];
             
-            // Smart logic based on user profile
-            if (risk.riskScore === 'medium' && goals.primary === 'retirement') {
+            // YOUNG AGGRESSIVE PROFILE (25yr, High Risk, House Goal)
+            if (profile.age <= 30 && risk.riskScore === 'high' && goals.primary === 'house') {
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('SBI Small Cap')),
+                    reason: 'High growth potential for short-term house goal - aggressive approach',
+                    priority: 1,
+                    allocation: 60
+                });
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('Mirae Asset')),
+                    reason: 'Large cap stability to balance small cap volatility',
+                    priority: 2,
+                    allocation: 40
+                });
+            }
+            
+            // BALANCED MID-CAREER (30-40yr, Medium Risk, Retirement)
+            else if (profile.age >= 30 && profile.age <= 40 && risk.riskScore === 'medium' && goals.primary === 'retirement') {
                 recommendedFunds.push({
                     fund: mutualFundsData.find(f => f.name.includes('HDFC Top 100')),
                     reason: 'Perfect for long-term retirement planning with balanced risk',
                     priority: 1,
                     allocation: 40
                 });
-                
                 recommendedFunds.push({
                     fund: mutualFundsData.find(f => f.name.includes('Mirae Asset')),
                     reason: 'Low expense ratio with consistent performance',
                     priority: 2,
                     allocation: 30
                 });
-                
                 recommendedFunds.push({
                     fund: mutualFundsData.find(f => f.name.includes('ICICI Prudential Debt')),
                     reason: 'Debt component for portfolio stability',
                     priority: 3,
+                    allocation: 30
+                });
+            }
+            
+            // PARENT FOCUSED (30-45yr, Child Education Goal)
+            else if (goals.primary === 'child_education') {
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('Axis Hybrid')),
+                    reason: 'Hybrid approach perfect for education planning - growth + stability',
+                    priority: 1,
+                    allocation: 50
+                });
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('HDFC Top 100')),
+                    reason: 'Large cap equity for long-term education corpus building',
+                    priority: 2,
+                    allocation: 35
+                });
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('Franklin India Debt')),
+                    reason: 'Debt allocation increases as education date approaches',
+                    priority: 3,
+                    allocation: 15
+                });
+            }
+            
+            // PRE-RETIREMENT CONSERVATIVE (45-55yr, Low Risk)
+            else if (profile.age >= 45 && risk.riskScore === 'low') {
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('ICICI Prudential Debt')),
+                    reason: 'Capital preservation priority as retirement approaches',
+                    priority: 1,
+                    allocation: 60
+                });
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('Franklin India Debt')),
+                    reason: 'Diversified debt portfolio for income generation',
+                    priority: 2,
+                    allocation: 25
+                });
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('HDFC Top 100')),
+                    reason: 'Small equity exposure to beat inflation',
+                    priority: 3,
+                    allocation: 15
+                });
+            }
+            
+            // WEALTH PRESERVATION (55+yr, Very Conservative)
+            else if (profile.age >= 55 && goals.primary === 'wealth_preservation') {
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('Franklin India Debt')),
+                    reason: 'Income generation and capital preservation for retirement',
+                    priority: 1,
+                    allocation: 70
+                });
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('ICICI Prudential Debt')),
+                    reason: 'Diversified debt exposure for stable returns',
+                    priority: 2,
                     allocation: 30
                 });
             }
@@ -8914,7 +9002,7 @@
                         </div>
                         <div style="margin-top: 1rem; padding: 1rem; background: rgba(76, 175, 80, 0.1); border-radius: 8px;">
                             <strong style="color: #4CAF50;">💡 Smart Tip:</strong> 
-                            <span style="color: var(--text-gray);">Start with ₹${Math.min(financial.monthlySurplus, 15000).toLocaleString()}/month SIP across these funds for optimal diversification.</span>
+                            <span style="color: var(--text-gray);">${getPersonalizedTip(profile, risk, goals, financial)}</span>
                         </div>
                     </div>
                 `;
@@ -8944,6 +9032,22 @@
         function generateInvestmentRecommendations(profile, risk, goals, financial) {
             // Logic for investment recommendations based on goals and risk
             console.log('Investment recommendations generated based on goals:', goals.primary);
+        }
+
+        function getPersonalizedTip(profile, risk, goals, financial) {
+            const suggestedSip = Math.min(financial.monthlySurplus, profile.income * 0.2);
+            
+            if (profile.age <= 30 && goals.primary === 'house') {
+                return `At ${profile.age}, start aggressive with ₹${suggestedSip.toLocaleString()}/month. House goal needs high growth - review every 6 months.`;
+            } else if (goals.primary === 'retirement' && profile.age <= 40) {
+                return `Perfect age for retirement planning! Start ₹${suggestedSip.toLocaleString()}/month SIP and increase by 10% annually.`;
+            } else if (goals.primary === 'child_education') {
+                return `Education planning requires discipline. Start ₹${suggestedSip.toLocaleString()}/month and switch to debt as goal approaches.`;
+            } else if (profile.age >= 45) {
+                return `Focus on capital preservation. Start conservative with ₹${suggestedSip.toLocaleString()}/month in debt-heavy allocation.`;
+            } else {
+                return `Start with ₹${suggestedSip.toLocaleString()}/month SIP across these funds for optimal diversification.`;
+            }
         }
 
         // Initialize app

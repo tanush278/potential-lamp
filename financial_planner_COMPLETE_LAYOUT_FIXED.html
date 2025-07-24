@@ -9066,62 +9066,58 @@
         function validateUserData() {
             console.log('VALIDATION DEBUG - Checking user data...');
             
-            // SUPER MINIMAL VALIDATION - Just need ANY data
-            
-            // Check if user has entered ANYTHING at all
+            // Check if user has entered basic data
             const age = document.getElementById('current-age')?.value || 
                        document.getElementById('insurance-age')?.value;
             const income = document.getElementById('monthly-income')?.value;
             const savings = document.getElementById('current-savings')?.value;
-            const anyNumberInput = document.querySelector('input[type="number"]')?.value;
             
-            console.log('Minimal check - Age:', age, 'Income:', income, 'Savings:', savings, 'Any number:', anyNumberInput);
+            console.log('User data check - Age:', age, 'Income:', income, 'Savings:', savings);
             
-            // If user has entered ANY financial data, allow recommendations
-            if (age || income || savings || anyNumberInput) {
-                console.log('VALIDATION PASSED - User has some data');
+            // Allow if user has basic financial info
+            if (age && income) {
+                console.log('VALIDATION PASSED - User has age and income');
                 return { isValid: true, missingFields: [] };
             }
             
-            // Only show error if literally NO data entered
-            console.log('VALIDATION FAILED - No data at all');
+            if (age || income || savings) {
+                console.log('VALIDATION PASSED - User has some basic data');
+                return { isValid: true, missingFields: [] };
+            }
+            
+            // Show error only if no basic data
+            console.log('VALIDATION FAILED - Need basic data');
             return {
                 isValid: false,
-                missingFields: ['Enter any basic information (age, income, or savings) to get recommendations']
+                missingFields: ['Enter your age and monthly income to get personalized recommendations']
             };
         }
         
-        // BYPASS VALIDATION - Generate recommendations anyway
+        // GENERATE WITH USER'S ACTUAL DATA
         function generateRecommendationsWithoutValidation() {
-            console.log('BYPASSING VALIDATION - Generating recommendations with minimal data');
+            console.log('Generating recommendations with user actual data');
             
-            // Create dummy data for missing fields
-            const userProfile = {
-                age: document.getElementById('current-age')?.value || 30,
-                income: document.getElementById('monthly-income')?.value || 50000,
-                dependents: 2
-            };
+            // Use REAL user data from the form
+            const userProfile = analyzeUserProfile();
+            const riskProfile = analyzeRiskProfile();
+            const goals = analyzeGoals();
+            const financialStatus = analyzeFinancialStatus();
             
-            const riskProfile = { level: 'moderate', score: 50 };
-            const goals = { retirement: 10000000, emergency: 500000 };
-            const financialStatus = {
-                savings: document.getElementById('current-savings')?.value || 100000,
-                expenses: 35000
-            };
+            console.log('Using actual user data:', { userProfile, riskProfile, goals, financialStatus });
             
-            // Hide validation error
+            // Show success message
             document.getElementById('smart-recommendations-summary').innerHTML = `
-                <div style="background: rgba(255, 193, 7, 0.1); border: 2px solid #FFC107; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="color: #FFC107; margin-bottom: 1rem;">
-                        <i class="fas fa-info-circle"></i> Basic Recommendations Generated
+                <div style="background: rgba(76, 175, 80, 0.1); border: 2px solid #4CAF50; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="color: #4CAF50; margin-bottom: 1rem;">
+                        <i class="fas fa-check-circle"></i> Personalized Recommendations Generated
                     </h3>
                     <p style="color: var(--text-gray); margin: 0;">
-                        Generated with minimal data. Complete your profile for more accurate recommendations.
+                        Based on your profile data. Recommendations will improve as you complete more sections.
                     </p>
                 </div>
             `;
             
-            // Generate recommendations with dummy data
+            // Generate recommendations with REAL user data
             generateMutualFundsRecommendations(userProfile, riskProfile, goals, financialStatus);
             generateInsuranceRecommendations(userProfile, goals, financialStatus);
             generateLoanRecommendations(userProfile, financialStatus);
@@ -10168,6 +10164,29 @@
                 });
                 
                 console.log('Integrated Financial Ecosystem activated - all sections now work together!');
+            
+            // TEST INTEGRATION IMMEDIATELY
+            setTimeout(() => {
+                const ageField = document.getElementById('current-age');
+                const incomeField = document.getElementById('monthly-income');
+                const insuranceAgeField = document.getElementById('insurance-age');
+                
+                console.log('INTEGRATION TEST:', {
+                    ageField: !!ageField,
+                    incomeField: !!incomeField, 
+                    insuranceAgeField: !!insuranceAgeField
+                });
+                
+                if (ageField && insuranceAgeField) {
+                    console.log('Testing age integration...');
+                    ageField.value = '35';
+                    ageField.dispatchEvent(new Event('input', { bubbles: true }));
+                    
+                    setTimeout(() => {
+                        console.log('Insurance age field value after integration:', insuranceAgeField.value);
+                    }, 100);
+                }
+            }, 1000);
             } catch (error) {
                 console.error('Failed to setup Financial Ecosystem:', error);
                 console.log('App will continue with basic functionality');

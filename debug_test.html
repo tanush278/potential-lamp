@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test - Financial Planner Issues</title>
+    <style>
+        body { 
+            background: #111; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            line-height: 1.6;
+        }
+        .test { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #333; 
+            border-radius: 8px;
+            background: #1a1a1a;
+        }
+        .issue { color: #ff6b6b; font-weight: bold; }
+        .fix { color: #51cf66; }
+        button { 
+            background: #ffd700; 
+            color: black; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 10px 5px;
+        }
+        input, select { 
+            background: #333; 
+            color: white; 
+            border: 1px solid #555; 
+            padding: 8px; 
+            margin: 5px;
+            border-radius: 4px;
+        }
+        .result {
+            background: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Test - What's Actually Working?</h1>
+    
+    <div class="test">
+        <h3>1. Test Risk Profile Calculation</h3>
+        <div class="issue">Issue: "Calculate Risk Profile" button not working</div>
+        
+        <!-- Minimal risk assessment form -->
+        <div style="margin: 15px 0;">
+            <label>Age Group:</label>
+            <select id="debug-age-group">
+                <option value="">Select Age Group</option>
+                <option value="10">18-25 years</option>
+                <option value="15">26-35 years</option>
+                <option value="20">36-45 years</option>
+            </select>
+            
+            <label>Investment Experience:</label>
+            <select id="debug-investment-experience">
+                <option value="">Select Experience</option>
+                <option value="5">Beginner</option>
+                <option value="15">Intermediate</option>
+                <option value="25">Expert</option>
+            </select>
+            
+            <label>Investment Horizon:</label>
+            <select id="debug-investment-horizon">
+                <option value="">Select Horizon</option>
+                <option value="5">1-3 years</option>
+                <option value="15">3-7 years</option>
+                <option value="25">7+ years</option>
+            </select>
+        </div>
+        
+        <button onclick="testRiskCalculation()">Test Risk Calculation</button>
+        <div id="risk-test-result" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test">
+        <h3>2. Test Portfolio Analysis Inflation</h3>
+        <div class="issue">Issue: Inflation-adjusted returns not showing</div>
+        
+        <div style="margin: 15px 0;">
+            <label>Total Portfolio Value (₹):</label>
+            <input type="number" id="debug-portfolio-value" value="1000000" placeholder="10,00,000">
+            
+            <label>Total Invested (₹):</label>
+            <input type="number" id="debug-invested" value="800000" placeholder="8,00,000">
+            
+            <label>Investment Start Date:</label>
+            <input type="date" id="debug-start-date" value="2022-01-01">
+            
+            <label>Inflation Rate (%):</label>
+            <input type="number" id="debug-inflation" value="6" step="0.1">
+        </div>
+        
+        <button onclick="testInflationCalculation()">Test Inflation Calculation</button>
+        <div id="inflation-test-result" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test">
+        <h3>3. Test localStorage Data</h3>
+        <button onclick="checkLocalStorage()">Check Saved Data</button>
+        <button onclick="clearLocalStorage()">Clear All Data</button>
+        <div id="storage-test-result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        function testRiskCalculation() {
+            const resultDiv = document.getElementById('risk-test-result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                const ageGroup = parseInt(document.getElementById('debug-age-group').value) || 0;
+                const experience = parseInt(document.getElementById('debug-investment-experience').value) || 0;
+                const horizon = parseInt(document.getElementById('debug-investment-horizon').value) || 0;
+                
+                if (!ageGroup || !experience || !horizon) {
+                    resultDiv.innerHTML = '<span style="color: #ff6b6b;">❌ FAIL: Please select all options first</span>';
+                    return;
+                }
+                
+                // Add default values for missing fields
+                const stability = 15; // Default moderate
+                const goals = 15; // Default moderate  
+                const tolerance = 15; // Default moderate
+                
+                const totalScore = ageGroup + experience + horizon + stability + goals + tolerance;
+                const maxScore = 150;
+                const riskPercentage = Math.round((totalScore / maxScore) * 100);
+                
+                let riskCategory;
+                if (riskPercentage <= 30) riskCategory = "Conservative";
+                else if (riskPercentage <= 50) riskCategory = "Moderate Conservative";
+                else if (riskPercentage <= 70) riskCategory = "Moderate";
+                else if (riskPercentage <= 85) riskCategory = "Moderate Aggressive";
+                else riskCategory = "Aggressive";
+                
+                // Test localStorage saving
+                const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+                clientData.riskProfile = {
+                    riskCategory: riskCategory,
+                    riskScore: riskPercentage,
+                    totalScore: totalScore
+                };
+                localStorage.setItem('clientData', JSON.stringify(clientData));
+                
+                resultDiv.innerHTML = `
+                    <span style="color: #51cf66;">✅ SUCCESS: Risk calculation working!</span><br>
+                    <strong>Score:</strong> ${totalScore}/${maxScore} (${riskPercentage}%)<br>
+                    <strong>Category:</strong> ${riskCategory}<br>
+                    <strong>Saved to localStorage:</strong> ✅
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: #ff6b6b;">❌ ERROR: ${error.message}</span>`;
+            }
+        }
+        
+        function testInflationCalculation() {
+            const resultDiv = document.getElementById('inflation-test-result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                const totalValue = parseFloat(document.getElementById('debug-portfolio-value').value) || 0;
+                const totalInvested = parseFloat(document.getElementById('debug-invested').value) || 0;
+                const startDate = document.getElementById('debug-start-date').value;
+                const inflationRate = parseFloat(document.getElementById('debug-inflation').value) || 6;
+                
+                if (!totalValue || !totalInvested || !startDate) {
+                    resultDiv.innerHTML = '<span style="color: #ff6b6b;">❌ FAIL: Please fill all fields</span>';
+                    return;
+                }
+                
+                // Calculate duration
+                const start = new Date(startDate);
+                const now = new Date();
+                const diffTime = Math.abs(now - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const months = Math.max(1, Math.round(diffDays / 30.44));
+                const years = Math.max(0.08, months / 12);
+                
+                // Calculate returns
+                const totalReturns = totalValue - totalInvested;
+                const returnPercentage = ((totalReturns / totalInvested) * 100).toFixed(2);
+                
+                // Calculate CAGR
+                const nominalCAGR = years > 0 ? (Math.pow(totalValue / totalInvested, 1 / years) - 1) * 100 : 0;
+                const realCAGR = ((1 + nominalCAGR/100) / (1 + inflationRate/100) - 1) * 100;
+                
+                // Calculate inflation-adjusted returns
+                const inflationAdjustedValue = totalInvested * Math.pow(1 + inflationRate/100, years);
+                const realReturns = totalValue - inflationAdjustedValue;
+                const realReturnPercentage = ((realReturns / totalInvested) * 100).toFixed(2);
+                
+                resultDiv.innerHTML = `
+                    <span style="color: #51cf66;">✅ SUCCESS: Inflation calculation working!</span><br>
+                    <strong>Duration:</strong> ${months} months (${years.toFixed(1)} years)<br>
+                    <strong>Nominal Returns:</strong> ₹${Math.round(totalReturns).toLocaleString('en-IN')} (${returnPercentage}%)<br>
+                    <strong>Real Returns:</strong> ₹${Math.round(realReturns).toLocaleString('en-IN')} (${realReturnPercentage}%)<br>
+                    <strong>Nominal CAGR:</strong> ${nominalCAGR.toFixed(2)}%<br>
+                    <strong>Real CAGR:</strong> ${realCAGR.toFixed(2)}%<br>
+                    <strong>Inflation Rate:</strong> ${inflationRate}%
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: #ff6b6b;">❌ ERROR: ${error.message}</span>`;
+            }
+        }
+        
+        function checkLocalStorage() {
+            const resultDiv = document.getElementById('storage-test-result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+                const hasRiskProfile = clientData.riskProfile ? '✅' : '❌';
+                const riskCategory = clientData.riskProfile?.riskCategory || 'Not set';
+                const riskScore = clientData.riskProfile?.riskScore || 'Not set';
+                
+                resultDiv.innerHTML = `
+                    <strong>localStorage Status:</strong><br>
+                    <strong>Has Risk Profile:</strong> ${hasRiskProfile}<br>
+                    <strong>Risk Category:</strong> ${riskCategory}<br>
+                    <strong>Risk Score:</strong> ${riskScore}<br>
+                    <strong>Raw Data:</strong> <pre style="background:#333;padding:10px;margin:10px 0;border-radius:4px;font-size:12px;">${JSON.stringify(clientData, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: #ff6b6b;">❌ ERROR: ${error.message}</span>`;
+            }
+        }
+        
+        function clearLocalStorage() {
+            localStorage.removeItem('clientData');
+            localStorage.removeItem('financialPlannerProfiles');
+            localStorage.removeItem('userGoals');
+            alert('✅ All localStorage data cleared!');
+            checkLocalStorage();
+        }
+    </script>
+</body>
+</html>

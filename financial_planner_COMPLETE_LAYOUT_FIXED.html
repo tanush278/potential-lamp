@@ -5015,6 +5015,7 @@
             }
             
             // Save to clientData
+            const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
             clientData.riskProfile = {
                 ...clientData.riskProfile,
                 riskCategory: riskCategory,

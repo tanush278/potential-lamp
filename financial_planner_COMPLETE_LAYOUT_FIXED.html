@@ -6850,8 +6850,9 @@
         }
 
         function createAssetAllocationChart(data) {
-            const ctx = document.getElementById('asset-allocation-chart');
-            if (!ctx) return;
+            const canvas = document.getElementById('asset-allocation-chart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             
             if (assetAllocationChart) {
                 assetAllocationChart.destroy();
@@ -6903,8 +6904,9 @@
         }
 
         function createLiabilityBreakdownChart(data) {
-            const ctx = document.getElementById('liability-breakdown-chart');
-            if (!ctx) return;
+            const canvas = document.getElementById('liability-breakdown-chart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             
             if (liabilityBreakdownChart) {
                 liabilityBreakdownChart.destroy();
@@ -7054,8 +7056,9 @@
         }
 
         function createNetWorthTrendChart(data) {
-            const ctx = document.getElementById('networth-trend-chart');
-            if (!ctx) return;
+            const canvas = document.getElementById('networth-trend-chart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             
             if (networthTrendChart) {
                 networthTrendChart.destroy();

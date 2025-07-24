@@ -1812,10 +1812,7 @@
                                 <i class="fas fa-balance-scale"></i> Compare Both
                                 <small style="display: block; font-size: 11px; margin-top: 4px;">Side-by-Side Analysis</small>
                             </button>
-                            <button type="button" class="regime-btn" data-regime="capital-gains" onclick="selectTaxRegime('capital-gains')" title="Calculate capital gains tax on investments">
-                                <i class="fas fa-chart-line"></i> Capital Gains Tax
-                                <small style="display: block; font-size: 11px; margin-top: 4px;">STCG & LTCG Calculator</small>
-                            </button>
+
                         </div>
                         
                         <!-- Regime Information -->
@@ -1844,14 +1841,7 @@
                                     <strong>Note:</strong> You can switch between regimes annually (except for business income taxpayers)
                                 </p>
                             </div>
-                            <div id="capital-gains-info" style="display: none;">
-                                <h4 style="color: var(--accent-gold); margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> Capital Gains Tax (FY 2024-25)</h4>
-                                <p style="margin: 0; color: var(--text-gray); line-height: 1.5;">
-                                    <strong>Short Term (STCG):</strong> Assets held ≤12 months (≤24 months for real estate). Taxed as per income tax slabs<br>
-                                    <strong>Long Term (LTCG):</strong> Assets held >12 months (>24 months for real estate). Equity: 10% above ₹1L exemption, Debt: 20% with indexation<br>
-                                    <strong>Note:</strong> Calculate tax liability on your investment gains and plan your portfolio exits strategically
-                                </p>
-                            </div>
+
                         </div>
                         
                         <input type="hidden" id="selected-tax-regime" value="old">
@@ -2000,80 +1990,7 @@
                         </div>
                     </div>
                     
-                    <!-- Capital Gains Tax Calculator -->
-                    <div class="card" id="capital-gains-section" style="display: none;">
-                        <div class="card-header">
-                            <h3 class="card-title">Capital Gains Tax Calculator</h3>
-                            <p class="card-subtitle">Calculate tax on your investment gains (STCG & LTCG)</p>
-                        </div>
-                        
-                        <!-- Asset Type Selection -->
-                        <div style="margin-bottom: 2rem;">
-                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-chart-line"></i> Investment Details
-                            </h4>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label>Asset Type</label>
-                                    <select id="asset-type" class="form-input" onchange="calculateCapitalGains()">
-                                        <option value="equity-mutual-funds">Equity/Equity Mutual Funds</option>
-                                        <option value="debt-mutual-funds">Debt Mutual Funds</option>
-                                        <option value="real-estate">Real Estate</option>
-                                        <option value="gold">Gold/Gold ETF</option>
-                                        <option value="crypto">Cryptocurrency</option>
-                                        <option value="other">Other Assets</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Purchase Date</label>
-                                    <input type="date" id="purchase-date" class="form-input" onchange="calculateCapitalGains()">
-                                </div>
-                                <div class="form-group">
-                                    <label>Sale Date</label>
-                                    <input type="date" id="sale-date" class="form-input" onchange="calculateCapitalGains()">
-                                </div>
-                                <div class="form-group">
-                                    <label>Purchase Price (₹)</label>
-                                    <input type="number" id="purchase-price" class="form-input" placeholder="Total purchase cost" onchange="calculateCapitalGains()">
-                                </div>
-                                <div class="form-group">
-                                    <label>Sale Price (₹)</label>
-                                    <input type="number" id="sale-price" class="form-input" placeholder="Total sale proceeds" onchange="calculateCapitalGains()">
-                                </div>
-                                <div class="form-group">
-                                    <label>Improvement Cost (₹)</label>
-                                    <input type="number" id="improvement-cost" class="form-input" placeholder="Brokerage, stamp duty, etc." onchange="calculateCapitalGains()">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Capital Gains Results -->
-                        <div id="capital-gains-results" style="display: none;">
-                            <!-- Results will be populated here -->
-                        </div>
-                        
-                        <!-- Multiple Assets Calculator -->
-                        <div style="margin-top: 2rem;">
-                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-plus-circle"></i> Multiple Assets Calculator
-                            </h4>
-                            <div id="multiple-assets-list">
-                                <!-- Dynamic asset list will be populated here -->
-                            </div>
-                            <button type="button" class="btn btn-secondary" onclick="addAssetForCapitalGains()" style="margin-top: 1rem;">
-                                <i class="fas fa-plus"></i> Add Another Asset
-                            </button>
-                        </div>
-                        
-                        <!-- Tax Optimization Tips -->
-                        <div id="capital-gains-tips" style="margin-top: 2rem; padding: 1.5rem; background: var(--card-black); border-radius: 8px; border: 1px solid var(--border-gray);">
-                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Tax Optimization Tips</h4>
-                            <div id="optimization-tips" style="color: var(--text-gray); line-height: 1.6;">
-                                <!-- Tips will be populated based on calculations -->
-                            </div>
-                        </div>
-                    </div>
-                    
+
                     <!-- Tax Calculation Results -->
                     <div class="card">
                         <div class="card-header">
@@ -2098,6 +2015,140 @@
                             <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Tax Saving Recommendations</h4>
                             <div id="recommendations-content">
                                 <!-- Recommendations will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Capital Gains Tax Section -->
+                <section id="capital-gains-tax" class="section">
+                    <div class="section-header">
+                        <h1 class="section-title">Capital Gains Tax Calculator</h1>
+                        <p class="section-subtitle">Calculate tax on your investment gains with STCG & LTCG support</p>
+                    </div>
+                    
+                    <!-- Asset Details Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Investment Asset Details</h3>
+                            <p class="card-subtitle">Enter your investment purchase and sale information</p>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Asset Type</label>
+                                <select id="cg-asset-type" class="form-input" onchange="calculateStandaloneCapitalGains()">
+                                    <option value="equity-mutual-funds">Equity/Equity Mutual Funds</option>
+                                    <option value="debt-mutual-funds">Debt Mutual Funds</option>
+                                    <option value="real-estate">Real Estate</option>
+                                    <option value="gold">Gold/Gold ETF</option>
+                                    <option value="crypto">Cryptocurrency</option>
+                                    <option value="other">Other Assets</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Purchase Date</label>
+                                <input type="date" id="cg-purchase-date" class="form-input" onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                            <div class="form-group">
+                                <label>Sale Date</label>
+                                <input type="date" id="cg-sale-date" class="form-input" onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                            <div class="form-group">
+                                <label>Purchase Price (₹)</label>
+                                <input type="number" id="cg-purchase-price" class="form-input" placeholder="Total purchase cost" onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                            <div class="form-group">
+                                <label>Sale Price (₹)</label>
+                                <input type="number" id="cg-sale-price" class="form-input" placeholder="Total sale proceeds" onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                            <div class="form-group">
+                                <label>Improvement Cost (₹)</label>
+                                <input type="number" id="cg-improvement-cost" class="form-input" placeholder="Brokerage, stamp duty, etc." onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Capital Gains Results -->
+                    <div class="card" id="cg-results-card" style="display: none;">
+                        <div class="card-header">
+                            <h3 class="card-title">Capital Gains Tax Calculation</h3>
+                            <p class="card-subtitle">Your tax liability on investment gains</p>
+                        </div>
+                        
+                        <div id="cg-results-content">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Multiple Assets Portfolio -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Portfolio Capital Gains Summary</h3>
+                            <p class="card-subtitle">Track multiple assets and total capital gains tax</p>
+                        </div>
+                        
+                        <div id="cg-portfolio-list" style="margin-bottom: 2rem;">
+                            <!-- Portfolio assets will be listed here -->
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                            <button type="button" class="btn btn-primary" onclick="addCurrentAssetToPortfolio()">
+                                <i class="fas fa-plus"></i> Add Current Asset to Portfolio
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="clearCapitalGainsPortfolio()">
+                                <i class="fas fa-trash"></i> Clear Portfolio
+                            </button>
+                        </div>
+                        
+                        <div id="cg-portfolio-summary" style="display: none;">
+                            <!-- Portfolio summary will be shown here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Tax Integration -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Total Tax Planning Integration</h3>
+                            <p class="card-subtitle">Combine capital gains tax with your income tax planning</p>
+                        </div>
+                        
+                        <div id="cg-tax-integration">
+                            <div style="text-align: center; padding: 2rem; color: var(--text-gray);">
+                                <i class="fas fa-link" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <p>Calculate your capital gains above, then use the Tax Planning section to see your total tax liability including both income tax and capital gains tax.</p>
+                                <button type="button" class="btn btn-accent" onclick="integrateWithTaxPlanning()" style="margin-top: 1rem;">
+                                    <i class="fas fa-calculator"></i> Integrate with Tax Planning
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tax Optimization Tips -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Capital Gains Tax Optimization</h3>
+                            <p class="card-subtitle">Strategic tips to minimize your capital gains tax</p>
+                        </div>
+                        
+                        <div id="cg-optimization-tips">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                                    <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Long Term Benefits</h4>
+                                    <ul style="color: var(--text-gray); line-height: 1.6;">
+                                        <li>Hold equity investments for >12 months to get 10% LTCG rate</li>
+                                        <li>Utilize ₹1,00,000 annual LTCG exemption on equity</li>
+                                        <li>Plan asset sales across financial years</li>
+                                    </ul>
+                                </div>
+                                <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                                    <h4 style="color: #ff6b6b; margin-bottom: 1rem;">Tax Loss Harvesting</h4>
+                                    <ul style="color: var(--text-gray); line-height: 1.6;">
+                                        <li>Offset capital gains with capital losses</li>
+                                        <li>STCG losses can offset both STCG and LTCG</li>
+                                        <li>Carry forward unused losses for 8 years</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -6910,30 +6961,18 @@
             document.getElementById('old-regime-info').style.display = regime === 'old' ? 'block' : 'none';
             document.getElementById('new-regime-info').style.display = regime === 'new' ? 'block' : 'none';
             document.getElementById('compare-regime-info').style.display = regime === 'compare' ? 'block' : 'none';
-            document.getElementById('capital-gains-info').style.display = regime === 'capital-gains' ? 'block' : 'none';
             
             // Show/hide sections based on regime
             const oldRegimeDeductions = document.getElementById('old-regime-deductions');
-            const capitalGainsSection = document.getElementById('capital-gains-section');
-            const incomeDetailsSection = document.querySelector('.card:has(#basic-salary)').parentElement;
             
-            if (regime === 'capital-gains') {
-                // Hide income tax sections, show capital gains
+            if (regime === 'new') {
                 if (oldRegimeDeductions) oldRegimeDeductions.style.display = 'none';
-                if (incomeDetailsSection) incomeDetailsSection.style.display = 'none';
-                if (capitalGainsSection) capitalGainsSection.style.display = 'block';
-                calculateCapitalGains();
             } else {
-                // Show income tax sections, hide capital gains
-                if (capitalGainsSection) capitalGainsSection.style.display = 'none';
-                if (incomeDetailsSection) incomeDetailsSection.style.display = 'block';
-                if (regime === 'new') {
-                    if (oldRegimeDeductions) oldRegimeDeductions.style.display = 'none';
-                } else {
-                    if (oldRegimeDeductions) oldRegimeDeductions.style.display = 'block';
-                }
-                calculateAdvancedTax();
+                if (oldRegimeDeductions) oldRegimeDeductions.style.display = 'block';
             }
+            
+            // Recalculate tax
+            calculateAdvancedTax();
         }
 
         function calculateAdvancedTax() {
@@ -8626,6 +8665,284 @@
             // Placeholder for multiple assets functionality
             alert('Multiple assets calculator will be implemented in the next update.');
         }
+
+        // Standalone Capital Gains Calculator Functions (New Section)
+        let capitalGainsPortfolio = [];
+
+        function calculateStandaloneCapitalGains() {
+            try {
+                const assetType = document.getElementById('cg-asset-type')?.value || 'equity-mutual-funds';
+                const purchaseDate = document.getElementById('cg-purchase-date')?.value;
+                const saleDate = document.getElementById('cg-sale-date')?.value;
+                const purchasePrice = parseFloat(document.getElementById('cg-purchase-price')?.value) || 0;
+                const salePrice = parseFloat(document.getElementById('cg-sale-price')?.value) || 0;
+                const improvementCost = parseFloat(document.getElementById('cg-improvement-cost')?.value) || 0;
+
+                if (!purchaseDate || !saleDate || purchasePrice === 0 || salePrice === 0) {
+                    document.getElementById('cg-results-card').style.display = 'none';
+                    return;
+                }
+
+                const purchase = new Date(purchaseDate);
+                const sale = new Date(saleDate);
+                const holdingPeriod = Math.floor((sale - purchase) / (1000 * 60 * 60 * 24 * 30)); // months
+
+                const isLongTerm = determineIsLongTerm(assetType, holdingPeriod);
+                const capitalGain = salePrice - purchasePrice - improvementCost;
+                
+                if (capitalGain <= 0) {
+                    displayStandaloneCapitalGainsResults({
+                        capitalGain: capitalGain,
+                        taxableGain: 0,
+                        tax: 0,
+                        isLongTerm: isLongTerm,
+                        holdingPeriod: holdingPeriod,
+                        assetType: assetType,
+                        isLoss: true
+                    });
+                    return;
+                }
+
+                const taxResult = calculateCapitalGainsTax(capitalGain, assetType, isLongTerm);
+                
+                displayStandaloneCapitalGainsResults({
+                    capitalGain: capitalGain,
+                    taxableGain: taxResult.taxableGain,
+                    tax: taxResult.tax,
+                    isLongTerm: isLongTerm,
+                    holdingPeriod: holdingPeriod,
+                    assetType: assetType,
+                    isLoss: false,
+                    exemption: taxResult.exemption
+                });
+
+            } catch (error) {
+                console.error('Error calculating standalone capital gains:', error);
+            }
+        }
+
+        function displayStandaloneCapitalGainsResults(result) {
+            const resultsDiv = document.getElementById('cg-results-content');
+            const resultsCard = document.getElementById('cg-results-card');
+            if (!resultsDiv || !resultsCard) return;
+
+            const holdingText = `${Math.floor(result.holdingPeriod)} months`;
+
+            resultsDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border: 1px solid #333;">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Investment Details</h5>
+                        <div style="margin-bottom: 8px; color: var(--text-gray);">
+                            <span>Asset Type:</span>
+                            <span style="float: right; color: var(--text-white); font-weight: 600;">${result.assetType.replace('-', ' ').toUpperCase()}</span>
+                        </div>
+                        <div style="margin-bottom: 8px; color: var(--text-gray);">
+                            <span>Holding Period:</span>
+                            <span style="float: right; color: var(--text-white); font-weight: 600;">${holdingText}</span>
+                        </div>
+                        <div style="margin-bottom: 8px; color: var(--text-gray);">
+                            <span>Gain Type:</span>
+                            <span style="float: right; color: ${result.isLongTerm ? 'var(--accent-gold)' : '#ff6b6b'}; font-weight: 600;">${result.isLongTerm ? 'LTCG' : 'STCG'}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border: 1px solid #333;">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Tax Calculation</h5>
+                        <div style="margin-bottom: 8px; color: var(--text-gray);">
+                            <span>Capital Gain:</span>
+                            <span style="float: right; color: ${result.isLoss ? '#ff6b6b' : 'var(--text-white)'}; font-weight: 600;">₹${Math.round(Math.abs(result.capitalGain)).toLocaleString('en-IN')}</span>
+                        </div>
+                        ${result.exemption > 0 ? `
+                        <div style="margin-bottom: 8px; color: var(--text-gray);">
+                            <span>Exemption:</span>
+                            <span style="float: right; color: var(--accent-gold); font-weight: 600;">₹${Math.round(result.exemption).toLocaleString('en-IN')}</span>
+                        </div>
+                        <div style="margin-bottom: 8px; color: var(--text-gray);">
+                            <span>Taxable Gain:</span>
+                            <span style="float: right; color: var(--text-white); font-weight: 600;">₹${Math.round(result.taxableGain).toLocaleString('en-IN')}</span>
+                        </div>
+                        ` : ''}
+                        <div style="padding: 12px; background: rgba(255,107,107,0.1); border-radius: 8px; margin-top: 12px;">
+                            <span style="color: var(--text-white); font-weight: 700;">Tax Liability:</span>
+                            <span style="float: right; color: #ff6b6b; font-weight: 700; font-size: 18px;">₹${Math.round(result.tax).toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                </div>
+
+                ${result.isLoss ? `
+                <div style="background: rgba(255,107,107,0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                    <h5 style="color: #ff6b6b; margin-bottom: 0.5rem;">Capital Loss</h5>
+                    <p style="color: var(--text-gray); margin: 0;">This loss can be offset against capital gains. Consider tax loss harvesting strategies.</p>
+                </div>
+                ` : ''}
+            `;
+            
+            resultsCard.style.display = 'block';
+        }
+
+        function addCurrentAssetToPortfolio() {
+            const assetType = document.getElementById('cg-asset-type')?.value;
+            const purchaseDate = document.getElementById('cg-purchase-date')?.value;
+            const saleDate = document.getElementById('cg-sale-date')?.value;
+            const purchasePrice = parseFloat(document.getElementById('cg-purchase-price')?.value) || 0;
+            const salePrice = parseFloat(document.getElementById('cg-sale-price')?.value) || 0;
+            const improvementCost = parseFloat(document.getElementById('cg-improvement-cost')?.value) || 0;
+
+            if (!purchaseDate || !saleDate || purchasePrice === 0 || salePrice === 0) {
+                alert('Please fill in all asset details before adding to portfolio.');
+                return;
+            }
+
+            const purchase = new Date(purchaseDate);
+            const sale = new Date(saleDate);
+            const holdingPeriod = Math.floor((sale - purchase) / (1000 * 60 * 60 * 24 * 30));
+            const isLongTerm = determineIsLongTerm(assetType, holdingPeriod);
+            const capitalGain = salePrice - purchasePrice - improvementCost;
+            const taxResult = calculateCapitalGainsTax(Math.max(0, capitalGain), assetType, isLongTerm);
+
+            const asset = {
+                id: Date.now(),
+                assetType: assetType,
+                purchaseDate: purchaseDate,
+                saleDate: saleDate,
+                purchasePrice: purchasePrice,
+                salePrice: salePrice,
+                improvementCost: improvementCost,
+                capitalGain: capitalGain,
+                tax: capitalGain > 0 ? taxResult.tax : 0,
+                isLongTerm: isLongTerm,
+                holdingPeriod: holdingPeriod
+            };
+
+            capitalGainsPortfolio.push(asset);
+            updatePortfolioDisplay();
+            
+            // Clear current form
+            document.getElementById('cg-purchase-date').value = '';
+            document.getElementById('cg-sale-date').value = '';
+            document.getElementById('cg-purchase-price').value = '';
+            document.getElementById('cg-sale-price').value = '';
+            document.getElementById('cg-improvement-cost').value = '';
+            document.getElementById('cg-results-card').style.display = 'none';
+        }
+
+        function updatePortfolioDisplay() {
+            const portfolioList = document.getElementById('cg-portfolio-list');
+            const portfolioSummary = document.getElementById('cg-portfolio-summary');
+            
+            if (capitalGainsPortfolio.length === 0) {
+                portfolioList.innerHTML = '<p style="color: var(--text-gray); text-align: center; padding: 2rem;">No assets added to portfolio yet.</p>';
+                portfolioSummary.style.display = 'none';
+                return;
+            }
+
+            // Display portfolio list
+            let html = '<div style="display: grid; gap: 1rem;">';
+            capitalGainsPortfolio.forEach(asset => {
+                html += `
+                    <div style="background: var(--primary-black); padding: 1rem; border-radius: 8px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: var(--text-white);">${asset.assetType.replace('-', ' ').toUpperCase()}</strong>
+                            <div style="color: var(--text-gray); font-size: 12px;">
+                                ${asset.isLongTerm ? 'LTCG' : 'STCG'} • ${asset.holdingPeriod} months • 
+                                Gain: ₹${Math.round(asset.capitalGain).toLocaleString('en-IN')}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #ff6b6b; font-weight: 600;">₹${Math.round(asset.tax).toLocaleString('en-IN')}</div>
+                            <button onclick="removeAssetFromPortfolio(${asset.id})" style="background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 12px;">Remove</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            portfolioList.innerHTML = html;
+
+            // Display portfolio summary
+            const totalGains = capitalGainsPortfolio.reduce((sum, asset) => sum + Math.max(0, asset.capitalGain), 0);
+            const totalTax = capitalGainsPortfolio.reduce((sum, asset) => sum + asset.tax, 0);
+            const totalLosses = capitalGainsPortfolio.reduce((sum, asset) => sum + Math.min(0, asset.capitalGain), 0);
+
+            portfolioSummary.innerHTML = `
+                <div style="background: var(--primary-black); padding: 2rem; border-radius: 12px; border: 1px solid #333;">
+                    <h4 style="color: var(--accent-gold); margin-bottom: 1.5rem; text-align: center;">Portfolio Capital Gains Summary</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Total Gains</div>
+                            <div style="color: var(--text-white); font-size: 24px; font-weight: 700;">₹${Math.round(totalGains).toLocaleString('en-IN')}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Total Tax</div>
+                            <div style="color: #ff6b6b; font-size: 24px; font-weight: 700;">₹${Math.round(totalTax).toLocaleString('en-IN')}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Net After Tax</div>
+                            <div style="color: var(--accent-gold); font-size: 24px; font-weight: 700;">₹${Math.round(totalGains - totalTax).toLocaleString('en-IN')}</div>
+                        </div>
+                    </div>
+                    ${totalLosses < 0 ? `
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,107,107,0.1); border-radius: 8px; text-align: center;">
+                        <div style="color: #ff6b6b; font-weight: 600;">Total Losses: ₹${Math.round(Math.abs(totalLosses)).toLocaleString('en-IN')}</div>
+                        <div style="color: var(--text-gray); font-size: 12px; margin-top: 4px;">Can be offset against gains</div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            portfolioSummary.style.display = 'block';
+
+            // Store total tax for integration
+            window.totalCapitalGainsTax = totalTax;
+        }
+
+        function removeAssetFromPortfolio(assetId) {
+            capitalGainsPortfolio = capitalGainsPortfolio.filter(asset => asset.id !== assetId);
+            updatePortfolioDisplay();
+        }
+
+        function clearCapitalGainsPortfolio() {
+            capitalGainsPortfolio = [];
+            updatePortfolioDisplay();
+            window.totalCapitalGainsTax = 0;
+        }
+
+        function integrateWithTaxPlanning() {
+            const totalCGTax = window.totalCapitalGainsTax || 0;
+            if (totalCGTax === 0) {
+                alert('Please calculate capital gains first by adding assets to your portfolio.');
+                return;
+            }
+
+            // Show integration message
+            document.getElementById('cg-tax-integration').innerHTML = `
+                <div style="background: var(--primary-black); padding: 2rem; border-radius: 12px; border: 1px solid var(--accent-gold);">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 1rem;"></i>
+                        <h4 style="color: var(--accent-gold); margin: 0;">Integration Ready</h4>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Capital Gains Tax</div>
+                            <div style="color: #ff6b6b; font-size: 24px; font-weight: 700;">₹${Math.round(totalCGTax).toLocaleString('en-IN')}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Status</div>
+                            <div style="color: var(--accent-gold); font-size: 16px; font-weight: 600;">Ready for Tax Planning</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <p style="color: var(--text-gray); margin-bottom: 1rem;">Your capital gains tax of ₹${Math.round(totalCGTax).toLocaleString('en-IN')} is ready to be added to your income tax calculation.</p>
+                        <button type="button" class="btn btn-primary" onclick="showSection('tax-planning')">
+                            <i class="fas fa-arrow-right"></i> Go to Tax Planning
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Store for later use in tax planning
+            localStorage.setItem('capitalGainsTax', totalCGTax.toString());
+            
+            alert(`Capital gains tax of ₹${Math.round(totalCGTax).toLocaleString('en-IN')} is now ready for integration. Go to Tax Planning section to see your total tax liability.`);
+        }
     </script>
 
     <!-- Version Footer -->
@@ -8643,7 +8960,7 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.8 - Fixed Tax Calculations & Capital Gains</span>
+                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.9 - Dedicated Capital Gains Section</span>
             <span>•</span>
                             <span>Last Updated: Dec 24, 2024 - 11:30 UTC</span>
             <span>•</span>

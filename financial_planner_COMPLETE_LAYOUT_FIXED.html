@@ -9066,30 +9066,56 @@
         function validateUserData() {
             const missingFields = [];
             
-            // Check Profile Section
-            const age = document.getElementById('current-age')?.value;
+            // DEBUG: Log what we're checking
+            console.log('🔍 VALIDATION DEBUG:');
+            
+            // Check Profile Section - MULTIPLE POSSIBLE IDs
+            const age = document.getElementById('current-age')?.value || 
+                       document.getElementById('client-age')?.value ||
+                       document.getElementById('insurance-age')?.value;
             const income = document.getElementById('monthly-income')?.value;
+            
+            console.log('Age found:', age, 'Income found:', income);
+            
             if (!age || !income) {
                 missingFields.push('Complete your Personal Profile (Age, Income)');
             }
             
-            // Check Risk Assessment
+            // Check Risk Assessment - More flexible
             const riskData = localStorage.getItem('riskAssessmentData');
-            if (!riskData) {
+            const riskQuestions = document.querySelectorAll('input[name^="risk"]:checked').length;
+            
+            console.log('Risk localStorage:', !!riskData, 'Risk questions answered:', riskQuestions);
+            
+            if (!riskData && riskQuestions < 3) {
                 missingFields.push('Complete Risk Assessment');
             }
             
-            // Check Goals
+            // Check Goals - More flexible
             const goalsData = localStorage.getItem('financialGoals');
-            if (!goalsData) {
+            const hasGoals = document.querySelector('#financial-goals input[type="number"]')?.value;
+            
+            console.log('Goals localStorage:', !!goalsData, 'Has goals input:', !!hasGoals);
+            
+            if (!goalsData && !hasGoals) {
                 missingFields.push('Set your Financial Goals');
             }
             
-            // Check Financial Status
-            const currentSavings = document.getElementById('current-savings')?.value;
+            // Check Financial Status - Multiple possible fields
+            const currentSavings = document.getElementById('current-savings')?.value ||
+                                 document.getElementById('savings-amount')?.value ||
+                                 document.getElementById('current-assets')?.value;
+            
+            console.log('Current savings found:', currentSavings);
+            
             if (!currentSavings) {
                 missingFields.push('Enter your Current Financial Status');
             }
+            
+            console.log('🎯 VALIDATION RESULT:', {
+                isValid: missingFields.length === 0,
+                missingFields: missingFields
+            });
             
             return {
                 isValid: missingFields.length === 0,
@@ -9559,9 +9585,97 @@
             ];
         }
 
+        // AUTO-POPULATION SYSTEM FOR SEAMLESS UX
+        const UserDataManager = {
+            // Central data store
+            userData: {
+                profile: {},
+                financial: {},
+                goals: {},
+                risk: {}
+            },
+            
+            // Update central store and auto-populate
+            updateField(section, field, value) {
+                this.userData[section][field] = value;
+                this.autoPopulateFields(field, value);
+                console.log(`📝 Updated ${section}.${field} = ${value}`);
+            },
+            
+            // Auto-populate same field across all sections
+            autoPopulateFields(fieldName, value) {
+                const fieldMappings = {
+                    'age': ['current-age', 'client-age', 'insurance-age', 'retirement-calc-age'],
+                    'income': ['monthly-income', 'salary-input', 'income-amount'],
+                    'savings': ['current-savings', 'savings-amount', 'current-assets', 'investment-amount']
+                };
+                
+                const relatedFields = fieldMappings[fieldName] || [fieldName];
+                
+                relatedFields.forEach(fieldId => {
+                    const element = document.getElementById(fieldId);
+                    if (element && element.value !== value) {
+                        element.value = value;
+                        console.log(`🔄 Auto-populated ${fieldId} = ${value}`);
+                    }
+                });
+            },
+            
+            // Get consolidated user data
+            getConsolidatedData() {
+                return {
+                    age: document.getElementById('current-age')?.value || 
+                         document.getElementById('client-age')?.value ||
+                         document.getElementById('insurance-age')?.value,
+                    income: document.getElementById('monthly-income')?.value,
+                    savings: document.getElementById('current-savings')?.value ||
+                            document.getElementById('savings-amount')?.value ||
+                            document.getElementById('current-assets')?.value
+                };
+            }
+        };
+        
+        // Setup auto-population listeners
+        function setupAutoPopulation() {
+            // Age fields
+            ['current-age', 'client-age', 'insurance-age'].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        UserDataManager.updateField('profile', 'age', this.value);
+                    });
+                }
+            });
+            
+            // Income fields
+            ['monthly-income'].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        UserDataManager.updateField('financial', 'income', this.value);
+                    });
+                }
+            });
+            
+            // Savings fields
+            ['current-savings', 'savings-amount', 'current-assets'].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        UserDataManager.updateField('financial', 'savings', this.value);
+                    });
+                }
+            });
+            
+            console.log('✅ Auto-population system activated!');
+        }
+
         // Initialize app with live data
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Financial Planner Pro initialized');
+            
+            // Setup auto-population system
+            setupAutoPopulation();
             
             // Try to load live mutual funds data
             try {

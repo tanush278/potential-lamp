@@ -1572,6 +1572,10 @@
                         <div class="card-header">
                             <h3 class="card-title">Portfolio Holdings</h3>
                             <p class="card-subtitle">Enter your current investment holdings for analysis</p>
+                            <div id="portfolio-integration-notice" style="display: none; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 6px; padding: 1rem; margin-top: 1rem;">
+                                <div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;">🔗 Smart Integration Active</div>
+                                <div style="color: var(--text-gray); font-size: 0.9rem;">Fields auto-populated based on your Investment Recommendations. You can modify any values for personalized analysis.</div>
+                            </div>
                         </div>
                         
                         <div id="portfolio-input-section">
@@ -1614,9 +1618,14 @@
                                 </div>
                             </div>
                             
-                            <button class="btn btn-primary" onclick="analyzePortfolio()" style="margin-top: 1rem;">
-                                Analyze Portfolio
-                            </button>
+                            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                                <button class="btn btn-primary" onclick="analyzePortfolio()">
+                                    Analyze Portfolio
+                                </button>
+                                <button class="btn btn-secondary" onclick="refreshPortfolioIntegration()" id="refresh-portfolio-btn" style="display: none;">
+                                    🔄 Refresh from Investment Recommendations
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -3744,8 +3753,92 @@
             `;
         }
 
-        // Initialize Portfolio Analysis with sample data
+        // Initialize Portfolio Analysis with integration from Investment Recommendations
         function initializePortfolioAnalysis() {
+            const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+            const riskProfile = clientData.riskProfile;
+            
+            if (riskProfile && riskProfile.riskCategory) {
+                // User has risk profile - use personalized data
+                loadPortfolioFromRiskProfile(riskProfile);
+            } else {
+                // No risk profile - show sample data with integration prompt
+                showSamplePortfolioWithPrompt();
+            }
+        }
+
+        function loadPortfolioFromRiskProfile(riskProfile) {
+            // Get recommended allocation from Investment Recommendations
+            const allocations = {
+                'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
+                'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
+                'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
+                'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
+                'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
+            };
+            
+            const recommendedAllocation = allocations[riskProfile.riskCategory] || allocations['Moderate'];
+            
+            // Create integrated portfolio data based on recommended allocation
+            const totalValue = 1000000; // Default portfolio value
+            const portfolioData = {
+                totalValue: totalValue,
+                totalInvested: totalValue * 0.8, // Assume 20% returns
+                monthlySIP: 20000,
+                startDate: '2022-01-01',
+                allocation: {
+                    equity: Math.round((totalValue * recommendedAllocation.equity) / 100),
+                    debt: Math.round((totalValue * recommendedAllocation.debt) / 100),
+                    gold: Math.round((totalValue * recommendedAllocation.gold) / 100),
+                    cash: Math.round((totalValue * recommendedAllocation.cash) / 100)
+                },
+                totalReturns: totalValue * 0.2,
+                riskProfile: riskProfile
+            };
+            
+            // Auto-populate input fields with recommended values
+            autoPopulatePortfolioInputs(portfolioData);
+            
+            // Update portfolio overview with integration message
+            updatePortfolioOverviewWithIntegration(portfolioData);
+            
+            // Generate analysis based on user's risk profile
+            analyzeAssetAllocation(portfolioData);
+            generatePortfolioHealthCheck(portfolioData);
+            createPerformanceChart(portfolioData);
+        }
+
+        function autoPopulatePortfolioInputs(data) {
+            // Auto-fill the input fields with recommended/sample values
+            const inputs = {
+                'total-portfolio-value': data.totalValue,
+                'total-invested': data.totalInvested,
+                'monthly-sip': data.monthlySIP,
+                'investment-start-date': data.startDate,
+                'portfolio-equity': data.allocation.equity,
+                'portfolio-debt': data.allocation.debt,
+                'portfolio-gold': data.allocation.gold,
+                'portfolio-cash': data.allocation.cash
+            };
+            
+            Object.keys(inputs).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = inputs[id];
+                    // Add visual indicator that this is auto-populated
+                    element.style.backgroundColor = 'rgba(255, 215, 0, 0.05)';
+                    element.style.border = '1px solid rgba(255, 215, 0, 0.3)';
+                }
+            });
+            
+            // Show integration notice
+            const notice = document.getElementById('portfolio-integration-notice');
+            if (notice) {
+                notice.style.display = 'block';
+            }
+        }
+
+        function showSamplePortfolioWithPrompt() {
             // Sample portfolio data for demonstration
             const sampleData = {
                 totalValue: 1250000,
@@ -3760,6 +3853,18 @@
             analyzeAssetAllocation(sampleData);
             generatePortfolioHealthCheck(sampleData);
             createPerformanceChart(sampleData);
+        }
+
+        function updatePortfolioOverviewWithIntegration(data) {
+            const overviewHeader = document.querySelector('#portfolio-overview .card-header + div');
+            if (overviewHeader && data.riskProfile) {
+                overviewHeader.innerHTML = `
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; margin-bottom: 2rem;">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Integrated Portfolio Analysis</h5>
+                        <p style="color: var(--text-gray); margin: 0;">Portfolio analysis based on your ${data.riskProfile.riskCategory} risk profile from Investment Recommendations. Adjust portfolio values above for personalized analysis.</p>
+                    </div>
+                `;
+            }
         }
 
         // Portfolio Analysis Functions

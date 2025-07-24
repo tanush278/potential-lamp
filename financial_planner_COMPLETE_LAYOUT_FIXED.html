@@ -1668,7 +1668,7 @@
                     </div>
 
                     <!-- Portfolio Overview -->
-                    <div class="card" id="portfolio-overview" style="margin-top: 2rem;">
+                    <div class="card" id="portfolio-overview" style="margin-top: 2rem; display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Portfolio Overview</h3>
                             <p class="card-subtitle">Key metrics and performance indicators</p>
@@ -1703,7 +1703,7 @@
                     </div>
 
                     <!-- Asset Allocation Analysis -->
-                    <div class="card" id="allocation-analysis" style="margin-top: 2rem;">
+                    <div class="card" id="allocation-analysis" style="margin-top: 2rem; display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Asset Allocation Analysis</h3>
                             <p class="card-subtitle">Current allocation vs recommended allocation</p>
@@ -1735,7 +1735,7 @@
                     </div>
 
                     <!-- Portfolio Health Check -->
-                    <div class="card" id="portfolio-health" style="margin-top: 2rem;">
+                    <div class="card" id="portfolio-health" style="margin-top: 2rem; display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Portfolio Health Check</h3>
                             <p class="card-subtitle">Comprehensive portfolio analysis and recommendations</p>
@@ -1751,7 +1751,7 @@
                     </div>
 
                     <!-- Performance Chart -->
-                    <div class="card" id="performance-chart" style="margin-top: 2rem;">
+                    <div class="card" id="performance-chart" style="margin-top: 2rem; display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Performance Tracking</h3>
                             <p class="card-subtitle">Portfolio growth visualization and projections</p>
@@ -4102,20 +4102,28 @@
         }
 
         function analyzePortfolio() {
-            const totalValue = parseFloat(document.getElementById('total-portfolio-value').value) || 0;
-            const totalInvested = parseFloat(document.getElementById('total-invested').value) || 0;
-            const monthlySIP = parseFloat(document.getElementById('monthly-sip').value) || 0;
-            const startDate = document.getElementById('investment-start-date').value;
-            
-            const equity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
-            const debt = parseFloat(document.getElementById('portfolio-debt').value) || 0;
-            const gold = parseFloat(document.getElementById('portfolio-gold').value) || 0;
-            const cash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
-            
-            if (totalValue <= 0) {
-                alert('Please enter your portfolio details');
-                return;
-            }
+            try {
+                const totalValue = parseFloat(document.getElementById('total-portfolio-value').value) || 0;
+                const totalInvested = parseFloat(document.getElementById('total-invested').value) || 0;
+                const monthlySIP = parseFloat(document.getElementById('monthly-sip').value) || 0;
+                const startDate = document.getElementById('investment-start-date').value;
+                
+                const equity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
+                const debt = parseFloat(document.getElementById('portfolio-debt').value) || 0;
+                const gold = parseFloat(document.getElementById('portfolio-gold').value) || 0;
+                const cash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
+                
+                // Validation
+                if (totalValue <= 0) {
+                    alert('Please enter your total portfolio value');
+                    return;
+                }
+                
+                const totalAllocation = equity + debt + gold + cash;
+                if (totalAllocation <= 0) {
+                    alert('Please enter your asset allocation details');
+                    return;
+                }
             
             // Calculate portfolio metrics
             const actualInvested = totalInvested || (totalValue * 0.8); // Default to 80% if not provided (assume 20% returns)
@@ -4131,21 +4139,43 @@
             // Update notice to show this is user's real data analysis
             updatePortfolioNoticeForUserData();
             
-            // Perform analysis
-            generatePortfolioOverview(portfolioData);
-            analyzeAssetAllocation(portfolioData);
-            generatePortfolioHealthCheck(portfolioData);
-            createPerformanceChart(portfolioData);
+            // Show loading message
+            const loadingMessage = document.createElement('div');
+            loadingMessage.id = 'portfolio-loading';
+            loadingMessage.style.cssText = 'text-align: center; padding: 2rem; color: var(--accent-gold); font-size: 1.2rem;';
+            loadingMessage.innerHTML = '⏳ Analyzing your portfolio...';
+            document.getElementById('portfolio-overview').style.display = 'block';
+            document.getElementById('portfolio-overview').appendChild(loadingMessage);
+            
+            // Perform analysis with a small delay for better UX
+            setTimeout(() => {
+                generatePortfolioOverview(portfolioData);
+                analyzeAssetAllocation(portfolioData);
+                generatePortfolioHealthCheck(portfolioData);
+                createPerformanceChart(portfolioData);
+                
+                // Remove loading message
+                const loading = document.getElementById('portfolio-loading');
+                if (loading) loading.remove();
+            }, 500);
             
             // Show analysis sections
             document.getElementById('portfolio-overview').style.display = 'block';
             document.getElementById('allocation-analysis').style.display = 'block';
             document.getElementById('portfolio-health').style.display = 'block';
             document.getElementById('performance-chart').style.display = 'block';
+            
+            console.log('Portfolio analysis completed successfully');
+            
+        } catch (error) {
+            console.error('Error in portfolio analysis:', error);
+            alert('An error occurred during portfolio analysis. Please check your inputs and try again.');
         }
+    }
 
         function generatePortfolioOverview(data) {
-            const returnPercentage = ((data.totalReturns / data.totalInvested) * 100).toFixed(2);
+            try {
+                const returnPercentage = ((data.totalReturns / data.totalInvested) * 100).toFixed(2);
             
             // Calculate investment duration
             let months = 12; // Default if no start date
@@ -4217,7 +4247,13 @@
             
             document.getElementById('portfolio-health-score').textContent = healthScore;
             document.getElementById('portfolio-duration').textContent = `${months} months (${years.toFixed(1)} years)`;
+            
+        } catch (error) {
+            console.error('Error in generatePortfolioOverview:', error);
+            // Show error message to user
+            document.getElementById('portfolio-total-returns').innerHTML = '<span style="color: #ff6b6b;">Error calculating returns</span>';
         }
+    }
 
         function calculatePortfolioHealthScore(data) {
             let score = 0;

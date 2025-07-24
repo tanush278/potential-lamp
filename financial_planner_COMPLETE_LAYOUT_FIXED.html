@@ -5379,9 +5379,16 @@
                                 },
                                 beforeBody: function(context) {
                                     const dataIndex = context[0].dataIndex;
-                                    const invested = chartData[dataIndex].invested;
-                                    const nominalValue = chartData[dataIndex].nominalValue;
-                                    const realValue = chartData[dataIndex].realValue;
+                                    
+                                    // Get data from the chart datasets directly
+                                    const investedData = context[0].chart.data.datasets[0].data;
+                                    const nominalData = context[0].chart.data.datasets[1].data;
+                                    const realData = context[0].chart.data.datasets[2].data;
+                                    
+                                    const invested = investedData[dataIndex];
+                                    const nominalValue = nominalData[dataIndex];
+                                    const realValue = realData[dataIndex];
+                                    
                                     const nominalGains = nominalValue - invested;
                                     const realGains = realValue - invested;
                                     const nominalReturn = invested > 0 ? ((nominalGains / invested) * 100) : 0;

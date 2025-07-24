@@ -1774,9 +1774,17 @@
                          <div id="networth-tracking" style="display: none; margin-top: 2rem;">
                              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                                  <h4 style="color: var(--accent-white); margin: 0;">Net Worth Tracking</h4>
-                                 <button class="btn btn-secondary" onclick="saveNetWorthSnapshot(this)">
-                                     <i class="fas fa-save"></i> Save Current Snapshot
-                                 </button>
+                                                 <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="saveNetWorthSnapshot(this)">
+                        <i class="fas fa-save"></i> Save Snapshot
+                    </button>
+                    <button class="btn btn-accent" onclick="exportNetWorthData()" style="background: var(--accent-gold); color: #000;">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearNetWorthHistory()" style="border: 1px solid #dc2626; color: #dc2626;">
+                        <i class="fas fa-trash"></i> Clear History
+                    </button>
+                </div>
                              </div>
                              <div style="position: relative; height: 400px; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1rem;">
                                  <canvas id="networth-trend-chart"></canvas>
@@ -8294,9 +8302,9 @@
                     datasets: [{
                         data: [data.liquidAssets, data.investmentAssets, data.physicalAssets],
                         backgroundColor: [
-                            '#4facfe', // Beautiful blue for liquid assets
-                            '#43e97b', // Vibrant green for investments
-                            '#fa709a'  // Elegant pink for physical assets
+                            '#3B82F6', // Professional blue for liquid assets
+                            '#10B981', // Professional emerald for investments  
+                            '#F59E0B'  // Professional amber for physical assets
                         ],
                         borderColor: ['#ffffff', '#ffffff', '#ffffff'],
                         borderWidth: 3,
@@ -8480,26 +8488,46 @@
             const debtToAssetRatio = data.totalAssets > 0 ? ((data.totalLiabilities / data.totalAssets) * 100).toFixed(1) : '0';
             const liquidityRatio = data.totalAssets > 0 ? ((data.liquidAssets / data.totalAssets) * 100).toFixed(1) : '0';
             const investmentRatio = data.totalAssets > 0 ? ((data.investmentAssets / data.totalAssets) * 100).toFixed(1) : '0';
+            const physicalAssetRatio = data.totalAssets > 0 ? ((data.physicalAssets / data.totalAssets) * 100).toFixed(1) : '0';
+            const securedDebtRatio = data.totalLiabilities > 0 ? ((data.securedLoans / data.totalLiabilities) * 100).toFixed(1) : '0';
 
             let healthScore = 100;
             let recommendations = [];
+            let strengths = [];
 
             // Calculate health score and recommendations
             if (parseFloat(debtToAssetRatio) > 50) {
                 healthScore -= 30;
-                recommendations.push("High debt-to-asset ratio. Consider reducing liabilities.");
+                recommendations.push("High debt-to-asset ratio (>50%). Focus on debt reduction strategies.");
+            } else if (parseFloat(debtToAssetRatio) < 30) {
+                strengths.push("Healthy debt-to-asset ratio. Good financial leverage management.");
             }
+
             if (parseFloat(liquidityRatio) < 10) {
                 healthScore -= 20;
-                recommendations.push("Low liquidity. Maintain at least 10-15% in liquid assets.");
+                recommendations.push("Low liquidity (<10%). Build emergency fund covering 6-12 months expenses.");
+            } else if (parseFloat(liquidityRatio) >= 15) {
+                strengths.push("Good liquidity position. Adequate emergency funds available.");
             }
+
             if (parseFloat(investmentRatio) < 20) {
                 healthScore -= 15;
-                recommendations.push("Low investment allocation. Consider increasing investments for wealth growth.");
+                recommendations.push("Low investment allocation (<20%). Increase investments for wealth growth.");
+            } else if (parseFloat(investmentRatio) >= 40) {
+                strengths.push("Strong investment portfolio. Good wealth building strategy.");
             }
+
             if (data.netWorth < 0) {
                 healthScore -= 35;
-                recommendations.push("Negative net worth. Focus on reducing debts and increasing assets.");
+                recommendations.push("Negative net worth. Prioritize debt reduction and asset building.");
+            } else if (data.netWorth > 1000000) {
+                strengths.push("Strong net worth position. Consider advanced wealth management strategies.");
+            }
+
+            if (parseFloat(securedDebtRatio) > 80) {
+                strengths.push("Most debt is secured (lower interest). Good debt structure.");
+            } else if (parseFloat(securedDebtRatio) < 50 && data.totalLiabilities > 0) {
+                recommendations.push("High unsecured debt ratio. Consider consolidating to secured loans.");
             }
 
             analysisDiv.innerHTML = `
@@ -8508,18 +8536,26 @@
                         <i class="fas fa-chart-bar"></i> Financial Health Analysis
                     </h4>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                        <div style="text-align: center; padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 8px;">
-                            <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem;">HEALTH SCORE</div>
-                            <div style="font-size: 2rem; font-weight: bold; color: ${healthScore >= 80 ? 'var(--accent-gold)' : healthScore >= 60 ? '#ffa500' : '#ff6b6b'};">${healthScore}/100</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="text-align: center; padding: 1.2rem; background: rgba(255,215,0,0.1); border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
+                            <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem; font-weight: 600;">HEALTH SCORE</div>
+                            <div style="font-size: 2.2rem; font-weight: bold; color: ${healthScore >= 80 ? 'var(--accent-gold)' : healthScore >= 60 ? '#F59E0B' : '#EF4444'};">${healthScore}/100</div>
+                            <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">${healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Good' : 'Needs Improvement'}</div>
                         </div>
-                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                            <div style="font-size: 0.8rem; color: var(--accent-white); margin-bottom: 0.5rem;">DEBT-TO-ASSET RATIO</div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${debtToAssetRatio}%</div>
+                        <div style="text-align: center; padding: 1.2rem; background: rgba(59,130,246,0.1); border-radius: 8px; border: 1px solid rgba(59,130,246,0.3);">
+                            <div style="font-size: 0.8rem; color: #3B82F6; margin-bottom: 0.5rem; font-weight: 600;">DEBT-TO-ASSET</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: #3B82F6;">${debtToAssetRatio}%</div>
+                            <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">${parseFloat(debtToAssetRatio) < 30 ? 'Healthy' : parseFloat(debtToAssetRatio) < 50 ? 'Moderate' : 'High Risk'}</div>
                         </div>
-                        <div style="text-align: center; padding: 1rem; background: rgba(192,192,192,0.1); border-radius: 8px;">
-                            <div style="font-size: 0.8rem; color: var(--accent-silver); margin-bottom: 0.5rem;">LIQUIDITY RATIO</div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-silver);">${liquidityRatio}%</div>
+                        <div style="text-align: center; padding: 1.2rem; background: rgba(16,185,129,0.1); border-radius: 8px; border: 1px solid rgba(16,185,129,0.3);">
+                            <div style="font-size: 0.8rem; color: #10B981; margin-bottom: 0.5rem; font-weight: 600;">LIQUIDITY</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: #10B981;">${liquidityRatio}%</div>
+                            <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">${parseFloat(liquidityRatio) >= 15 ? 'Strong' : parseFloat(liquidityRatio) >= 10 ? 'Adequate' : 'Low'}</div>
+                        </div>
+                        <div style="text-align: center; padding: 1.2rem; background: rgba(245,158,11,0.1); border-radius: 8px; border: 1px solid rgba(245,158,11,0.3);">
+                            <div style="font-size: 0.8rem; color: #F59E0B; margin-bottom: 0.5rem; font-weight: 600;">INVESTMENTS</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: #F59E0B;">${investmentRatio}%</div>
+                            <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">${parseFloat(investmentRatio) >= 40 ? 'Excellent' : parseFloat(investmentRatio) >= 20 ? 'Good' : 'Low'}</div>
                         </div>
                         <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
                             <div style="font-size: 0.8rem; color: var(--accent-white); margin-bottom: 0.5rem;">INVESTMENT RATIO</div>
@@ -8527,19 +8563,36 @@
                         </div>
                     </div>
 
-                    ${recommendations.length > 0 ? `
-                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,107,107,0.1); border-left: 4px solid #ff6b6b; border-radius: 4px;">
-                            <h5 style="color: #ff6b6b; margin: 0 0 1rem 0;">Recommendations for Improvement</h5>
-                            <ul style="color: var(--text-gray); margin: 0; padding-left: 1.5rem;">
-                                ${recommendations.map(rec => `<li style="margin-bottom: 0.5rem;">${rec}</li>`).join('')}
-                            </ul>
-                        </div>
-                    ` : `
-                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,215,0,0.1); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
-                            <h5 style="color: var(--accent-gold); margin: 0 0 0.5rem 0;">Excellent Financial Health!</h5>
-                            <p style="color: var(--text-gray); margin: 0;">Your financial position is strong. Continue maintaining this balanced approach.</p>
-                        </div>
-                    `}
+                    <div style="display: grid; grid-template-columns: ${strengths.length > 0 && recommendations.length > 0 ? '1fr 1fr' : '1fr'}; gap: 1rem; margin-top: 1.5rem;">
+                        ${strengths.length > 0 ? `
+                            <div style="padding: 1rem; background: rgba(16,185,129,0.1); border-left: 4px solid #10B981; border-radius: 4px;">
+                                <h5 style="color: #10B981; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-check-circle"></i> Financial Strengths
+                                </h5>
+                                <ul style="color: var(--text-gray); margin: 0; padding-left: 1.5rem; list-style-type: none;">
+                                    ${strengths.map(strength => `<li style="margin-bottom: 0.5rem; position: relative; padding-left: 1rem;"><span style="position: absolute; left: 0; color: #10B981;">✓</span>${strength}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${recommendations.length > 0 ? `
+                            <div style="padding: 1rem; background: rgba(239,68,68,0.1); border-left: 4px solid #EF4444; border-radius: 4px;">
+                                <h5 style="color: #EF4444; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-exclamation-triangle"></i> Areas for Improvement
+                                </h5>
+                                <ul style="color: var(--text-gray); margin: 0; padding-left: 1.5rem;">
+                                    ${recommendations.map(rec => `<li style="margin-bottom: 0.5rem;">${rec}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${strengths.length === 0 && recommendations.length === 0 ? `
+                            <div style="padding: 1rem; background: rgba(255,215,0,0.1); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
+                                <h5 style="color: var(--accent-gold); margin: 0 0 0.5rem 0;">Balanced Financial Position</h5>
+                                <p style="color: var(--text-gray); margin: 0;">Your financial position shows good balance. Continue monitoring and optimizing your portfolio.</p>
+                            </div>
+                        ` : ''}
+                    </div>
                 </div>
             `;
         }
@@ -8585,20 +8638,20 @@
                     datasets: [{
                         label: 'Net Worth Progression',
                         data: data.map(d => d.netWorth),
-                        borderColor: '#00d4aa',
-                        backgroundColor: 'rgba(0, 212, 170, 0.15)',
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
                         borderWidth: 4,
                         fill: true,
                         tension: 0.4,
                         pointRadius: 8,
                         pointHoverRadius: 12,
-                        pointBackgroundColor: '#00d4aa',
+                        pointBackgroundColor: '#10B981',
                         pointBorderColor: '#ffffff',
                         pointBorderWidth: 3,
                         pointHoverBackgroundColor: '#ffd700',
                         pointHoverBorderColor: '#ffffff',
                         pointHoverBorderWidth: 4,
-                        shadowColor: 'rgba(0, 212, 170, 0.5)',
+                        shadowColor: 'rgba(16, 185, 129, 0.5)',
                         shadowBlur: 10,
                         shadowOffsetX: 0,
                         shadowOffsetY: 4
@@ -8699,6 +8752,66 @@
                     }
                 }
             });
+        }
+
+        function exportNetWorthData() {
+            const savedData = JSON.parse(localStorage.getItem('networthHistory') || '[]');
+            
+            if (savedData.length === 0) {
+                alert('No net worth history to export. Please save some snapshots first.');
+                return;
+            }
+            
+            // Create CSV content
+            let csvContent = "Date,Net Worth,Total Assets,Total Liabilities\n";
+            savedData.forEach(snapshot => {
+                const date = new Date(snapshot.date).toLocaleDateString('en-IN');
+                csvContent += `${date},${snapshot.netWorth},${snapshot.totalAssets},${snapshot.totalLiabilities}\n`;
+            });
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `net-worth-history-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success feedback
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Exported!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function clearNetWorthHistory() {
+            if (confirm('Are you sure you want to clear all net worth history? This action cannot be undone.')) {
+                localStorage.removeItem('networthHistory');
+                
+                // Clear the chart
+                if (networthTrendChart) {
+                    networthTrendChart.destroy();
+                    networthTrendChart = null;
+                }
+                
+                // Hide the tracking section
+                document.getElementById('networth-tracking').style.display = 'none';
+                
+                // Show success feedback
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Cleared!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+                
+                alert('Net worth history cleared successfully.');
+            }
         }
 
         function saveNetWorthSnapshot(buttonElement) {

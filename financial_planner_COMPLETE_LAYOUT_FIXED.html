@@ -9775,11 +9775,20 @@
                 // Calculate corpus adequacy percentage
                 const adequacyPercentage = requiredCorpus > 0 ? (totalCorpusAtRetirement / requiredCorpus) * 100 : 0;
 
+                // Calculate inflation-adjusted corpus (real value in today's terms)
+                const inflationAdjustedCorpus = totalCorpusAtRetirement / Math.pow(1 + inflationRate/100, yearsToRetirement);
+                const inflationAdjustedRequired = requiredCorpus / Math.pow(1 + inflationRate/100, yearsToRetirement);
+
+                // Calculate purchasing power loss due to inflation
+                const inflationImpact = ((totalCorpusAtRetirement - inflationAdjustedCorpus) / totalCorpusAtRetirement) * 100;
+
                 console.log('Final calculations:', {
                     requiredCorpus: Math.round(requiredCorpus),
                     totalCorpusAtRetirement: Math.round(totalCorpusAtRetirement),
+                    inflationAdjustedCorpus: Math.round(inflationAdjustedCorpus),
                     corpusGap: Math.round(corpusGap),
-                    adequacyPercentage: Math.round(adequacyPercentage)
+                    adequacyPercentage: Math.round(adequacyPercentage),
+                    inflationImpact: Math.round(inflationImpact)
                 });
 
                 // Generate year-wise data for chart
@@ -9796,7 +9805,8 @@
                     currentExpenses, futureMonthlyExpenses, adjustedMonthlyExpenses, healthcareExpenses,
                     totalMonthlyExpenses, emergencyCorpus, requiredCorpus, totalCorpusAtRetirement,
                     corpusGap, additionalMonthlySipNeeded, adequacyPercentage, lifestyleChoice,
-                    expectedReturn, inflationRate, postRetirementReturn, chartData
+                    expectedReturn, inflationRate, postRetirementReturn, chartData,
+                    inflationAdjustedCorpus, inflationAdjustedRequired, inflationImpact
                 };
 
                 // Display results

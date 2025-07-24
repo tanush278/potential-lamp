@@ -95,7 +95,7 @@
             width: calc(100vw - 70px);
         }
 
-        /* SIDEBAR HEADER */
+        /* SIDEBAR HEADER - FIXED LAYOUT */
         .sidebar-header {
             padding: 1.5rem;
             border-bottom: 1px solid var(--border-gray);
@@ -103,13 +103,17 @@
             position: sticky;
             top: 0;
             z-index: 1001;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .sidebar.collapsed .sidebar-header {
-            padding: 1rem 0.5rem;
+            padding: 1rem;
+            justify-content: center;
         }
 
-        .app-logo {
+        .sidebar-logo {
             font-family: 'Poppins', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
@@ -120,15 +124,11 @@
             white-space: nowrap;
         }
 
-        .sidebar.collapsed .app-logo {
-            justify-content: center;
-        }
-
-        .sidebar.collapsed .app-logo .logo-text {
+        .sidebar.collapsed .sidebar-logo .sidebar-text {
             display: none;
         }
 
-        .app-logo i {
+        .sidebar-logo i {
             font-size: 1.8rem;
             background: var(--gradient-accent);
             -webkit-background-clip: text;
@@ -137,23 +137,26 @@
             flex-shrink: 0;
         }
 
-        /* TOGGLE BUTTON */
+        /* TOGGLE BUTTON - NO OVERLAP */
         .sidebar-toggle {
-            position: absolute;
-            top: 1.2rem;
-            right: 1rem;
-            background: var(--card-black);
-            border: 2px solid var(--border-gray);
+            background: var(--border-gray);
+            border: none;
             color: var(--text-white);
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 1002;
             transition: var(--transition-smooth);
+            font-size: 14px;
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            position: absolute;
+            top: 1.2rem;
+            right: 1rem;
         }
 
         .sidebar-toggle:hover {
@@ -599,107 +602,81 @@
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="app-logo">
-                    <i class="fas fa-chart-line"></i>
-                    <span class="logo-text">FinancePro</span>
-                </div>
-                <button class="sidebar-toggle" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
+                         <div class="sidebar-header">
+                 <div class="sidebar-logo">
+                     <i class="fas fa-chart-line"></i>
+                     <span class="sidebar-text">FinPro</span>
+                 </div>
+                 <button class="sidebar-toggle" onclick="toggleSidebar()">
+                     <i class="fas fa-bars"></i>
+                 </button>
+             </div>
             
-            <nav class="sidebar-nav">
+                         <nav class="sidebar-nav">
                 <!-- Dashboard Section -->
                 <div class="nav-section">
                     <div class="nav-section-title">Overview</div>
                     <div class="nav-item">
                         <a class="nav-link active" onclick="showSection('dashboard')">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <i class="nav-icon fas fa-home"></i>
                             <span class="nav-text">Dashboard</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a class="nav-link" onclick="showSection('profiles')">
-                            <i class="nav-icon fas fa-users"></i>
-                            <span class="nav-text">Client Profiles</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- Assessment Section -->
+                <!-- Client Data Section -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Assessment</div>
+                    <div class="nav-section-title">Client Data</div>
                     <div class="nav-item">
                         <a class="nav-link" onclick="toggleNavItem(this)">
-                            <i class="nav-icon fas fa-clipboard-check"></i>
-                            <span class="nav-text">Financial Assessment</span>
+                            <i class="nav-icon fas fa-user-edit"></i>
+                            <span class="nav-text">Client Profile</span>
                             <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
                         <div class="nav-submenu">
                             <a class="nav-sublink" onclick="showSection('personality')">
-                                <i class="fas fa-brain"></i> Personality Assessment
+                                <i class="fas fa-brain"></i> Assessment
                             </a>
-                            <a class="nav-sublink" onclick="showSection('basic-info')">
-                                <i class="fas fa-user"></i> Basic Information
+                            <a class="nav-sublink" onclick="showSection('profile')">
+                                <i class="fas fa-id-card"></i> Basic Info
                             </a>
-                            <a class="nav-sublink" onclick="showSection('financial-status')">
+                            <a class="nav-sublink" onclick="showSection('financial')">
                                 <i class="fas fa-wallet"></i> Financial Status
                             </a>
-                            <a class="nav-sublink" onclick="showSection('risk-profile')">
-                                <i class="fas fa-chart-bar"></i> Risk Assessment
+                            <a class="nav-sublink" onclick="showSection('networth')">
+                                <i class="fas fa-calculator"></i> Net Worth
                             </a>
                             <a class="nav-sublink" onclick="showSection('goals')">
-                                <i class="fas fa-bullseye"></i> Financial Goals
+                                <i class="fas fa-bullseye"></i> Goals & Insurance
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('risk')">
+                                <i class="fas fa-chart-area"></i> Risk Profile
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Calculators Section -->
+                <!-- Investment Advisory Section -->
                 <div class="nav-section">
-                    <div class="nav-section-title">Calculators</div>
+                    <div class="nav-section-title">Advisory</div>
                     <div class="nav-item">
                         <a class="nav-link" onclick="toggleNavItem(this)">
-                            <i class="nav-icon fas fa-calculator"></i>
-                            <span class="nav-text">Financial Calculators</span>
-                            <i class="nav-arrow fas fa-chevron-right"></i>
-                        </a>
-                        <div class="nav-submenu">
-                            <a class="nav-sublink" onclick="showSection('sip-main')">
-                                <i class="fas fa-chart-line"></i> SIP Calculator
-                            </a>
-                            <a class="nav-sublink" onclick="showSection('emi')">
-                                <i class="fas fa-home"></i> EMI Calculator
-                            </a>
-                            <a class="nav-sublink" onclick="showSection('net-worth')">
-                                <i class="fas fa-coins"></i> Net Worth
-                            </a>
-                            <a class="nav-sublink" onclick="showSection('insurance')">
-                                <i class="fas fa-shield-alt"></i> Insurance Needs
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Investment Section -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Investment</div>
-                    <div class="nav-item">
-                        <a class="nav-link" onclick="toggleNavItem(this)">
-                            <i class="nav-icon fas fa-chart-pie"></i>
+                            <i class="nav-icon fas fa-chart-line"></i>
                             <span class="nav-text">Investment Advisory</span>
                             <i class="nav-arrow fas fa-chevron-right"></i>
                         </a>
                         <div class="nav-submenu">
-                            <a class="nav-sublink" onclick="showSection('portfolio-main')">
-                                <i class="fas fa-briefcase"></i> Portfolio Analysis
+                            <a class="nav-sublink" onclick="showSection('recommendations')">
+                                <i class="fas fa-lightbulb"></i> Investment Plan
                             </a>
-                            <a class="nav-sublink" onclick="showSection('recommendations-main')">
-                                <i class="fas fa-lightbulb"></i> Investment Recommendations
+                            <a class="nav-sublink" onclick="showSection('portfolio')">
+                                <i class="fas fa-pie-chart"></i> Portfolio Analysis
                             </a>
-                            <a class="nav-sublink" onclick="showSection('tax-planning')">
-                                <i class="fas fa-file-invoice-dollar"></i> Tax Planning
+                            <a class="nav-sublink" onclick="showSection('sip')">
+                                <i class="fas fa-calendar-check"></i> SIP Calculator
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('tax')">
+                                <i class="fas fa-receipt"></i> Tax Planning
                             </a>
                             <a class="nav-sublink" onclick="showSection('retirement')">
                                 <i class="fas fa-umbrella"></i> Retirement
@@ -841,22 +818,22 @@
                             <div class="card-icon"><i class="fas fa-user-edit"></i></div>
                             <h3 class="card-title">Client Profile</h3>
                             <p class="card-description">Build your comprehensive financial profile with personal information and financial status.</p>
-                            <div class="card-action">
-                                <button class="btn btn-primary" onclick="showSection('basic-info')">
-                                    <i class="fas fa-edit"></i> Update Profile
-                                </button>
-                            </div>
+                                                         <div class="card-action">
+                                 <button class="btn btn-primary" onclick="showSection('profile')">
+                                     <i class="fas fa-edit"></i> Update Profile
+                                 </button>
+                             </div>
                         </div>
 
                         <div class="dashboard-card">
                             <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
                             <h3 class="card-title">Investment Recommendations</h3>
                             <p class="card-description">Get personalized investment strategies powered by advanced algorithms and market analysis.</p>
-                            <div class="card-action">
-                                <button class="btn btn-primary" onclick="showSection('recommendations-main')">
-                                    <i class="fas fa-magic"></i> Get Recommendations
-                                </button>
-                            </div>
+                                                         <div class="card-action">
+                                 <button class="btn btn-primary" onclick="showSection('recommendations')">
+                                     <i class="fas fa-magic"></i> Get Recommendations
+                                 </button>
+                             </div>
                         </div>
 
                         <div class="dashboard-card">
@@ -914,7 +891,7 @@
                 </section>
 
                 <!-- Basic Information Section -->
-                <section id="basic-info" class="section">
+                <section id="profile" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Basic Information</h1>
                         <p class="section-subtitle">Tell us about yourself to create a personalized financial plan</p>
@@ -961,7 +938,7 @@
                 </section>
 
                 <!-- Financial Status Section -->
-                <section id="financial-status" class="section">
+                <section id="financial" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Financial Status</h1>
                         <p class="section-subtitle">Current financial position and monthly cash flow</p>
@@ -1002,7 +979,7 @@
                 </section>
 
                 <!-- Risk Profile Section -->
-                <section id="risk-profile" class="section">
+                <section id="risk" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Risk Assessment</h1>
                         <p class="section-subtitle">Determine your investment risk tolerance and profile</p>
@@ -1051,7 +1028,7 @@
                 </section>
 
                 <!-- SIP Calculator Section -->
-                <section id="sip-main" class="section">
+                <section id="sip" class="section">
                     <div class="section-header">
                         <h1 class="section-title">SIP Calculator</h1>
                         <p class="section-subtitle">Calculate your Systematic Investment Plan returns</p>
@@ -1096,54 +1073,42 @@
                     </div>
                 </section>
 
-                <!-- EMI Calculator Section -->
-                <section id="emi" class="section">
-                    <div class="section-header">
-                        <h1 class="section-title">EMI Calculator</h1>
-                        <p class="section-subtitle">Calculate your loan EMI and repayment schedule</p>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Loan EMI Calculator</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Loan Amount</label>
-                                <input type="number" class="form-input" id="loan-amount" placeholder="Enter loan amount">
-                            </div>
-                            <div class="form-group">
-                                <label>Interest Rate (%)</label>
-                                <input type="number" class="form-input" id="interest-rate" placeholder="Enter annual interest rate">
-                            </div>
-                            <div class="form-group">
-                                <label>Loan Tenure (Years)</label>
-                                <input type="number" class="form-input" id="loan-tenure" placeholder="Enter loan tenure">
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="calculateEMI()">
-                            <i class="fas fa-calculator"></i> Calculate EMI
-                        </button>
-                        <div id="emi-results" class="results-section" style="display: none; margin-top: 2rem;">
-                            <h4>EMI Calculation Results</h4>
-                            <div class="results-grid">
-                                <div class="result-item">
-                                    <span class="result-label">Monthly EMI:</span>
-                                    <span class="result-value" id="monthly-emi">₹0</span>
-                                </div>
-                                <div class="result-item">
-                                    <span class="result-label">Total Interest:</span>
-                                    <span class="result-value" id="total-interest">₹0</span>
-                                </div>
-                                <div class="result-item">
-                                    <span class="result-label">Total Amount:</span>
-                                    <span class="result-value" id="total-amount">₹0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                                 <!-- Net Worth Section -->
+                 <section id="networth" class="section">
+                     <div class="section-header">
+                         <h1 class="section-title">Net Worth Calculator</h1>
+                         <p class="section-subtitle">Calculate and track your net worth over time</p>
+                     </div>
+                     
+                     <div class="card">
+                         <h3>Net Worth Calculation</h3>
+                         <p>Track your assets and liabilities to calculate your net worth.</p>
+                         <div class="form-grid">
+                             <div class="form-group">
+                                 <label>Cash & Bank Balance</label>
+                                 <input type="number" class="form-input" placeholder="Enter cash and bank balance">
+                             </div>
+                             <div class="form-group">
+                                 <label>Investments</label>
+                                 <input type="number" class="form-input" placeholder="Enter total investments">
+                             </div>
+                             <div class="form-group">
+                                 <label>Property Value</label>
+                                 <input type="number" class="form-input" placeholder="Enter property value">
+                             </div>
+                             <div class="form-group">
+                                 <label>Outstanding Loans</label>
+                                 <input type="number" class="form-input" placeholder="Enter total loans">
+                             </div>
+                         </div>
+                         <button class="btn btn-primary">
+                             <i class="fas fa-calculator"></i> Calculate Net Worth
+                         </button>
+                     </div>
+                 </section>
 
                 <!-- Tax Planning Section -->
-                <section id="tax-planning" class="section">
+                <section id="tax" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Tax Planning</h1>
                         <p class="section-subtitle">Optimize your tax savings and plan your investments</p>
@@ -1191,37 +1156,9 @@
                     </div>
                 </section>
 
-                <!-- All other sections would follow the same pattern -->
-                <!-- Adding placeholders for remaining sections -->
-                <section id="net-worth" class="section">
-                    <div class="section-header">
-                        <h1 class="section-title">Net Worth Calculator</h1>
-                        <p class="section-subtitle">Calculate and track your net worth over time</p>
-                    </div>
-                    <div class="card">
-                        <h3>Net Worth Calculation</h3>
-                        <p>Track your assets and liabilities to calculate your net worth.</p>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-coins"></i> Calculate Net Worth
-                        </button>
-                    </div>
-                </section>
+                
 
-                <section id="insurance" class="section">
-                    <div class="section-header">
-                        <h1 class="section-title">Insurance Needs</h1>
-                        <p class="section-subtitle">Calculate your insurance requirements</p>
-                    </div>
-                    <div class="card">
-                        <h3>Insurance Needs Analysis</h3>
-                        <p>Determine the optimal insurance coverage for your family.</p>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-shield-alt"></i> Calculate Insurance Needs
-                        </button>
-                    </div>
-                </section>
-
-                <section id="portfolio-main" class="section">
+                <section id="portfolio" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Portfolio Analysis</h1>
                         <p class="section-subtitle">Analyze your investment portfolio performance</p>
@@ -1235,7 +1172,7 @@
                     </div>
                 </section>
 
-                <section id="recommendations-main" class="section">
+                <section id="recommendations" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Investment Recommendations</h1>
                         <p class="section-subtitle">Advanced investment recommendations based on your profile</p>
@@ -1375,19 +1312,7 @@
                     </div>
                 </section>
 
-                <section id="profiles" class="section">
-                    <div class="section-header">
-                        <h1 class="section-title">Client Profiles</h1>
-                        <p class="section-subtitle">Manage multiple client profiles</p>
-                    </div>
-                    <div class="card">
-                        <h3>Profile Management</h3>
-                        <p>Create and manage multiple client profiles for comprehensive financial planning.</p>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-users"></i> Manage Profiles
-                        </button>
-                    </div>
-                </section>
+                
             </div>
         </main>
     </div>

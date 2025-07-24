@@ -9064,65 +9064,73 @@
         }
         
         function validateUserData() {
-            // Use the integrated ecosystem to check profile completeness
-            const clientProfile = FinancialEcosystem.getClientProfile();
             const missingFields = [];
             
-            console.log('VALIDATION DEBUG - Client Profile:', clientProfile);
+            console.log('VALIDATION DEBUG - Checking user data...');
             
-            // Check if ecosystem has complete data
-            if (clientProfile.isComplete) {
-                console.log('VALIDATION RESULT: Profile is complete!');
-                return { isValid: true, missingFields: [] };
-            }
+            // MUCH MORE FLEXIBLE VALIDATION - Only check essentials
             
-            // If ecosystem data is incomplete, check individual fields as fallback
+            // 1. Age check - Multiple possible fields
             const age = document.getElementById('current-age')?.value || 
                        document.getElementById('client-age')?.value ||
                        document.getElementById('insurance-age')?.value;
+            
+            // 2. Income check  
             const income = document.getElementById('monthly-income')?.value;
             
-            console.log('Fallback check - Age found:', age, 'Income found:', income);
+            console.log('Basic check - Age:', age, 'Income:', income);
             
-            if (!age || !income) {
-                missingFields.push('Complete your Personal Profile (Age, Income)');
+            // Only require age OR income (not both)
+            if (!age && !income) {
+                missingFields.push('Enter either your Age or Monthly Income');
             }
             
-            // Check Risk Assessment - More flexible
+            // 3. Risk Assessment - VERY FLEXIBLE
             const riskData = localStorage.getItem('riskAssessmentData');
             const riskQuestions = document.querySelectorAll('input[name^="risk"]:checked').length;
+            const hasAnyRiskInput = document.querySelector('input[type="radio"]:checked') || 
+                                   document.querySelector('select')?.value ||
+                                   riskQuestions > 0;
             
-            console.log('Risk localStorage:', !!riskData, 'Risk questions answered:', riskQuestions);
+            console.log('Risk check - localStorage:', !!riskData, 'Questions:', riskQuestions, 'Any input:', !!hasAnyRiskInput);
             
-            if (!riskData && riskQuestions < 3) {
-                missingFields.push('Complete Risk Assessment');
+            // Accept if ANY risk-related input exists
+            if (!riskData && riskQuestions < 1 && !hasAnyRiskInput) {
+                missingFields.push('Complete at least part of Risk Assessment');
             }
             
-            // Check Goals - More flexible  
+            // 4. Goals - SUPER FLEXIBLE
             const goalsData = localStorage.getItem('financialGoals');
-            const hasGoals = document.querySelector('#financial-goals input[type="number"]')?.value ||
+            const hasGoals = document.querySelector('input[type="number"]')?.value ||
                             document.getElementById('retirement-goal')?.value ||
                             document.getElementById('home-goal')?.value ||
-                            document.getElementById('education-goal')?.value;
+                            document.getElementById('education-goal')?.value ||
+                            document.getElementById('sip-amount')?.value ||
+                            document.getElementById('investment-amount')?.value;
             
-            console.log('Goals localStorage:', !!goalsData, 'Has goals input:', !!hasGoals);
+            console.log('Goals check - localStorage:', !!goalsData, 'Has any goal:', !!hasGoals);
             
+            // Accept if ANY financial goal exists
             if (!goalsData && !hasGoals) {
-                missingFields.push('Set your Financial Goals');
+                missingFields.push('Set at least one Financial Goal or Investment Amount');
             }
             
-            // Check Financial Status - Multiple possible fields
+            // 5. Financial Status - VERY FLEXIBLE
             const currentSavings = document.getElementById('current-savings')?.value ||
                                  document.getElementById('savings-amount')?.value ||
                                  document.getElementById('current-assets')?.value;
             
-            console.log('Current savings found:', currentSavings);
+            const monthlyExpenses = document.getElementById('monthly-expenses')?.value ||
+                                  document.getElementById('current-monthly-expenses')?.value;
             
-            if (!currentSavings) {
-                missingFields.push('Enter your Current Financial Status');
+            console.log('Financial check - Savings:', currentSavings, 'Expenses:', monthlyExpenses);
+            
+            // Accept if EITHER savings OR expenses exists
+            if (!currentSavings && !monthlyExpenses) {
+                missingFields.push('Enter either Current Savings or Monthly Expenses');
             }
             
-            console.log('VALIDATION RESULT:', {
+            console.log('FLEXIBLE VALIDATION RESULT:', {
                 isValid: missingFields.length === 0,
                 missingFields: missingFields
             });
@@ -9646,12 +9654,13 @@
                 console.log(`Updated ${section}.${field} = ${value}`);
             },
             
-            // Auto-populate same field across all sections
+                            // Auto-populate same field across all sections
             autoPopulateFields(fieldName, value) {
                 const fieldMappings = {
                     'age': ['current-age', 'client-age', 'insurance-age', 'retirement-calc-age'],
                     'income': ['monthly-income', 'salary-input', 'income-amount'],
-                    'savings': ['current-savings', 'savings-amount', 'current-assets', 'investment-amount']
+                    'savings': ['current-savings', 'savings-amount', 'current-assets', 'investment-amount'],
+                    'expenses': ['monthly-expenses', 'current-monthly-expenses', 'retirement-expenses']
                 };
                 
                 const relatedFields = fieldMappings[fieldName] || [fieldName];
@@ -9920,6 +9929,23 @@
                                 }
                             } catch (error) {
                                 console.error(`Error updating savings from ${fieldId}:`, error);
+                            }
+                        });
+                    }
+                });
+                
+                // Monthly expenses integration - SAME FIELD DIFFERENT NAMES
+                ['monthly-expenses', 'current-monthly-expenses', 'retirement-expenses'].forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('input', function() {
+                            try {
+                                const value = parseFloat(this.value) || 0;
+                                if (value >= 0) {
+                                    FinancialEcosystem.updateClientData('financial', 'monthlyExpenses', value);
+                                }
+                            } catch (error) {
+                                console.error(`Error updating expenses from ${fieldId}:`, error);
                             }
                         });
                     }

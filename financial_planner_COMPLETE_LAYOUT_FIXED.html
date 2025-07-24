@@ -1899,7 +1899,7 @@
                         <div id="cg-tax-integration">
                             <div style="text-align: center; padding: 2rem; color: var(--text-gray);">
                                 <i class="fas fa-link" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                                <p><strong>Workflow:</strong> Calculate your capital gains above → Add to portfolio → Integrate → Go to Tax Planning section for total tax liability.</p>
+                                <p><strong>Workflow:</strong> Calculate your capital gains above | Add to portfolio | Integrate | Go to Tax Planning section for total tax liability.</p>
                                 <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
                                     <button type="button" class="btn btn-accent" onclick="integrateWithTaxPlanning()">
                                         <i class="fas fa-link"></i> Integrate Capital Gains
@@ -4572,19 +4572,19 @@
                     <div style="display: grid; gap: 0.8rem;">
                         <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
                             <span style="color: var(--text-gray);">Equity</span>
-                            <span style="color: var(--accent-gold);">${currentAllocation.equity}% → ${targetAllocation.equity}%</span>
+                                                                <span style="color: var(--accent-gold);">${currentAllocation.equity}% to ${targetAllocation.equity}%</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
                             <span style="color: var(--text-gray);">Debt</span>
-                            <span style="color: var(--accent-white);">${currentAllocation.debt}% → ${targetAllocation.debt}%</span>
+                                                                <span style="color: var(--accent-white);">${currentAllocation.debt}% to ${targetAllocation.debt}%</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
                             <span style="color: var(--text-gray);">Gold</span>
-                            <span style="color: var(--accent-silver);">${currentAllocation.gold}% → ${targetAllocation.gold}%</span>
+                                                                <span style="color: var(--accent-silver);">${currentAllocation.gold}% to ${targetAllocation.gold}%</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding: 0.5rem;">
                             <span style="color: var(--text-gray);">Cash</span>
-                            <span style="color: var(--text-gray);">${currentAllocation.cash}% → ${targetAllocation.cash}%</span>
+                                                                <span style="color: var(--text-gray);">${currentAllocation.cash}% to ${targetAllocation.cash}%</span>
                         </div>
                     </div>
                 </div>
@@ -5976,7 +5976,7 @@
                                         <div style="flex: 1; background: var(--border-gray); height: 8px; border-radius: 4px; overflow: hidden;">
                                             <div style="background: var(--accent-gold); height: 100%; width: ${currentPercent}%; transition: width 0.3s ease;"></div>
                                         </div>
-                                        <div style="color: var(--text-gray); font-size: 0.9rem; min-width: 80px;">${currentPercent}% → ${targetPercent}%</div>
+                                        <div style="color: var(--text-gray); font-size: 0.9rem; min-width: 80px;">${currentPercent}% to ${targetPercent}%</div>
                                     </div>
                                     <div style="color: ${statusColor}; font-weight: bold; text-align: center; font-size: 0.9rem;">
                                         ${status === 'balanced' ? 'Balanced' : status === 'underweight' ? `+${Math.abs(difference).toFixed(1)}%` : `-${Math.abs(difference).toFixed(1)}%`}
@@ -8226,7 +8226,7 @@
             assetAllocationChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['💰 Liquid Assets', '📈 Investment Assets', '🏠 Physical Assets'],
+                    labels: ['Liquid Assets', 'Investment Assets', 'Physical Assets'],
                     datasets: [{
                         data: [data.liquidAssets, data.investmentAssets, data.physicalAssets],
                         backgroundColor: [
@@ -8295,7 +8295,7 @@
                                 label: function(context) {
                                     const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
                                     const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : '0';
-                                    return `${context.label.replace(/[💰📈🏠]/g, '').trim()}: ₹${context.parsed.toLocaleString('en-IN')} (${percentage}%)`;
+                                    return `${context.label}: ₹${context.parsed.toLocaleString('en-IN')} (${percentage}%)`;
                                 }
                             }
                         }
@@ -8519,7 +8519,7 @@
                 data: {
                     labels: data.map(d => new Date(d.date).toLocaleDateString('en-IN')),
                     datasets: [{
-                        label: '📈 Net Worth Progression',
+                        label: 'Net Worth Progression',
                         data: data.map(d => d.netWorth),
                         borderColor: '#00d4aa',
                         backgroundColor: 'rgba(0, 212, 170, 0.15)',
@@ -8588,7 +8588,7 @@
                                 label: function(context) {
                                     const value = context.parsed.y;
                                     const isPositive = value >= 0;
-                                    return `💰 Net Worth: ₹${Math.abs(value).toLocaleString('en-IN')} ${isPositive ? '(Positive)' : '(Negative)'}`;
+                                    return `Net Worth: ₹${Math.abs(value).toLocaleString('en-IN')} ${isPositive ? '(Positive)' : '(Negative)'}`;
                                 }
                             }
                         }

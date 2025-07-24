@@ -1488,25 +1488,37 @@
                          <p>Track your assets and liabilities to calculate your net worth.</p>
                          <div class="form-grid">
                              <div class="form-group">
-                                 <label>Cash & Bank Balance</label>
-                                 <input type="number" class="form-input" placeholder="Enter cash and bank balance">
+                                 <label>Cash & Bank Balance (₹)</label>
+                                 <input type="number" id="cash-balance" class="form-input" placeholder="Enter cash and bank balance">
                              </div>
                              <div class="form-group">
-                                 <label>Investments</label>
-                                 <input type="number" class="form-input" placeholder="Enter total investments">
+                                 <label>Investments (₹)</label>
+                                 <input type="number" id="investments" class="form-input" placeholder="Enter total investments">
                              </div>
                              <div class="form-group">
-                                 <label>Property Value</label>
-                                 <input type="number" class="form-input" placeholder="Enter property value">
+                                 <label>Property Value (₹)</label>
+                                 <input type="number" id="property-value" class="form-input" placeholder="Enter property value">
                              </div>
                              <div class="form-group">
-                                 <label>Outstanding Loans</label>
-                                 <input type="number" class="form-input" placeholder="Enter total loans">
+                                 <label>Outstanding Loans (₹)</label>
+                                 <input type="number" id="outstanding-loans" class="form-input" placeholder="Enter total loans">
+                             </div>
+                             <div class="form-group">
+                                 <label>Other Assets (₹)</label>
+                                 <input type="number" id="other-assets" class="form-input" placeholder="Enter other assets">
+                             </div>
+                             <div class="form-group">
+                                 <label>Credit Card Debt (₹)</label>
+                                 <input type="number" id="credit-card-debt" class="form-input" placeholder="Enter credit card debt">
                              </div>
                          </div>
-                         <button class="btn btn-primary">
+                         <button class="btn btn-primary" onclick="calculateNetWorth()">
                              <i class="fas fa-calculator"></i> Calculate Net Worth
                          </button>
+                         
+                         <div id="networth-results" style="display: none; margin-top: 2rem;">
+                             <!-- Results will be displayed here -->
+                         </div>
                      </div>
                  </section>
 
@@ -4034,13 +4046,14 @@
             }
             
             // Calculate portfolio metrics
+            const actualInvested = totalInvested || (totalValue * 0.8); // Default to 80% if not provided (assume 20% returns)
             const portfolioData = {
                 totalValue: totalValue,
-                totalInvested: totalInvested || totalValue,
+                totalInvested: actualInvested,
                 monthlySIP: monthlySIP,
                 startDate: startDate,
                 allocation: { equity, debt, gold, cash },
-                totalReturns: totalValue - (totalInvested || totalValue)
+                totalReturns: totalValue - actualInvested
             };
             
             // Update notice to show this is user's real data analysis
@@ -5099,6 +5112,87 @@
             document.getElementById('income-stability').value = '';
             document.getElementById('financial-goals').value = '';
             document.getElementById('loss-tolerance').value = '';
+        }
+
+        function calculateNetWorth() {
+            const cashBalance = parseFloat(document.getElementById('cash-balance').value) || 0;
+            const investments = parseFloat(document.getElementById('investments').value) || 0;
+            const propertyValue = parseFloat(document.getElementById('property-value').value) || 0;
+            const outstandingLoans = parseFloat(document.getElementById('outstanding-loans').value) || 0;
+            const otherAssets = parseFloat(document.getElementById('other-assets').value) || 0;
+            const creditCardDebt = parseFloat(document.getElementById('credit-card-debt').value) || 0;
+            
+            // Calculate totals
+            const totalAssets = cashBalance + investments + propertyValue + otherAssets;
+            const totalLiabilities = outstandingLoans + creditCardDebt;
+            const netWorth = totalAssets - totalLiabilities;
+            
+            // Display results
+            const resultsDiv = document.getElementById('networth-results');
+            resultsDiv.style.display = 'block';
+            
+            resultsDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem; text-transform: uppercase;">Total Assets</div>
+                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--accent-gold);">₹${totalAssets.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem; text-transform: uppercase;">Total Liabilities</div>
+                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--accent-silver);">₹${totalLiabilities.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem; text-transform: uppercase;">Net Worth</div>
+                        <div style="font-size: 2rem; font-weight: bold; color: ${netWorth >= 0 ? 'var(--accent-gold)' : '#ff6b6b'};">₹${netWorth.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                    <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Asset Breakdown</h4>
+                    <div style="display: grid; gap: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Cash & Bank Balance</span>
+                            <span style="color: var(--accent-white); font-weight: bold;">₹${cashBalance.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Investments</span>
+                            <span style="color: var(--accent-white); font-weight: bold;">₹${investments.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Property Value</span>
+                            <span style="color: var(--accent-white); font-weight: bold;">₹${propertyValue.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Other Assets</span>
+                            <span style="color: var(--accent-white); font-weight: bold;">₹${otherAssets.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                    <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Liability Breakdown</h4>
+                    <div style="display: grid; gap: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Outstanding Loans</span>
+                            <span style="color: var(--accent-silver); font-weight: bold;">₹${outstandingLoans.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem;">
+                            <span style="color: var(--text-gray);">Credit Card Debt</span>
+                            <span style="color: var(--accent-silver); font-weight: bold;">₹${creditCardDebt.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,215,0,0.05); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
+                    <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Net Worth Analysis</h5>
+                    <p style="color: var(--text-gray); line-height: 1.6; margin: 0;">
+                        ${netWorth >= 0 
+                            ? `Your net worth is positive at ₹${netWorth.toLocaleString('en-IN')}. This indicates good financial health with assets exceeding liabilities.`
+                            : `Your net worth is negative at ₹${Math.abs(netWorth).toLocaleString('en-IN')}. Focus on reducing liabilities and increasing assets to improve your financial position.`
+                        }
+                    </p>
+                </div>
+            `;
         }
 
         function calculateTaxSavings() {

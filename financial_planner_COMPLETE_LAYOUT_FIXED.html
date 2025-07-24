@@ -7064,34 +7064,64 @@
                 // Update HRA breakdown
                 updateHRABreakdown(basicSalary, hraReceived, monthlyRent, cityType, hraExemption);
                 
-                // Calculate taxable income
+                // Calculate taxable income for old regime (with deductions)
                 const totalDeductions = eligible80c + healthInsurance80d + parentsHealthInsurance + 
                                       homeLoanInterest + educationLoanInterest + nps80ccd + donations80g;
                 
-                const taxableIncome = Math.max(0, grossSalary - hraExemption - totalDeductions);
+                const oldRegimeTaxableIncome = Math.max(0, grossSalary - hraExemption - totalDeductions);
                 
                 // Get selected regime
                 const selectedRegime = document.getElementById('selected-tax-regime')?.value || 'old';
                 
+                // Prepare deduction data for tax calculations
+                const deductionData = {
+                    hraExemption,
+                    total80c: eligible80c,
+                    healthInsurance80d,
+                    parentsHealthInsurance,
+                    homeLoanInterest,
+                    educationLoanInterest,
+                    nps80ccd,
+                    donations80g,
+                    totalDeductions
+                };
+                
                 // Calculate tax based on regime
                 let taxCalculation;
                 if (selectedRegime === 'compare') {
-                    const oldRegimeTax = calculateTaxByRegime(grossSalary, 'old');
-                    const newRegimeTax = calculateTaxByRegime(grossSalary, 'new');
+                    const oldRegimeTax = calculateTaxByRegimeWithDeductions(grossSalary, 'old', deductionData);
+                    const newRegimeTax = calculateTaxByRegimeWithDeductions(grossSalary, 'new', deductionData);
                     taxCalculation = { oldRegime: oldRegimeTax, newRegime: newRegimeTax, comparison: true };
                 } else {
-                    taxCalculation = calculateTaxByRegime(grossSalary, selectedRegime);
+                    taxCalculation = calculateTaxByRegimeWithDeductions(grossSalary, selectedRegime, deductionData);
+                }
+                
+                // Add capital gains tax if available
+                const storedCGTax = localStorage.getItem('capitalGainsTax');
+                const capitalGainsTax = storedCGTax ? parseFloat(storedCGTax) : 0;
+                
+                if (capitalGainsTax > 0) {
+                    if (selectedRegime === 'compare') {
+                        taxCalculation.oldRegime.totalTaxWithCess += capitalGainsTax;
+                        taxCalculation.newRegime.totalTaxWithCess += capitalGainsTax;
+                        taxCalculation.oldRegime.capitalGainsTax = capitalGainsTax;
+                        taxCalculation.newRegime.capitalGainsTax = capitalGainsTax;
+                    } else {
+                        taxCalculation.totalTaxWithCess += capitalGainsTax;
+                        taxCalculation.capitalGainsTax = capitalGainsTax;
+                    }
                 }
                 
                 // Display results using new Part 2 functions
                 if (selectedRegime === 'compare') {
-                    displayTaxResults(taxCalculation.oldRegime, taxCalculation.newRegime, selectedRegime, grossSalary, taxableIncome);
+                    displayTaxResults(taxCalculation.oldRegime, taxCalculation.newRegime, selectedRegime, grossSalary, oldRegimeTaxableIncome);
                 } else {
-                    displayTaxResults(taxCalculation, null, selectedRegime, grossSalary, taxableIncome);
+                    displayTaxResults(taxCalculation, null, selectedRegime, grossSalary, oldRegimeTaxableIncome);
                 }
                 
             } catch (error) {
                 console.error('Error calculating advanced tax:', error);
+                alert('Error calculating tax. Please check your inputs and try again.');
             }
         }
 
@@ -7134,6 +7164,129 @@
                     </div>
                 </div>
             `;
+        }
+
+        function calculateTaxByRegimeWithDeductions(grossIncome, regime, deductions = {}) {
+            let tax = 0;
+            let cess = 0;
+            let totalTax = 0;
+            let effectiveRate = 0;
+            let taxBreakdown = [];
+            let standardDeduction = regime === 'old' ? 50000 : 75000;
+            let rebateAmount = 0;
+            let taxableIncome = 0;
+            
+            if (regime === 'old') {
+                // Old regime: Apply all deductions
+                taxableIncome = Math.max(0, grossIncome - standardDeduction - (deductions.totalDeductions || 0) - (deductions.hraExemption || 0));
+                
+                // Old Tax Regime Slabs (FY 2024-25)
+                if (taxableIncome > 250000) {
+                    if (taxableIncome <= 500000) {
+                        const taxableAmount = taxableIncome - 250000;
+                        const slabTax = taxableAmount * 0.05;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: slabTax });
+                    } else if (taxableIncome <= 1000000) {
+                        tax += 12500; // 5% on 2.5L to 5L
+                        const taxableAmount = taxableIncome - 500000;
+                        const slabTax = taxableAmount * 0.2;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: 12500 });
+                        taxBreakdown.push({ slab: '₹5L - ₹10L', rate: '20%', amount: slabTax });
+                    } else {
+                        tax += 12500; // 5% on 2.5L to 5L
+                        tax += 100000; // 20% on 5L to 10L
+                        const taxableAmount = taxableIncome - 1000000;
+                        const slabTax = taxableAmount * 0.3;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: 12500 });
+                        taxBreakdown.push({ slab: '₹5L - ₹10L', rate: '20%', amount: 100000 });
+                        taxBreakdown.push({ slab: 'Above ₹10L', rate: '30%', amount: slabTax });
+                    }
+                }
+                
+                // Section 87A Rebate for Old Regime (up to ₹5L income)
+                if (grossIncome <= 500000) {
+                    rebateAmount = Math.min(tax, 12500);
+                    tax = Math.max(0, tax - rebateAmount);
+                }
+                
+            } else {
+                // New regime: Only standard deduction, no other deductions
+                taxableIncome = Math.max(0, grossIncome - standardDeduction);
+                
+                // New Tax Regime Slabs (FY 2024-25)
+                if (taxableIncome > 300000) {
+                    if (taxableIncome <= 600000) {
+                        const taxableAmount = taxableIncome - 300000;
+                        const slabTax = taxableAmount * 0.05;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: slabTax });
+                    } else if (taxableIncome <= 900000) {
+                        tax += 15000; // 5% on 3L to 6L
+                        const taxableAmount = taxableIncome - 600000;
+                        const slabTax = taxableAmount * 0.1;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
+                        taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: slabTax });
+                    } else if (taxableIncome <= 1200000) {
+                        tax += 15000 + 30000; // Previous slabs
+                        const taxableAmount = taxableIncome - 900000;
+                        const slabTax = taxableAmount * 0.15;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
+                        taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: 30000 });
+                        taxBreakdown.push({ slab: '₹9L - ₹12L', rate: '15%', amount: slabTax });
+                    } else if (taxableIncome <= 1500000) {
+                        tax += 15000 + 30000 + 45000; // Previous slabs
+                        const taxableAmount = taxableIncome - 1200000;
+                        const slabTax = taxableAmount * 0.2;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
+                        taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: 30000 });
+                        taxBreakdown.push({ slab: '₹9L - ₹12L', rate: '15%', amount: 45000 });
+                        taxBreakdown.push({ slab: '₹12L - ₹15L', rate: '20%', amount: slabTax });
+                    } else {
+                        tax += 15000 + 30000 + 45000 + 60000; // Previous slabs
+                        const taxableAmount = taxableIncome - 1500000;
+                        const slabTax = taxableAmount * 0.3;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
+                        taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: 30000 });
+                        taxBreakdown.push({ slab: '₹9L - ₹12L', rate: '15%', amount: 45000 });
+                        taxBreakdown.push({ slab: '₹12L - ₹15L', rate: '20%', amount: 60000 });
+                        taxBreakdown.push({ slab: 'Above ₹15L', rate: '30%', amount: slabTax });
+                    }
+                }
+                
+                // Section 87A Rebate for New Regime (up to ₹7L income)
+                if (grossIncome <= 700000) {
+                    rebateAmount = Math.min(tax, 25000);
+                    tax = Math.max(0, tax - rebateAmount);
+                }
+            }
+            
+            // Calculate cess (4% of tax)
+            cess = tax * 0.04;
+            totalTax = tax + cess;
+            effectiveRate = grossIncome > 0 ? (totalTax / grossIncome * 100) : 0;
+            
+            return {
+                income: grossIncome,
+                grossIncome: grossIncome,
+                standardDeduction,
+                taxableIncome,
+                tax,
+                rebateAmount,
+                cess,
+                totalTax: totalTax,
+                totalTaxWithCess: totalTax,
+                effectiveRate,
+                taxBreakdown,
+                regime,
+                deductions: deductions
+            };
         }
 
         function calculateTaxByRegime(income, regime) {
@@ -7378,13 +7531,14 @@
                 createTaxComparisonChart(oldRegimeTax, newRegimeTax);
                 
             } else {
-                // Single regime view
-                const taxData = selectedRegime === 'old' ? oldRegimeTax : newRegimeTax;
+                // Single regime view - oldRegimeTax contains the single regime data
+                const taxData = oldRegimeTax;
                 const effectiveRate = ((taxData.totalTaxWithCess / grossSalary) * 100).toFixed(2);
+                const regimeName = taxData.regime === 'old' ? 'Old' : 'New';
                 
                 resultsDiv.innerHTML = `
                     <div style="background: var(--card-black); border-radius: 12px; padding: 2rem; border: 1px solid var(--border-gray);">
-                        <h4 style="color: var(--text-white); margin-bottom: 2rem; text-align: center; font-size: 20px;">${selectedRegime === 'old' ? 'Old' : 'New'} Tax Regime Results</h4>
+                        <h4 style="color: var(--text-white); margin-bottom: 2rem; text-align: center; font-size: 20px;">${regimeName} Tax Regime Results</h4>
                         
                         <div style="background: var(--primary-black); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #333;">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
@@ -8953,42 +9107,114 @@
         }
 
         function integrateWithTaxPlanning() {
-            const totalCGTax = window.totalCapitalGainsTax || 0;
-            if (totalCGTax === 0) {
-                alert('Please calculate capital gains first by adding assets to your portfolio.');
-                return;
+            try {
+                const totalCGTax = window.totalCapitalGainsTax || 0;
+                if (totalCGTax === 0) {
+                    alert('Please calculate capital gains first by adding assets to your portfolio.');
+                    return;
+                }
+
+                // Show integration message
+                document.getElementById('cg-tax-integration').innerHTML = `
+                    <div style="background: var(--primary-black); padding: 2rem; border-radius: 12px; border: 1px solid var(--accent-gold);">
+                        <div style="text-align: center; margin-bottom: 1.5rem;">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 1rem;"></i>
+                            <h4 style="color: var(--accent-gold); margin: 0;">Integration Ready</h4>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                            <div style="text-align: center;">
+                                <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Capital Gains Tax</div>
+                                <div style="color: #ff6b6b; font-size: 24px; font-weight: 700;">₹${Math.round(totalCGTax).toLocaleString('en-IN')}</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Status</div>
+                                <div style="color: var(--accent-gold); font-size: 16px; font-weight: 600;">Ready for Tax Planning</div>
+                            </div>
+                        </div>
+                        <div style="text-align: center;">
+                            <p style="color: var(--text-gray); margin-bottom: 1rem;">Your capital gains tax of ₹${Math.round(totalCGTax).toLocaleString('en-IN')} is ready to be added to your income tax calculation.</p>
+                            <button type="button" class="btn btn-primary" onclick="goToTaxPlanningSection()">
+                                <i class="fas fa-arrow-right"></i> Go to Tax Planning
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Store for later use in tax planning
+                localStorage.setItem('capitalGainsTax', totalCGTax.toString());
+                
+                alert(`Capital gains tax of ₹${Math.round(totalCGTax).toLocaleString('en-IN')} is now ready for integration. Go to Tax Planning section to see your total tax liability.`);
+            } catch (error) {
+                console.error('Error in integrateWithTaxPlanning:', error);
+                alert('Error integrating capital gains. Please try again.');
             }
+        }
 
-            // Show integration message
-            document.getElementById('cg-tax-integration').innerHTML = `
-                <div style="background: var(--primary-black); padding: 2rem; border-radius: 12px; border: 1px solid var(--accent-gold);">
-                    <div style="text-align: center; margin-bottom: 1.5rem;">
-                        <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 1rem;"></i>
-                        <h4 style="color: var(--accent-gold); margin: 0;">Integration Ready</h4>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-                        <div style="text-align: center;">
-                            <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Capital Gains Tax</div>
-                            <div style="color: #ff6b6b; font-size: 24px; font-weight: 700;">₹${Math.round(totalCGTax).toLocaleString('en-IN')}</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="color: var(--text-gray); font-size: 14px; margin-bottom: 8px;">Status</div>
-                            <div style="color: var(--accent-gold); font-size: 16px; font-weight: 600;">Ready for Tax Planning</div>
-                        </div>
-                    </div>
-                    <div style="text-align: center;">
-                        <p style="color: var(--text-gray); margin-bottom: 1rem;">Your capital gains tax of ₹${Math.round(totalCGTax).toLocaleString('en-IN')} is ready to be added to your income tax calculation.</p>
-                        <button type="button" class="btn btn-primary" onclick="showSection('tax-planning')">
-                            <i class="fas fa-arrow-right"></i> Go to Tax Planning
-                        </button>
-                    </div>
-                </div>
-            `;
+        function goToTaxPlanningSection() {
+            try {
+                // Hide all sections first
+                const sections = document.querySelectorAll('.section');
+                sections.forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Show tax planning section
+                const taxSection = document.getElementById('tax');
+                if (taxSection) {
+                    taxSection.style.display = 'block';
+                    
+                    // Update sidebar active state
+                    const sidebarItems = document.querySelectorAll('.sidebar-item');
+                    sidebarItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    const taxSidebarItem = document.querySelector('[onclick="showSection(\'tax\')"]');
+                    if (taxSidebarItem) {
+                        taxSidebarItem.classList.add('active');
+                    }
+                    
+                    // Scroll to top of tax section
+                    taxSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    
+                    // Auto-populate capital gains if available
+                    const storedCGTax = localStorage.getItem('capitalGainsTax');
+                    if (storedCGTax && parseFloat(storedCGTax) > 0) {
+                        // Show capital gains integration message in tax planning
+                        showCapitalGainsIntegration(parseFloat(storedCGTax));
+                    }
+                } else {
+                    console.error('Tax planning section not found');
+                    alert('Tax planning section not found. Please check the page.');
+                }
+            } catch (error) {
+                console.error('Error navigating to tax planning:', error);
+                alert('Error navigating to tax planning. Please try again.');
+            }
+        }
 
-            // Store for later use in tax planning
-            localStorage.setItem('capitalGainsTax', totalCGTax.toString());
-            
-            alert(`Capital gains tax of ₹${Math.round(totalCGTax).toLocaleString('en-IN')} is now ready for integration. Go to Tax Planning section to see your total tax liability.`);
+        function showCapitalGainsIntegration(cgTax) {
+            // Add capital gains integration notice to tax planning section
+            const taxSection = document.getElementById('tax');
+            if (taxSection) {
+                let integrationNotice = document.getElementById('cg-integration-notice');
+                if (!integrationNotice) {
+                    integrationNotice = document.createElement('div');
+                    integrationNotice.id = 'cg-integration-notice';
+                    integrationNotice.style.marginBottom = '2rem';
+                    taxSection.insertBefore(integrationNotice, taxSection.firstChild.nextSibling);
+                }
+                
+                integrationNotice.innerHTML = `
+                    <div class="card" style="background: linear-gradient(135deg, #1a365d, #2c5282); border: 2px solid var(--accent-gold);">
+                        <div style="text-align: center; padding: 1.5rem;">
+                            <i class="fas fa-link" style="font-size: 2rem; color: var(--accent-gold); margin-bottom: 1rem;"></i>
+                            <h4 style="color: var(--accent-gold); margin: 0 0 0.5rem 0;">Capital Gains Integrated</h4>
+                            <p style="color: var(--text-white); margin: 0;">Capital gains tax of ₹${Math.round(cgTax).toLocaleString('en-IN')} will be added to your total tax liability</p>
+                        </div>
+                    </div>
+                `;
+            }
         }
     </script>
 

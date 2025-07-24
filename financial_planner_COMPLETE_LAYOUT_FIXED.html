@@ -9656,23 +9656,42 @@
 
         function calculateRetirement() {
             try {
-                // Get all input values
-                const currentAge = parseFloat(document.getElementById('current-age').value) || 0;
-                const retirementAge = parseFloat(document.getElementById('retirement-age').value) || 0;
-                const lifeExpectancy = parseFloat(document.getElementById('life-expectancy').value) || 85;
-                const currentExpenses = parseFloat(document.getElementById('current-expenses').value) || 0;
-                const currentSavings = parseFloat(document.getElementById('current-savings').value) || 0;
-                const monthlySip = parseFloat(document.getElementById('monthly-sip').value) || 0;
-                const expectedReturn = parseFloat(document.getElementById('expected-return').value) || 12;
-                const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 6;
-                const postRetirementReturn = parseFloat(document.getElementById('post-retirement-return').value) || 8;
-                const lifestyleChoice = document.getElementById('lifestyle-choice').value;
-                const healthcareBuffer = parseFloat(document.getElementById('healthcare-buffer').value) || 20;
-                const emergencyBuffer = parseFloat(document.getElementById('emergency-buffer').value) || 12;
+                console.log('Starting retirement calculation...');
+                
+                // Get all input values with better error handling
+                const currentAge = parseFloat(document.getElementById('current-age')?.value) || 0;
+                const retirementAge = parseFloat(document.getElementById('retirement-age')?.value) || 0;
+                const lifeExpectancy = parseFloat(document.getElementById('life-expectancy')?.value) || 85;
+                const currentExpenses = parseFloat(document.getElementById('current-expenses')?.value) || 0;
+                const currentSavings = parseFloat(document.getElementById('current-savings')?.value) || 0;
+                const monthlySip = parseFloat(document.getElementById('monthly-sip')?.value) || 0;
+                const expectedReturn = parseFloat(document.getElementById('expected-return')?.value) || 12;
+                const inflationRate = parseFloat(document.getElementById('inflation-rate')?.value) || 6;
+                const postRetirementReturn = parseFloat(document.getElementById('post-retirement-return')?.value) || 8;
+                const lifestyleChoice = document.getElementById('lifestyle-choice')?.value || 'moderate';
+                const healthcareBuffer = parseFloat(document.getElementById('healthcare-buffer')?.value) || 20;
+                const emergencyBuffer = parseFloat(document.getElementById('emergency-buffer')?.value) || 12;
 
-                // Validation
-                if (currentAge <= 0 || retirementAge <= 0 || currentAge >= retirementAge) {
-                    alert('Please enter valid ages. Current age must be less than retirement age.');
+                console.log('Input values:', { currentAge, retirementAge, currentExpenses, currentSavings, monthlySip });
+
+                // Enhanced validation
+                if (currentAge <= 0 || currentAge > 100) {
+                    alert('Please enter a valid current age (1-100).');
+                    return;
+                }
+
+                if (retirementAge <= 0 || retirementAge > 100) {
+                    alert('Please enter a valid retirement age (1-100).');
+                    return;
+                }
+
+                if (currentAge >= retirementAge) {
+                    alert('Current age must be less than retirement age.');
+                    return;
+                }
+
+                if (retirementAge >= lifeExpectancy) {
+                    alert('Retirement age must be less than life expectancy.');
                     return;
                 }
 
@@ -9681,9 +9700,11 @@
                     return;
                 }
 
-                // Calculate years to retirement and retirement duration
+                // Calculate basic metrics
                 const yearsToRetirement = retirementAge - currentAge;
                 const retirementDuration = lifeExpectancy - retirementAge;
+
+                console.log('Calculated metrics:', { yearsToRetirement, retirementDuration });
 
                 // Calculate lifestyle multiplier
                 const lifestyleMultipliers = {
@@ -9692,41 +9713,74 @@
                     'comfortable': 1.00,
                     'luxurious': 1.20
                 };
-                const lifestyleMultiplier = lifestyleMultipliers[lifestyleChoice];
+                const lifestyleMultiplier = lifestyleMultipliers[lifestyleChoice] || 0.85;
 
                 // Calculate future expenses at retirement (with inflation)
-                const futureMonthlyExpenses = currentExpenses * Math.pow(1 + inflationRate/100, yearsToRetirement);
+                const inflationMultiplier = Math.pow(1 + inflationRate/100, yearsToRetirement);
+                const futureMonthlyExpenses = currentExpenses * inflationMultiplier;
                 const adjustedMonthlyExpenses = futureMonthlyExpenses * lifestyleMultiplier;
                 const healthcareExpenses = adjustedMonthlyExpenses * (healthcareBuffer/100);
                 const totalMonthlyExpenses = adjustedMonthlyExpenses + healthcareExpenses;
                 const emergencyCorpus = totalMonthlyExpenses * emergencyBuffer;
 
-                // Calculate required retirement corpus
+                console.log('Expense calculations:', { 
+                    futureMonthlyExpenses: Math.round(futureMonthlyExpenses),
+                    totalMonthlyExpenses: Math.round(totalMonthlyExpenses),
+                    emergencyCorpus: Math.round(emergencyCorpus)
+                });
+
+                // Calculate required retirement corpus using proper annuity formula
                 const realReturnRate = ((1 + postRetirementReturn/100) / (1 + inflationRate/100)) - 1;
                 const monthlyRealReturn = realReturnRate / 12;
                 const totalRetirementMonths = retirementDuration * 12;
                 
-                // Present value of annuity formula for required corpus
-                const requiredCorpus = totalMonthlyExpenses * ((1 - Math.pow(1 + monthlyRealReturn, -totalRetirementMonths)) / monthlyRealReturn) + emergencyCorpus;
+                let requiredCorpus;
+                if (monthlyRealReturn <= 0 || isNaN(monthlyRealReturn)) {
+                    // If real return is zero or negative, use simple multiplication
+                    requiredCorpus = totalMonthlyExpenses * totalRetirementMonths + emergencyCorpus;
+                } else {
+                    // Present value of annuity formula
+                    const pvFactor = (1 - Math.pow(1 + monthlyRealReturn, -totalRetirementMonths)) / monthlyRealReturn;
+                    requiredCorpus = totalMonthlyExpenses * pvFactor + emergencyCorpus;
+                }
 
                 // Calculate future value of current savings
                 const futureValueCurrentSavings = currentSavings * Math.pow(1 + expectedReturn/100, yearsToRetirement);
 
-                // Calculate future value of SIP
+                // Calculate future value of SIP investments
                 const monthlyReturn = expectedReturn / 100 / 12;
                 const totalSipMonths = yearsToRetirement * 12;
-                const futureValueSip = monthlySip * (Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn;
+                
+                let futureValueSip = 0;
+                if (monthlySip > 0 && monthlyReturn > 0) {
+                    futureValueSip = monthlySip * ((Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn);
+                } else if (monthlySip > 0) {
+                    futureValueSip = monthlySip * totalSipMonths;
+                }
 
                 // Total corpus at retirement
                 const totalCorpusAtRetirement = futureValueCurrentSavings + futureValueSip;
 
                 // Gap analysis
                 const corpusGap = requiredCorpus - totalCorpusAtRetirement;
-                const additionalMonthlySipNeeded = corpusGap > 0 ? 
-                    corpusGap / ((Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn) : 0;
+                let additionalMonthlySipNeeded = 0;
+                
+                if (corpusGap > 0 && monthlyReturn > 0) {
+                    const sipFactor = (Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn;
+                    additionalMonthlySipNeeded = corpusGap / sipFactor;
+                } else if (corpusGap > 0) {
+                    additionalMonthlySipNeeded = corpusGap / totalSipMonths;
+                }
 
                 // Calculate corpus adequacy percentage
-                const adequacyPercentage = (totalCorpusAtRetirement / requiredCorpus) * 100;
+                const adequacyPercentage = requiredCorpus > 0 ? (totalCorpusAtRetirement / requiredCorpus) * 100 : 0;
+
+                console.log('Final calculations:', {
+                    requiredCorpus: Math.round(requiredCorpus),
+                    totalCorpusAtRetirement: Math.round(totalCorpusAtRetirement),
+                    corpusGap: Math.round(corpusGap),
+                    adequacyPercentage: Math.round(adequacyPercentage)
+                });
 
                 // Generate year-wise data for chart
                 const chartData = generateRetirementChartData({
@@ -9734,84 +9788,115 @@
                     expectedReturn, postRetirementReturn, inflationRate, totalMonthlyExpenses
                 });
 
-                // Display results
-                displayRetirementResults({
+                console.log('Chart data generated:', chartData.length, 'data points');
+
+                // Prepare data object for display functions
+                const retirementData = {
                     currentAge, retirementAge, lifeExpectancy, yearsToRetirement, retirementDuration,
                     currentExpenses, futureMonthlyExpenses, adjustedMonthlyExpenses, healthcareExpenses,
                     totalMonthlyExpenses, emergencyCorpus, requiredCorpus, totalCorpusAtRetirement,
                     corpusGap, additionalMonthlySipNeeded, adequacyPercentage, lifestyleChoice,
                     expectedReturn, inflationRate, postRetirementReturn, chartData
-                });
+                };
+
+                // Display results
+                displayRetirementResults(retirementData);
+
+                console.log('Retirement calculation completed successfully');
 
             } catch (error) {
                 console.error('Error in retirement calculation:', error);
-                alert('Error calculating retirement plan. Please check your inputs.');
+                alert('Error calculating retirement plan: ' + error.message);
             }
         }
 
         function generateRetirementChartData(params) {
-            const { currentAge, retirementAge, lifeExpectancy, currentSavings, monthlySip, 
-                    expectedReturn, postRetirementReturn, inflationRate, totalMonthlyExpenses } = params;
-            
-            const data = [];
-            let corpus = currentSavings;
-            const monthlyReturn = expectedReturn / 100 / 12;
-            const postRetirementMonthlyReturn = postRetirementReturn / 100 / 12;
+            try {
+                const { currentAge, retirementAge, lifeExpectancy, currentSavings, monthlySip, 
+                        expectedReturn, postRetirementReturn, inflationRate, totalMonthlyExpenses } = params;
+                
+                console.log('Generating chart data with params:', params);
+                
+                const data = [];
+                let corpus = currentSavings || 0;
+                const monthlyReturn = (expectedReturn || 12) / 100 / 12;
+                const postRetirementMonthlyReturn = (postRetirementReturn || 8) / 100 / 12;
+                const monthlyExpenses = totalMonthlyExpenses || 0;
 
-            // Accumulation phase
-            for (let age = currentAge; age <= retirementAge; age++) {
-                if (age < retirementAge) {
-                    // Add monthly SIP and growth for 12 months
-                    for (let month = 0; month < 12; month++) {
-                        corpus = corpus * (1 + monthlyReturn) + monthlySip;
+                // Accumulation phase (current age to retirement)
+                for (let age = currentAge; age <= retirementAge; age++) {
+                    if (age < retirementAge) {
+                        // Add monthly SIP and growth for 12 months
+                        for (let month = 0; month < 12; month++) {
+                            corpus = corpus * (1 + monthlyReturn) + (monthlySip || 0);
+                        }
                     }
+                    data.push({
+                        age: age,
+                        corpus: Math.max(0, corpus),
+                        phase: age < retirementAge ? 'accumulation' : 'retirement'
+                    });
                 }
-                data.push({
-                    age: age,
-                    corpus: corpus,
-                    phase: age < retirementAge ? 'accumulation' : 'retirement'
-                });
-            }
 
-            // Retirement phase - corpus depletion
-            let retirementCorpus = corpus;
-            for (let age = retirementAge + 1; age <= lifeExpectancy; age++) {
-                // Withdraw monthly expenses and apply post-retirement growth
-                for (let month = 0; month < 12; month++) {
-                    retirementCorpus = retirementCorpus * (1 + postRetirementMonthlyReturn) - totalMonthlyExpenses;
-                    if (retirementCorpus < 0) retirementCorpus = 0;
+                // Retirement phase - corpus depletion
+                let retirementCorpus = corpus;
+                for (let age = retirementAge + 1; age <= lifeExpectancy; age++) {
+                    // Withdraw monthly expenses and apply post-retirement growth
+                    for (let month = 0; month < 12; month++) {
+                        retirementCorpus = retirementCorpus * (1 + postRetirementMonthlyReturn) - monthlyExpenses;
+                        if (retirementCorpus < 0) retirementCorpus = 0;
+                    }
+                    data.push({
+                        age: age,
+                        corpus: Math.max(0, retirementCorpus),
+                        phase: 'retirement'
+                    });
                 }
-                data.push({
-                    age: age,
-                    corpus: retirementCorpus,
-                    phase: 'retirement'
-                });
-            }
 
-            return data;
+                console.log('Chart data generated:', data.length, 'points');
+                return data;
+            } catch (error) {
+                console.error('Error generating chart data:', error);
+                return [];
+            }
         }
 
         function displayRetirementResults(data) {
-            // Show results section
-            document.getElementById('retirement-results').style.display = 'block';
+            try {
+                console.log('Displaying retirement results...');
+                
+                // Show results section
+                const resultsSection = document.getElementById('retirement-results');
+                if (!resultsSection) {
+                    console.error('Results section not found');
+                    return;
+                }
+                resultsSection.style.display = 'block';
 
-            // Display summary cards
-            displayRetirementSummaryCards(data);
+                // Display summary cards
+                displayRetirementSummaryCards(data);
 
-            // Display detailed analysis
-            displayRetirementDetailedAnalysis(data);
+                // Display detailed analysis
+                displayRetirementDetailedAnalysis(data);
 
-            // Create retirement chart
-            createRetirementChart(data.chartData);
+                // Create retirement chart
+                createRetirementChart(data.chartData);
 
-            // Display scenario analysis
-            displayRetirementScenarios(data);
+                // Display scenario analysis
+                displayRetirementScenarios(data);
 
-            // Display recommendations
-            displayRetirementRecommendations(data);
+                // Display recommendations
+                displayRetirementRecommendations(data);
 
-            // Scroll to results
-            document.getElementById('retirement-results').scrollIntoView({ behavior: 'smooth' });
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                console.log('Results displayed successfully');
+
+            } catch (error) {
+                console.error('Error displaying results:', error);
+                alert('Error displaying results: ' + error.message);
+            }
         }
 
         function displayRetirementSummaryCards(data) {
@@ -9981,106 +10066,130 @@
         }
 
         function createRetirementChart(chartData) {
-            const ctx = document.getElementById('retirement-growth-chart').getContext('2d');
-            
-            // Destroy existing chart if it exists
-            if (retirementChart) {
-                retirementChart.destroy();
-            }
+            try {
+                const canvas = document.getElementById('retirement-growth-chart');
+                if (!canvas) {
+                    console.error('Chart canvas not found');
+                    return;
+                }
 
-            const ages = chartData.map(d => d.age);
-            const corpusValues = chartData.map(d => d.corpus);
-            const accumulationData = chartData.filter(d => d.phase === 'accumulation').map(d => d.corpus);
-            const retirementData = chartData.filter(d => d.phase === 'retirement').map(d => d.corpus);
+                const ctx = canvas.getContext('2d');
+                
+                // Destroy existing chart if it exists
+                if (retirementChart) {
+                    retirementChart.destroy();
+                }
 
-            retirementChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ages,
-                    datasets: [{
-                        label: 'Retirement Corpus',
-                        data: corpusValues,
-                        borderColor: 'var(--accent-gold)',
-                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 8,
-                        pointBackgroundColor: 'var(--accent-gold)',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointHoverBackgroundColor: 'var(--accent-gold)',
-                        pointHoverBorderColor: '#ffffff',
-                        pointHoverBorderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            labels: {
-                                color: 'var(--text-white)',
-                                font: { size: 12 }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleColor: 'var(--accent-gold)',
-                            bodyColor: 'var(--text-white)',
+                if (!chartData || chartData.length === 0) {
+                    console.error('No chart data available');
+                    return;
+                }
+
+                const ages = chartData.map(d => d.age);
+                const corpusValues = chartData.map(d => d.corpus);
+
+                console.log('Creating chart with', ages.length, 'data points');
+
+                retirementChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ages,
+                        datasets: [{
+                            label: 'Retirement Corpus (₹ Crores)',
+                            data: corpusValues,
                             borderColor: 'var(--accent-gold)',
-                            borderWidth: 1,
-                            callbacks: {
-                                title: function(context) {
-                                    return `Age: ${context[0].label}`;
-                                },
-                                label: function(context) {
-                                    const value = context.raw;
-                                    const phase = chartData[context.dataIndex].phase;
-                                    return `Corpus: ₹${(value/10000000).toFixed(2)}Cr (${phase})`;
-                                }
-                            }
-                        }
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: 'var(--accent-gold)',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointHoverBackgroundColor: 'var(--accent-gold)',
+                            pointHoverBorderColor: '#ffffff',
+                            pointHoverBorderWidth: 3
+                        }]
                     },
-                    scales: {
-                        x: {
-                            title: {
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
                                 display: true,
-                                text: 'Age',
-                                color: 'var(--text-white)',
-                                font: { size: 14 }
+                                labels: {
+                                    color: 'var(--text-white)',
+                                    font: { size: 14, weight: '600' }
+                                }
                             },
-                            ticks: {
-                                color: 'var(--text-gray)',
-                                font: { size: 11 }
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: 'var(--accent-gold)',
+                                bodyColor: 'var(--text-white)',
+                                borderColor: 'var(--accent-gold)',
+                                borderWidth: 2,
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    title: function(context) {
+                                        return `Age: ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        const value = context.raw;
+                                        const phase = chartData[context.dataIndex]?.phase || 'unknown';
+                                        const crores = (value / 10000000).toFixed(2);
+                                        return `Corpus: ₹${crores}Cr (${phase})`;
+                                    }
+                                }
                             }
                         },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Corpus (₹ Crores)',
-                                color: 'var(--text-white)',
-                                font: { size: 14 }
-                            },
-                            ticks: {
-                                color: 'var(--text-gray)',
-                                font: { size: 11 },
-                                callback: function(value) {
-                                    return '₹' + (value/10000000).toFixed(1) + 'Cr';
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Age (Years)',
+                                    color: 'var(--text-white)',
+                                    font: { size: 14, weight: '600' }
+                                },
+                                ticks: {
+                                    color: 'var(--text-gray)',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
                                 }
                             },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Corpus (₹ Crores)',
+                                    color: 'var(--text-white)',
+                                    font: { size: 14, weight: '600' }
+                                },
+                                ticks: {
+                                    color: 'var(--text-gray)',
+                                    font: { size: 12 },
+                                    callback: function(value) {
+                                        return '₹' + (value/10000000).toFixed(1) + 'Cr';
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
                             }
+                        },
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeInOutQuart'
                         }
                     }
-                }
-            });
+                });
+
+                console.log('Chart created successfully');
+            } catch (error) {
+                console.error('Error creating retirement chart:', error);
+            }
         }
 
         function displayRetirementScenarios(data) {

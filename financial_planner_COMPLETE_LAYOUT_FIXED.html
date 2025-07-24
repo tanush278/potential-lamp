@@ -10055,20 +10055,20 @@
                             </h5>
                             <div style="margin-bottom: 1rem;">
                                                                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                                                                                                                                       <span style="color: var(--text-gray);">Growth Phase Return (Age ${data.currentAge}-${data.retirementAge}):</span>
+                                     <span style="color: var(--text-gray);">Growth Phase Return (Age ${data.currentAge}-${data.retirementAge}):</span>
                                      <span style="color: var(--text-white); font-weight: 600;">${data.expectedReturn}% per year</span>
                                  </div>
                                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                                                                                                                                       <span style="color: var(--text-gray);">Retirement Phase Return (Age ${data.retirementAge}-${data.lifeExpectancy}):</span>
+                                     <span style="color: var(--text-gray);">Retirement Phase Return (Age ${data.retirementAge}-${data.lifeExpectancy}):</span>
                                      <span style="color: var(--text-white); font-weight: 600;">${data.postRetirementReturn}% per year</span>
                                  </div>
                                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                                                                                                                                       <span style="color: var(--text-gray);">Expected Inflation Rate:</span>
+                                     <span style="color: var(--text-gray);">Expected Inflation Rate:</span>
                                      <span style="color: var(--text-white); font-weight: 600;">${data.inflationRate}% per year</span>
                                  </div>
                                  <div style="border-top: 1px solid #333; padding-top: 0.5rem; margin-top: 1rem;">
                                      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                                                                                                                                                       <span style="color: var(--accent-gold); font-weight: 600;">Real Return After Inflation:</span>
+                                         <span style="color: var(--accent-gold); font-weight: 600;">Real Return After Inflation:</span>
                                          <span style="color: var(--accent-gold); font-weight: 700;">${((data.postRetirementReturn - data.inflationRate)).toFixed(1)}% per year</span>
                                      </div>
                                     <div style="font-size: 0.8rem; color: var(--text-gray); margin-top: 0.5rem; font-style: italic;">
@@ -10307,7 +10307,7 @@
                             <div style="padding: 1.5rem; background: rgba(255,107,107,0.1); border-radius: 8px; border: 1px solid rgba(255,107,107,0.3);">
                                 <h5 style="color: #ff6b6b; margin-bottom: 1rem; text-align: center;">${scenario.name} Scenario</h5>
                                                                  <div style="text-align: center; color: #ff6b6b;">
-                                                                                                                                                       <div>Calculation Error</div>
+                                     <div>Calculation Error</div>
                                     <div style="font-size: 0.8rem; margin-top: 0.5rem;">Check console for details</div>
                                 </div>
                             </div>
@@ -10326,7 +10326,7 @@
                 if (scenariosDiv) {
                     scenariosDiv.innerHTML = `
                         <div style="background: rgba(255,107,107,0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #ff6b6b;">
-                                                                                                                   <h5 style="color: #ff6b6b; margin: 0;">Scenario Analysis Error</h5>
+                                                         <h5 style="color: #ff6b6b; margin: 0;">Scenario Analysis Error</h5>
                             <p style="color: var(--text-gray); margin: 0.5rem 0 0 0;">Unable to calculate scenarios. Check console for details.</p>
                         </div>
                     `;

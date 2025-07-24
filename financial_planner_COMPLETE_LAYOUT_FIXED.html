@@ -4482,6 +4482,25 @@
             return lumpsums.sort((a, b) => new Date(a.date) - new Date(b.date));
         }
         
+        function calculateTotalSIPInvested(monthlySIP, sipFrequency, startDate) {
+            if (!monthlySIP || !startDate) return 0;
+            
+            const startDateObj = new Date(startDate);
+            const currentDate = new Date();
+            const monthsDiff = (currentDate.getFullYear() - startDateObj.getFullYear()) * 12 + 
+                             (currentDate.getMonth() - startDateObj.getMonth());
+            
+            const frequencyMultiplier = {
+                'monthly': 1,
+                'quarterly': 3,
+                'semi-annually': 6,
+                'annually': 12
+            };
+            
+            const investmentPeriods = Math.floor(monthsDiff / frequencyMultiplier[sipFrequency]);
+            return monthlySIP * investmentPeriods;
+        }
+        
         function selectChartPeriod(period) {
             currentChartPeriod = period;
             
@@ -4586,7 +4605,7 @@
                     }
                     
                     // Set calculated portfolio value
-                    const calculatedValue = Math.round(lumpsumGrowth + sipGrowth);
+                    const calculatedValue = Math.round(initialLumpsumGrowth + additionalLumpsumGrowth + sipGrowth);
                     document.getElementById('total-portfolio-value').value = calculatedValue;
                 }
             }
@@ -5511,6 +5530,10 @@
             const monthlyReturn = 0.01; // Assume 12% annual return
             const monthlyInflation = inflationRate / 12 / 100; // Monthly inflation rate
             
+            // Get initial lumpsum and additional lumpsums
+            const initialLumpsum = parseFloat(document.getElementById('initial-lumpsum').value) || 0;
+            const additionalLumpsums = getAdditionalLumpsums();
+            
             // Convert SIP to monthly equivalent
             const sipMultiplier = {
                 'monthly': 1,
@@ -5518,21 +5541,46 @@
                 'semi-annually': 1/6,
                 'annually': 1/12
             };
-            const monthlySIP = (data.monthlySIP || (data.totalInvested / months)) * sipMultiplier[sipFrequency];
+            const monthlySIP = data.monthlySIP * sipMultiplier[sipFrequency];
             
-            let invested = 0;
-            let nominalValue = 0;
-            let realValue = 0;
+            let totalInvested = initialLumpsum; // Start with initial lumpsum
+            let lumpsumValue = initialLumpsum; // Track lumpsum growth separately
+            let sipInvested = 0; // Track SIP investments separately
+            let sipValue = 0; // Track SIP growth separately
             
             for (let i = 0; i <= months; i++) {
-                invested += monthlySIP;
-                nominalValue = invested * Math.pow(1 + monthlyReturn, i);
-                // Calculate real value (inflation-adjusted)
-                realValue = nominalValue / Math.pow(1 + monthlyInflation, i);
+                // Add monthly SIP
+                if (i > 0) { // Don't add SIP at month 0
+                    sipInvested += monthlySIP;
+                    totalInvested += monthlySIP;
+                }
+                
+                // Add any additional lumpsums for this month
+                if (data.startDate && additionalLumpsums.length > 0) {
+                    const currentMonthDate = new Date(data.startDate);
+                    currentMonthDate.setMonth(currentMonthDate.getMonth() + i);
+                    
+                    additionalLumpsums.forEach(lumpsum => {
+                        const lumpsumDate = new Date(lumpsum.date);
+                        const lumpsumMonth = Math.round((lumpsumDate - new Date(data.startDate)) / (1000 * 60 * 60 * 24 * 30.44));
+                        
+                        if (lumpsumMonth === i) {
+                            totalInvested += lumpsum.amount;
+                            lumpsumValue += lumpsum.amount; // Add to lumpsum tracking
+                        }
+                    });
+                }
+                
+                // Calculate growth
+                lumpsumValue = lumpsumValue * (1 + monthlyReturn);
+                sipValue = sipInvested * Math.pow(1 + monthlyReturn, i);
+                
+                const nominalValue = lumpsumValue + sipValue;
+                const realValue = nominalValue / Math.pow(1 + monthlyInflation, i);
                 
                 monthlyData.push({
                     month: i,
-                    invested: invested,
+                    invested: totalInvested,
                     nominalValue: nominalValue,
                     realValue: realValue
                 });

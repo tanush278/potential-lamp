@@ -4474,10 +4474,17 @@
             const validationDiv = document.getElementById('allocation-validation') || createValidationDiv();
             
             if (portfolioValue > 0 && allocatedTotal > 0) {
-                const difference = Math.abs(portfolioValue - allocatedTotal);
-                const percentageDiff = (difference / portfolioValue) * 100;
+                const difference = portfolioValue - allocatedTotal;
+                const absDifference = Math.abs(difference);
+                const percentageDiff = (absDifference / portfolioValue) * 100;
                 
-                if (difference < 1000) { // Within ₹1000 tolerance
+                // Auto-adjust for small penny amounts (₹1-100)
+                if (absDifference > 0 && absDifference <= 100) {
+                    autoAdjustAllocation(difference);
+                    return; // Exit after auto-adjustment
+                }
+                
+                if (absDifference < 1000) { // Within ₹1000 tolerance
                     validationDiv.innerHTML = `
                         <div style="background: rgba(0,255,0,0.1); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
                             <div style="color: #00ff00; font-weight: bold; margin-bottom: 0.5rem;">
@@ -4486,7 +4493,7 @@
                             <div style="color: var(--text-gray); font-size: 0.9rem;">
                                 Portfolio Value: ₹${portfolioValue.toLocaleString('en-IN')} | 
                                 Allocated Total: ₹${allocatedTotal.toLocaleString('en-IN')} | 
-                                Difference: ₹${difference.toLocaleString('en-IN')}
+                                Difference: ₹${absDifference.toLocaleString('en-IN')}
                             </div>
                         </div>
                     `;
@@ -4500,7 +4507,7 @@
                             <div style="color: var(--text-gray); font-size: 0.9rem;">
                                 Portfolio Value: ₹${portfolioValue.toLocaleString('en-IN')} | 
                                 Allocated Total: ₹${allocatedTotal.toLocaleString('en-IN')} | 
-                                Excess: ₹${difference.toLocaleString('en-IN')} (${percentageDiff.toFixed(1)}%)
+                                Excess: ₹${absDifference.toLocaleString('en-IN')} (${percentageDiff.toFixed(1)}%)
                             </div>
                             <div style="color: #ff6b6b; font-size: 0.85rem; margin-top: 0.5rem;">
                                 Your asset values add up to more than your total portfolio. Please check your entries.
@@ -4517,7 +4524,7 @@
                             <div style="color: var(--text-gray); font-size: 0.9rem;">
                                 Portfolio Value: ₹${portfolioValue.toLocaleString('en-IN')} | 
                                 Allocated Total: ₹${allocatedTotal.toLocaleString('en-IN')} | 
-                                Missing: ₹${difference.toLocaleString('en-IN')} (${percentageDiff.toFixed(1)}%)
+                                Missing: ₹${absDifference.toLocaleString('en-IN')} (${percentageDiff.toFixed(1)}%)
                             </div>
                             <div style="color: var(--accent-gold); font-size: 0.85rem; margin-top: 0.5rem;">
                                 Please allocate the remaining amount to complete your portfolio breakdown.
@@ -4528,6 +4535,59 @@
                 }
             } else {
                 validationDiv.style.display = 'none';
+            }
+        }
+        
+        function autoAdjustAllocation(difference) {
+            // Auto-adjust the largest allocation to match portfolio value exactly
+            const equity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
+            const debt = parseFloat(document.getElementById('portfolio-debt').value) || 0;
+            const gold = parseFloat(document.getElementById('portfolio-gold').value) || 0;
+            const cash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
+            
+            // Find the largest allocation to adjust
+            const allocations = [
+                { id: 'portfolio-equity', value: equity, name: 'Equity' },
+                { id: 'portfolio-debt', value: debt, name: 'Debt' },
+                { id: 'portfolio-gold', value: gold, name: 'Gold' },
+                { id: 'portfolio-cash', value: cash, name: 'Cash' }
+            ];
+            
+            // Sort by value to find the largest allocation
+            const largestAllocation = allocations.reduce((max, current) => 
+                current.value > max.value ? current : max
+            );
+            
+            // Adjust the largest allocation
+            const adjustedValue = largestAllocation.value + difference;
+            
+            // Only adjust if the result is positive
+            if (adjustedValue >= 0) {
+                document.getElementById(largestAllocation.id).value = Math.round(adjustedValue);
+                
+                // Show auto-adjustment notification
+                const validationDiv = document.getElementById('allocation-validation') || createValidationDiv();
+                validationDiv.innerHTML = `
+                    <div style="background: rgba(0,255,0,0.1); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                        <div style="color: #00ff00; font-weight: bold; margin-bottom: 0.5rem;">
+                            <i class="fas fa-magic"></i> Auto-Adjusted for Perfect Match
+                        </div>
+                        <div style="color: var(--text-gray); font-size: 0.9rem;">
+                            Automatically adjusted ${largestAllocation.name} by ₹${Math.abs(difference)} to match portfolio value exactly.
+                        </div>
+                    </div>
+                `;
+                validationDiv.style.display = 'block';
+                
+                // Hide the notification after 3 seconds
+                setTimeout(() => {
+                    if (validationDiv) {
+                        validationDiv.style.display = 'none';
+                    }
+                }, 3000);
+                
+                // Trigger recalculation
+                calculatePortfolioMetrics();
             }
         }
         

@@ -2405,32 +2405,40 @@
         }
 
         function performAdvancedSIPCalculation(sipAmount, years, annualRate, inflationRate, stepUpRate, calcType, lumpsumAmount, frequency) {
-            // Define frequency parameters
+            // Define frequency parameters - compounding matches investment frequency
+            // Monthly: 12 investments, 12 compounding periods
+            // Quarterly: 4 investments, 4 compounding periods  
+            // Semi-annual: 2 investments, 2 compounding periods
+            // Annual: 1 investment, 1 compounding period
             const frequencyData = {
-                'monthly': { installmentsPerYear: 12, monthsBetween: 1 },
-                'quarterly': { installmentsPerYear: 4, monthsBetween: 3 },
-                'semi-annually': { installmentsPerYear: 2, monthsBetween: 6 },
-                'annually': { installmentsPerYear: 1, monthsBetween: 12 }
+                'monthly': { installmentsPerYear: 12, compoundingPerYear: 12 },
+                'quarterly': { installmentsPerYear: 4, compoundingPerYear: 4 },
+                'semi-annually': { installmentsPerYear: 2, compoundingPerYear: 2 },
+                'annually': { installmentsPerYear: 1, compoundingPerYear: 1 }
             };
             
-            const { installmentsPerYear, monthsBetween } = frequencyData[frequency];
+            const { installmentsPerYear, compoundingPerYear } = frequencyData[frequency];
             
-            const monthlyRate = annualRate / 12 / 100;
-            const inflationMonthlyRate = inflationRate / 12 / 100;
+            // Calculate rates based on actual compounding frequency
+            // For quarterly: 12%/4 = 3% per quarter
+            // For annual: 12%/1 = 12% per year
+            const periodRate = annualRate / compoundingPerYear / 100;
+            const inflationPeriodRate = inflationRate / compoundingPerYear / 100;
             
             let totalInvestment = 0;
             let nominalValue = 0;
             let currentSIPAmount = sipAmount;
             
             const yearlyData = [];
+            const totalPeriods = years * compoundingPerYear;
             
             for (let year = 1; year <= years; year++) {
                 let yearInvestment = 0;
-                let yearEndValue = nominalValue;
+                let yearStartValue = nominalValue;
                 
                 // Add lumpsum in first year
                 if (year === 1 && calcType === 'lumpsum' && lumpsumAmount > 0) {
-                    yearEndValue += lumpsumAmount;
+                    nominalValue += lumpsumAmount;
                     totalInvestment += lumpsumAmount;
                     yearInvestment += lumpsumAmount;
                 }
@@ -2440,20 +2448,16 @@
                     currentSIPAmount = currentSIPAmount * (1 + stepUpRate / 100);
                 }
                 
-                // Calculate monthly compounding and SIP investments
-                for (let month = 1; month <= 12; month++) {
-                    // Compound monthly
-                    yearEndValue = yearEndValue * (1 + monthlyRate);
+                // Calculate compounding and SIP investments for each period in the year
+                for (let period = 1; period <= compoundingPerYear; period++) {
+                    // Compound the existing amount
+                    nominalValue = nominalValue * (1 + periodRate);
                     
-                    // Add SIP investment based on frequency
-                    if (month % monthsBetween === 0) {
-                        yearEndValue += currentSIPAmount;
-                        yearInvestment += currentSIPAmount;
-                        totalInvestment += currentSIPAmount;
-                    }
+                    // Add SIP investment at the end of each period
+                    nominalValue += currentSIPAmount;
+                    yearInvestment += currentSIPAmount;
+                    totalInvestment += currentSIPAmount;
                 }
-                
-                nominalValue = yearEndValue;
                 
                 // Calculate real value (inflation adjusted)
                 const realValue = nominalValue / Math.pow(1 + inflationRate / 100, year);

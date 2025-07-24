@@ -3052,10 +3052,9 @@
                 generateDefaultInvestmentStrategy();
             }
             
-            // Always show recommendation cards
+            // Always show recommendation cards (except rebalancing which is now in Portfolio Analysis)
             document.getElementById('asset-allocation-card').style.display = 'block';
             document.getElementById('fund-recommendations-card').style.display = 'block';
-            document.getElementById('rebalancing-card').style.display = 'block';
             document.getElementById('strategy-card').style.display = 'block';
         }
 
@@ -3229,7 +3228,7 @@
                     </div>
                     <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
                         <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Score</div>
-                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-white);">${riskProfile.riskPercentage}%</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-white);">${riskProfile.riskScore || riskProfile.riskPercentage || '60'}%</div>
                     </div>
                     <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
                         <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Investment Horizon</div>

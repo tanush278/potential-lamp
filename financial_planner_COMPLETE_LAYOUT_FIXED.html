@@ -1538,48 +1538,217 @@
                     </div>
                 </section>
 
-                                 <!-- Net Worth Section -->
+                                 <!-- Advanced Net Worth Calculator Section -->
                  <section id="networth" class="section">
                      <div class="section-header">
-                         <h1 class="section-title">Net Worth Calculator</h1>
-                         <p class="section-subtitle">Calculate and track your net worth over time</p>
+                         <h1 class="section-title">Advanced Net Worth Calculator</h1>
+                         <p class="section-subtitle">Comprehensive net worth tracking with detailed analysis and historical trends</p>
                      </div>
                      
+                     <!-- Assets Section -->
                      <div class="card">
-                         <h3>Net Worth Calculation</h3>
-                         <p>Track your assets and liabilities to calculate your net worth.</p>
-                         <div class="form-grid">
-                             <div class="form-group">
-                                 <label>Cash & Bank Balance (₹)</label>
-                                 <input type="number" id="cash-balance" class="form-input" placeholder="Enter cash and bank balance">
-                             </div>
-                             <div class="form-group">
-                                 <label>Investments (₹)</label>
-                                 <input type="number" id="investments" class="form-input" placeholder="Enter total investments">
-                             </div>
-                             <div class="form-group">
-                                 <label>Property Value (₹)</label>
-                                 <input type="number" id="property-value" class="form-input" placeholder="Enter property value">
-                             </div>
-                             <div class="form-group">
-                                 <label>Outstanding Loans (₹)</label>
-                                 <input type="number" id="outstanding-loans" class="form-input" placeholder="Enter total loans">
-                             </div>
-                             <div class="form-group">
-                                 <label>Other Assets (₹)</label>
-                                 <input type="number" id="other-assets" class="form-input" placeholder="Enter other assets">
-                             </div>
-                             <div class="form-group">
-                                 <label>Credit Card Debt (₹)</label>
-                                 <input type="number" id="credit-card-debt" class="form-input" placeholder="Enter credit card debt">
+                         <div class="card-header">
+                             <h3 class="card-title">Assets</h3>
+                             <p class="card-subtitle">All your valuable possessions and investments</p>
+                         </div>
+                         
+                         <!-- Liquid Assets -->
+                         <div style="margin-bottom: 2rem;">
+                             <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                 <i class="fas fa-coins"></i> Liquid Assets
+                             </h4>
+                             <div class="form-grid">
+                                 <div class="form-group">
+                                     <label>Savings Account (₹)</label>
+                                     <input type="number" id="savings-account" class="form-input" placeholder="Bank savings balance" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Current Account (₹)</label>
+                                     <input type="number" id="current-account" class="form-input" placeholder="Current account balance" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Fixed Deposits (₹)</label>
+                                     <input type="number" id="fixed-deposits" class="form-input" placeholder="FD investments" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Cash in Hand (₹)</label>
+                                     <input type="number" id="cash-hand" class="form-input" placeholder="Physical cash" onchange="calculateAdvancedNetWorth()">
+                                 </div>
                              </div>
                          </div>
-                         <button class="btn btn-primary" onclick="calculateNetWorth()">
-                             <i class="fas fa-calculator"></i> Calculate Net Worth
-                         </button>
                          
-                         <div id="networth-results" style="display: none; margin-top: 2rem;">
-                             <!-- Results will be displayed here -->
+                         <!-- Investment Assets -->
+                         <div style="margin-bottom: 2rem;">
+                             <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                 <i class="fas fa-chart-line"></i> Investment Assets
+                             </h4>
+                             <div class="form-grid">
+                                 <div class="form-group">
+                                     <label>Mutual Funds (₹)</label>
+                                     <input type="number" id="mutual-funds" class="form-input" placeholder="Current MF value" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Stocks & Shares (₹)</label>
+                                     <input type="number" id="stocks-shares" class="form-input" placeholder="Equity portfolio value" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Bonds & Debentures (₹)</label>
+                                     <input type="number" id="bonds-debentures" class="form-input" placeholder="Fixed income securities" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>PPF/EPF/NPS (₹)</label>
+                                     <input type="number" id="retirement-funds" class="form-input" placeholder="Retirement savings" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Gold/Precious Metals (₹)</label>
+                                     <input type="number" id="gold-metals" class="form-input" placeholder="Physical/digital gold" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Cryptocurrency (₹)</label>
+                                     <input type="number" id="cryptocurrency" class="form-input" placeholder="Crypto investments" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                             </div>
+                         </div>
+                         
+                         <!-- Physical Assets -->
+                         <div style="margin-bottom: 2rem;">
+                             <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                 <i class="fas fa-home"></i> Physical Assets
+                             </h4>
+                             <div class="form-grid">
+                                 <div class="form-group">
+                                     <label>Primary Residence (₹)</label>
+                                     <input type="number" id="primary-residence" class="form-input" placeholder="Current market value" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Investment Property (₹)</label>
+                                     <input type="number" id="investment-property" class="form-input" placeholder="Rental/investment property" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Vehicles (₹)</label>
+                                     <input type="number" id="vehicles" class="form-input" placeholder="Cars, bikes current value" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Jewelry & Valuables (₹)</label>
+                                     <input type="number" id="jewelry-valuables" class="form-input" placeholder="Jewelry, art, collectibles" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Business Assets (₹)</label>
+                                     <input type="number" id="business-assets" class="form-input" placeholder="Business ownership value" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Other Assets (₹)</label>
+                                     <input type="number" id="other-assets-nw" class="form-input" placeholder="Any other valuable assets" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <!-- Liabilities Section -->
+                     <div class="card">
+                         <div class="card-header">
+                             <h3 class="card-title">Liabilities</h3>
+                             <p class="card-subtitle">All your debts and financial obligations</p>
+                         </div>
+                         
+                         <!-- Secured Loans -->
+                         <div style="margin-bottom: 2rem;">
+                             <h4 style="color: var(--accent-silver); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                 <i class="fas fa-home"></i> Secured Loans
+                             </h4>
+                             <div class="form-grid">
+                                 <div class="form-group">
+                                     <label>Home Loan Outstanding (₹)</label>
+                                     <input type="number" id="home-loan" class="form-input" placeholder="Remaining home loan amount" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Car Loan Outstanding (₹)</label>
+                                     <input type="number" id="car-loan" class="form-input" placeholder="Remaining car loan amount" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Property Loan Outstanding (₹)</label>
+                                     <input type="number" id="property-loan" class="form-input" placeholder="Investment property loan" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Gold Loan Outstanding (₹)</label>
+                                     <input type="number" id="gold-loan" class="form-input" placeholder="Loan against gold" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                             </div>
+                         </div>
+                         
+                         <!-- Unsecured Loans -->
+                         <div style="margin-bottom: 2rem;">
+                             <h4 style="color: var(--accent-silver); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                 <i class="fas fa-credit-card"></i> Unsecured Debts
+                             </h4>
+                             <div class="form-grid">
+                                 <div class="form-group">
+                                     <label>Personal Loan Outstanding (₹)</label>
+                                     <input type="number" id="personal-loan" class="form-input" placeholder="Personal loan amount" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Credit Card Outstanding (₹)</label>
+                                     <input type="number" id="credit-card-outstanding" class="form-input" placeholder="Total CC outstanding" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Education Loan Outstanding (₹)</label>
+                                     <input type="number" id="education-loan" class="form-input" placeholder="Student loan amount" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Business Loan Outstanding (₹)</label>
+                                     <input type="number" id="business-loan" class="form-input" placeholder="Business loan amount" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Other Debts (₹)</label>
+                                     <input type="number" id="other-debts" class="form-input" placeholder="Any other debts" onchange="calculateAdvancedNetWorth()">
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <!-- Net Worth Summary -->
+                     <div class="card">
+                         <div class="card-header">
+                             <h3 class="card-title">Net Worth Summary</h3>
+                             <p class="card-subtitle">Your complete financial position at a glance</p>
+                         </div>
+                         
+                         <div id="networth-summary" style="display: none;">
+                             <!-- Summary cards will be populated here -->
+                         </div>
+                         
+                         <!-- Asset Allocation Chart -->
+                         <div id="asset-allocation-section" style="display: none; margin-top: 2rem;">
+                             <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Asset Allocation Breakdown</h4>
+                             <div style="position: relative; height: 400px; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1rem;">
+                                 <canvas id="asset-allocation-chart"></canvas>
+                             </div>
+                         </div>
+                         
+                         <!-- Liability Breakdown Chart -->
+                         <div id="liability-breakdown-section" style="display: none; margin-top: 2rem;">
+                             <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Liability Breakdown</h4>
+                             <div style="position: relative; height: 300px; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1rem;">
+                                 <canvas id="liability-breakdown-chart"></canvas>
+                             </div>
+                         </div>
+                         
+                         <!-- Detailed Analysis -->
+                         <div id="detailed-analysis" style="display: none; margin-top: 2rem;">
+                             <!-- Detailed analysis will be populated here -->
+                         </div>
+                         
+                         <!-- Net Worth Tracking -->
+                         <div id="networth-tracking" style="display: none; margin-top: 2rem;">
+                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                 <h4 style="color: var(--accent-white); margin: 0;">Net Worth Tracking</h4>
+                                 <button class="btn btn-secondary" onclick="saveNetWorthSnapshot()">
+                                     <i class="fas fa-save"></i> Save Current Snapshot
+                                 </button>
+                             </div>
+                             <div style="position: relative; height: 400px; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1rem;">
+                                 <canvas id="networth-trend-chart"></canvas>
+                             </div>
                          </div>
                      </div>
                  </section>
@@ -6524,7 +6693,7 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <span style="color: var(--accent-gold);">Financial Planner Pro v4.5 - Lumpsum Chart Markers</span>
+                            <span style="color: var(--accent-gold);">Financial Planner Pro v5.0 - Advanced Net Worth Calculator</span>
             <span>•</span>
                             <span>Last Updated: Dec 24, 2024 - 11:30 UTC</span>
             <span>•</span>

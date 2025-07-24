@@ -4262,8 +4262,7 @@
                 riskProfile: riskProfile
             };
             
-            // Auto-populate input fields with recommended values
-            autoPopulatePortfolioInputs(portfolioData);
+            // Removed auto-populate - users must enter their own values
             
             // Update portfolio overview with integration message
             updatePortfolioOverviewWithIntegration(portfolioData);
@@ -4274,41 +4273,7 @@
             createPerformanceChart(portfolioData);
         }
 
-        function autoPopulatePortfolioInputs(data) {
-            // Auto-fill the input fields with recommended/sample values
-            const inputs = {
-                'total-portfolio-value': data.totalValue,
-                'total-invested': data.totalInvested,
-                'monthly-sip': data.monthlySIP,
-                'investment-start-date': data.startDate,
-                'portfolio-equity': data.allocation.equity,
-                'portfolio-debt': data.allocation.debt,
-                'portfolio-gold': data.allocation.gold,
-                'portfolio-cash': data.allocation.cash
-            };
-            
-            Object.keys(inputs).forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.value = inputs[id];
-                    // Add visual indicator that this is auto-populated
-                    element.style.backgroundColor = 'rgba(255, 215, 0, 0.05)';
-                    element.style.border = '1px solid rgba(255, 215, 0, 0.3)';
-                }
-            });
-            
-            // Show integration notice
-            const notice = document.getElementById('portfolio-integration-notice');
-            if (notice) {
-                notice.style.display = 'block';
-            }
-            
-            // Show refresh button
-            const refreshBtn = document.getElementById('refresh-portfolio-btn');
-            if (refreshBtn) {
-                refreshBtn.style.display = 'block';
-            }
-        }
+        // Removed autoPopulatePortfolioInputs function - no auto-fill allowed
 
         // Function removed - refresh button was confusing and not needed
 
@@ -5356,14 +5321,14 @@
                                     const realReturn = invested > 0 ? ((realGains / invested) * 100) : 0;
                                     
                                     return [
-                                        `💰 Amount Invested: ₹${Math.round(invested).toLocaleString('en-IN')}`,
-                                        `📈 Nominal Value: ₹${Math.round(nominalValue).toLocaleString('en-IN')}`,
-                                        `🔥 Real Value: ₹${Math.round(realValue).toLocaleString('en-IN')}`,
+                                        `Amount Invested: ₹${Math.round(invested).toLocaleString('en-IN')}`,
+                                        `Nominal Value: ₹${Math.round(nominalValue).toLocaleString('en-IN')}`,
+                                        `Real Value: ₹${Math.round(realValue).toLocaleString('en-IN')}`,
                                         ``,
-                                        `💵 Nominal Gains: ₹${Math.round(nominalGains).toLocaleString('en-IN')} (${nominalReturn.toFixed(1)}%)`,
-                                        `⚡ Real Gains: ₹${Math.round(realGains).toLocaleString('en-IN')} (${realReturn.toFixed(1)}%)`,
+                                        `Nominal Gains: ₹${Math.round(nominalGains).toLocaleString('en-IN')} (${nominalReturn.toFixed(1)}%)`,
+                                        `Real Gains: ₹${Math.round(realGains).toLocaleString('en-IN')} (${realReturn.toFixed(1)}%)`,
                                         ``,
-                                        `🎯 Inflation Impact: ₹${Math.round(nominalValue - realValue).toLocaleString('en-IN')}`
+                                        `Inflation Impact: ₹${Math.round(nominalValue - realValue).toLocaleString('en-IN')}`
                                     ];
                                 },
                                 label: function(context) {

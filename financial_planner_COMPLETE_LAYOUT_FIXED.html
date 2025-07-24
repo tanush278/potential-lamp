@@ -4066,13 +4066,20 @@
             let months = 12; // Default if no start date
             let years = 1;
             
-            if (data.startDate) {
+            if (data.startDate && data.startDate !== '') {
                 const start = new Date(data.startDate);
                 const now = new Date();
-                const diffTime = Math.abs(now - start);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                months = Math.max(1, Math.round(diffDays / 30.44)); // More accurate month calculation
-                years = Math.max(0.08, months / 12); // Minimum 1 month for calculation
+                
+                // Validate dates
+                if (!isNaN(start.getTime()) && start <= now) {
+                    const diffTime = Math.abs(now - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    months = Math.max(1, Math.round(diffDays / 30.44)); // More accurate month calculation
+                    years = Math.max(0.08, months / 12); // Minimum 1 month for calculation
+                } else {
+                    // Invalid date, use default
+                    console.warn('Invalid start date provided:', data.startDate);
+                }
             }
             
             // Calculate CAGR (Nominal)
@@ -5204,11 +5211,11 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-            <span style="color: var(--accent-gold);">Financial Planner Pro v3.2</span>
+            <span style="color: var(--accent-gold);">Financial Planner Pro v3.3</span>
             <span>•</span>
-            <span>Last Updated: Dec 19, 2024 - 14:30 UTC</span>
+            <span>Last Updated: Dec 19, 2024 - 15:45 UTC</span>
             <span>•</span>
-            <span style="color: var(--accent-silver);">Git: 66d2789</span>
+            <span style="color: var(--accent-silver);">Git: 8a6b195</span>
         </div>
     </footer>
 </body>

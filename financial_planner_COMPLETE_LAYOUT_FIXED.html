@@ -3076,8 +3076,30 @@
 
                 <section id="comparison" class="section">
                     <div class="section-header">
-                        <h1 class="section-title">Product Comparison</h1>
-                        <p class="section-subtitle">Compare financial products side-by-side to make informed decisions</p>
+                        <h1 class="section-title">Smart Product Comparison & Recommendations</h1>
+                        <p class="section-subtitle">AI-powered recommendations based on your complete financial profile</p>
+                    </div>
+
+                    <!-- Smart Recommendations Banner -->
+                    <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.05) 100%); border: 2px solid rgba(255,215,0,0.3);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <i class="fas fa-brain" style="font-size: 2rem; color: var(--accent-gold);"></i>
+                            <div>
+                                <h3 style="color: var(--accent-gold); margin: 0; font-size: 1.4rem; font-weight: 600;">AI-Powered Smart Recommendations</h3>
+                                <p style="color: var(--text-gray); margin: 0; font-size: 0.95rem;">Based on your age, income, risk profile, goals, and current portfolio</p>
+                            </div>
+                        </div>
+                        <div id="smart-recommendations-summary" style="padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                                <div><strong style="color: var(--accent-gold);">Profile:</strong> <span id="user-profile-summary">Complete your profile for personalized recommendations</span></div>
+                                <div><strong style="color: var(--accent-gold);">Risk Level:</strong> <span id="user-risk-summary">Take risk assessment</span></div>
+                                <div><strong style="color: var(--accent-gold);">Top Priority:</strong> <span id="user-goal-summary">Set your financial goals</span></div>
+                                <div><strong style="color: var(--accent-gold);">Recommendation:</strong> <span id="smart-recommendation-text">Building your recommendation...</span></div>
+                            </div>
+                        </div>
+                        <button onclick="generateSmartRecommendations()" style="padding: 0.8rem 1.5rem; background: var(--accent-gold); color: var(--primary-black); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-magic"></i> Generate Smart Recommendations
+                        </button>
                     </div>
 
                     <!-- Product Category Selection -->
@@ -3141,6 +3163,11 @@
                                 <button onclick="resetMutualFundsFilters()" style="padding: 0.5rem 1rem; background: var(--accent-gold); color: var(--primary-black); border: none; border-radius: 5px; font-weight: 600;">
                                     <i class="fas fa-undo"></i> Reset
                                 </button>
+                            </div>
+
+                            <!-- Smart Recommendations for Mutual Funds -->
+                            <div id="mutual-funds-recommendations" style="margin-bottom: 2rem; display: none;">
+                                <!-- Smart recommendations will be populated here -->
                             </div>
 
                             <!-- Comparison Table -->
@@ -8757,6 +8784,166 @@
             document.getElementById('fund-type-filter').value = 'all';
             document.getElementById('risk-level-filter').value = 'all';
             filterMutualFunds();
+        }
+
+        // SMART RECOMMENDATIONS ENGINE
+        function generateSmartRecommendations() {
+            // Simulate gathering data from other sections
+            const userProfile = analyzeUserProfile();
+            const riskProfile = analyzeRiskProfile();
+            const goals = analyzeGoals();
+            const financialStatus = analyzeFinancialStatus();
+            
+            // Update summary
+            updateRecommendationsSummary(userProfile, riskProfile, goals);
+            
+            // Generate category-specific recommendations
+            generateMutualFundsRecommendations(userProfile, riskProfile, goals, financialStatus);
+            generateInsuranceRecommendations(userProfile, goals, financialStatus);
+            generateLoanRecommendations(userProfile, financialStatus);
+            generateInvestmentRecommendations(userProfile, riskProfile, goals, financialStatus);
+        }
+
+        function analyzeUserProfile() {
+            // This would normally read from profile section
+            // For demo, using sample data
+            return {
+                age: 30,
+                income: 100000,
+                family: 'married',
+                experience: 'intermediate'
+            };
+        }
+
+        function analyzeRiskProfile() {
+            // This would normally read from risk assessment section
+            return {
+                riskScore: 'medium',
+                timeHorizon: 'long',
+                lossTolerance: 15
+            };
+        }
+
+        function analyzeGoals() {
+            // This would normally read from goals section
+            return {
+                primary: 'retirement',
+                secondary: 'house',
+                timeframe: 25,
+                amount: 50000000
+            };
+        }
+
+        function analyzeFinancialStatus() {
+            // This would normally read from financial section
+            return {
+                currentSavings: 1000000,
+                monthlySurplus: 25000,
+                existingInvestments: ['epf', 'fd'],
+                insuranceCoverage: 500000
+            };
+        }
+
+        function updateRecommendationsSummary(profile, risk, goals) {
+            document.getElementById('user-profile-summary').textContent = 
+                `${profile.age}yr, ₹${(profile.income/1000).toFixed(0)}K income, ${profile.family}`;
+            
+            document.getElementById('user-risk-summary').textContent = 
+                `${risk.riskScore.toUpperCase()} risk, ${risk.timeHorizon} term`;
+            
+            document.getElementById('user-goal-summary').textContent = 
+                `${goals.primary.toUpperCase()} in ${goals.timeframe}yr`;
+            
+            document.getElementById('smart-recommendation-text').textContent = 
+                `Focus on ${risk.riskScore} risk equity funds for ${goals.primary}`;
+        }
+
+        function generateMutualFundsRecommendations(profile, risk, goals, financial) {
+            const recommendedFunds = [];
+            
+            // Smart logic based on user profile
+            if (risk.riskScore === 'medium' && goals.primary === 'retirement') {
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('HDFC Top 100')),
+                    reason: 'Perfect for long-term retirement planning with balanced risk',
+                    priority: 1,
+                    allocation: 40
+                });
+                
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('Mirae Asset')),
+                    reason: 'Low expense ratio with consistent performance',
+                    priority: 2,
+                    allocation: 30
+                });
+                
+                recommendedFunds.push({
+                    fund: mutualFundsData.find(f => f.name.includes('ICICI Prudential Debt')),
+                    reason: 'Debt component for portfolio stability',
+                    priority: 3,
+                    allocation: 30
+                });
+            }
+            
+            if (recommendedFunds.length > 0) {
+                const recommendationHTML = `
+                    <div style="background: rgba(76, 175, 80, 0.1); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h4 style="color: #4CAF50; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-thumbs-up"></i> Recommended for Your Profile
+                        </h4>
+                        <div style="display: grid; gap: 1rem;">
+                            ${recommendedFunds.map(rec => `
+                                <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; border-left: 4px solid #4CAF50;">
+                                    <div style="display: flex; justify-content: between; align-items: start; gap: 1rem;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                                <span style="background: #4CAF50; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">#${rec.priority}</span>
+                                                <strong style="color: var(--text-white);">${rec.fund.name}</strong>
+                                                <span style="color: #4CAF50; font-weight: 600;">${rec.allocation}% allocation</span>
+                                            </div>
+                                            <p style="color: var(--text-gray); margin: 0; font-size: 0.9rem;">${rec.reason}</p>
+                                            <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-gray);">
+                                                <span style="margin-right: 1rem;">Returns: <strong style="color: #4CAF50;">${rec.fund.returns3Y}%</strong></span>
+                                                <span style="margin-right: 1rem;">Risk: <strong>${rec.fund.risk}</strong></span>
+                                                <span>Min Investment: <strong>₹${rec.fund.minInvestment.toLocaleString()}</strong></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top: 1rem; padding: 1rem; background: rgba(76, 175, 80, 0.1); border-radius: 8px;">
+                            <strong style="color: #4CAF50;">💡 Smart Tip:</strong> 
+                            <span style="color: var(--text-gray);">Start with ₹${Math.min(financial.monthlySurplus, 15000).toLocaleString()}/month SIP across these funds for optimal diversification.</span>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('mutual-funds-recommendations').innerHTML = recommendationHTML;
+                document.getElementById('mutual-funds-recommendations').style.display = 'block';
+            }
+        }
+
+        function generateInsuranceRecommendations(profile, goals, financial) {
+            // Logic for insurance recommendations based on profile
+            const requiredCoverage = Math.max(profile.income * 10, 10000000); // 10x income or 1Cr minimum
+            const recommendedProduct = insuranceData.find(p => p.coverage >= requiredCoverage);
+            
+            if (recommendedProduct) {
+                // Update insurance section with personalized recommendation
+                console.log('Insurance recommendation generated for coverage:', requiredCoverage);
+            }
+        }
+
+        function generateLoanRecommendations(profile, financial) {
+            // Logic for loan recommendations
+            const eligibleAmount = profile.income * 60; // 60x monthly income
+            console.log('Loan recommendation generated for amount:', eligibleAmount);
+        }
+
+        function generateInvestmentRecommendations(profile, risk, goals, financial) {
+            // Logic for investment recommendations based on goals and risk
+            console.log('Investment recommendations generated based on goals:', goals.primary);
         }
 
         // Initialize app

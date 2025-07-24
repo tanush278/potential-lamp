@@ -885,11 +885,57 @@
                         <p class="section-subtitle">Discover your investment personality and behavioral traits to optimize your financial strategy</p>
                     </div>
                     
-                    <div class="card">
+                    <div class="card" id="assessment-intro">
                         <h3>Investment Personality Assessment</h3>
                         <p>This comprehensive assessment will help identify your financial personality type, risk tolerance, and investment preferences.</p>
+                        <p><strong>Assessment includes:</strong></p>
+                        <ul style="margin: 1rem 0; color: var(--text-gray);">
+                            <li>Risk tolerance evaluation</li>
+                            <li>Investment behavior analysis</li>
+                            <li>Financial goals alignment</li>
+                            <li>Personality-based recommendations</li>
+                        </ul>
                         <button class="btn btn-primary" onclick="startPersonalityAssessment()">
                             <i class="fas fa-play"></i> Start Assessment
+                        </button>
+                    </div>
+
+                    <div class="card" id="assessment-questions" style="display: none;">
+                        <h3>Question <span id="current-question">1</span> of <span id="total-questions">10</span></h3>
+                        <div class="progress-bar" style="background: var(--border-gray); height: 4px; border-radius: 2px; margin: 1rem 0;">
+                            <div id="progress-fill" style="background: var(--accent-white); height: 100%; border-radius: 2px; width: 10%; transition: width 0.3s;"></div>
+                        </div>
+                        
+                        <div id="question-content">
+                            <h4 id="question-text">Loading question...</h4>
+                            <div id="question-options" class="form-grid" style="margin-top: 2rem;">
+                                <!-- Options will be populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button class="btn btn-secondary" id="prev-btn" onclick="previousQuestion()" disabled>
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </button>
+                            <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled>
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <button class="btn btn-primary" id="finish-btn" onclick="finishAssessment()" style="display: none;">
+                                <i class="fas fa-check"></i> Finish Assessment
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card" id="assessment-results" style="display: none;">
+                        <h3>Your Financial Personality Profile</h3>
+                        <div id="personality-result">
+                            <!-- Results will be populated by JS -->
+                        </div>
+                        <button class="btn btn-secondary" onclick="retakeAssessment()">
+                            <i class="fas fa-redo"></i> Retake Assessment
+                        </button>
+                        <button class="btn btn-primary" onclick="showSection('profile')">
+                            <i class="fas fa-arrow-right"></i> Continue to Profile Setup
                         </button>
                     </div>
                 </section>
@@ -989,11 +1035,94 @@
                         <p class="section-subtitle">Determine your investment risk tolerance and profile</p>
                     </div>
                     
-                    <div class="card">
-                        <h3>Risk Tolerance Questionnaire</h3>
-                        <p>Answer these questions to determine your risk profile for investment recommendations.</p>
-                        <button class="btn btn-primary" onclick="startRiskAssessment()">
-                            <i class="fas fa-chart-bar"></i> Start Risk Assessment
+                    <div class="card" id="risk-assessment">
+                        <h3>Risk Tolerance Calculator</h3>
+                        <p>Complete this comprehensive risk assessment to determine your optimal investment strategy.</p>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Age Group</label>
+                                <select class="form-select" id="age-group">
+                                    <option value="">Select age group</option>
+                                    <option value="20">Under 25 (High risk capacity)</option>
+                                    <option value="15">25-35 (Moderate-High risk capacity)</option>
+                                    <option value="10">36-45 (Moderate risk capacity)</option>
+                                    <option value="5">46-55 (Moderate-Low risk capacity)</option>
+                                    <option value="2">Over 55 (Low risk capacity)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Investment Experience</label>
+                                <select class="form-select" id="investment-experience">
+                                    <option value="">Select experience level</option>
+                                    <option value="5">No experience</option>
+                                    <option value="10">Basic knowledge</option>
+                                    <option value="15">Moderate experience</option>
+                                    <option value="20">Experienced investor</option>
+                                    <option value="25">Expert level</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Investment Horizon</label>
+                                <select class="form-select" id="investment-horizon">
+                                    <option value="">Select time period</option>
+                                    <option value="5">Less than 1 year</option>
+                                    <option value="10">1-3 years</option>
+                                    <option value="15">3-5 years</option>
+                                    <option value="20">5-10 years</option>
+                                    <option value="25">More than 10 years</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Income Stability</label>
+                                <select class="form-select" id="income-stability">
+                                    <option value="">Select stability level</option>
+                                    <option value="5">Very unstable</option>
+                                    <option value="10">Somewhat unstable</option>
+                                    <option value="15">Stable</option>
+                                    <option value="20">Very stable</option>
+                                    <option value="25">Extremely stable (govt/pension)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Financial Goals Priority</label>
+                                <select class="form-select" id="financial-goals">
+                                    <option value="">Select primary goal</option>
+                                    <option value="5">Capital preservation</option>
+                                    <option value="10">Regular income</option>
+                                    <option value="15">Balanced growth</option>
+                                    <option value="20">Wealth accumulation</option>
+                                    <option value="25">Maximum growth</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Market Loss Tolerance</label>
+                                <select class="form-select" id="loss-tolerance">
+                                    <option value="">How much loss can you handle?</option>
+                                    <option value="5">Cannot handle any loss</option>
+                                    <option value="10">Up to 5% loss</option>
+                                    <option value="15">Up to 15% loss</option>
+                                    <option value="20">Up to 25% loss</option>
+                                    <option value="25">More than 25% loss</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="calculateRiskProfile()">
+                            <i class="fas fa-chart-bar"></i> Calculate Risk Profile
+                        </button>
+                    </div>
+
+                    <div class="card" id="risk-results" style="display: none;">
+                        <h3>Your Risk Profile Analysis</h3>
+                        <div id="risk-profile-result">
+                            <!-- Results will be populated by JS -->
+                        </div>
+                        <button class="btn btn-secondary" onclick="recalculateRisk()">
+                            <i class="fas fa-redo"></i> Recalculate
+                        </button>
+                        <button class="btn btn-primary" onclick="showSection('goals')">
+                            <i class="fas fa-arrow-right"></i> Set Financial Goals
                         </button>
                     </div>
                 </section>
@@ -1469,13 +1598,472 @@
             alert('Goals saved successfully!');
         }
 
-        // Placeholder functions
+        // Personality Assessment System
+        const assessmentQuestions = [
+            {
+                question: "How do you typically react when your investments lose value?",
+                options: [
+                    { text: "I panic and want to sell immediately", score: 1 },
+                    { text: "I feel worried but try to stay calm", score: 3 },
+                    { text: "I review my strategy and hold steady", score: 5 },
+                    { text: "I see it as a buying opportunity", score: 7 }
+                ]
+            },
+            {
+                question: "What is your primary investment goal?",
+                options: [
+                    { text: "Capital preservation - don't lose money", score: 1 },
+                    { text: "Steady income with some growth", score: 3 },
+                    { text: "Balanced growth with moderate risk", score: 5 },
+                    { text: "Maximum growth, willing to take risks", score: 7 }
+                ]
+            },
+            {
+                question: "How much of your portfolio would you invest in stocks?",
+                options: [
+                    { text: "0-20% - I prefer safe investments", score: 1 },
+                    { text: "20-40% - Some stocks for growth", score: 3 },
+                    { text: "40-70% - Balanced stock allocation", score: 5 },
+                    { text: "70%+ - Stocks are the best long-term investment", score: 7 }
+                ]
+            },
+            {
+                question: "How often do you check your investment portfolio?",
+                options: [
+                    { text: "Daily - I need to stay updated", score: 2 },
+                    { text: "Weekly - Regular monitoring", score: 4 },
+                    { text: "Monthly - Periodic reviews", score: 6 },
+                    { text: "Quarterly or less - Long-term focus", score: 8 }
+                ]
+            },
+            {
+                question: "What would you do if a stock you own dropped 30%?",
+                options: [
+                    { text: "Sell immediately to prevent further loss", score: 1 },
+                    { text: "Sell half to limit losses", score: 3 },
+                    { text: "Hold and wait for recovery", score: 5 },
+                    { text: "Buy more at the lower price", score: 7 }
+                ]
+            },
+            {
+                question: "How do you prefer to make investment decisions?",
+                options: [
+                    { text: "Follow expert recommendations", score: 2 },
+                    { text: "Extensive research and analysis", score: 6 },
+                    { text: "Based on market trends", score: 4 },
+                    { text: "Gut feeling and intuition", score: 3 }
+                ]
+            },
+            {
+                question: "What is your investment time horizon?",
+                options: [
+                    { text: "Less than 2 years", score: 1 },
+                    { text: "2-5 years", score: 3 },
+                    { text: "5-10 years", score: 5 },
+                    { text: "More than 10 years", score: 7 }
+                ]
+            },
+            {
+                question: "How important is it to have access to your money quickly?",
+                options: [
+                    { text: "Very important - need immediate access", score: 1 },
+                    { text: "Somewhat important", score: 3 },
+                    { text: "Not very important", score: 5 },
+                    { text: "Not important at all", score: 7 }
+                ]
+            },
+            {
+                question: "What best describes your financial knowledge?",
+                options: [
+                    { text: "Beginner - learning the basics", score: 2 },
+                    { text: "Intermediate - understand key concepts", score: 4 },
+                    { text: "Advanced - well-versed in finance", score: 6 },
+                    { text: "Expert - finance professional", score: 8 }
+                ]
+            },
+            {
+                question: "How do you feel about borrowing money to invest?",
+                options: [
+                    { text: "Never - too risky", score: 1 },
+                    { text: "Only for very safe investments", score: 3 },
+                    { text: "If the potential return is high enough", score: 5 },
+                    { text: "It's a smart way to leverage returns", score: 7 }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let assessmentAnswers = [];
+
         function startPersonalityAssessment() {
-            alert('Personality assessment functionality will be implemented');
+            document.getElementById('assessment-intro').style.display = 'none';
+            document.getElementById('assessment-questions').style.display = 'block';
+            document.getElementById('assessment-results').style.display = 'none';
+            
+            currentQuestionIndex = 0;
+            assessmentAnswers = [];
+            document.getElementById('total-questions').textContent = assessmentQuestions.length;
+            
+            showCurrentQuestion();
         }
 
-        function startRiskAssessment() {
-            alert('Risk assessment functionality will be implemented');
+        function showCurrentQuestion() {
+            const question = assessmentQuestions[currentQuestionIndex];
+            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+            document.getElementById('question-text').textContent = question.question;
+            
+            // Update progress bar
+            const progress = ((currentQuestionIndex + 1) / assessmentQuestions.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            
+            // Create options
+            const optionsContainer = document.getElementById('question-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'form-group';
+                optionDiv.innerHTML = `
+                    <label class="option-label" style="display: flex; align-items: center; padding: 1rem; border: 1px solid var(--border-gray); border-radius: 8px; cursor: pointer; transition: var(--transition-smooth);">
+                        <input type="radio" name="question-${currentQuestionIndex}" value="${option.score}" style="margin-right: 0.5rem;" onchange="selectOption(this)">
+                        <span>${option.text}</span>
+                    </label>
+                `;
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            // Update button states
+            document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn').style.display = currentQuestionIndex === assessmentQuestions.length - 1 ? 'none' : 'inline-flex';
+            document.getElementById('finish-btn').style.display = currentQuestionIndex === assessmentQuestions.length - 1 ? 'inline-flex' : 'none';
+        }
+
+        function selectOption(radio) {
+            assessmentAnswers[currentQuestionIndex] = parseInt(radio.value);
+            document.getElementById('next-btn').disabled = false;
+            document.getElementById('finish-btn').disabled = false;
+            
+            // Style selected option
+            document.querySelectorAll('.option-label').forEach(label => {
+                label.style.background = 'transparent';
+                label.style.borderColor = 'var(--border-gray)';
+            });
+            radio.parentElement.style.background = 'rgba(255, 255, 255, 0.1)';
+            radio.parentElement.style.borderColor = 'var(--accent-white)';
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showCurrentQuestion();
+                
+                // Pre-select previous answer if exists
+                const previousAnswer = assessmentAnswers[currentQuestionIndex];
+                if (previousAnswer) {
+                    const radio = document.querySelector(`input[value="${previousAnswer}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                        selectOption(radio);
+                    }
+                }
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < assessmentQuestions.length - 1) {
+                currentQuestionIndex++;
+                showCurrentQuestion();
+                
+                // Pre-select previous answer if exists
+                const previousAnswer = assessmentAnswers[currentQuestionIndex];
+                if (previousAnswer) {
+                    const radio = document.querySelector(`input[value="${previousAnswer}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                        selectOption(radio);
+                    }
+                }
+            }
+        }
+
+        function finishAssessment() {
+            const totalScore = assessmentAnswers.reduce((sum, score) => sum + score, 0);
+            const averageScore = totalScore / assessmentQuestions.length;
+            
+            let personalityType, description, recommendations;
+            
+            if (averageScore <= 2.5) {
+                personalityType = "Conservative Investor";
+                description = "You prioritize capital preservation and prefer low-risk investments. You value stability over growth and are comfortable with modest returns.";
+                recommendations = [
+                    "Focus on Fixed Deposits, Government Bonds, and PPF",
+                    "Consider conservative mutual funds",
+                    "Maintain 6-month emergency fund",
+                    "Gradually increase risk tolerance with education"
+                ];
+            } else if (averageScore <= 4.5) {
+                personalityType = "Moderate Investor";
+                description = "You seek a balance between growth and security. You're willing to accept some risk for potentially higher returns but prefer steady progress.";
+                recommendations = [
+                    "Balanced mutual funds (60% equity, 40% debt)",
+                    "SIP in large-cap equity funds",
+                    "Mix of FDs and equity investments",
+                    "Consider ELSS for tax saving"
+                ];
+            } else if (averageScore <= 6.5) {
+                personalityType = "Growth-Oriented Investor";
+                description = "You're focused on long-term wealth creation and comfortable with market volatility. You understand that higher returns come with higher risks.";
+                recommendations = [
+                    "Equity-heavy portfolio (70-80% stocks)",
+                    "Mid-cap and large-cap mutual funds",
+                    "Direct equity investments",
+                    "International diversification"
+                ];
+            } else {
+                personalityType = "Aggressive Investor";
+                description = "You're a high-risk, high-reward investor who seeks maximum growth. You're comfortable with significant volatility and have strong market knowledge.";
+                recommendations = [
+                    "Small-cap and mid-cap funds",
+                    "Direct stock investments",
+                    "Sector-specific funds",
+                    "Alternative investments (REITs, commodities)"
+                ];
+            }
+            
+            // Save results to clientData
+            clientData.riskProfile = {
+                personalityType: personalityType,
+                riskScore: Math.round(averageScore * 10) / 10,
+                totalScore: totalScore,
+                averageScore: averageScore,
+                description: description,
+                recommendations: recommendations,
+                assessmentDate: new Date().toISOString()
+            };
+            
+            localStorage.setItem('clientData', JSON.stringify(clientData));
+            
+            // Display results
+            document.getElementById('assessment-questions').style.display = 'none';
+            document.getElementById('assessment-results').style.display = 'block';
+            
+            const resultsContainer = document.getElementById('personality-result');
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">
+                        ${personalityType === 'Conservative Investor' ? '🛡️' : 
+                          personalityType === 'Moderate Investor' ? '⚖️' : 
+                          personalityType === 'Growth-Oriented Investor' ? '📈' : '🚀'}
+                    </div>
+                    <h2 style="color: var(--accent-white); margin-bottom: 0.5rem;">${personalityType}</h2>
+                    <div style="font-size: 1.2rem; color: var(--text-gray);">Risk Score: ${Math.round(averageScore * 10) / 10}/7.0</div>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h4>About Your Profile:</h4>
+                    <p style="color: var(--text-gray); line-height: 1.6;">${description}</p>
+                </div>
+                
+                <div>
+                    <h4>Recommended Investment Strategy:</h4>
+                    <ul style="color: var(--text-gray); line-height: 1.6;">
+                        ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function retakeAssessment() {
+            document.getElementById('assessment-results').style.display = 'none';
+            document.getElementById('assessment-intro').style.display = 'block';
+            currentQuestionIndex = 0;
+            assessmentAnswers = [];
+        }
+
+        // Risk Assessment System
+        function calculateRiskProfile() {
+            const ageGroup = parseInt(document.getElementById('age-group').value) || 0;
+            const experience = parseInt(document.getElementById('investment-experience').value) || 0;
+            const horizon = parseInt(document.getElementById('investment-horizon').value) || 0;
+            const stability = parseInt(document.getElementById('income-stability').value) || 0;
+            const goals = parseInt(document.getElementById('financial-goals').value) || 0;
+            const tolerance = parseInt(document.getElementById('loss-tolerance').value) || 0;
+            
+            if (!ageGroup || !experience || !horizon || !stability || !goals || !tolerance) {
+                alert('Please complete all fields before calculating your risk profile.');
+                return;
+            }
+            
+            const totalScore = ageGroup + experience + horizon + stability + goals + tolerance;
+            const maxScore = 150;
+            const riskPercentage = Math.round((totalScore / maxScore) * 100);
+            
+            let riskCategory, riskDescription, portfolioRecommendation, investmentOptions;
+            
+            if (riskPercentage <= 30) {
+                riskCategory = "Conservative";
+                riskDescription = "You prefer safety and capital preservation over growth. You're comfortable with lower returns in exchange for stability.";
+                portfolioRecommendation = {
+                    equity: 20,
+                    debt: 70,
+                    gold: 5,
+                    cash: 5
+                };
+                investmentOptions = [
+                    "Fixed Deposits and Savings Accounts",
+                    "Government Bonds and Treasury Bills",
+                    "Conservative Debt Mutual Funds",
+                    "PPF and EPF",
+                    "Bank Fixed Deposits"
+                ];
+            } else if (riskPercentage <= 50) {
+                riskCategory = "Moderate Conservative";
+                riskDescription = "You seek steady growth with minimal risk. You're willing to accept slight volatility for better returns than pure conservative investments.";
+                portfolioRecommendation = {
+                    equity: 35,
+                    debt: 55,
+                    gold: 5,
+                    cash: 5
+                };
+                investmentOptions = [
+                    "Hybrid/Balanced Mutual Funds",
+                    "Large Cap Equity Funds",
+                    "Corporate Bond Funds",
+                    "Monthly Income Plans",
+                    "Debt-oriented ELSS"
+                ];
+            } else if (riskPercentage <= 70) {
+                riskCategory = "Moderate";
+                riskDescription = "You seek a balance between growth and stability. You can handle moderate market fluctuations for potentially higher returns.";
+                portfolioRecommendation = {
+                    equity: 50,
+                    debt: 35,
+                    gold: 10,
+                    cash: 5
+                };
+                investmentOptions = [
+                    "Diversified Equity Funds",
+                    "Large & Mid Cap Funds",
+                    "Balanced Advantage Funds",
+                    "ELSS Tax Saving Funds",
+                    "Index Funds"
+                ];
+            } else if (riskPercentage <= 85) {
+                riskCategory = "Moderate Aggressive";
+                riskDescription = "You're focused on long-term wealth creation and can handle significant market volatility. You prioritize growth over stability.";
+                portfolioRecommendation = {
+                    equity: 70,
+                    debt: 20,
+                    gold: 5,
+                    cash: 5
+                };
+                investmentOptions = [
+                    "Mid Cap and Small Cap Funds",
+                    "Sector-specific Equity Funds",
+                    "International Equity Funds",
+                    "Growth-oriented Mutual Funds",
+                    "Direct Equity Investments"
+                ];
+            } else {
+                riskCategory = "Aggressive";
+                riskDescription = "You're a high-risk, high-reward investor seeking maximum growth. You can handle significant volatility and losses for potential high returns.";
+                portfolioRecommendation = {
+                    equity: 85,
+                    debt: 10,
+                    gold: 3,
+                    cash: 2
+                };
+                investmentOptions = [
+                    "Small Cap and Micro Cap Funds",
+                    "Sector and Thematic Funds",
+                    "International Markets",
+                    "Direct Stock Investments",
+                    "Alternative Investments (REITs, etc.)"
+                ];
+            }
+            
+            // Save to clientData
+            clientData.riskProfile = {
+                ...clientData.riskProfile,
+                riskCategory: riskCategory,
+                riskScore: riskPercentage,
+                totalScore: totalScore,
+                maxScore: maxScore,
+                portfolioRecommendation: portfolioRecommendation,
+                investmentOptions: investmentOptions,
+                assessmentDate: new Date().toISOString()
+            };
+            
+            localStorage.setItem('clientData', JSON.stringify(clientData));
+            
+            // Display results
+            document.getElementById('risk-assessment').style.display = 'none';
+            document.getElementById('risk-results').style.display = 'block';
+            
+            const resultsContainer = document.getElementById('risk-profile-result');
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">
+                        ${riskCategory === 'Conservative' ? '🛡️' : 
+                          riskCategory === 'Moderate Conservative' ? '🏦' : 
+                          riskCategory === 'Moderate' ? '⚖️' : 
+                          riskCategory === 'Moderate Aggressive' ? '📈' : '🚀'}
+                    </div>
+                    <h2 style="color: var(--accent-white); margin-bottom: 0.5rem;">${riskCategory} Investor</h2>
+                    <div style="font-size: 1.2rem; color: var(--text-gray);">Risk Score: ${riskPercentage}/100</div>
+                    <div style="background: var(--border-gray); height: 8px; border-radius: 4px; margin: 1rem auto; width: 200px;">
+                        <div style="background: var(--accent-white); height: 100%; border-radius: 4px; width: ${riskPercentage}%; transition: width 1s ease;"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h4>Profile Description:</h4>
+                    <p style="color: var(--text-gray); line-height: 1.6;">${riskDescription}</p>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h4>Recommended Portfolio Allocation:</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${portfolioRecommendation.equity}%</div>
+                            <div style="color: var(--text-gray);">Equity</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${portfolioRecommendation.debt}%</div>
+                            <div style="color: var(--text-gray);">Debt</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${portfolioRecommendation.gold}%</div>
+                            <div style="color: var(--text-gray);">Gold</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${portfolioRecommendation.cash}%</div>
+                            <div style="color: var(--text-gray);">Cash</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4>Suitable Investment Options:</h4>
+                    <ul style="color: var(--text-gray); line-height: 1.6;">
+                        ${investmentOptions.map(option => `<li>${option}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function recalculateRisk() {
+            document.getElementById('risk-results').style.display = 'none';
+            document.getElementById('risk-assessment').style.display = 'block';
+            
+            // Clear form
+            document.getElementById('age-group').value = '';
+            document.getElementById('investment-experience').value = '';
+            document.getElementById('investment-horizon').value = '';
+            document.getElementById('income-stability').value = '';
+            document.getElementById('financial-goals').value = '';
+            document.getElementById('loss-tolerance').value = '';
         }
 
         function calculateTaxSavings() {

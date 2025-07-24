@@ -9719,7 +9719,9 @@
                 const currentCoverage = parseFloat(document.getElementById('insurance-coverage')?.value) || 0;
                 
                 if (age && monthlyIncome && currentCoverage > 0) {
-                    const annualIncome = monthlyIncome * 12;
+                    // SMART INCOME CALCULATION - Account for EPF and deductions
+                    const incomeCalculation = this.calculateAnnualIncome(monthlyIncome);
+                    const annualIncome = incomeCalculation.grossAnnual;
                     
                     // Calculate IDEAL coverage based on professional standards
                     let idealMultiplier;
@@ -9746,6 +9748,7 @@
                     this.showInsuranceAnalysis({
                         monthlyIncome,
                         annualIncome,
+                        incomeCalculation,
                         currentCoverage,
                         idealCoverage,
                         coverageGap,
@@ -9759,6 +9762,39 @@
                     
                     console.log(`Insurance Analysis: Current ${currentCoverage.toLocaleString()} vs Ideal ${idealCoverage.toLocaleString()}, Gap: ${coverageGap.toLocaleString()}`);
                 }
+            },
+            
+            // SMART INCOME CALCULATION - Handle EPF and deductions properly
+            calculateAnnualIncome(monthlyIncome) {
+                // Assume user enters take-home (net) monthly income
+                const netMonthly = monthlyIncome;
+                
+                // Reverse calculate gross income accounting for standard deductions
+                // Standard deductions: EPF (12%), Professional Tax (~200/month), TDS (varies)
+                // Assumption: Net income is ~85% of gross (accounting for EPF, PT, basic TDS)
+                
+                const grossMonthly = netMonthly / 0.85; // Reverse calculate gross
+                const grossAnnual = grossMonthly * 12;
+                
+                // EPF calculation (12% employee + 12% employer = 24% total)
+                const epfEmployee = grossMonthly * 0.12 * 12; // Employee contribution
+                const epfEmployer = grossMonthly * 0.12 * 12; // Employer contribution
+                const totalEPF = epfEmployee + epfEmployer;
+                
+                // Professional Tax (approximate)
+                const professionalTax = 200 * 12; // Rs 200/month average
+                
+                return {
+                    netMonthly: netMonthly,
+                    grossMonthly: grossMonthly,
+                    grossAnnual: grossAnnual,
+                    epfEmployee: epfEmployee,
+                    epfEmployer: epfEmployer,
+                    totalEPF: totalEPF,
+                    professionalTax: professionalTax,
+                    totalDeductions: epfEmployee + professionalTax,
+                    explanation: `Based on net monthly income of Rs ${netMonthly.toLocaleString()}, estimated gross annual: Rs ${grossAnnual.toLocaleString()}`
+                };
             },
             
             // Show comprehensive insurance analysis
@@ -9810,13 +9846,18 @@
                                 </div>
                             </div>
                             
-                            <div style="background: rgba(255,215,0,0.05); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-gold);">
-                                <h6 style="color: var(--accent-white); margin-bottom: 0.8rem;">Professional Analysis:</h6>
-                                <div style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.6;">
-                                    <div style="margin-bottom: 0.5rem;">
-                                        <strong style="color: var(--accent-white);">Income Replacement:</strong> 
-                                        ${analysis.idealMultiplier}x annual income (Rs ${analysis.annualIncome.toLocaleString()})
-                                    </div>
+                                                         <div style="background: rgba(255,215,0,0.05); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                                 <h6 style="color: var(--accent-white); margin-bottom: 0.8rem;">Professional Analysis:</h6>
+                                 <div style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.6;">
+                                     <div style="margin-bottom: 0.5rem;">
+                                         <strong style="color: var(--accent-white);">Income Calculation:</strong> 
+                                         Net Monthly Rs ${analysis.incomeCalculation.netMonthly.toLocaleString()} → 
+                                         Gross Annual Rs ${analysis.incomeCalculation.grossAnnual.toLocaleString()}
+                                     </div>
+                                     <div style="margin-bottom: 0.5rem;">
+                                         <strong style="color: var(--accent-white);">Income Replacement:</strong> 
+                                         ${analysis.idealMultiplier}x gross annual income
+                                     </div>
                                     <div style="margin-bottom: 0.5rem;">
                                         <strong style="color: var(--accent-white);">Coverage Gap:</strong> 
                                         Rs ${Math.abs(analysis.coverageGap).toLocaleString()} 
@@ -9826,13 +9867,18 @@
                                         <strong style="color: var(--accent-white);">Gap Percentage:</strong> 
                                         ${analysis.gapPercentage.toFixed(1)}% ${analysis.isAdequate ? 'over-covered' : 'under-covered'}
                                     </div>
-                                    <div style="margin-bottom: 1rem;">
-                                        <strong style="color: var(--accent-white);">Family Protection:</strong> 
-                                        Your current coverage will support ${analysis.dependents} dependents for 
-                                        <span style="color: ${analysis.familySurvivalYears >= analysis.idealSurvivalYears ? 'var(--accent-gold)' : '#F44336'}; font-weight: bold;">
-                                            ${analysis.familySurvivalYears.toFixed(1)} years
-                                        </span>
-                                    </div>
+                                                                         <div style="margin-bottom: 0.5rem;">
+                                         <strong style="color: var(--accent-white);">EPF Consideration:</strong> 
+                                         Total EPF Rs ${analysis.incomeCalculation.totalEPF.toLocaleString()} 
+                                         (Employee: Rs ${analysis.incomeCalculation.epfEmployee.toLocaleString()})
+                                     </div>
+                                     <div style="margin-bottom: 1rem;">
+                                         <strong style="color: var(--accent-white);">Family Protection:</strong> 
+                                         Your current coverage will support ${analysis.dependents} dependents for 
+                                         <span style="color: ${analysis.familySurvivalYears >= analysis.idealSurvivalYears ? 'var(--accent-gold)' : '#F44336'}; font-weight: bold;">
+                                             ${analysis.familySurvivalYears.toFixed(1)} years
+                                         </span>
+                                     </div>
                                     
                                     ${this.getInsuranceRecommendation(analysis)}
                                 </div>

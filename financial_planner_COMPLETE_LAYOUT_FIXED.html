@@ -1746,9 +1746,7 @@
                 nominalValue: Math.round(finalNominalValue),
                 realValue: Math.round(finalRealValue),
                 totalReturns: Math.round(totalReturns),
-                yearlyData: yearlyData,
-                cagr: (Math.pow(finalNominalValue / totalInvestment, 1 / years) - 1) * 100,
-                realCAGR: (Math.pow(finalRealValue / totalInvestment, 1 / years) - 1) * 100
+                yearlyData: yearlyData
             };
         }
 
@@ -1882,36 +1880,51 @@
 
         function generateInvestmentInsights(calculations) {
             const insights = document.getElementById('insights-content');
-            const nominalCAGR = calculations.cagr.toFixed(2);
-            const realCAGR = calculations.realCAGR.toFixed(2);
+            const annualRate = parseFloat(document.getElementById('sip-return').value) || 0;
+            const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 0;
+            
+            // Correct CAGR calculations
+            const nominalCAGR = annualRate; // This is the expected annual return entered by user
+            const realCAGR = ((1 + nominalCAGR/100) / (1 + inflationRate/100) - 1) * 100; // Real CAGR formula
             const inflationImpact = ((calculations.nominalValue - calculations.realValue) / calculations.nominalValue * 100).toFixed(1);
             
             insights.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                    <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                        <h5 style="color: var(--accent-white); margin-bottom: 0.5rem;">Compound Annual Growth Rate</h5>
-                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${nominalCAGR}%</div>
-                        <div style="font-size: 0.9rem; color: var(--text-gray);">Nominal CAGR</div>
+                    <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border: 1px solid var(--accent-silver); border-radius: 12px; box-shadow: var(--shadow-glow);">
+                        <h5 style="color: var(--accent-white); margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;">Expected Annual Return</h5>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-white); margin-bottom: 0.3rem;">${nominalCAGR.toFixed(2)}%</div>
+                        <div style="font-size: 0.85rem; color: var(--text-gray);">Nominal CAGR (Pre-inflation)</div>
                     </div>
-                    <div style="padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 8px;">
-                        <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Real CAGR (Inflation Adjusted)</h5>
-                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-gold);">${realCAGR}%</div>
-                        <div style="font-size: 0.9rem; color: var(--text-gray);">After inflation impact</div>
+                    <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05)); border: 1px solid var(--accent-gold); border-radius: 12px; box-shadow: 0 0 20px rgba(255,215,0,0.2);">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;">Real Annual Return</h5>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-gold); margin-bottom: 0.3rem;">${realCAGR.toFixed(2)}%</div>
+                        <div style="font-size: 0.85rem; color: var(--text-gray);">After ${inflationRate}% inflation impact</div>
                     </div>
-                    <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                        <h5 style="color: var(--text-gray); margin-bottom: 0.5rem;">Inflation Impact</h5>
-                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-gray);">${inflationImpact}%</div>
-                        <div style="font-size: 0.9rem; color: var(--text-gray);">Purchasing power reduction</div>
+                    <div style="padding: 1.5rem; background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(192,192,192,0.05)); border: 1px solid var(--accent-silver); border-radius: 12px;">
+                        <h5 style="color: var(--accent-silver); margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;">Purchasing Power Loss</h5>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-silver); margin-bottom: 0.3rem;">${inflationImpact}%</div>
+                        <div style="font-size: 0.85rem; color: var(--text-gray);">Due to inflation erosion</div>
                     </div>
                 </div>
-                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.02); border-left: 3px solid var(--accent-gold); border-radius: 4px;">
-                    <h5 style="color: var(--accent-white); margin-bottom: 0.5rem;">💡 Key Insights:</h5>
-                    <ul style="color: var(--text-gray); line-height: 1.6; margin: 0; padding-left: 1.5rem;">
-                        <li>Your investment will grow ${(calculations.nominalValue / calculations.totalInvestment).toFixed(1)}x in nominal terms</li>
-                        <li>After adjusting for inflation, the real growth is ${(calculations.realValue / calculations.totalInvestment).toFixed(1)}x</li>
-                        <li>Inflation reduces your purchasing power by ₹${(calculations.nominalValue - calculations.realValue).toLocaleString('en-IN')}</li>
-                        <li>${realCAGR > 3 ? 'Excellent! Your real returns beat inflation significantly.' : realCAGR > 0 ? 'Good! Your returns are beating inflation.' : 'Warning! Your returns are not keeping pace with inflation.'}</li>
-                    </ul>
+                <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-left: 4px solid var(--accent-gold); border-radius: 8px; box-shadow: var(--shadow-light);">
+                    <h5 style="color: var(--accent-white); margin-bottom: 1rem; font-size: 1.1rem;">💡 Investment Analysis:</h5>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                        <ul style="color: var(--text-gray); line-height: 1.8; margin: 0; padding-left: 1.5rem; list-style-type: none;">
+                            <li style="margin-bottom: 0.5rem;">📈 <strong style="color: var(--accent-white);">Growth Multiple:</strong> ${(calculations.nominalValue / calculations.totalInvestment).toFixed(1)}x nominal growth</li>
+                            <li style="margin-bottom: 0.5rem;">💰 <strong style="color: var(--accent-gold);">Real Growth:</strong> ${(calculations.realValue / calculations.totalInvestment).toFixed(1)}x after inflation</li>
+                            <li style="margin-bottom: 0.5rem;">⚠️ <strong style="color: var(--accent-silver);">Inflation Cost:</strong> ₹${(calculations.nominalValue - calculations.realValue).toLocaleString('en-IN')} purchasing power loss</li>
+                        </ul>
+                        <div style="padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 8px; border: 1px solid var(--accent-gold);">
+                            <div style="font-size: 0.9rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;">
+                                ${realCAGR > 5 ? '🎉 EXCELLENT STRATEGY!' : realCAGR > 2 ? '✅ GOOD STRATEGY!' : '⚠️ REVIEW STRATEGY!'}
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--text-gray);">
+                                ${realCAGR > 5 ? 'Your real returns significantly beat inflation. This is a strong wealth-building strategy.' : 
+                                  realCAGR > 2 ? 'Your returns are beating inflation, ensuring wealth preservation and growth.' : 
+                                  'Your returns barely beat inflation. Consider higher-return investments or review your strategy.'}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
         }

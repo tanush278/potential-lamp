@@ -1598,7 +1598,29 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Investment Start Date</label>
-                                    <input type="date" id="investment-start-date" class="form-input" onchange="calculatePortfolioMetrics()" max="">
+                                    <input type="date" id="investment-start-date" class="form-input" onchange="calculatePortfolioMetrics()">
+                                    <script>
+                                        // Immediate date initialization to fix input issues
+                                        (function() {
+                                            const dateInput = document.getElementById('investment-start-date');
+                                            if (dateInput) {
+                                                const today = new Date();
+                                                const todayStr = today.toISOString().split('T')[0];
+                                                const tenYearsAgo = new Date();
+                                                tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
+                                                const minDateStr = tenYearsAgo.toISOString().split('T')[0];
+                                                
+                                                dateInput.setAttribute('max', todayStr);
+                                                dateInput.setAttribute('min', minDateStr);
+                                                
+                                                if (!dateInput.value) {
+                                                    const twoYearsAgo = new Date();
+                                                    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+                                                    dateInput.value = twoYearsAgo.toISOString().split('T')[0];
+                                                }
+                                            }
+                                        })();
+                                    </script>
                                 </div>
                                 <div class="form-group">
                                     <label>Expected Inflation Rate (%)</label>
@@ -3846,17 +3868,32 @@
 
         // Initialize Portfolio Analysis with integration from Investment Recommendations
         function initializePortfolioAnalysis() {
-            // Set max date for investment start date to today
+            // Set date constraints for investment start date
             const dateInput = document.getElementById('investment-start-date');
             if (dateInput) {
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.setAttribute('max', today);
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                
+                // Set reasonable date range (10 years ago to today)
+                const tenYearsAgo = new Date();
+                tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
+                const minDateStr = tenYearsAgo.toISOString().split('T')[0];
+                
+                dateInput.setAttribute('max', todayStr);
+                dateInput.setAttribute('min', minDateStr);
+                
                 // Set default to 2 years ago if no value
                 if (!dateInput.value) {
                     const twoYearsAgo = new Date();
                     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
                     dateInput.value = twoYearsAgo.toISOString().split('T')[0];
                 }
+                
+                console.log('Date input initialized:', {
+                    min: minDateStr,
+                    max: todayStr,
+                    defaultValue: dateInput.value
+                });
             }
             
             // Ensure rebalancing results are hidden initially

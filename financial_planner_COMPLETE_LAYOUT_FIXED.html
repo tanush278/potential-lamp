@@ -2419,11 +2419,11 @@
             
             const { installmentsPerYear, compoundingPerYear } = frequencyData[frequency];
             
-            // Calculate rates based on actual compounding frequency
-            // For quarterly: 12%/4 = 3% per quarter
-            // For annual: 12%/1 = 12% per year
-            const periodRate = annualRate / compoundingPerYear / 100;
-            const inflationPeriodRate = inflationRate / compoundingPerYear / 100;
+            // Calculate rates based on CAGR compounding frequency
+            // For quarterly: (1.12)^(1/4) - 1 = 2.874% per quarter
+            // For annual: (1.12)^(1/1) - 1 = 12% per year
+            const periodRate = Math.pow(1 + annualRate / 100, 1 / compoundingPerYear) - 1;
+            const inflationPeriodRate = Math.pow(1 + inflationRate / 100, 1 / compoundingPerYear) - 1;
             
             let totalInvestment = 0;
             let nominalValue = 0;

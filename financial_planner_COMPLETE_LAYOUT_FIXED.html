@@ -4448,19 +4448,7 @@
                 updatePortfolioNoticeForUserData();
             }
             
-            // Auto-adjust total portfolio value if allocation is entered
-            if (allocatedTotal > 0 && totalValue === 0) {
-                document.getElementById('total-portfolio-value').value = allocatedTotal;
-            }
-            
-            // Auto-distribute if total is entered but allocation is empty
-            if (totalValue > 0 && allocatedTotal === 0) {
-                // Use default moderate allocation
-                document.getElementById('portfolio-equity').value = Math.round(totalValue * 0.5);
-                document.getElementById('portfolio-debt').value = Math.round(totalValue * 0.35);
-                document.getElementById('portfolio-gold').value = Math.round(totalValue * 0.1);
-                document.getElementById('portfolio-cash').value = Math.round(totalValue * 0.05);
-            }
+            // Removed auto-fill functionality - users must enter their own allocation values
             
             // Update advanced analytics in real-time
             updateAdvancedAnalytics();

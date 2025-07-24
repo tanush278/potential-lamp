@@ -5045,52 +5045,14 @@
         function generateAllocationInsights(current, recommended, totalValue) {
             const insights = document.getElementById('allocation-insights');
             
-            // Calculate rebalancing needs
-            const rebalanceActions = [];
-            Object.keys(recommended).forEach(asset => {
-                const currentPercent = parseFloat(current[asset]);
-                const recommendedPercent = recommended[asset];
-                const difference = recommendedPercent - currentPercent;
-                const amount = Math.round((totalValue * difference) / 100);
-                
-                if (Math.abs(difference) > 5) { // Only show if > 5% difference
-                    rebalanceActions.push({
-                        asset: asset,
-                        action: difference > 0 ? 'Increase' : 'Decrease',
-                        amount: Math.abs(amount),
-                        percentage: Math.abs(difference).toFixed(1)
-                    });
-                }
-            });
+            // Removed rebalancing calculation - only calculated when user clicks "Calculate Rebalancing Actions"
             
             let insightsHTML = `
                 <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
                     <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Allocation Analysis</h5>
             `;
             
-            if (rebalanceActions.length > 0) {
-                insightsHTML += `
-                    <div style="margin-bottom: 1.5rem;">
-                        <h6 style="color: var(--accent-gold); margin-bottom: 1rem;">Rebalancing Recommendations</h6>
-                        <div style="display: grid; gap: 0.8rem;">
-                `;
-                rebalanceActions.forEach(action => {
-                    const color = action.action === 'Increase' ? 'var(--accent-gold)' : 'var(--accent-silver)';
-                    insightsHTML += `
-                        <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,255,255,0.02); border-radius: 6px;">
-                            <span style="color: var(--text-gray); text-transform: capitalize;">${action.asset}</span>
-                            <span style="color: ${color}; font-weight: bold;">${action.action} by ${action.percentage}% (₹${action.amount.toLocaleString('en-IN')})</span>
-                        </div>
-                    `;
-                });
-                insightsHTML += '</div></div>';
-            } else {
-                insightsHTML += `
-                    <div style="text-align: center; padding: 1rem; background: rgba(0,255,0,0.1); border-radius: 8px; margin-bottom: 1rem;">
-                        <span style="color: var(--accent-gold); font-weight: bold;">Portfolio is well-balanced! No major rebalancing needed.</span>
-                    </div>
-                `;
-            }
+            // Removed automatic rebalancing recommendations - only show when user clicks "Calculate Rebalancing Actions"
             
             insightsHTML += `
                     <div style="padding: 1rem; background: rgba(255,215,0,0.05); border-left: 4px solid var(--accent-gold); border-radius: 4px;">

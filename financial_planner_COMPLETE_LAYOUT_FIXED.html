@@ -7457,9 +7457,20 @@
                                         <span style="color: var(--text-gray); font-size: 14px;">Cess (4%)</span>
                                         <span style="color: var(--text-white); font-weight: 600;">₹${Math.round(oldRegimeTax.cess).toLocaleString('en-IN')}</span>
                                     </div>
+                                    ${oldRegimeTax.capitalGainsTax && oldRegimeTax.capitalGainsTax > 0 ? `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; border-top: 1px solid #333; margin-top: 4px; padding-top: 8px;">
+                                        <span style="color: var(--text-gray); font-size: 14px;">Capital Gains Tax</span>
+                                        <span style="color: #ffa500; font-weight: 600;">₹${Math.round(oldRegimeTax.capitalGainsTax).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    ` : ''}
                                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,107,107,0.1); border-radius: 8px; margin-top: 8px;">
-                                        <span style="color: var(--text-white); font-weight: 700; font-size: 16px;">Total Tax</span>
+                                        <span style="color: var(--text-white); font-weight: 700; font-size: 16px;">Total Tax Liability</span>
                                         <span style="color: #ff6b6b; font-weight: 700; font-size: 18px;">₹${Math.round(oldRegimeTax.totalTaxWithCess).toLocaleString('en-IN')}</span>
+                                        ${oldRegimeTax.capitalGainsTax && oldRegimeTax.capitalGainsTax > 0 ? `
+                                        <div style="font-size: 10px; color: var(--text-gray); margin-top: 2px; text-align: center;">
+                                            (Includes ₹${Math.round(oldRegimeTax.capitalGainsTax).toLocaleString('en-IN')} CG Tax)
+                                        </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                                 
@@ -7495,9 +7506,20 @@
                                         <span style="color: var(--text-gray); font-size: 14px;">Cess (4%)</span>
                                         <span style="color: var(--text-white); font-weight: 600;">₹${Math.round(newRegimeTax.cess).toLocaleString('en-IN')}</span>
                                     </div>
+                                    ${newRegimeTax.capitalGainsTax && newRegimeTax.capitalGainsTax > 0 ? `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; border-top: 1px solid #333; margin-top: 4px; padding-top: 8px;">
+                                        <span style="color: var(--text-gray); font-size: 14px;">Capital Gains Tax</span>
+                                        <span style="color: #ffa500; font-weight: 600;">₹${Math.round(newRegimeTax.capitalGainsTax).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    ` : ''}
                                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,107,107,0.1); border-radius: 8px; margin-top: 8px;">
-                                        <span style="color: var(--text-white); font-weight: 700; font-size: 16px;">Total Tax</span>
+                                        <span style="color: var(--text-white); font-weight: 700; font-size: 16px;">Total Tax Liability</span>
                                         <span style="color: #ff6b6b; font-weight: 700; font-size: 18px;">₹${Math.round(newRegimeTax.totalTaxWithCess).toLocaleString('en-IN')}</span>
+                                        ${newRegimeTax.capitalGainsTax && newRegimeTax.capitalGainsTax > 0 ? `
+                                        <div style="font-size: 10px; color: var(--text-gray); margin-top: 2px; text-align: center;">
+                                            (Includes ₹${Math.round(newRegimeTax.capitalGainsTax).toLocaleString('en-IN')} CG Tax)
+                                        </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                                 
@@ -7567,9 +7589,20 @@
                                         <span>Health & Education Cess:</span>
                                         <span style="float: right; color: var(--text-white); font-weight: 600;">₹${Math.round(taxData.cess).toLocaleString('en-IN')}</span>
                                     </div>
+                                    ${taxData.capitalGainsTax && taxData.capitalGainsTax > 0 ? `
+                                    <div style="margin-bottom: 8px; color: var(--text-gray); border-top: 1px solid #333; padding-top: 8px;">
+                                        <span>Capital Gains Tax:</span>
+                                        <span style="float: right; color: #ffa500; font-weight: 600;">₹${Math.round(taxData.capitalGainsTax).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    ` : ''}
                                     <div style="padding: 12px; background: rgba(255,107,107,0.1); border-radius: 8px; margin-top: 12px;">
-                                        <span style="color: var(--text-white); font-weight: 700;">Total Tax:</span>
+                                        <span style="color: var(--text-white); font-weight: 700;">Total Tax Liability:</span>
                                         <span style="float: right; color: #ff6b6b; font-weight: 700; font-size: 18px;">₹${Math.round(taxData.totalTaxWithCess).toLocaleString('en-IN')}</span>
+                                        ${taxData.capitalGainsTax && taxData.capitalGainsTax > 0 ? `
+                                        <div style="font-size: 12px; color: var(--text-gray); margin-top: 4px; text-align: center;">
+                                            (Includes ₹${Math.round(taxData.capitalGainsTax).toLocaleString('en-IN')} Capital Gains Tax)
+                                        </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -7585,6 +7618,26 @@
                                 <div style="color: var(--text-white); font-size: 24px; font-weight: 700;">₹${Math.round(grossSalary - taxData.totalTaxWithCess).toLocaleString('en-IN')}</div>
                             </div>
                         </div>
+                        
+                        ${taxData.capitalGainsTax && taxData.capitalGainsTax > 0 ? `
+                        <div style="background: var(--primary-black); border-radius: 12px; padding: 1.5rem; border: 1px solid #333; margin-bottom: 2rem;">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Tax Composition Breakdown</h5>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                                <div style="text-align: center; background: rgba(255,107,107,0.1); padding: 1rem; border-radius: 8px;">
+                                    <div style="color: var(--text-gray); font-size: 12px; margin-bottom: 4px;">Income Tax + Cess</div>
+                                    <div style="color: #ff6b6b; font-size: 18px; font-weight: 700;">₹${Math.round(taxData.totalTax + taxData.cess).toLocaleString('en-IN')}</div>
+                                </div>
+                                <div style="text-align: center; background: rgba(255,165,0,0.1); padding: 1rem; border-radius: 8px;">
+                                    <div style="color: var(--text-gray); font-size: 12px; margin-bottom: 4px;">Capital Gains Tax</div>
+                                    <div style="color: #ffa500; font-size: 18px; font-weight: 700;">₹${Math.round(taxData.capitalGainsTax).toLocaleString('en-IN')}</div>
+                                </div>
+                                <div style="text-align: center; background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 8px; border: 2px solid var(--accent-gold);">
+                                    <div style="color: var(--text-gray); font-size: 12px; margin-bottom: 4px;">Total Tax Liability</div>
+                                    <div style="color: var(--accent-gold); font-size: 20px; font-weight: 700;">₹${Math.round(taxData.totalTaxWithCess).toLocaleString('en-IN')}</div>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
                         
                         <div style="background: var(--primary-black); border-radius: 12px; padding: 1.5rem; border: 1px solid #333;">
                             <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Tax Slab Breakdown</h5>

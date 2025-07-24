@@ -1621,38 +1621,43 @@
                     </div>
 
                     <!-- Portfolio Overview -->
-                    <div class="card" id="portfolio-overview" style="display: none; margin-top: 2rem;">
+                    <div class="card" id="portfolio-overview" style="margin-top: 2rem;">
                         <div class="card-header">
                             <h3 class="card-title">Portfolio Overview</h3>
                             <p class="card-subtitle">Key metrics and performance indicators</p>
                         </div>
                         
+                        <div style="text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; margin-bottom: 2rem;">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Sample Portfolio Analysis</h5>
+                            <p style="color: var(--text-gray); margin: 0;">Enter your portfolio details above to get personalized analysis. Below is a sample analysis for demonstration.</p>
+                        </div>
+                        
                         <div class="results-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                             <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
                                 <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem; text-transform: uppercase;">Total Returns</div>
-                                <div id="portfolio-total-returns" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-gold);">₹0</div>
-                                <div id="portfolio-returns-percentage" style="font-size: 0.9rem; color: var(--text-gray);">0%</div>
+                                <div id="portfolio-total-returns" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-gold);">₹2,50,000</div>
+                                <div id="portfolio-returns-percentage" style="font-size: 0.9rem; color: var(--text-gray);">25% (Sample)</div>
                             </div>
                             <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
                                 <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem; text-transform: uppercase;">Annual Return</div>
-                                <div id="portfolio-annual-return" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-white);">0%</div>
+                                <div id="portfolio-annual-return" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-white);">12.5%</div>
                                 <div style="font-size: 0.9rem; color: var(--text-gray);">CAGR</div>
                             </div>
                             <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
                                 <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem; text-transform: uppercase;">Portfolio Health</div>
-                                <div id="portfolio-health-score" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-silver);">0</div>
+                                <div id="portfolio-health-score" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-silver);">78</div>
                                 <div style="font-size: 0.9rem; color: var(--text-gray);">Score out of 100</div>
                             </div>
                             <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-light); border-radius: 12px; padding: 1.5rem; text-align: center;">
                                 <div style="font-size: 0.9rem; color: var(--accent-light); margin-bottom: 0.5rem; text-transform: uppercase;">Investment Duration</div>
-                                <div id="portfolio-duration" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-light);">0</div>
+                                <div id="portfolio-duration" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-light);">24</div>
                                 <div style="font-size: 0.9rem; color: var(--text-gray);">Months</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Asset Allocation Analysis -->
-                    <div class="card" id="allocation-analysis" style="display: none; margin-top: 2rem;">
+                    <div class="card" id="allocation-analysis" style="margin-top: 2rem;">
                         <div class="card-header">
                             <h3 class="card-title">Asset Allocation Analysis</h3>
                             <p class="card-subtitle">Current allocation vs recommended allocation</p>
@@ -1684,7 +1689,7 @@
                     </div>
 
                     <!-- Portfolio Health Check -->
-                    <div class="card" id="portfolio-health" style="display: none; margin-top: 2rem;">
+                    <div class="card" id="portfolio-health" style="margin-top: 2rem;">
                         <div class="card-header">
                             <h3 class="card-title">Portfolio Health Check</h3>
                             <p class="card-subtitle">Comprehensive portfolio analysis and recommendations</p>
@@ -1700,7 +1705,7 @@
                     </div>
 
                     <!-- Performance Chart -->
-                    <div class="card" id="performance-chart" style="display: none; margin-top: 2rem;">
+                    <div class="card" id="performance-chart" style="margin-top: 2rem;">
                         <div class="card-header">
                             <h3 class="card-title">Performance Tracking</h3>
                             <p class="card-subtitle">Portfolio growth visualization and projections</p>
@@ -3739,6 +3744,24 @@
             `;
         }
 
+        // Initialize Portfolio Analysis with sample data
+        function initializePortfolioAnalysis() {
+            // Sample portfolio data for demonstration
+            const sampleData = {
+                totalValue: 1250000,
+                totalInvested: 1000000,
+                monthlySIP: 20000,
+                startDate: '2022-01-01',
+                allocation: { equity: 625000, debt: 437500, gold: 125000, cash: 62500 },
+                totalReturns: 250000
+            };
+            
+            // Generate sample analysis
+            analyzeAssetAllocation(sampleData);
+            generatePortfolioHealthCheck(sampleData);
+            createPerformanceChart(sampleData);
+        }
+
         // Portfolio Analysis Functions
         let portfolioAllocationChart = null;
         let portfolioPerformanceChart = null;
@@ -4830,6 +4853,9 @@
             
             // Initialize Investment Recommendations dynamically
             loadInvestmentRecommendations();
+            
+            // Initialize Portfolio Analysis with sample data
+            initializePortfolioAnalysis();
             
             // Load saved goals
             loadSavedGoals();

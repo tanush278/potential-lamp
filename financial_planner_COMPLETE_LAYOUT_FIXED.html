@@ -6676,6 +6676,508 @@
         const style = document.createElement('style');
         style.textContent = additionalCSS;
         document.head.appendChild(style);
+
+        // Advanced Net Worth Calculator Functions - NEW FEATURE v5.0
+        let assetAllocationChart = null;
+        let liabilityBreakdownChart = null;
+        let networthTrendChart = null;
+
+        function calculateAdvancedNetWorth() {
+            try {
+                // Get all asset values
+                const liquidAssets = {
+                    savingsAccount: parseFloat(document.getElementById('savings-account')?.value) || 0,
+                    currentAccount: parseFloat(document.getElementById('current-account')?.value) || 0,
+                    fixedDeposits: parseFloat(document.getElementById('fixed-deposits')?.value) || 0,
+                    cashHand: parseFloat(document.getElementById('cash-hand')?.value) || 0
+                };
+
+                const investmentAssets = {
+                    mutualFunds: parseFloat(document.getElementById('mutual-funds')?.value) || 0,
+                    stocksShares: parseFloat(document.getElementById('stocks-shares')?.value) || 0,
+                    bondsDebentures: parseFloat(document.getElementById('bonds-debentures')?.value) || 0,
+                    retirementFunds: parseFloat(document.getElementById('retirement-funds')?.value) || 0,
+                    goldMetals: parseFloat(document.getElementById('gold-metals')?.value) || 0,
+                    cryptocurrency: parseFloat(document.getElementById('cryptocurrency')?.value) || 0
+                };
+
+                const physicalAssets = {
+                    primaryResidence: parseFloat(document.getElementById('primary-residence')?.value) || 0,
+                    investmentProperty: parseFloat(document.getElementById('investment-property')?.value) || 0,
+                    vehicles: parseFloat(document.getElementById('vehicles')?.value) || 0,
+                    jewelryValuables: parseFloat(document.getElementById('jewelry-valuables')?.value) || 0,
+                    businessAssets: parseFloat(document.getElementById('business-assets')?.value) || 0,
+                    otherAssets: parseFloat(document.getElementById('other-assets-nw')?.value) || 0
+                };
+
+                // Get all liability values
+                const securedLoans = {
+                    homeLoan: parseFloat(document.getElementById('home-loan')?.value) || 0,
+                    carLoan: parseFloat(document.getElementById('car-loan')?.value) || 0,
+                    propertyLoan: parseFloat(document.getElementById('property-loan')?.value) || 0,
+                    goldLoan: parseFloat(document.getElementById('gold-loan')?.value) || 0
+                };
+
+                const unsecuredDebts = {
+                    personalLoan: parseFloat(document.getElementById('personal-loan')?.value) || 0,
+                    creditCardOutstanding: parseFloat(document.getElementById('credit-card-outstanding')?.value) || 0,
+                    educationLoan: parseFloat(document.getElementById('education-loan')?.value) || 0,
+                    businessLoan: parseFloat(document.getElementById('business-loan')?.value) || 0,
+                    otherDebts: parseFloat(document.getElementById('other-debts')?.value) || 0
+                };
+
+                // Calculate totals
+                const totalLiquidAssets = Object.values(liquidAssets).reduce((sum, val) => sum + val, 0);
+                const totalInvestmentAssets = Object.values(investmentAssets).reduce((sum, val) => sum + val, 0);
+                const totalPhysicalAssets = Object.values(physicalAssets).reduce((sum, val) => sum + val, 0);
+                const totalAssets = totalLiquidAssets + totalInvestmentAssets + totalPhysicalAssets;
+
+                const totalSecuredLoans = Object.values(securedLoans).reduce((sum, val) => sum + val, 0);
+                const totalUnsecuredDebts = Object.values(unsecuredDebts).reduce((sum, val) => sum + val, 0);
+                const totalLiabilities = totalSecuredLoans + totalUnsecuredDebts;
+
+                const netWorth = totalAssets - totalLiabilities;
+
+                // Only proceed if we have valid elements
+                if (document.getElementById('networth-summary')) {
+                    displayNetWorthSummary({
+                        totalAssets,
+                        totalLiabilities,
+                        netWorth,
+                        liquidAssets: totalLiquidAssets,
+                        investmentAssets: totalInvestmentAssets,
+                        physicalAssets: totalPhysicalAssets,
+                        securedLoans: totalSecuredLoans,
+                        unsecuredDebts: totalUnsecuredDebts
+                    });
+
+                    // Create charts only if elements exist
+                    if (document.getElementById('asset-allocation-chart')) {
+                        createAssetAllocationChart({
+                            liquidAssets: totalLiquidAssets,
+                            investmentAssets: totalInvestmentAssets,
+                            physicalAssets: totalPhysicalAssets
+                        });
+                    }
+
+                    if (totalLiabilities > 0 && document.getElementById('liability-breakdown-chart')) {
+                        createLiabilityBreakdownChart({
+                            securedLoans: totalSecuredLoans,
+                            unsecuredDebts: totalUnsecuredDebts
+                        });
+                    }
+
+                    if (document.getElementById('detailed-analysis')) {
+                        displayDetailedAnalysis({
+                            totalAssets,
+                            totalLiabilities,
+                            netWorth,
+                            liquidAssets,
+                            investmentAssets,
+                            physicalAssets,
+                            securedLoans,
+                            unsecuredDebts
+                        });
+                    }
+
+                    if (document.getElementById('networth-tracking')) {
+                        loadNetWorthTracking();
+                    }
+                }
+            } catch (error) {
+                console.error('Error calculating advanced net worth:', error);
+                // Fail silently to not crash the app
+            }
+        }
+
+        function displayNetWorthSummary(data) {
+            const summaryDiv = document.getElementById('networth-summary');
+            if (!summaryDiv) return;
+            
+            summaryDiv.style.display = 'block';
+
+            const assetLiabilityRatio = data.totalLiabilities > 0 ? (data.totalAssets / data.totalLiabilities).toFixed(2) : 'N/A';
+            const liquidityRatio = data.totalAssets > 0 ? ((data.liquidAssets / data.totalAssets) * 100).toFixed(1) : '0';
+
+            summaryDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="fas fa-coins"></i> Total Assets
+                        </div>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-gold);">₹${data.totalAssets.toLocaleString('en-IN')}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-gray); margin-top: 0.5rem;">
+                            Liquid: ${liquidityRatio}% | Investment: ${data.totalAssets > 0 ? ((data.investmentAssets/data.totalAssets)*100).toFixed(1) : '0'}%
+                        </div>
+                    </div>
+                    
+                    <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="fas fa-credit-card"></i> Total Liabilities
+                        </div>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-silver);">₹${data.totalLiabilities.toLocaleString('en-IN')}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-gray); margin-top: 0.5rem;">
+                            Secured: ${data.totalLiabilities > 0 ? ((data.securedLoans/data.totalLiabilities)*100).toFixed(1) : '0'}% | Unsecured: ${data.totalLiabilities > 0 ? ((data.unsecuredDebts/data.totalLiabilities)*100).toFixed(1) : '0'}%
+                        </div>
+                    </div>
+                    
+                    <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid ${data.netWorth >= 0 ? 'var(--accent-gold)' : '#ff6b6b'}; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: ${data.netWorth >= 0 ? 'var(--accent-gold)' : '#ff6b6b'}; margin-bottom: 0.5rem; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="fas fa-chart-line"></i> Net Worth
+                        </div>
+                        <div style="font-size: 2.2rem; font-weight: bold; color: ${data.netWorth >= 0 ? 'var(--accent-gold)' : '#ff6b6b'};">₹${data.netWorth.toLocaleString('en-IN')}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-gray); margin-top: 0.5rem;">
+                            Asset/Liability Ratio: ${assetLiabilityRatio}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="background: rgba(255,215,0,0.05); border-left: 4px solid var(--accent-gold); border-radius: 4px; padding: 1rem;">
+                        <h5 style="color: var(--accent-gold); margin: 0 0 0.5rem 0; font-size: 0.9rem;">LIQUID ASSETS</h5>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-white);">₹${data.liquidAssets.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent-white); border-radius: 4px; padding: 1rem;">
+                        <h5 style="color: var(--accent-white); margin: 0 0 0.5rem 0; font-size: 0.9rem;">INVESTMENT ASSETS</h5>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-white);">₹${data.investmentAssets.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div style="background: rgba(192,192,192,0.05); border-left: 4px solid var(--accent-silver); border-radius: 4px; padding: 1rem;">
+                        <h5 style="color: var(--accent-silver); margin: 0 0 0.5rem 0; font-size: 0.9rem;">PHYSICAL ASSETS</h5>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-white);">₹${data.physicalAssets.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createAssetAllocationChart(data) {
+            const ctx = document.getElementById('asset-allocation-chart');
+            if (!ctx) return;
+            
+            if (assetAllocationChart) {
+                assetAllocationChart.destroy();
+            }
+
+            document.getElementById('asset-allocation-section').style.display = 'block';
+
+            assetAllocationChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Liquid Assets', 'Investment Assets', 'Physical Assets'],
+                    datasets: [{
+                        data: [data.liquidAssets, data.investmentAssets, data.physicalAssets],
+                        backgroundColor: ['#ffd700', '#ffffff', '#c0c0c0'],
+                        borderColor: ['#ffd700', '#ffffff', '#c0c0c0'],
+                        borderWidth: 2,
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#ffffff',
+                                font: { size: 12 },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                            titleColor: '#ffd700',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffd700',
+                            borderWidth: 2,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : '0';
+                                    return `${context.label}: ₹${context.parsed.toLocaleString('en-IN')} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createLiabilityBreakdownChart(data) {
+            const ctx = document.getElementById('liability-breakdown-chart');
+            if (!ctx) return;
+            
+            if (liabilityBreakdownChart) {
+                liabilityBreakdownChart.destroy();
+            }
+
+            document.getElementById('liability-breakdown-section').style.display = 'block';
+
+            liabilityBreakdownChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Secured Loans', 'Unsecured Debts'],
+                    datasets: [{
+                        data: [data.securedLoans, data.unsecuredDebts],
+                        backgroundColor: ['#c0c0c0', '#ff6b6b'],
+                        borderColor: ['#c0c0c0', '#ff6b6b'],
+                        borderWidth: 2,
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#ffffff',
+                                font: { size: 12 },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                            titleColor: '#ffd700',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffd700',
+                            borderWidth: 2,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : '0';
+                                    return `${context.label}: ₹${context.parsed.toLocaleString('en-IN')} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayDetailedAnalysis(data) {
+            const analysisDiv = document.getElementById('detailed-analysis');
+            if (!analysisDiv) return;
+            
+            analysisDiv.style.display = 'block';
+
+            const debtToAssetRatio = data.totalAssets > 0 ? ((data.totalLiabilities / data.totalAssets) * 100).toFixed(1) : '0';
+            const liquidityRatio = data.totalAssets > 0 ? ((data.liquidAssets / data.totalAssets) * 100).toFixed(1) : '0';
+            const investmentRatio = data.totalAssets > 0 ? ((data.investmentAssets / data.totalAssets) * 100).toFixed(1) : '0';
+
+            let healthScore = 100;
+            let recommendations = [];
+
+            // Calculate health score and recommendations
+            if (parseFloat(debtToAssetRatio) > 50) {
+                healthScore -= 30;
+                recommendations.push("High debt-to-asset ratio. Consider reducing liabilities.");
+            }
+            if (parseFloat(liquidityRatio) < 10) {
+                healthScore -= 20;
+                recommendations.push("Low liquidity. Maintain at least 10-15% in liquid assets.");
+            }
+            if (parseFloat(investmentRatio) < 20) {
+                healthScore -= 15;
+                recommendations.push("Low investment allocation. Consider increasing investments for wealth growth.");
+            }
+            if (data.netWorth < 0) {
+                healthScore -= 35;
+                recommendations.push("Negative net worth. Focus on reducing debts and increasing assets.");
+            }
+
+            analysisDiv.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 2rem;">
+                    <h4 style="color: var(--accent-white); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-chart-bar"></i> Financial Health Analysis
+                    </h4>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 8px;">
+                            <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem;">HEALTH SCORE</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: ${healthScore >= 80 ? 'var(--accent-gold)' : healthScore >= 60 ? '#ffa500' : '#ff6b6b'};">${healthScore}/100</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <div style="font-size: 0.8rem; color: var(--accent-white); margin-bottom: 0.5rem;">DEBT-TO-ASSET RATIO</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${debtToAssetRatio}%</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(192,192,192,0.1); border-radius: 8px;">
+                            <div style="font-size: 0.8rem; color: var(--accent-silver); margin-bottom: 0.5rem;">LIQUIDITY RATIO</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-silver);">${liquidityRatio}%</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <div style="font-size: 0.8rem; color: var(--accent-white); margin-bottom: 0.5rem;">INVESTMENT RATIO</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${investmentRatio}%</div>
+                        </div>
+                    </div>
+
+                    ${recommendations.length > 0 ? `
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,107,107,0.1); border-left: 4px solid #ff6b6b; border-radius: 4px;">
+                            <h5 style="color: #ff6b6b; margin: 0 0 1rem 0;">Recommendations for Improvement</h5>
+                            <ul style="color: var(--text-gray); margin: 0; padding-left: 1.5rem;">
+                                ${recommendations.map(rec => `<li style="margin-bottom: 0.5rem;">${rec}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : `
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,215,0,0.1); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
+                            <h5 style="color: var(--accent-gold); margin: 0 0 0.5rem 0;">Excellent Financial Health!</h5>
+                            <p style="color: var(--text-gray); margin: 0;">Your financial position is strong. Continue maintaining this balanced approach.</p>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function loadNetWorthTracking() {
+            const trackingDiv = document.getElementById('networth-tracking');
+            if (!trackingDiv) return;
+            
+            trackingDiv.style.display = 'block';
+            
+            const savedData = JSON.parse(localStorage.getItem('networthHistory') || '[]');
+            
+            if (savedData.length > 0) {
+                createNetWorthTrendChart(savedData);
+            } else {
+                // Show placeholder
+                const chartContainer = document.querySelector('#networth-trend-chart')?.parentElement;
+                if (chartContainer) {
+                    chartContainer.innerHTML = `
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: var(--text-gray);">
+                            <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <h4 style="margin-bottom: 0.5rem;">No Historical Data</h4>
+                            <p style="text-align: center; max-width: 300px; margin: 0;">Save your current net worth to start tracking your financial progress over time.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function createNetWorthTrendChart(data) {
+            const ctx = document.getElementById('networth-trend-chart');
+            if (!ctx) return;
+            
+            if (networthTrendChart) {
+                networthTrendChart.destroy();
+            }
+
+            networthTrendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => new Date(d.date).toLocaleDateString('en-IN')),
+                    datasets: [{
+                        label: 'Net Worth',
+                        data: data.map(d => d.netWorth),
+                        borderColor: '#ffd700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#ffd700',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                            titleColor: '#ffd700',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffd700',
+                            borderWidth: 2,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Net Worth: ₹${context.parsed.y.toLocaleString('en-IN')}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#aaaaaa' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#aaaaaa',
+                                callback: function(value) {
+                                    return '₹' + (value / 100000).toFixed(1) + 'L';
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function saveNetWorthSnapshot() {
+            try {
+                // Calculate current net worth first
+                calculateAdvancedNetWorth();
+                
+                // Wait a moment for calculation to complete, then get values
+                setTimeout(() => {
+                    const summaryDiv = document.getElementById('networth-summary');
+                    if (!summaryDiv || summaryDiv.style.display === 'none') {
+                        alert('Please calculate your net worth first by entering some values.');
+                        return;
+                    }
+                    
+                    // Get current values from the displayed summary
+                    const assetElements = summaryDiv.querySelectorAll('.result-card');
+                    if (assetElements.length < 3) return;
+                    
+                    const totalAssets = parseFloat(assetElements[0].querySelector('div:nth-child(2)').textContent.replace(/[₹,]/g, '')) || 0;
+                    const totalLiabilities = parseFloat(assetElements[1].querySelector('div:nth-child(2)').textContent.replace(/[₹,]/g, '')) || 0;
+                    const netWorth = totalAssets - totalLiabilities;
+                    
+                    const snapshot = {
+                        date: new Date().toISOString(),
+                        netWorth: netWorth,
+                        totalAssets: totalAssets,
+                        totalLiabilities: totalLiabilities
+                    };
+                    
+                    const savedData = JSON.parse(localStorage.getItem('networthHistory') || '[]');
+                    savedData.push(snapshot);
+                    
+                    // Keep only last 12 entries
+                    if (savedData.length > 12) {
+                        savedData.shift();
+                    }
+                    
+                    localStorage.setItem('networthHistory', JSON.stringify(savedData));
+                    
+                    // Refresh the chart
+                    createNetWorthTrendChart(savedData);
+                    
+                    // Show success message
+                    if (typeof event !== 'undefined' && event.target) {
+                        const button = event.target;
+                        const originalText = button.innerHTML;
+                        button.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                        button.style.background = 'var(--accent-gold)';
+                        
+                        setTimeout(() => {
+                            button.innerHTML = originalText;
+                            button.style.background = '';
+                        }, 2000);
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Error saving snapshot:', error);
+                // Fail silently to not crash the app
+            }
+        }
     </script>
 
     <!-- Version Footer -->

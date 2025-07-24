@@ -1310,7 +1310,7 @@
 
                         <!-- Detailed Breakdown -->
                         <div id="detailed-breakdown" style="margin-top: 2rem;">
-                            <h4 style="color: var(--accent-white); margin-bottom: 1rem; font-size: 1.3rem;">📊 Year-wise Investment Breakdown</h4>
+                            <h4 style="color: var(--accent-white); margin-bottom: 1rem; font-size: 1.3rem;">Year-wise Investment Breakdown</h4>
                             <div style="max-height: 400px; overflow-y: auto; margin-top: 1rem; border: 2px solid var(--border-gray); border-radius: 12px; background: var(--card-black);">
                                 <table id="breakdown-table" style="width: 100%; border-collapse: collapse;">
                                     <thead style="position: sticky; top: 0; z-index: 100; background: linear-gradient(135deg, var(--secondary-black), var(--primary-black)); box-shadow: 0 2px 10px rgba(0,0,0,0.8);">
@@ -1330,7 +1330,7 @@
 
                         <!-- Investment Insights -->
                         <div id="investment-insights" style="margin-top: 2rem;">
-                            <h4 style="color: var(--accent-white); margin-bottom: 1rem; font-size: 1.4rem;">💡 Advanced Investment Analysis</h4>
+                            <h4 style="color: var(--accent-white); margin-bottom: 1rem; font-size: 1.4rem;">Advanced Investment Analysis</h4>
                             <div id="insights-content">
                                 <!-- Insights will be populated by JavaScript -->
                             </div>
@@ -1996,17 +1996,17 @@
                     </div>
                 </div>
                 <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-left: 4px solid var(--accent-gold); border-radius: 8px; box-shadow: var(--shadow-light);">
-                    <h5 style="color: var(--accent-white); margin-bottom: 1rem; font-size: 1.1rem;">💡 Investment Analysis:</h5>
+                                         <h5 style="color: var(--accent-white); margin-bottom: 1rem; font-size: 1.1rem;">Investment Analysis:</h5>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
-                        <ul style="color: var(--text-gray); line-height: 1.8; margin: 0; padding-left: 1.5rem; list-style-type: none;">
-                            <li style="margin-bottom: 0.5rem;">📈 <strong style="color: var(--accent-white);">Growth Multiple:</strong> ${(calculations.nominalValue / calculations.totalInvestment).toFixed(1)}x nominal growth</li>
-                            <li style="margin-bottom: 0.5rem;">💰 <strong style="color: var(--accent-gold);">Real Growth:</strong> ${(calculations.realValue / calculations.totalInvestment).toFixed(1)}x after inflation</li>
-                            <li style="margin-bottom: 0.5rem;">⚠️ <strong style="color: var(--accent-silver);">Inflation Cost:</strong> ₹${(calculations.nominalValue - calculations.realValue).toLocaleString('en-IN')} purchasing power loss</li>
-                        </ul>
+                                                 <ul style="color: var(--text-gray); line-height: 1.8; margin: 0; padding-left: 1.5rem; list-style-type: none;">
+                             <li style="margin-bottom: 0.5rem;"><strong style="color: var(--accent-white);">Growth Multiple:</strong> ${(calculations.nominalValue / calculations.totalInvestment).toFixed(1)}x nominal growth</li>
+                             <li style="margin-bottom: 0.5rem;"><strong style="color: var(--accent-gold);">Real Growth:</strong> ${(calculations.realValue / calculations.totalInvestment).toFixed(1)}x after inflation</li>
+                             <li style="margin-bottom: 0.5rem;"><strong style="color: var(--accent-silver);">Inflation Cost:</strong> ₹${(calculations.nominalValue - calculations.realValue).toLocaleString('en-IN')} purchasing power loss</li>
+                         </ul>
                         <div style="padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 8px; border: 1px solid var(--accent-gold);">
-                            <div style="font-size: 0.9rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;">
-                                ${realCAGR > 5 ? '🎉 EXCELLENT STRATEGY!' : realCAGR > 2 ? '✅ GOOD STRATEGY!' : '⚠️ REVIEW STRATEGY!'}
-                            </div>
+                                                         <div style="font-size: 0.9rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;">
+                                 ${realCAGR > 5 ? 'EXCELLENT STRATEGY' : realCAGR > 2 ? 'GOOD STRATEGY' : 'REVIEW STRATEGY'}
+                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-gray);">
                                 ${realCAGR > 5 ? 'Your real returns significantly beat inflation. This is a strong wealth-building strategy.' : 
                                   realCAGR > 2 ? 'Your returns are beating inflation, ensuring wealth preservation and growth.' : 
@@ -2032,7 +2032,7 @@
                 
                 strategyContent = `
                     <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 2rem;">
-                        <h5 style="color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.2rem;">🚀 Step-up SIP Strategy Analysis</h5>
+                                                 <h5 style="color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.2rem;">Step-up SIP Strategy Analysis</h5>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                             <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
                                 <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Monthly SIP Growth</h6>
@@ -2047,11 +2047,11 @@
                             </div>
                         </div>
                         <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 6px;">
-                            <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
-                                <strong style="color: var(--accent-gold);">💡 Strategy Benefit:</strong> By increasing your SIP by ${sipIncrease}% annually, 
-                                you're building a corpus that's ₹${Math.round(stepUpBenefit).toLocaleString('en-IN')} larger than a standard SIP. 
-                                This strategy helps you keep pace with inflation and salary increments!
-                            </p>
+                                                         <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
+                                 <strong style="color: var(--accent-gold);">Strategy Benefit:</strong> By increasing your SIP by ${sipIncrease}% annually, 
+                                 you're building a corpus that's ₹${Math.round(stepUpBenefit).toLocaleString('en-IN')} larger than a standard SIP. 
+                                 This strategy helps you keep pace with inflation and salary increments.
+                             </p>
                         </div>
                     </div>
                 `;
@@ -2062,7 +2062,7 @@
                 
                 strategyContent = `
                     <div style="background: linear-gradient(135deg, rgba(192,192,192,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 2rem;">
-                        <h5 style="color: var(--accent-silver); margin-bottom: 1.5rem; font-size: 1.2rem;">💰 Lumpsum + SIP Hybrid Strategy</h5>
+                                                 <h5 style="color: var(--accent-silver); margin-bottom: 1.5rem; font-size: 1.2rem;">Lumpsum + SIP Hybrid Strategy</h5>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                             <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
                                 <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Lumpsum Impact</h6>
@@ -2077,11 +2077,11 @@
                             </div>
                         </div>
                         <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(192,192,192,0.1); border-radius: 6px;">
-                            <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
-                                <strong style="color: var(--accent-silver);">💡 Strategy Benefit:</strong> Your lumpsum investment of ₹${lumpsumAmount.toLocaleString('en-IN')} 
-                                gets the maximum time to compound, growing to ₹${Math.round(lumpsumGrowth).toLocaleString('en-IN')}. 
-                                Combined with systematic SIPs, this creates a powerful wealth-building strategy!
-                            </p>
+                                                         <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
+                                 <strong style="color: var(--accent-silver);">Strategy Benefit:</strong> Your lumpsum investment of ₹${lumpsumAmount.toLocaleString('en-IN')} 
+                                 gets the maximum time to compound, growing to ₹${Math.round(lumpsumGrowth).toLocaleString('en-IN')}. 
+                                 Combined with systematic SIPs, this creates a powerful wealth-building strategy.
+                             </p>
                         </div>
                     </div>
                 `;
@@ -2092,7 +2092,7 @@
                 
                 strategyContent = `
                     <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--accent-white); border-radius: 12px; padding: 2rem;">
-                        <h5 style="color: var(--accent-white); margin-bottom: 1.5rem; font-size: 1.2rem;">📈 Standard SIP Strategy Analysis</h5>
+                                                 <h5 style="color: var(--accent-white); margin-bottom: 1.5rem; font-size: 1.2rem;">Standard SIP Strategy Analysis</h5>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                             <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
                                 <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Compounding Power</h6>
@@ -2106,11 +2106,11 @@
                             </div>
                         </div>
                         <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.08); border-radius: 6px;">
-                            <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
-                                <strong style="color: var(--accent-white);">💡 SIP Advantage:</strong> Your disciplined monthly investment of ₹${monthlyAmount.toLocaleString('en-IN')} 
-                                creates ₹${powerOfCompounding.toLocaleString('en-IN')} of additional wealth through the power of compounding. 
-                                Consistency and time are your greatest allies in wealth creation!
-                            </p>
+                                                         <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
+                                 <strong style="color: var(--accent-white);">SIP Advantage:</strong> Your disciplined monthly investment of ₹${monthlyAmount.toLocaleString('en-IN')} 
+                                 creates ₹${powerOfCompounding.toLocaleString('en-IN')} of additional wealth through the power of compounding. 
+                                 Consistency and time are your greatest allies in wealth creation.
+                             </p>
                         </div>
                     </div>
                 `;

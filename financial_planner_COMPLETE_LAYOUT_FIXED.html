@@ -5131,5 +5131,28 @@
         style.textContent = additionalCSS;
         document.head.appendChild(style);
     </script>
+
+    <!-- Version Footer -->
+    <footer style="
+        position: fixed; 
+        bottom: 0; 
+        right: 0; 
+        background: rgba(0,0,0,0.8); 
+        color: var(--text-gray); 
+        padding: 0.5rem 1rem; 
+        font-size: 0.75rem; 
+        border-top-left-radius: 8px;
+        border: 1px solid var(--border-gray);
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    ">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <span style="color: var(--accent-gold);">Financial Planner Pro v3.2</span>
+            <span>•</span>
+            <span>Last Updated: Dec 19, 2024 - 14:30 UTC</span>
+            <span>•</span>
+            <span style="color: var(--accent-silver);">Git: 66d2789</span>
+        </div>
+    </footer>
 </body>
 </html>

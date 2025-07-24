@@ -3030,16 +3030,175 @@
             const riskProfile = clientData.riskProfile;
             
             if (riskProfile && riskProfile.riskCategory) {
+                // User has completed risk assessment - show personalized recommendations
                 displayProfileSummary(riskProfile);
                 generateAssetAllocation(riskProfile);
                 generateFundRecommendations(riskProfile);
                 generateInvestmentStrategy(riskProfile);
-                
-                // Show recommendation cards
-                document.getElementById('asset-allocation-card').style.display = 'block';
-                document.getElementById('fund-recommendations-card').style.display = 'block';
-                document.getElementById('rebalancing-card').style.display = 'block';
-                document.getElementById('strategy-card').style.display = 'block';
+            } else {
+                // No risk profile - show sample/default recommendations with prompt
+                displayDefaultProfileSummary();
+                generateDefaultAssetAllocation();
+                generateDefaultFundRecommendations();
+                generateDefaultInvestmentStrategy();
+            }
+            
+            // Always show recommendation cards
+            document.getElementById('asset-allocation-card').style.display = 'block';
+            document.getElementById('fund-recommendations-card').style.display = 'block';
+            document.getElementById('rebalancing-card').style.display = 'block';
+            document.getElementById('strategy-card').style.display = 'block';
+        }
+
+        function displayDefaultProfileSummary() {
+            const profileSummary = document.getElementById('profile-summary');
+            profileSummary.innerHTML = `
+                <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border-radius: 12px; border: 2px solid var(--accent-gold);">
+                    <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Sample Investment Recommendations</h4>
+                    <p style="color: var(--text-gray); margin-bottom: 1.5rem;">Below are sample recommendations for a moderate investor. Complete your Risk Assessment to get personalized recommendations tailored to your profile.</p>
+                    <button class="btn btn-primary" onclick="showSection('risk-assessment')" style="margin-right: 1rem;">Complete Risk Assessment</button>
+                    <button class="btn btn-secondary" onclick="showSection('profile')">Update Profile</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
+                    <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Profile</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-gold);">Moderate (Sample)</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Score</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-white);">60% (Sample)</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Investment Horizon</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-silver);">Long Term</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateDefaultAssetAllocation() {
+            // Use moderate allocation as default
+            const allocation = { equity: 50, debt: 35, gold: 10, cash: 5 };
+            
+            // Update the static HTML with dynamic content but keep the structure
+            const breakdown = document.getElementById('allocation-breakdown');
+            if (breakdown) {
+                breakdown.innerHTML = `
+                    <div style="background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.05)); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem;">EQUITY</div>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-gold);">${allocation.equity}%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-gray);">Growth focused (Sample)</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem;">DEBT</div>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-white);">${allocation.debt}%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-gray);">Stability focused (Sample)</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(192,192,192,0.05)); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem;">GOLD</div>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-silver);">${allocation.gold}%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-gray);">Hedge (Sample)</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--text-gray); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">CASH</div>
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--text-gray);">${allocation.cash}%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-gray);">Emergency (Sample)</div>
+                    </div>
+                `;
+            }
+            
+            // Create allocation chart
+            createAllocationChart(allocation);
+        }
+
+        function generateDefaultFundRecommendations() {
+            const fundCategories = document.getElementById('fund-categories');
+            if (fundCategories) {
+                fundCategories.innerHTML = `
+                    <div style="background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Sample Recommendations for Moderate Investor</h5>
+                        <p style="color: var(--text-gray); margin: 0;">Complete your Risk Assessment to get personalized fund recommendations based on your specific risk tolerance and goals.</p>
+                    </div>
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Large Cap Funds (50% allocation)</h4>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                                <div>
+                                    <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Axis Bluechip Fund</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Large Cap (Sample)</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: var(--accent-gold); font-weight: bold;">12-15%</div>
+                                    <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #ffc107; font-weight: bold;">Medium</div>
+                                    <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Sample Fund</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Debt Funds (35% allocation)</h4>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-white);">
+                                <div>
+                                    <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Axis Strategic Bond Fund</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Debt (Sample)</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: var(--accent-white); font-weight: bold;">7-9%</div>
+                                    <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #17a2b8; font-weight: bold;">Low</div>
+                                    <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">Sample Fund</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function generateDefaultInvestmentStrategy() {
+            const strategyContent = document.getElementById('strategy-content');
+            if (strategyContent) {
+                strategyContent.innerHTML = `
+                    <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border-radius: 12px; padding: 2rem;">
+                        <h4 style="color: var(--accent-gold); margin-bottom: 1rem; text-align: center;">Sample: Balanced Growth Strategy</h4>
+                        <div style="text-align: center; margin-bottom: 2rem; padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 8px;">
+                            <p style="color: var(--text-gray); margin: 0;">This is a sample strategy for moderate investors. Complete your Risk Assessment to get a personalized investment strategy.</p>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                            <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 1.5rem;">
+                                <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Strategy Focus</h5>
+                                <p style="color: var(--text-gray); line-height: 1.6;">Balance between growth and stability</p>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 1.5rem;">
+                                <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Investment Approach</h5>
+                                <p style="color: var(--text-gray); line-height: 1.6;">Diversified allocation across asset classes</p>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 1.5rem;">
+                                <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Time Horizon</h5>
+                                <p style="color: var(--accent-gold); font-size: 1.2rem; font-weight: bold;">5-10 years</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(255,215,0,0.05); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Get Your Personalized Strategy</h5>
+                            <p style="color: var(--text-gray); line-height: 1.6; margin: 0;">Your actual investment strategy will be customized based on your risk tolerance, financial goals, investment experience, and time horizon. Complete the Risk Assessment to unlock personalized recommendations.</p>
+                        </div>
+                    </div>
+                `;
             }
         }
 
@@ -3194,24 +3353,58 @@
                 'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
             }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
             
+            // Risk-profile specific fund recommendations
             const fundRecommendations = {
-                equity: [
-                    { name: "Large Cap Equity Fund", category: "Large Cap", risk: "Medium", returns: "10-12%", rating: "★★★★☆" },
-                    { name: "Mid Cap Growth Fund", category: "Mid Cap", risk: "High", returns: "12-15%", rating: "★★★★★" },
-                    { name: "Small Cap Opportunity Fund", category: "Small Cap", risk: "Very High", returns: "15-18%", rating: "★★★★☆" },
-                    { name: "Flexi Cap Fund", category: "Multi Cap", risk: "Medium-High", returns: "11-14%", rating: "★★★★☆" }
-                ],
-                debt: [
-                    { name: "Liquid Fund", category: "Ultra Short", risk: "Very Low", returns: "3-5%", rating: "★★★☆☆" },
-                    { name: "Short Duration Fund", category: "Short Term", risk: "Low", returns: "5-7%", rating: "★★★★☆" },
-                    { name: "Medium Duration Fund", category: "Medium Term", risk: "Medium", returns: "6-8%", rating: "★★★★☆" },
-                    { name: "Long Duration Fund", category: "Long Term", risk: "Medium-High", returns: "7-9%", rating: "★★★★☆" }
-                ],
-                gold: [
-                    { name: "Gold ETF", category: "Physical Gold", risk: "Medium", returns: "8-10%", rating: "★★★☆☆" },
-                    { name: "Gold Fund of Fund", category: "Gold Fund", risk: "Medium", returns: "7-9%", rating: "★★★☆☆" }
-                ]
+                'Conservative': {
+                    equity: [
+                        { name: "SBI Bluechip Fund", category: "Large Cap", risk: "Low", returns: "10-12%", rating: "★★★★☆" },
+                        { name: "HDFC Top 100 Fund", category: "Large Cap", risk: "Low", returns: "9-11%", rating: "★★★★☆" }
+                    ],
+                    debt: [
+                        { name: "HDFC Liquid Fund", category: "Liquid", risk: "Very Low", returns: "3-4%", rating: "★★★★★" },
+                        { name: "SBI Short Term Debt Fund", category: "Short Term", risk: "Low", returns: "6-8%", rating: "★★★★☆" },
+                        { name: "ICICI Prudential Corporate Bond Fund", category: "Corporate Bond", risk: "Low", returns: "6-7%", rating: "★★★★☆" }
+                    ],
+                    gold: [
+                        { name: "SBI Gold ETF", category: "Gold ETF", risk: "Medium", returns: "6-10%", rating: "★★★★☆" }
+                    ]
+                },
+                'Moderate': {
+                    equity: [
+                        { name: "Axis Bluechip Fund", category: "Large Cap", risk: "Medium", returns: "12-15%", rating: "★★★★★" },
+                        { name: "Mirae Asset Large Cap Fund", category: "Large Cap", risk: "Medium", returns: "11-14%", rating: "★★★★☆" },
+                        { name: "HDFC Balanced Advantage Fund", category: "Hybrid", risk: "Medium", returns: "10-13%", rating: "★★★★☆" }
+                    ],
+                    debt: [
+                        { name: "Axis Strategic Bond Fund", category: "Strategic", risk: "Medium", returns: "7-9%", rating: "★★★★★" },
+                        { name: "Kotak Dynamic Bond Fund", category: "Dynamic", risk: "Medium", returns: "7-9%", rating: "★★★★☆" }
+                    ],
+                    gold: [
+                        { name: "SBI Gold ETF", category: "Gold ETF", risk: "Medium", returns: "8-12%", rating: "★★★★☆" }
+                    ]
+                },
+                'Aggressive': {
+                    equity: [
+                        { name: "Axis Midcap Fund", category: "Mid Cap", risk: "High", returns: "15-18%", rating: "★★★★★" },
+                        { name: "DSP Midcap Fund", category: "Mid Cap", risk: "High", returns: "14-17%", rating: "★★★★☆" },
+                        { name: "SBI Small Cap Fund", category: "Small Cap", risk: "Very High", returns: "16-20%", rating: "★★★★☆" },
+                        { name: "ICICI Prudential Technology Fund", category: "Sectoral", risk: "Very High", returns: "18-25%", rating: "★★★★☆" }
+                    ],
+                    debt: [
+                        { name: "Axis Strategic Bond Fund", category: "Strategic", risk: "Medium", returns: "8-10%", rating: "★★★★★" },
+                        { name: "HDFC Corporate Bond Fund", category: "Corporate", risk: "Low", returns: "7-9%", rating: "★★★★☆" }
+                    ],
+                    gold: [
+                        { name: "SBI Gold ETF", category: "Gold ETF", risk: "Medium", returns: "8-12%", rating: "★★★★☆" }
+                    ]
+                }
             };
+            
+            // Select appropriate fund recommendations based on risk category
+            const categoryKey = riskProfile.riskCategory.includes('Conservative') ? 'Conservative' : 
+                              riskProfile.riskCategory.includes('Aggressive') ? 'Aggressive' : 'Moderate';
+            
+            const selectedFunds = fundRecommendations[categoryKey];
             
             let fundHTML = '';
             
@@ -3221,7 +3414,7 @@
                         <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Equity Funds (${allocation.equity}% allocation)</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                 `;
-                fundRecommendations.equity.forEach(fund => {
+                selectedFunds.equity.forEach(fund => {
                     fundHTML += `
                         <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
@@ -4635,9 +4828,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Financial Planner Pro initialized');
             
-            // Initialize Investment Recommendations chart
-            const defaultAllocation = { equity: 50, debt: 35, gold: 10, cash: 5 };
-            createAllocationChart(defaultAllocation);
+            // Initialize Investment Recommendations dynamically
+            loadInvestmentRecommendations();
             
             // Load saved goals
             loadSavedGoals();

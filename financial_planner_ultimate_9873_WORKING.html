@@ -987,8 +987,10 @@
             margin: 1.5rem 0;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             transition: var(--transition-smooth);
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .card::before {
@@ -1042,6 +1044,8 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             margin: 2rem 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .form-group {
@@ -1063,6 +1067,7 @@
 
         .form-input, .form-select {
             width: 100%;
+            max-width: 100%;
             padding: 1rem 1.25rem;
             background: var(--secondary-black);
             border: 2px solid var(--border-gray);
@@ -1071,6 +1076,7 @@
             font-size: 1rem;
             transition: var(--transition-smooth);
             font-family: inherit;
+            box-sizing: border-box;
         }
 
         .form-input:focus, .form-select:focus {
@@ -1833,6 +1839,8 @@
             
             .form-grid {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 1rem 0;
             }
             
             .charts-grid {
@@ -1841,6 +1849,16 @@
             
             .widgets-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .card {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
         }
 

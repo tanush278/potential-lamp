@@ -8077,6 +8077,26 @@
                 font-weight: 700;
                 font-size: 1.1rem;
             }
+            
+            .btn-sm {
+                padding: 0.4rem 0.8rem;
+                font-size: 12px;
+                border-radius: 4px;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-sm:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            
+            .btn-sm:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+                transform: none;
+            }
         `;
         
         // Add the additional CSS to the page
@@ -9295,6 +9315,51 @@
             }
         }
 
+        function refreshTaxCalculation() {
+            // Recalculate tax with current inputs
+            calculateAdvancedTax();
+            
+            // Show brief success message
+            const refreshBtn = event.target.closest('button');
+            const originalText = refreshBtn.innerHTML;
+            refreshBtn.innerHTML = '<i class="fas fa-check"></i> Updated';
+            refreshBtn.disabled = true;
+            
+            setTimeout(() => {
+                refreshBtn.innerHTML = originalText;
+                refreshBtn.disabled = false;
+            }, 1500);
+        }
+
+        function saveAndContinue() {
+            // Save current state to localStorage
+            const taxData = {
+                basicSalary: document.getElementById('basic-salary')?.value || '',
+                hraReceived: document.getElementById('hra-received')?.value || '',
+                specialAllowances: document.getElementById('special-allowances')?.value || '',
+                bonusIncentives: document.getElementById('bonus-incentives')?.value || '',
+                otherIncome: document.getElementById('other-income')?.value || '',
+                selectedRegime: document.getElementById('selected-tax-regime')?.value || 'old',
+                capitalGainsTax: localStorage.getItem('capitalGainsTax') || '0'
+            };
+            
+            localStorage.setItem('taxPlanningData', JSON.stringify(taxData));
+            
+            // Show success message and hide integration notice
+            const saveBtn = event.target.closest('button');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
+            saveBtn.disabled = true;
+            
+            // Optionally hide the integration notice after saving
+            setTimeout(() => {
+                const integrationNotice = document.getElementById('cg-integration-notice');
+                if (integrationNotice) {
+                    integrationNotice.style.display = 'none';
+                }
+            }, 2000);
+        }
+
         function showCapitalGainsIntegration(cgTax) {
             // Add capital gains integration notice to tax planning section
             const taxSection = document.getElementById('tax');
@@ -9308,11 +9373,25 @@
                 }
                 
                 integrationNotice.innerHTML = `
-                    <div class="card" style="background: linear-gradient(135deg, #1a365d, #2c5282); border: 2px solid var(--accent-gold);">
-                        <div style="text-align: center; padding: 1.5rem;">
-                            <i class="fas fa-link" style="font-size: 2rem; color: var(--accent-gold); margin-bottom: 1rem;"></i>
-                            <h4 style="color: var(--accent-gold); margin: 0 0 0.5rem 0;">Capital Gains Integrated</h4>
-                            <p style="color: var(--text-white); margin: 0;">Capital gains tax of ₹${Math.round(cgTax).toLocaleString('en-IN')} will be added to your total tax liability</p>
+                    <div class="card" style="background: var(--card-black); border: 1px solid var(--accent-gold); border-left: 4px solid var(--accent-gold);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="background: rgba(255,215,0,0.1); padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-check-circle" style="color: var(--accent-gold); font-size: 1.2rem;"></i>
+                                </div>
+                                <div>
+                                    <h5 style="color: var(--accent-gold); margin: 0; font-size: 16px;">Capital Gains Integrated</h5>
+                                    <p style="color: var(--text-gray); margin: 0; font-size: 14px;">₹${Math.round(cgTax).toLocaleString('en-IN')} added to tax calculation</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="refreshTaxCalculation()" style="padding: 0.5rem 1rem; font-size: 12px;">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                                <button type="button" class="btn btn-accent btn-sm" onclick="saveAndContinue()" style="padding: 0.5rem 1rem; font-size: 12px;">
+                                    <i class="fas fa-save"></i> Save & Continue
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;

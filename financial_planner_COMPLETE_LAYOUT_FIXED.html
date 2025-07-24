@@ -496,6 +496,33 @@
             box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
         }
 
+        /* FREQUENCY TOGGLE BUTTONS */
+        .frequency-btn {
+            padding: 0.6rem 1rem;
+            border: 2px solid var(--border-gray);
+            background: var(--card-black);
+            color: var(--text-gray);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+        }
+
+        .frequency-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-white);
+        }
+
+        .frequency-btn.active {
+            border-color: var(--accent-gold);
+            background: var(--accent-gold);
+            color: var(--primary-black);
+            font-weight: 600;
+        }
+
         /* BUTTONS */
         .btn {
             padding: 0.8rem 1.5rem;
@@ -1369,17 +1396,19 @@
                         <h3>SIP Investment Calculator</h3>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>SIP Frequency</label>
-                                <select class="form-select" id="sip-frequency" onchange="updateSIPLabels()">
-                                    <option value="monthly">Monthly</option>
-                                    <option value="quarterly">Quarterly</option>
-                                    <option value="semi-annually">Semi-Annually</option>
-                                    <option value="annually">Annually</option>
-                                </select>
+                                <label>SIP Investment Frequency</label>
+                                <div class="frequency-toggle" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <button type="button" class="frequency-btn active" data-frequency="monthly" onclick="selectFrequency('monthly')">Monthly</button>
+                                    <button type="button" class="frequency-btn" data-frequency="quarterly" onclick="selectFrequency('quarterly')">Quarterly</button>
+                                    <button type="button" class="frequency-btn" data-frequency="semi-annually" onclick="selectFrequency('semi-annually')">Semi-Annual</button>
+                                    <button type="button" class="frequency-btn" data-frequency="annually" onclick="selectFrequency('annually')">Annual</button>
+                                </div>
+                                <input type="hidden" id="sip-frequency" value="monthly">
                             </div>
                             <div class="form-group">
-                                <label id="sip-amount-label">Monthly Investment (₹)</label>
-                                <input type="number" class="form-input" id="sip-amount" placeholder="Enter SIP amount" value="5000">
+                                <label id="sip-amount-label">Monthly Investment Amount (₹)</label>
+                                <input type="number" class="form-input" id="sip-amount" placeholder="Enter your monthly SIP amount" value="5000">
+                                <small id="sip-frequency-info" style="color: var(--text-gray); font-size: 0.85rem; margin-top: 0.5rem; display: block;">You invest this amount every month</small>
                             </div>
                             <div class="form-group">
                                 <label>Investment Period (Years)</label>
@@ -2284,31 +2313,45 @@
         // Advanced SIP Calculator Functions
         let sipChart = null;
         
-        function updateSIPLabels() {
-            const frequency = document.getElementById('sip-frequency').value;
+        function selectFrequency(frequency) {
+            // Update hidden input
+            document.getElementById('sip-frequency').value = frequency;
+            
+            // Update button states
+            document.querySelectorAll('.frequency-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-frequency="${frequency}"]`).classList.add('active');
+            
+            // Update labels and placeholders
             const label = document.getElementById('sip-amount-label');
             const input = document.getElementById('sip-amount');
+            const info = document.getElementById('sip-frequency-info');
             
             switch(frequency) {
                 case 'monthly':
-                    label.textContent = 'Monthly Investment (₹)';
-                    input.placeholder = 'Enter monthly SIP amount';
+                    label.textContent = 'Monthly Investment Amount (₹)';
+                    input.placeholder = 'Enter your monthly SIP amount';
                     input.value = '5000';
+                    info.textContent = 'You invest this amount every month (12 times per year)';
                     break;
                 case 'quarterly':
-                    label.textContent = 'Quarterly Investment (₹)';
-                    input.placeholder = 'Enter quarterly SIP amount';
+                    label.textContent = 'Quarterly Investment Amount (₹)';
+                    input.placeholder = 'Enter your quarterly SIP amount';
                     input.value = '15000';
+                    info.textContent = 'You invest this amount every quarter (4 times per year)';
                     break;
                 case 'semi-annually':
-                    label.textContent = 'Semi-Annual Investment (₹)';
-                    input.placeholder = 'Enter semi-annual SIP amount';
+                    label.textContent = 'Semi-Annual Investment Amount (₹)';
+                    input.placeholder = 'Enter your semi-annual SIP amount';
                     input.value = '30000';
+                    info.textContent = 'You invest this amount every 6 months (2 times per year)';
                     break;
                 case 'annually':
-                    label.textContent = 'Annual Investment (₹)';
-                    input.placeholder = 'Enter annual SIP amount';
+                    label.textContent = 'Annual Investment Amount (₹)';
+                    input.placeholder = 'Enter your annual SIP amount';
                     input.value = '60000';
+                    info.textContent = 'You invest this amount once per year';
                     break;
             }
         }
@@ -2362,25 +2405,22 @@
         }
 
         function performAdvancedSIPCalculation(sipAmount, years, annualRate, inflationRate, stepUpRate, calcType, lumpsumAmount, frequency) {
-            // Convert to monthly equivalent for calculations
-            const frequencyMultiplier = {
-                'monthly': 1,
-                'quarterly': 3,
-                'semi-annually': 6,
-                'annually': 12
+            // Define frequency parameters
+            const frequencyData = {
+                'monthly': { installmentsPerYear: 12, monthsBetween: 1 },
+                'quarterly': { installmentsPerYear: 4, monthsBetween: 3 },
+                'semi-annually': { installmentsPerYear: 2, monthsBetween: 6 },
+                'annually': { installmentsPerYear: 1, monthsBetween: 12 }
             };
             
-            const monthsPerInstallment = frequencyMultiplier[frequency];
-            const monthlyAmount = sipAmount / monthsPerInstallment;
+            const { installmentsPerYear, monthsBetween } = frequencyData[frequency];
             
             const monthlyRate = annualRate / 12 / 100;
             const inflationMonthlyRate = inflationRate / 12 / 100;
-            const stepUpMonthlyRate = stepUpRate / 12 / 100;
             
             let totalInvestment = 0;
             let nominalValue = 0;
-            let currentMonthlyAmount = monthlyAmount;
-            let lumpsumValue = lumpsumAmount;
+            let currentSIPAmount = sipAmount;
             
             const yearlyData = [];
             
@@ -2395,21 +2435,21 @@
                     yearInvestment += lumpsumAmount;
                 }
                 
-                // Calculate SIPs for the year based on frequency
+                // Adjust SIP amount for step-up at the beginning of each year (except first year)
+                if (calcType === 'step-up' && year > 1) {
+                    currentSIPAmount = currentSIPAmount * (1 + stepUpRate / 100);
+                }
+                
+                // Calculate monthly compounding and SIP investments
                 for (let month = 1; month <= 12; month++) {
                     // Compound monthly
                     yearEndValue = yearEndValue * (1 + monthlyRate);
                     
                     // Add SIP investment based on frequency
-                    if (month % monthsPerInstallment === 0) {
-                        // Adjust SIP amount for step-up (at the beginning of each year)
-                        if (calcType === 'step-up' && month === monthsPerInstallment && year > 1) {
-                            sipAmount = sipAmount * (1 + stepUpRate / 100);
-                        }
-                        
-                        yearEndValue += sipAmount;
-                        yearInvestment += sipAmount;
-                        totalInvestment += sipAmount;
+                    if (month % monthsBetween === 0) {
+                        yearEndValue += currentSIPAmount;
+                        yearInvestment += currentSIPAmount;
+                        totalInvestment += currentSIPAmount;
                     }
                 }
                 

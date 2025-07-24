@@ -7220,23 +7220,43 @@
             const breakdownDiv = document.getElementById('tax-slab-breakdown');
             if (!breakdownDiv) return;
             
-            let html = '';
+            let html = '<div style="margin-bottom: 20px;">';
             
-            taxData.taxBreakdown.forEach(slab => {
+            // Create visual progress bars for each slab
+            taxData.taxBreakdown.forEach((slab, index) => {
                 const percentage = ((slab.amount / taxData.tax) * 100).toFixed(1);
+                const progressWidth = Math.max(percentage, 5); // Minimum 5% width for visibility
+                
+                // Color scheme for different slabs
+                const colors = ['#28a745', '#ffc107', '#fd7e14', '#dc3545', '#6f42c1', '#20c997'];
+                const bgColor = colors[index % colors.length];
+                
                 html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee;">
-                        <div>
-                            <strong>${slab.slab}</strong> @ ${slab.rate}
+                    <div style="margin-bottom: 15px; padding: 15px; background: linear-gradient(135deg, ${bgColor}15, ${bgColor}08); border-left: 4px solid ${bgColor}; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div>
+                                <strong style="color: #333; font-size: 14px;">${slab.slab}</strong>
+                                <span style="background: ${bgColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">${slab.rate}</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 16px; font-weight: bold; color: ${bgColor};">₹${Math.round(slab.amount).toLocaleString('en-IN')}</div>
+                                <div style="font-size: 11px; color: #666;">${percentage}% of total tax</div>
+                            </div>
                         </div>
-                        <div style="text-align: right;">
-                            <strong>₹${Math.round(slab.amount).toLocaleString('en-IN')}</strong>
-                            <div style="font-size: 12px; color: #666;">${percentage}% of total tax</div>
+                        
+                        <!-- Visual Progress Bar -->
+                        <div style="background: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px;">
+                            <div style="background: linear-gradient(90deg, ${bgColor}, ${bgColor}cc); height: 100%; width: ${progressWidth}%; border-radius: 4px; transition: width 0.8s ease;"></div>
+                        </div>
+                        
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Taxable Amount: ₹${Math.round((slab.amount / (parseFloat(slab.rate) / 100))).toLocaleString('en-IN')}
                         </div>
                     </div>
                 `;
             });
             
+            html += '</div>';
             breakdownDiv.innerHTML = html;
         }
 

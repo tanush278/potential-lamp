@@ -1586,11 +1586,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Investment Start Date</label>
-                                    <input type="date" id="investment-start-date" class="form-input" onchange="calculatePortfolioMetrics()">
+                                    <input type="date" id="investment-start-date" class="form-input" onchange="calculatePortfolioMetrics()" max="">
                                 </div>
                                 <div class="form-group">
                                     <label>Expected Inflation Rate (%)</label>
-                                    <input type="number" id="portfolio-inflation" class="form-input" placeholder="Annual inflation rate" value="6" step="0.1" onchange="calculatePortfolioMetrics()">
+                                    <input type="number" id="inflation-rate" class="form-input" placeholder="Annual inflation rate" value="6" step="0.1" min="0" max="20" onchange="calculatePortfolioMetrics()">
                                 </div>
                                 <div class="form-group">
                                     <label>Total Amount Invested (₹)</label>
@@ -3536,7 +3536,7 @@
             const totalPortfolio = currentEquity + currentDebt + currentGold + currentCash;
             
             if (totalPortfolio <= 0) {
-                alert('Please enter your current portfolio values');
+                alert('Please enter your current portfolio values in the Portfolio Analysis section first');
                 return;
             }
             
@@ -3578,7 +3578,9 @@
             };
             
             const results = document.getElementById('rebalancing-results');
-            const actions = document.getElementById('rebalancing-actions');
+            
+            // Clear any existing content and ensure results section is ready to display
+            results.innerHTML = '';
             
             let actionsHTML = `
                 <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
@@ -3625,7 +3627,8 @@
             
             actionsHTML += '</div></div>';
             
-            actions.innerHTML = actionsHTML;
+            // Display the results
+            results.innerHTML = actionsHTML;
             results.style.display = 'block';
         }
 
@@ -3754,6 +3757,29 @@
 
         // Initialize Portfolio Analysis with integration from Investment Recommendations
         function initializePortfolioAnalysis() {
+            // Set max date for investment start date to today
+            const dateInput = document.getElementById('investment-start-date');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('max', today);
+                // Set default to 2 years ago if no value
+                if (!dateInput.value) {
+                    const twoYearsAgo = new Date();
+                    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+                    dateInput.value = twoYearsAgo.toISOString().split('T')[0];
+                }
+            }
+            
+            // Ensure rebalancing results are hidden initially
+            const rebalancingResults = document.getElementById('rebalancing-results');
+            if (rebalancingResults) {
+                rebalancingResults.innerHTML = `
+                    <div style="text-align: center; color: var(--text-gray); padding: 2rem;">
+                        Click "Calculate Rebalancing Actions" to see what adjustments are needed.
+                    </div>
+                `;
+            }
+            
             const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
             const riskProfile = clientData.riskProfile;
             
@@ -3981,25 +4007,56 @@
             
             // Calculate investment duration
             let months = 12; // Default if no start date
+            let years = 1;
+            
             if (data.startDate) {
                 const start = new Date(data.startDate);
                 const now = new Date();
-                months = Math.max(1, Math.round((now - start) / (1000 * 60 * 60 * 24 * 30)));
+                const diffTime = Math.abs(now - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                months = Math.max(1, Math.round(diffDays / 30.44)); // More accurate month calculation
+                years = Math.max(0.08, months / 12); // Minimum 1 month for calculation
             }
             
-            // Calculate CAGR
-            const years = months / 12;
-            const cagr = years > 0 ? (Math.pow(data.totalValue / data.totalInvested, 1 / years) - 1) * 100 : 0;
+            // Calculate CAGR (Nominal)
+            const nominalCAGR = years > 0 ? (Math.pow(data.totalValue / data.totalInvested, 1 / years) - 1) * 100 : 0;
+            
+            // Get inflation rate and calculate Real CAGR
+            const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 6;
+            const realCAGR = ((1 + nominalCAGR/100) / (1 + inflationRate/100) - 1) * 100;
+            
+            // Calculate inflation-adjusted returns
+            const inflationAdjustedValue = data.totalInvested * Math.pow(1 + inflationRate/100, years);
+            const realReturns = data.totalValue - inflationAdjustedValue;
+            const realReturnPercentage = ((realReturns / data.totalInvested) * 100).toFixed(2);
             
             // Calculate portfolio health score
             const healthScore = calculatePortfolioHealthScore(data);
             
-            // Update display
-            document.getElementById('portfolio-total-returns').textContent = `₹${Math.round(data.totalReturns).toLocaleString('en-IN')}`;
-            document.getElementById('portfolio-returns-percentage').textContent = `${returnPercentage}%`;
-            document.getElementById('portfolio-annual-return').textContent = `${cagr.toFixed(2)}%`;
+            // Update display with both nominal and real values
+            document.getElementById('portfolio-total-returns').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                    <div style="color: var(--accent-gold);">₹${Math.round(data.totalReturns).toLocaleString('en-IN')}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-gray);">Real: ₹${Math.round(realReturns).toLocaleString('en-IN')}</div>
+                </div>
+            `;
+            
+            document.getElementById('portfolio-returns-percentage').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                    <div style="color: var(--accent-gold);">${returnPercentage}%</div>
+                    <div style="font-size: 0.85rem; color: var(--text-gray);">Real: ${realReturnPercentage}%</div>
+                </div>
+            `;
+            
+            document.getElementById('portfolio-annual-return').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                    <div style="color: var(--accent-gold);">${nominalCAGR.toFixed(2)}%</div>
+                    <div style="font-size: 0.85rem; color: var(--text-gray);">Real: ${realCAGR.toFixed(2)}%</div>
+                </div>
+            `;
+            
             document.getElementById('portfolio-health-score').textContent = healthScore;
-            document.getElementById('portfolio-duration').textContent = months;
+            document.getElementById('portfolio-duration').textContent = `${months} months (${years.toFixed(1)} years)`;
         }
 
         function calculatePortfolioHealthScore(data) {

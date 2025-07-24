@@ -9672,7 +9672,21 @@
                 const healthcareBuffer = parseFloat(document.getElementById('healthcare-buffer')?.value) || 20;
                 const emergencyBuffer = parseFloat(document.getElementById('emergency-buffer')?.value) || 12;
 
-                console.log('Input values:', { currentAge, retirementAge, currentExpenses, currentSavings, monthlySip });
+                console.log('Input values:', { 
+                    currentAge, 
+                    retirementAge, 
+                    currentExpenses, 
+                    currentSavings, 
+                    monthlySip, 
+                    expectedReturn, 
+                    inflationRate 
+                });
+                
+                // Check if any critical values are missing
+                if (currentSavings === 0 && monthlySip === 0) {
+                    alert('Please enter either current savings or monthly SIP amount (or both) to calculate your retirement corpus.');
+                    return;
+                }
 
                 // Enhanced validation
                 if (currentAge <= 0 || currentAge > 100) {
@@ -9751,15 +9765,35 @@
                 const monthlyReturn = expectedReturn / 100 / 12;
                 const totalSipMonths = yearsToRetirement * 12;
                 
+                console.log('SIP Calculation Debug:', {
+                    monthlySip: monthlySip,
+                    monthlyReturn: monthlyReturn,
+                    totalSipMonths: totalSipMonths,
+                    expectedReturn: expectedReturn
+                });
+                
                 let futureValueSip = 0;
                 if (monthlySip > 0 && monthlyReturn > 0) {
                     futureValueSip = monthlySip * ((Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn);
+                    console.log('SIP calculation (compound):', futureValueSip);
                 } else if (monthlySip > 0) {
                     futureValueSip = monthlySip * totalSipMonths;
+                    console.log('SIP calculation (simple):', futureValueSip);
+                } else {
+                    console.log('No SIP amount provided');
                 }
 
                 // Total corpus at retirement
                 const totalCorpusAtRetirement = futureValueCurrentSavings + futureValueSip;
+                
+                console.log('Corpus Calculation Debug:', {
+                    currentSavings: currentSavings,
+                    expectedReturn: expectedReturn,
+                    yearsToRetirement: yearsToRetirement,
+                    futureValueCurrentSavings: Math.round(futureValueCurrentSavings),
+                    futureValueSip: Math.round(futureValueSip),
+                    totalCorpusAtRetirement: Math.round(totalCorpusAtRetirement)
+                });
 
                 // Gap analysis
                 const corpusGap = requiredCorpus - totalCorpusAtRetirement;
@@ -10415,6 +10449,45 @@
 
             recommendationsHtml += '</div>';
             document.getElementById('retirement-recommendations').innerHTML = recommendationsHtml;
+        }
+
+        // Debug function to test calculations
+        function testRetirementCalculation() {
+            console.log('=== RETIREMENT CALCULATION TEST ===');
+            
+            // Test with sample data
+            const testData = {
+                currentAge: 30,
+                retirementAge: 60,
+                currentExpenses: 50000,
+                currentSavings: 1000000,
+                monthlySip: 25000,
+                expectedReturn: 12,
+                inflationRate: 6
+            };
+            
+            console.log('Test inputs:', testData);
+            
+            // Calculate years to retirement
+            const yearsToRetirement = testData.retirementAge - testData.currentAge;
+            console.log('Years to retirement:', yearsToRetirement);
+            
+            // Calculate future value of current savings
+            const futureValueCurrentSavings = testData.currentSavings * Math.pow(1 + testData.expectedReturn/100, yearsToRetirement);
+            console.log('Future value of current savings:', Math.round(futureValueCurrentSavings));
+            
+            // Calculate future value of SIP
+            const monthlyReturn = testData.expectedReturn / 100 / 12;
+            const totalSipMonths = yearsToRetirement * 12;
+            const futureValueSip = testData.monthlySip * ((Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn);
+            console.log('Future value of SIP:', Math.round(futureValueSip));
+            
+            // Total corpus
+            const totalCorpus = futureValueCurrentSavings + futureValueSip;
+            console.log('Total corpus:', Math.round(totalCorpus));
+            console.log('Total corpus in Crores:', (totalCorpus/10000000).toFixed(2));
+            
+            console.log('=== TEST COMPLETE ===');
         }
 
         function clearRetirementForm() {

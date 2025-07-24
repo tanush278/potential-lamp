@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Risk Profile Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #111; color: white; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 8px; }
+        .pass { border-color: green; background: #001100; }
+        .fail { border-color: red; background: #110000; }
+        button { padding: 10px 20px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Risk Profile Synchronization Test</h1>
+    
+    <div class="test-section" id="test1">
+        <h3>Test 1: Check Conservative Risk Profile Allocation</h3>
+        <p>Expected: 20% equity, 60% debt, 10% gold, 10% cash</p>
+        <p id="test1-result">Loading...</p>
+    </div>
+    
+    <div class="test-section" id="test2">
+        <h3>Test 2: Check Investment Recommendations Allocation</h3>
+        <p>Expected: Same allocations as Risk Assessment</p>
+        <p id="test2-result">Loading...</p>
+    </div>
+    
+    <div class="test-section" id="test3">
+        <h3>Test 3: Check Portfolio Analysis Inflation Field</h3>
+        <p>Expected: inflation-rate field exists and has default value 6</p>
+        <p id="test3-result">Loading...</p>
+    </div>
+
+    <script>
+        // Load the main app in an iframe to test
+        const iframe = document.createElement('iframe');
+        iframe.src = 'financial_planner_COMPLETE_LAYOUT_FIXED.html';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        iframe.onload = function() {
+            const doc = iframe.contentDocument;
+            
+            // Test 1: Check Risk Assessment allocations
+            const scriptContent = doc.documentElement.innerHTML;
+            const conservativeMatch = scriptContent.match(/Conservative.*?equity:\s*20.*?debt:\s*60.*?gold:\s*10.*?cash:\s*10/s);
+            
+            if (conservativeMatch) {
+                document.getElementById('test1').className = 'test-section pass';
+                document.getElementById('test1-result').textContent = 'PASS: Conservative allocation is correctly set';
+            } else {
+                document.getElementById('test1').className = 'test-section fail';
+                document.getElementById('test1-result').textContent = 'FAIL: Conservative allocation not found or incorrect';
+            }
+            
+            // Test 2: Check Investment Recommendations allocations
+            const investmentAllocations = scriptContent.match(/'Conservative':\s*{\s*equity:\s*20,\s*debt:\s*60,\s*gold:\s*10,\s*cash:\s*10\s*}/);
+            
+            if (investmentAllocations) {
+                document.getElementById('test2').className = 'test-section pass';
+                document.getElementById('test2-result').textContent = 'PASS: Investment Recommendations allocation matches';
+            } else {
+                document.getElementById('test2').className = 'test-section fail';
+                document.getElementById('test2-result').textContent = 'FAIL: Investment Recommendations allocation mismatch';
+            }
+            
+            // Test 3: Check inflation field
+            const inflationField = doc.getElementById('inflation-rate');
+            
+            if (inflationField && inflationField.value === '6') {
+                document.getElementById('test3').className = 'test-section pass';
+                document.getElementById('test3-result').textContent = 'PASS: Inflation field exists with default value 6';
+            } else {
+                document.getElementById('test3').className = 'test-section fail';
+                document.getElementById('test3-result').textContent = 'FAIL: Inflation field missing or incorrect default value';
+            }
+        };
+    </script>
+</body>
+</html>

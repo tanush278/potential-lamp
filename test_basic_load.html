@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Load Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #000; 
+            color: #fff; 
+            padding: 20px;
+            margin: 0;
+        }
+        .test-section {
+            background: #111;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #FF6B6B; }
+        .warning { color: #FFA726; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Financial Planner App Diagnostic Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Basic Load Test</h2>
+        <div id="load-status">Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 External Resources Test</h2>
+        <div id="resources-status">Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 JavaScript Test</h2>
+        <div id="js-status">Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Console Errors</h2>
+        <div id="console-errors">Checking...</div>
+    </div>
+
+    <script>
+        console.log('🚀 Diagnostic test started...');
+        
+        // Test 1: Basic load
+        document.getElementById('load-status').innerHTML = '<span class="success">✅ HTML loaded successfully</span>';
+        
+        // Test 2: External resources
+        let resourceTests = [];
+        
+        // Test Font Awesome
+        const faTest = document.createElement('i');
+        faTest.className = 'fas fa-heart';
+        document.body.appendChild(faTest);
+        const faStyles = window.getComputedStyle(faTest);
+        if (faStyles.fontFamily.includes('Font Awesome')) {
+            resourceTests.push('<span class="success">✅ Font Awesome loaded</span>');
+        } else {
+            resourceTests.push('<span class="error">❌ Font Awesome failed</span>');
+        }
+        document.body.removeChild(faTest);
+        
+        // Test Chart.js
+        if (typeof Chart !== 'undefined') {
+            resourceTests.push('<span class="success">✅ Chart.js loaded</span>');
+        } else {
+            resourceTests.push('<span class="error">❌ Chart.js failed</span>');
+        }
+        
+        document.getElementById('resources-status').innerHTML = resourceTests.join('<br>');
+        
+        // Test 3: JavaScript functionality
+        try {
+            const testDiv = document.createElement('div');
+            testDiv.id = 'test-element';
+            document.body.appendChild(testDiv);
+            
+            const retrieved = document.getElementById('test-element');
+            if (retrieved) {
+                document.getElementById('js-status').innerHTML = '<span class="success">✅ JavaScript DOM manipulation working</span>';
+            } else {
+                document.getElementById('js-status').innerHTML = '<span class="error">❌ JavaScript DOM manipulation failed</span>';
+            }
+            
+            document.body.removeChild(testDiv);
+        } catch (error) {
+            document.getElementById('js-status').innerHTML = `<span class="error">❌ JavaScript error: ${error.message}</span>`;
+        }
+        
+        // Test 4: Console errors
+        let consoleErrors = [];
+        const originalError = console.error;
+        console.error = function(...args) {
+            consoleErrors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+        
+        setTimeout(() => {
+            if (consoleErrors.length === 0) {
+                document.getElementById('console-errors').innerHTML = '<span class="success">✅ No console errors detected</span>';
+            } else {
+                document.getElementById('console-errors').innerHTML = 
+                    '<span class="error">❌ Console errors found:</span><br>' + 
+                    consoleErrors.map(err => `<span class="error">• ${err}</span>`).join('<br>');
+            }
+        }, 2000);
+        
+        console.log('✅ Diagnostic test completed');
+    </script>
+
+    <!-- Test external resources -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.js"></script>
+</body>
+</html>

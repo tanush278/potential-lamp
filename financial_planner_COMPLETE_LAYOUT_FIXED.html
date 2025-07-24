@@ -2821,14 +2821,151 @@
                 <section id="retirement" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Retirement Planning</h1>
-                        <p class="section-subtitle">Plan for your retirement goals</p>
+                        <p class="section-subtitle">Comprehensive retirement planning with inflation modeling and lifestyle analysis</p>
                     </div>
-                    <div class="card">
-                        <h3>Retirement Calculator</h3>
-                        <p>Calculate how much you need to save for a comfortable retirement.</p>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-umbrella"></i> Plan Retirement
-                        </button>
+
+                    <!-- Retirement Planning Input Form -->
+                    <div class="card" style="margin-bottom: 2rem;">
+                        <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-umbrella"></i> Retirement Planning Calculator
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                            <!-- Personal Information -->
+                            <div class="form-section">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-user"></i> Personal Information
+                                </h4>
+                                <div class="form-group">
+                                    <label>Current Age</label>
+                                    <input type="number" id="current-age" class="form-input" placeholder="e.g., 30" min="18" max="65" onchange="calculateRetirement()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Planned Retirement Age</label>
+                                    <input type="number" id="retirement-age" class="form-input" placeholder="e.g., 60" min="40" max="80" onchange="calculateRetirement()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Life Expectancy (Years)</label>
+                                    <input type="number" id="life-expectancy" class="form-input" placeholder="e.g., 85" min="65" max="100" value="85" onchange="calculateRetirement()">
+                                </div>
+                            </div>
+
+                            <!-- Current Financial Status -->
+                            <div class="form-section">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-wallet"></i> Current Financial Status
+                                </h4>
+                                <div class="form-group">
+                                    <label>Current Monthly Expenses (₹)</label>
+                                    <input type="number" id="current-expenses" class="form-input" placeholder="e.g., 50,000" min="0" onchange="calculateRetirement()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Current Retirement Savings (₹)</label>
+                                    <input type="number" id="current-savings" class="form-input" placeholder="e.g., 5,00,000" min="0" onchange="calculateRetirement()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Monthly SIP for Retirement (₹)</label>
+                                    <input type="number" id="monthly-sip" class="form-input" placeholder="e.g., 10,000" min="0" onchange="calculateRetirement()">
+                                </div>
+                            </div>
+
+                            <!-- Assumptions & Goals -->
+                            <div class="form-section">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-target"></i> Assumptions & Goals
+                                </h4>
+                                <div class="form-group">
+                                    <label>Expected Return (% per annum)</label>
+                                    <input type="number" id="expected-return" class="form-input" placeholder="e.g., 12" min="1" max="30" step="0.1" value="12" onchange="calculateRetirement()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Inflation Rate (% per annum)</label>
+                                    <input type="number" id="inflation-rate" class="form-input" placeholder="e.g., 6" min="1" max="15" step="0.1" value="6" onchange="calculateRetirement()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Post-Retirement Return (%)</label>
+                                    <input type="number" id="post-retirement-return" class="form-input" placeholder="e.g., 8" min="1" max="20" step="0.1" value="8" onchange="calculateRetirement()">
+                                </div>
+                            </div>
+
+                            <!-- Lifestyle Preferences -->
+                            <div class="form-section">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-heart"></i> Lifestyle Preferences
+                                </h4>
+                                <div class="form-group">
+                                    <label>Retirement Lifestyle</label>
+                                    <select id="lifestyle-choice" class="form-input" onchange="calculateRetirement()">
+                                        <option value="conservative">Conservative (70% of current expenses)</option>
+                                        <option value="moderate" selected>Moderate (85% of current expenses)</option>
+                                        <option value="comfortable">Comfortable (100% of current expenses)</option>
+                                        <option value="luxurious">Luxurious (120% of current expenses)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Healthcare Buffer (% of expenses)</label>
+                                    <input type="number" id="healthcare-buffer" class="form-input" placeholder="e.g., 20" min="0" max="100" value="20" onchange="calculateRetirement()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Emergency Buffer (Months)</label>
+                                    <input type="number" id="emergency-buffer" class="form-input" placeholder="e.g., 12" min="6" max="36" value="12" onchange="calculateRetirement()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button type="button" class="btn btn-primary" onclick="calculateRetirement()" style="padding: 12px 30px; font-size: 16px;">
+                                <i class="fas fa-calculator"></i> Calculate Retirement Plan
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="clearRetirementForm()" style="margin-left: 1rem;">
+                                <i class="fas fa-undo"></i> Clear Form
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Retirement Results -->
+                    <div id="retirement-results" style="display: none;">
+                        <!-- Quick Summary Cards -->
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-chart-line"></i> Retirement Summary
+                            </h3>
+                            <div id="retirement-summary-cards"></div>
+                        </div>
+
+                        <!-- Detailed Analysis -->
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-analytics"></i> Detailed Analysis
+                            </h3>
+                            <div id="retirement-detailed-analysis"></div>
+                        </div>
+
+                        <!-- Retirement Progression Chart -->
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-chart-area"></i> Retirement Corpus Growth
+                            </h3>
+                            <div style="position: relative; height: 400px;">
+                                <canvas id="retirement-growth-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Scenario Analysis -->
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-layer-group"></i> Scenario Analysis
+                            </h3>
+                            <div id="retirement-scenarios"></div>
+                        </div>
+
+                        <!-- Recommendations -->
+                        <div class="card">
+                            <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-lightbulb"></i> Retirement Recommendations
+                            </h3>
+                            <div id="retirement-recommendations"></div>
+                        </div>
                     </div>
                 </section>
 
@@ -9508,6 +9645,599 @@
                         </div>
                     </div>
                 `;
+            }
+        }
+
+        // ====================================
+        // RETIREMENT PLANNING FUNCTIONS
+        // ====================================
+
+        let retirementChart = null;
+
+        function calculateRetirement() {
+            try {
+                // Get all input values
+                const currentAge = parseFloat(document.getElementById('current-age').value) || 0;
+                const retirementAge = parseFloat(document.getElementById('retirement-age').value) || 0;
+                const lifeExpectancy = parseFloat(document.getElementById('life-expectancy').value) || 85;
+                const currentExpenses = parseFloat(document.getElementById('current-expenses').value) || 0;
+                const currentSavings = parseFloat(document.getElementById('current-savings').value) || 0;
+                const monthlySip = parseFloat(document.getElementById('monthly-sip').value) || 0;
+                const expectedReturn = parseFloat(document.getElementById('expected-return').value) || 12;
+                const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 6;
+                const postRetirementReturn = parseFloat(document.getElementById('post-retirement-return').value) || 8;
+                const lifestyleChoice = document.getElementById('lifestyle-choice').value;
+                const healthcareBuffer = parseFloat(document.getElementById('healthcare-buffer').value) || 20;
+                const emergencyBuffer = parseFloat(document.getElementById('emergency-buffer').value) || 12;
+
+                // Validation
+                if (currentAge <= 0 || retirementAge <= 0 || currentAge >= retirementAge) {
+                    alert('Please enter valid ages. Current age must be less than retirement age.');
+                    return;
+                }
+
+                if (currentExpenses <= 0) {
+                    alert('Please enter your current monthly expenses.');
+                    return;
+                }
+
+                // Calculate years to retirement and retirement duration
+                const yearsToRetirement = retirementAge - currentAge;
+                const retirementDuration = lifeExpectancy - retirementAge;
+
+                // Calculate lifestyle multiplier
+                const lifestyleMultipliers = {
+                    'conservative': 0.70,
+                    'moderate': 0.85,
+                    'comfortable': 1.00,
+                    'luxurious': 1.20
+                };
+                const lifestyleMultiplier = lifestyleMultipliers[lifestyleChoice];
+
+                // Calculate future expenses at retirement (with inflation)
+                const futureMonthlyExpenses = currentExpenses * Math.pow(1 + inflationRate/100, yearsToRetirement);
+                const adjustedMonthlyExpenses = futureMonthlyExpenses * lifestyleMultiplier;
+                const healthcareExpenses = adjustedMonthlyExpenses * (healthcareBuffer/100);
+                const totalMonthlyExpenses = adjustedMonthlyExpenses + healthcareExpenses;
+                const emergencyCorpus = totalMonthlyExpenses * emergencyBuffer;
+
+                // Calculate required retirement corpus
+                const realReturnRate = ((1 + postRetirementReturn/100) / (1 + inflationRate/100)) - 1;
+                const monthlyRealReturn = realReturnRate / 12;
+                const totalRetirementMonths = retirementDuration * 12;
+                
+                // Present value of annuity formula for required corpus
+                const requiredCorpus = totalMonthlyExpenses * ((1 - Math.pow(1 + monthlyRealReturn, -totalRetirementMonths)) / monthlyRealReturn) + emergencyCorpus;
+
+                // Calculate future value of current savings
+                const futureValueCurrentSavings = currentSavings * Math.pow(1 + expectedReturn/100, yearsToRetirement);
+
+                // Calculate future value of SIP
+                const monthlyReturn = expectedReturn / 100 / 12;
+                const totalSipMonths = yearsToRetirement * 12;
+                const futureValueSip = monthlySip * (Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn;
+
+                // Total corpus at retirement
+                const totalCorpusAtRetirement = futureValueCurrentSavings + futureValueSip;
+
+                // Gap analysis
+                const corpusGap = requiredCorpus - totalCorpusAtRetirement;
+                const additionalMonthlySipNeeded = corpusGap > 0 ? 
+                    corpusGap / ((Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn) : 0;
+
+                // Calculate corpus adequacy percentage
+                const adequacyPercentage = (totalCorpusAtRetirement / requiredCorpus) * 100;
+
+                // Generate year-wise data for chart
+                const chartData = generateRetirementChartData({
+                    currentAge, retirementAge, lifeExpectancy, currentSavings, monthlySip,
+                    expectedReturn, postRetirementReturn, inflationRate, totalMonthlyExpenses
+                });
+
+                // Display results
+                displayRetirementResults({
+                    currentAge, retirementAge, lifeExpectancy, yearsToRetirement, retirementDuration,
+                    currentExpenses, futureMonthlyExpenses, adjustedMonthlyExpenses, healthcareExpenses,
+                    totalMonthlyExpenses, emergencyCorpus, requiredCorpus, totalCorpusAtRetirement,
+                    corpusGap, additionalMonthlySipNeeded, adequacyPercentage, lifestyleChoice,
+                    expectedReturn, inflationRate, postRetirementReturn, chartData
+                });
+
+            } catch (error) {
+                console.error('Error in retirement calculation:', error);
+                alert('Error calculating retirement plan. Please check your inputs.');
+            }
+        }
+
+        function generateRetirementChartData(params) {
+            const { currentAge, retirementAge, lifeExpectancy, currentSavings, monthlySip, 
+                    expectedReturn, postRetirementReturn, inflationRate, totalMonthlyExpenses } = params;
+            
+            const data = [];
+            let corpus = currentSavings;
+            const monthlyReturn = expectedReturn / 100 / 12;
+            const postRetirementMonthlyReturn = postRetirementReturn / 100 / 12;
+
+            // Accumulation phase
+            for (let age = currentAge; age <= retirementAge; age++) {
+                if (age < retirementAge) {
+                    // Add monthly SIP and growth for 12 months
+                    for (let month = 0; month < 12; month++) {
+                        corpus = corpus * (1 + monthlyReturn) + monthlySip;
+                    }
+                }
+                data.push({
+                    age: age,
+                    corpus: corpus,
+                    phase: age < retirementAge ? 'accumulation' : 'retirement'
+                });
+            }
+
+            // Retirement phase - corpus depletion
+            let retirementCorpus = corpus;
+            for (let age = retirementAge + 1; age <= lifeExpectancy; age++) {
+                // Withdraw monthly expenses and apply post-retirement growth
+                for (let month = 0; month < 12; month++) {
+                    retirementCorpus = retirementCorpus * (1 + postRetirementMonthlyReturn) - totalMonthlyExpenses;
+                    if (retirementCorpus < 0) retirementCorpus = 0;
+                }
+                data.push({
+                    age: age,
+                    corpus: retirementCorpus,
+                    phase: 'retirement'
+                });
+            }
+
+            return data;
+        }
+
+        function displayRetirementResults(data) {
+            // Show results section
+            document.getElementById('retirement-results').style.display = 'block';
+
+            // Display summary cards
+            displayRetirementSummaryCards(data);
+
+            // Display detailed analysis
+            displayRetirementDetailedAnalysis(data);
+
+            // Create retirement chart
+            createRetirementChart(data.chartData);
+
+            // Display scenario analysis
+            displayRetirementScenarios(data);
+
+            // Display recommendations
+            displayRetirementRecommendations(data);
+
+            // Scroll to results
+            document.getElementById('retirement-results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayRetirementSummaryCards(data) {
+            const isAdequate = data.adequacyPercentage >= 100;
+            const statusColor = isAdequate ? 'var(--accent-gold)' : 'var(--accent-white)';
+            const statusText = isAdequate ? 'On Track' : 'Needs Attention';
+
+            document.getElementById('retirement-summary-cards').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div style="text-align: center; padding: 1.2rem; background: rgba(255,215,0,0.1); border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
+                        <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem; font-weight: 600;">RETIREMENT STATUS</div>
+                        <div style="font-size: 1.8rem; font-weight: bold; color: ${statusColor};">${statusText}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">${Math.round(data.adequacyPercentage)}% Adequate</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.2rem; background: rgba(192,192,192,0.1); border-radius: 8px; border: 1px solid rgba(192,192,192,0.3);">
+                        <div style="font-size: 0.8rem; color: var(--accent-silver); margin-bottom: 0.5rem; font-weight: 600;">YEARS TO RETIREMENT</div>
+                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--accent-silver);">${data.yearsToRetirement}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">Age ${data.currentAge} to ${data.retirementAge}</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.2rem; background: rgba(255,255,255,0.1); border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
+                        <div style="font-size: 0.8rem; color: var(--accent-white); margin-bottom: 0.5rem; font-weight: 600;">REQUIRED CORPUS</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-white);">₹${(data.requiredCorpus/10000000).toFixed(1)}Cr</div>
+                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">₹${Math.round(data.requiredCorpus).toLocaleString('en-IN')}</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.2rem; background: rgba(255,215,0,0.1); border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
+                        <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem; font-weight: 600;">PROJECTED CORPUS</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-gold);">₹${(data.totalCorpusAtRetirement/10000000).toFixed(1)}Cr</div>
+                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">₹${Math.round(data.totalCorpusAtRetirement).toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+
+                ${data.corpusGap > 0 ? `
+                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-white); margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h5 style="color: var(--accent-white); margin: 0; font-size: 16px;">Additional Investment Needed</h5>
+                            <p style="color: var(--text-gray); margin: 0; font-size: 14px;">Increase monthly SIP by ₹${Math.round(data.additionalMonthlySipNeeded).toLocaleString('en-IN')}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-white);">₹${(data.corpusGap/10000000).toFixed(2)}Cr</div>
+                            <div style="font-size: 0.7rem; color: var(--text-gray);">Shortfall</div>
+                        </div>
+                    </div>
+                </div>
+                ` : `
+                <div style="background: rgba(255,215,0,0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-gold); margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="background: rgba(255,215,0,0.2); padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-check-circle" style="color: var(--accent-gold); font-size: 1.2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 style="color: var(--accent-gold); margin: 0; font-size: 16px;">Congratulations! You're on Track</h5>
+                            <p style="color: var(--text-gray); margin: 0; font-size: 14px;">Your current savings plan meets your retirement goals</p>
+                        </div>
+                    </div>
+                </div>
+                `}
+            `;
+        }
+
+        function displayRetirementDetailedAnalysis(data) {
+            document.getElementById('retirement-detailed-analysis').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <!-- Current vs Future Expenses -->
+                    <div style="background: rgba(255,215,0,0.05); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2);">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-chart-line"></i> Expense Analysis
+                        </h5>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Current Monthly Expenses:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">₹${Math.round(data.currentExpenses).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Future Expenses (Inflation Adjusted):</span>
+                                <span style="color: var(--text-white); font-weight: 600;">₹${Math.round(data.futureMonthlyExpenses).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Lifestyle Adjusted Expenses:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">₹${Math.round(data.adjustedMonthlyExpenses).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Healthcare Buffer:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">₹${Math.round(data.healthcareExpenses).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="border-top: 1px solid #333; padding-top: 0.5rem; margin-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--accent-gold); font-weight: 600;">Total Monthly Retirement Expenses:</span>
+                                    <span style="color: var(--accent-gold); font-weight: 700;">₹${Math.round(data.totalMonthlyExpenses).toLocaleString('en-IN')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Corpus Breakdown -->
+                    <div style="background: rgba(192,192,192,0.05); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(192,192,192,0.2);">
+                        <h5 style="color: var(--accent-silver); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-piggy-bank"></i> Corpus Breakdown
+                        </h5>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Required Retirement Corpus:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">₹${Math.round(data.requiredCorpus).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Emergency Buffer:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">₹${Math.round(data.emergencyCorpus).toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="border-top: 1px solid #333; padding-top: 0.5rem; margin-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--accent-silver); font-weight: 600;">Projected Corpus at Retirement:</span>
+                                    <span style="color: var(--accent-silver); font-weight: 700;">₹${Math.round(data.totalCorpusAtRetirement).toLocaleString('en-IN')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Retirement Duration -->
+                    <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+                        <h5 style="color: var(--accent-white); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-clock"></i> Timeline Analysis
+                        </h5>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Years to Retirement:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">${data.yearsToRetirement} years</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Retirement Duration:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">${data.retirementDuration} years</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Lifestyle Choice:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">${data.lifestyleChoice.charAt(0).toUpperCase() + data.lifestyleChoice.slice(1)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Returns Analysis -->
+                    <div style="background: rgba(255,215,0,0.05); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2);">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-percentage"></i> Returns Analysis
+                        </h5>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Pre-Retirement Return:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">${data.expectedReturn}% p.a.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Post-Retirement Return:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">${data.postRetirementReturn}% p.a.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Inflation Rate:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">${data.inflationRate}% p.a.</span>
+                            </div>
+                            <div style="border-top: 1px solid #333; padding-top: 0.5rem; margin-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--accent-gold); font-weight: 600;">Real Return (Post-Retirement):</span>
+                                    <span style="color: var(--accent-gold); font-weight: 700;">${((data.postRetirementReturn - data.inflationRate)).toFixed(1)}% p.a.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createRetirementChart(chartData) {
+            const ctx = document.getElementById('retirement-growth-chart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (retirementChart) {
+                retirementChart.destroy();
+            }
+
+            const ages = chartData.map(d => d.age);
+            const corpusValues = chartData.map(d => d.corpus);
+            const accumulationData = chartData.filter(d => d.phase === 'accumulation').map(d => d.corpus);
+            const retirementData = chartData.filter(d => d.phase === 'retirement').map(d => d.corpus);
+
+            retirementChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ages,
+                    datasets: [{
+                        label: 'Retirement Corpus',
+                        data: corpusValues,
+                        borderColor: 'var(--accent-gold)',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: 'var(--accent-gold)',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: 'var(--accent-gold)',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: 'var(--text-white)',
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'var(--accent-gold)',
+                            bodyColor: 'var(--text-white)',
+                            borderColor: 'var(--accent-gold)',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: function(context) {
+                                    return `Age: ${context[0].label}`;
+                                },
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const phase = chartData[context.dataIndex].phase;
+                                    return `Corpus: ₹${(value/10000000).toFixed(2)}Cr (${phase})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Age',
+                                color: 'var(--text-white)',
+                                font: { size: 14 }
+                            },
+                            ticks: {
+                                color: 'var(--text-gray)',
+                                font: { size: 11 }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Corpus (₹ Crores)',
+                                color: 'var(--text-white)',
+                                font: { size: 14 }
+                            },
+                            ticks: {
+                                color: 'var(--text-gray)',
+                                font: { size: 11 },
+                                callback: function(value) {
+                                    return '₹' + (value/10000000).toFixed(1) + 'Cr';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayRetirementScenarios(data) {
+            // Calculate scenarios with different return rates
+            const scenarios = [
+                { name: 'Conservative', return: data.expectedReturn - 2, color: 'var(--accent-white)' },
+                { name: 'Expected', return: data.expectedReturn, color: 'var(--accent-gold)' },
+                { name: 'Optimistic', return: data.expectedReturn + 2, color: 'var(--accent-silver)' }
+            ];
+
+            let scenarioHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">';
+
+            scenarios.forEach(scenario => {
+                // Recalculate corpus for this scenario
+                const monthlyReturn = scenario.return / 100 / 12;
+                const yearsToRetirement = data.retirementAge - data.currentAge;
+                const totalSipMonths = yearsToRetirement * 12;
+                const currentSavings = parseFloat(document.getElementById('current-savings').value) || 0;
+                const monthlySip = parseFloat(document.getElementById('monthly-sip').value) || 0;
+                
+                const futureValueCurrentSavings = currentSavings * Math.pow(1 + scenario.return/100, yearsToRetirement);
+                const futureValueSip = monthlySip * (Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn;
+                const scenarioCorpus = futureValueCurrentSavings + futureValueSip;
+                const adequacy = (scenarioCorpus / data.requiredCorpus) * 100;
+
+                scenarioHtml += `
+                    <div style="padding: 1.5rem; background: rgba(${scenario.color === 'var(--accent-gold)' ? '255,215,0' : scenario.color === 'var(--accent-silver)' ? '192,192,192' : '255,255,255'},0.1); border-radius: 8px; border: 1px solid rgba(${scenario.color === 'var(--accent-gold)' ? '255,215,0' : scenario.color === 'var(--accent-silver)' ? '192,192,192' : '255,255,255'},0.3);">
+                        <h5 style="color: ${scenario.color}; margin-bottom: 1rem; text-align: center;">${scenario.name} Scenario</h5>
+                        <div style="text-align: center; margin-bottom: 1rem;">
+                            <div style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 0.5rem;">Expected Return</div>
+                            <div style="font-size: 1.4rem; font-weight: bold; color: ${scenario.color};">${scenario.return}% p.a.</div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Projected Corpus:</span>
+                                <span style="color: var(--text-white); font-weight: 600; font-size: 0.9rem;">₹${(scenarioCorpus/10000000).toFixed(1)}Cr</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Adequacy:</span>
+                                <span style="color: ${adequacy >= 100 ? 'var(--accent-gold)' : 'var(--accent-white)'}; font-weight: 600; font-size: 0.9rem;">${Math.round(adequacy)}%</span>
+                            </div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 4px; text-align: center;">
+                            <span style="color: ${adequacy >= 100 ? 'var(--accent-gold)' : 'var(--accent-white)'}; font-size: 0.8rem; font-weight: 600;">
+                                ${adequacy >= 100 ? 'Goal Achieved' : 'Needs Adjustment'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            scenarioHtml += '</div>';
+            document.getElementById('retirement-scenarios').innerHTML = scenarioHtml;
+        }
+
+        function displayRetirementRecommendations(data) {
+            let recommendations = [];
+
+            // Generate personalized recommendations
+            if (data.adequacyPercentage < 100) {
+                recommendations.push({
+                    icon: 'fas fa-arrow-up',
+                    title: 'Increase Monthly SIP',
+                    description: `Consider increasing your monthly SIP by ₹${Math.round(data.additionalMonthlySipNeeded).toLocaleString('en-IN')} to meet your retirement goal.`,
+                    priority: 'high'
+                });
+            }
+
+            if (data.yearsToRetirement > 20) {
+                recommendations.push({
+                    icon: 'fas fa-chart-line',
+                    title: 'Higher Equity Allocation',
+                    description: 'With 20+ years to retirement, consider a higher equity allocation (70-80%) for better long-term growth.',
+                    priority: 'medium'
+                });
+            }
+
+            if (data.yearsToRetirement < 10) {
+                recommendations.push({
+                    icon: 'fas fa-shield-alt',
+                    title: 'Reduce Risk Gradually',
+                    description: 'Start moving towards safer investments as you approach retirement. Consider reducing equity to 40-50%.',
+                    priority: 'medium'
+                });
+            }
+
+            recommendations.push({
+                icon: 'fas fa-heartbeat',
+                title: 'Health Insurance',
+                description: 'Ensure adequate health insurance coverage. Medical expenses can significantly impact retirement corpus.',
+                priority: 'high'
+            });
+
+            recommendations.push({
+                icon: 'fas fa-sync-alt',
+                title: 'Regular Review',
+                description: 'Review and adjust your retirement plan annually. Life changes may require plan modifications.',
+                priority: 'medium'
+            });
+
+            if (data.inflationRate > 6) {
+                recommendations.push({
+                    icon: 'fas fa-fire',
+                    title: 'Inflation Protection',
+                    description: 'Consider inflation-protected investments like TIPS or equity funds to combat high inflation.',
+                    priority: 'medium'
+                });
+            }
+
+            let recommendationsHtml = '<div style="display: grid; gap: 1rem;">';
+
+            recommendations.forEach(rec => {
+                const priorityColor = rec.priority === 'high' ? 'var(--accent-gold)' : 'var(--accent-silver)';
+                const priorityBg = rec.priority === 'high' ? 'rgba(255,215,0,0.1)' : 'rgba(192,192,192,0.1)';
+
+                recommendationsHtml += `
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: ${priorityBg}; border-radius: 8px; border-left: 4px solid ${priorityColor};">
+                        <div style="background: rgba(${rec.priority === 'high' ? '255,215,0' : '192,192,192'},0.2); padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="${rec.icon}" style="color: ${priorityColor}; font-size: 1.1rem;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <h5 style="color: ${priorityColor}; margin: 0 0 0.5rem 0; font-size: 16px;">${rec.title}</h5>
+                            <p style="color: var(--text-gray); margin: 0; font-size: 14px; line-height: 1.4;">${rec.description}</p>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.7rem; color: ${priorityColor}; text-transform: uppercase; font-weight: 600;">
+                            ${rec.priority}
+                        </div>
+                    </div>
+                `;
+            });
+
+            recommendationsHtml += '</div>';
+            document.getElementById('retirement-recommendations').innerHTML = recommendationsHtml;
+        }
+
+        function clearRetirementForm() {
+            // Clear all input fields
+            document.getElementById('current-age').value = '';
+            document.getElementById('retirement-age').value = '';
+            document.getElementById('life-expectancy').value = '85';
+            document.getElementById('current-expenses').value = '';
+            document.getElementById('current-savings').value = '';
+            document.getElementById('monthly-sip').value = '';
+            document.getElementById('expected-return').value = '12';
+            document.getElementById('inflation-rate').value = '6';
+            document.getElementById('post-retirement-return').value = '8';
+            document.getElementById('lifestyle-choice').value = 'moderate';
+            document.getElementById('healthcare-buffer').value = '20';
+            document.getElementById('emergency-buffer').value = '12';
+
+            // Hide results
+            document.getElementById('retirement-results').style.display = 'none';
+
+            // Destroy chart if exists
+            if (retirementChart) {
+                retirementChart.destroy();
+                retirementChart = null;
             }
         }
     </script>

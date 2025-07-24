@@ -10035,20 +10035,34 @@
         // Setup integrated financial ecosystem (CRASH-SAFE)
         function setupFinancialEcosystem() {
             try {
-                // Profile section listeners
-                ['current-age', 'client-age', 'insurance-age'].forEach(fieldId => {
+                console.log('Setting up Financial Ecosystem...');
+                
+                // REAL AGE FIELDS INTEGRATION
+                const ageFields = ['current-age', 'insurance-age', 'retirement-calc-age'];
+                ageFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
                     if (field) {
+                        console.log(`✅ Found age field: ${fieldId}`);
                         field.addEventListener('input', function() {
                             try {
                                 const value = parseFloat(this.value) || 0;
                                 if (value > 0 && value < 100) {
+                                    console.log(`Age updated from ${fieldId}: ${value}`);
                                     FinancialEcosystem.updateClientData('profile', 'age', value);
+                                    
+                                    // Show visible feedback
+                                    const feedback = document.getElementById('test-feedback');
+                                    if (feedback) {
+                                        feedback.innerHTML = `Age ${value} auto-populated to all sections!`;
+                                        feedback.style.color = '#4CAF50';
+                                    }
                                 }
                             } catch (error) {
                                 console.error(`Error updating age from ${fieldId}:`, error);
                             }
                         });
+                    } else {
+                        console.log(`❌ Age field not found: ${fieldId}`);
                     }
                 });
                 
@@ -10162,6 +10176,49 @@
             
             // Setup integrated financial ecosystem
             setupFinancialEcosystem();
+            
+            // TEST INTEGRATION - Add visible feedback
+            setTimeout(() => {
+                console.log('TESTING INTEGRATION...');
+                const ageField = document.getElementById('current-age');
+                const incomeField = document.getElementById('monthly-income');
+                
+                if (ageField && incomeField) {
+                    console.log('✅ Age and Income fields found');
+                    
+                    // Add visible integration test
+                    const testDiv = document.createElement('div');
+                    testDiv.id = 'integration-test';
+                    testDiv.innerHTML = `
+                        <div style="position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8); color: white; padding: 1rem; border-radius: 8px; z-index: 10000; max-width: 300px;">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Integration Test</h4>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Enter age or income to test auto-population:</p>
+                            <div id="test-feedback" style="font-size: 0.8rem; color: var(--text-gray);">Waiting for input...</div>
+                            <button onclick="this.parentNode.parentNode.remove()" style="margin-top: 0.5rem; padding: 0.3rem 0.8rem; background: var(--accent-gold); color: black; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+                        </div>
+                    `;
+                    document.body.appendChild(testDiv);
+                    
+                    // Add test listeners
+                    ageField.addEventListener('input', function() {
+                        const feedback = document.getElementById('test-feedback');
+                        if (feedback) {
+                            feedback.innerHTML = `Age entered: ${this.value} - Checking integration...`;
+                            feedback.style.color = 'var(--accent-gold)';
+                        }
+                    });
+                    
+                    incomeField.addEventListener('input', function() {
+                        const feedback = document.getElementById('test-feedback');
+                        if (feedback) {
+                            feedback.innerHTML = `Income entered: ${this.value} - Checking integration...`;
+                            feedback.style.color = 'var(--accent-gold)';
+                        }
+                    });
+                } else {
+                    console.log('❌ Fields not found:', { ageField: !!ageField, incomeField: !!incomeField });
+                }
+            }, 2000);
             
             // Try to load live mutual funds data
             try {

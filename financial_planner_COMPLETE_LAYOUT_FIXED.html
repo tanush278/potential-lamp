@@ -5527,7 +5527,10 @@
             // Generate historical performance simulation
             const months = data.startDate ? Math.round((new Date() - new Date(data.startDate)) / (1000 * 60 * 60 * 24 * 30.44)) : 12;
             const monthlyData = [];
-            const monthlyReturn = 0.01; // Assume 12% annual return
+            
+            // Get expected return and calculate monthly rate
+            const expectedReturn = parseFloat(document.getElementById('expected-return').value) || 12;
+            const monthlyReturn = Math.pow(1 + expectedReturn / 100, 1 / 12) - 1; // Correct CAGR-based monthly rate
             const monthlyInflation = inflationRate / 12 / 100; // Monthly inflation rate
             
             // Get initial lumpsum and additional lumpsums
@@ -5545,13 +5548,11 @@
             
             let totalInvested = initialLumpsum; // Start with initial lumpsum
             let lumpsumValue = initialLumpsum; // Track lumpsum growth separately
-            let sipInvested = 0; // Track SIP investments separately
             let sipValue = 0; // Track SIP growth separately
             
             for (let i = 0; i <= months; i++) {
-                // Add monthly SIP
-                if (i > 0) { // Don't add SIP at month 0
-                    sipInvested += monthlySIP;
+                // Add monthly SIP (except at month 0)
+                if (i > 0) {
                     totalInvested += monthlySIP;
                 }
                 
@@ -5571,9 +5572,14 @@
                     });
                 }
                 
-                // Calculate growth
+                // Calculate growth - lumpsum grows every month
                 lumpsumValue = lumpsumValue * (1 + monthlyReturn);
-                sipValue = sipInvested * Math.pow(1 + monthlyReturn, i);
+                
+                // Calculate SIP value correctly - each SIP installment grows from when it was invested
+                sipValue = 0;
+                for (let j = 1; j <= i; j++) {
+                    sipValue += monthlySIP * Math.pow(1 + monthlyReturn, i - j);
+                }
                 
                 const nominalValue = lumpsumValue + sipValue;
                 const realValue = nominalValue / Math.pow(1 + monthlyInflation, i);
@@ -5587,11 +5593,15 @@
             }
             
             // Adjust final values to match current portfolio
-            const adjustmentFactor = data.totalValue / nominalValue;
-            monthlyData.forEach(point => {
-                point.nominalValue *= adjustmentFactor;
-                point.realValue *= adjustmentFactor;
-            });
+            const finalNominalValue = monthlyData[monthlyData.length - 1].nominalValue;
+            if (finalNominalValue > 0) {
+                const adjustmentFactor = data.totalValue / finalNominalValue;
+                monthlyData.forEach(point => {
+                    point.nominalValue *= adjustmentFactor;
+                    point.realValue *= adjustmentFactor;
+                    // Note: We don't scale 'invested' amounts as they represent actual money put in
+                });
+            }
             
             // Filter data based on selected period
             let chartData = monthlyData;

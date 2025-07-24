@@ -2838,15 +2838,15 @@
                                 </h4>
                                 <div class="form-group">
                                     <label>Current Age</label>
-                                    <input type="number" id="current-age" class="form-input" placeholder="e.g., 30" min="18" max="65" onchange="calculateRetirement()">
+                                    <input type="number" id="current-age" class="form-input" placeholder="e.g., 30" min="18" max="65">
                                 </div>
                                 <div class="form-group">
                                     <label>Planned Retirement Age</label>
-                                    <input type="number" id="retirement-age" class="form-input" placeholder="e.g., 60" min="40" max="80" onchange="calculateRetirement()">
+                                    <input type="number" id="retirement-age" class="form-input" placeholder="e.g., 60" min="40" max="80">
                                 </div>
                                 <div class="form-group">
                                     <label>Life Expectancy (Years)</label>
-                                    <input type="number" id="life-expectancy" class="form-input" placeholder="e.g., 85" min="65" max="100" value="85" onchange="calculateRetirement()">
+                                    <input type="number" id="life-expectancy" class="form-input" placeholder="e.g., 85" min="65" max="100" value="85">
                                 </div>
                             </div>
 
@@ -2857,15 +2857,15 @@
                                 </h4>
                                 <div class="form-group">
                                     <label>Current Monthly Expenses (₹)</label>
-                                    <input type="number" id="current-expenses" class="form-input" placeholder="e.g., 50,000" min="0" onchange="calculateRetirement()">
+                                    <input type="number" id="current-expenses" class="form-input" placeholder="e.g., 50,000" min="0">
                                 </div>
                                 <div class="form-group">
                                     <label>Current Retirement Savings (₹)</label>
-                                    <input type="number" id="current-savings" class="form-input" placeholder="e.g., 5,00,000" min="0" onchange="calculateRetirement()">
+                                    <input type="number" id="current-savings" class="form-input" placeholder="e.g., 5,00,000" min="0">
                                 </div>
                                 <div class="form-group">
                                     <label>Monthly SIP for Retirement (₹)</label>
-                                    <input type="number" id="monthly-sip" class="form-input" placeholder="e.g., 10,000" min="0" onchange="calculateRetirement()">
+                                    <input type="number" id="monthly-sip" class="form-input" placeholder="e.g., 10,000" min="0">
                                 </div>
                             </div>
 
@@ -2876,15 +2876,15 @@
                                 </h4>
                                 <div class="form-group">
                                     <label>Expected Return (% per annum)</label>
-                                    <input type="number" id="expected-return" class="form-input" placeholder="e.g., 12" min="1" max="30" step="0.1" value="12" onchange="calculateRetirement()">
+                                    <input type="number" id="expected-return" class="form-input" placeholder="e.g., 12" min="1" max="30" step="0.1" value="12">
                                 </div>
                                 <div class="form-group">
                                     <label>Inflation Rate (% per annum)</label>
-                                    <input type="number" id="inflation-rate" class="form-input" placeholder="e.g., 6" min="1" max="15" step="0.1" value="6" onchange="calculateRetirement()">
+                                    <input type="number" id="inflation-rate" class="form-input" placeholder="e.g., 6" min="1" max="15" step="0.1" value="6">
                                 </div>
                                 <div class="form-group">
                                     <label>Post-Retirement Return (%)</label>
-                                    <input type="number" id="post-retirement-return" class="form-input" placeholder="e.g., 8" min="1" max="20" step="0.1" value="8" onchange="calculateRetirement()">
+                                    <input type="number" id="post-retirement-return" class="form-input" placeholder="e.g., 8" min="1" max="20" step="0.1" value="8">
                                 </div>
                             </div>
 
@@ -2895,7 +2895,7 @@
                                 </h4>
                                 <div class="form-group">
                                     <label>Retirement Lifestyle</label>
-                                    <select id="lifestyle-choice" class="form-input" onchange="calculateRetirement()">
+                                    <select id="lifestyle-choice" class="form-input">
                                         <option value="conservative">Conservative (70% of current expenses)</option>
                                         <option value="moderate" selected>Moderate (85% of current expenses)</option>
                                         <option value="comfortable">Comfortable (100% of current expenses)</option>
@@ -2904,11 +2904,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Healthcare Buffer (% of expenses)</label>
-                                    <input type="number" id="healthcare-buffer" class="form-input" placeholder="e.g., 20" min="0" max="100" value="20" onchange="calculateRetirement()">
+                                    <input type="number" id="healthcare-buffer" class="form-input" placeholder="e.g., 20" min="0" max="100" value="20">
                                 </div>
                                 <div class="form-group">
                                     <label>Emergency Buffer (Months)</label>
-                                    <input type="number" id="emergency-buffer" class="form-input" placeholder="e.g., 12" min="6" max="36" value="12" onchange="calculateRetirement()">
+                                    <input type="number" id="emergency-buffer" class="form-input" placeholder="e.g., 12" min="6" max="36" value="12">
                                 </div>
                             </div>
                         </div>
@@ -9888,8 +9888,10 @@
                 // Display recommendations
                 displayRetirementRecommendations(data);
 
-                // Scroll to results
-                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Scroll to results only after a small delay to ensure content is rendered
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
                 
                 console.log('Results displayed successfully');
 

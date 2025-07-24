@@ -1800,18 +1800,56 @@
                         </div>
                         
                         <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                            <button type="button" class="regime-btn active" data-regime="old" onclick="selectTaxRegime('old')">
+                            <button type="button" class="regime-btn active" data-regime="old" onclick="selectTaxRegime('old')" title="Old regime with deductions like 80C, 80D, HRA, etc.">
                                 <i class="fas fa-university"></i> Old Tax Regime
+                                <small style="display: block; font-size: 11px; margin-top: 4px;">With Deductions</small>
                             </button>
-                            <button type="button" class="regime-btn" data-regime="new" onclick="selectTaxRegime('new')">
-                                <i class="fas fa-coins"></i> New Tax Regime
+                            <button type="button" class="regime-btn" data-regime="new" onclick="selectTaxRegime('new')" title="New regime with lower tax rates but no deductions">
+                                <i class="fas fa-coins"></i> New Tax Regime  
+                                <small style="display: block; font-size: 11px; margin-top: 4px;">Lower Rates, No Deductions</small>
                             </button>
-                            <button type="button" class="regime-btn" data-regime="compare" onclick="selectTaxRegime('compare')">
+                            <button type="button" class="regime-btn" data-regime="compare" onclick="selectTaxRegime('compare')" title="Compare both regimes side by side">
                                 <i class="fas fa-balance-scale"></i> Compare Both
+                                <small style="display: block; font-size: 11px; margin-top: 4px;">Side-by-Side Analysis</small>
                             </button>
                         </div>
                         
+                        <!-- Regime Information -->
+                        <div id="regime-info" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <div id="old-regime-info" style="display: block;">
+                                <h4 style="color: #2c5aa0; margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> Old Tax Regime (FY 2024-25)</h4>
+                                <p style="margin: 0; color: #666; line-height: 1.5;">
+                                    <strong>Benefits:</strong> Claim deductions under 80C (₹1.5L), 80D (₹25K-75K), HRA, home loan interest, etc.<br>
+                                    <strong>Tax Slabs:</strong> 0% up to ₹2.5L, 5% (₹2.5L-5L), 20% (₹5L-10L), 30% (above ₹10L)<br>
+                                    <strong>Best for:</strong> Those with significant investments and deductions
+                                </p>
+                            </div>
+                            <div id="new-regime-info" style="display: none;">
+                                <h4 style="color: #28a745; margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> New Tax Regime (FY 2024-25)</h4>
+                                <p style="margin: 0; color: #666; line-height: 1.5;">
+                                    <strong>Benefits:</strong> Lower tax rates, higher standard deduction (₹75K for salaried), no tax up to ₹7L income<br>
+                                    <strong>Tax Slabs:</strong> 0% up to ₹3L, 5% (₹3L-6L), 10% (₹6L-9L), 15% (₹9L-12L), 20% (₹12L-15L), 30% (above ₹15L)<br>
+                                    <strong>Best for:</strong> Those with lower deductions or simpler tax filing
+                                </p>
+                            </div>
+                            <div id="compare-regime-info" style="display: none;">
+                                <h4 style="color: #ffc107; margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> Tax Regime Comparison</h4>
+                                <p style="margin: 0; color: #666; line-height: 1.5;">
+                                    <strong>Analysis:</strong> Compare both regimes to find which saves more tax based on your income and deductions<br>
+                                    <strong>Recommendation:</strong> System will automatically suggest the better option for your situation<br>
+                                    <strong>Note:</strong> You can switch between regimes annually (except for business income taxpayers)
+                                </p>
+                            </div>
+                        </div>
+                        
                         <input type="hidden" id="selected-tax-regime" value="old">
+                        
+                        <!-- Sample Data Button -->
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button type="button" onclick="loadSampleTaxData()" style="background: #17a2b8; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                                <i class="fas fa-magic"></i> Load Sample Data for Testing
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- Income Details -->
@@ -6787,6 +6825,11 @@
             // Update hidden input
             document.getElementById('selected-tax-regime').value = regime;
             
+            // Show/hide regime information
+            document.getElementById('old-regime-info').style.display = regime === 'old' ? 'block' : 'none';
+            document.getElementById('new-regime-info').style.display = regime === 'new' ? 'block' : 'none';
+            document.getElementById('compare-regime-info').style.display = regime === 'compare' ? 'block' : 'none';
+            
             // Show/hide deduction sections based on regime
             const oldRegimeDeductions = document.getElementById('old-regime-deductions');
             if (regime === 'new') {
@@ -6920,26 +6963,29 @@
             let totalTax = 0;
             let effectiveRate = 0;
             let taxBreakdown = [];
+            let standardDeduction = regime === 'old' ? 50000 : 75000;
+            let taxableIncome = Math.max(0, income - standardDeduction);
+            let rebateAmount = 0;
             
             if (regime === 'old') {
-                // Old tax regime slabs
-                if (income > 250000) {
-                    if (income <= 500000) {
-                        const taxableAmount = income - 250000;
+                // Old Tax Regime Slabs (FY 2024-25) - No changes
+                if (taxableIncome > 250000) {
+                    if (taxableIncome <= 500000) {
+                        const taxableAmount = taxableIncome - 250000;
                         const slabTax = taxableAmount * 0.05;
                         tax += slabTax;
                         taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: slabTax });
-                    } else if (income <= 1000000) {
-                        tax += 250000 * 0.05; // 5% on 2.5L to 5L
-                        const taxableAmount = income - 500000;
+                    } else if (taxableIncome <= 1000000) {
+                        tax += 12500; // 5% on 2.5L to 5L (250000 * 0.05)
+                        const taxableAmount = taxableIncome - 500000;
                         const slabTax = taxableAmount * 0.2;
                         tax += slabTax;
                         taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: 12500 });
                         taxBreakdown.push({ slab: '₹5L - ₹10L', rate: '20%', amount: slabTax });
                     } else {
-                        tax += 250000 * 0.05; // 5% on 2.5L to 5L
-                        tax += 500000 * 0.2;  // 20% on 5L to 10L
-                        const taxableAmount = income - 1000000;
+                        tax += 12500; // 5% on 2.5L to 5L
+                        tax += 100000; // 20% on 5L to 10L (500000 * 0.2)
+                        const taxableAmount = taxableIncome - 1000000;
                         const slabTax = taxableAmount * 0.3;
                         tax += slabTax;
                         taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: 12500 });
@@ -6947,33 +6993,40 @@
                         taxBreakdown.push({ slab: 'Above ₹10L', rate: '30%', amount: slabTax });
                     }
                 }
+                
+                // Section 87A Rebate for Old Regime (up to ₹5L income)
+                if (income <= 500000) {
+                    rebateAmount = Math.min(tax, 12500);
+                    tax = Math.max(0, tax - rebateAmount);
+                }
+                
             } else {
-                // New tax regime slabs (2023-24)
-                if (income > 300000) {
-                    if (income <= 600000) {
-                        const taxableAmount = income - 300000;
+                // New Tax Regime Slabs (FY 2024-25)
+                if (taxableIncome > 300000) {
+                    if (taxableIncome <= 600000) {
+                        const taxableAmount = taxableIncome - 300000;
                         const slabTax = taxableAmount * 0.05;
                         tax += slabTax;
                         taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: slabTax });
-                    } else if (income <= 900000) {
-                        tax += 300000 * 0.05; // 5% on 3L to 6L
-                        const taxableAmount = income - 600000;
+                    } else if (taxableIncome <= 900000) {
+                        tax += 15000; // 5% on 3L to 6L (300000 * 0.05)
+                        const taxableAmount = taxableIncome - 600000;
                         const slabTax = taxableAmount * 0.1;
                         tax += slabTax;
                         taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
                         taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: slabTax });
-                    } else if (income <= 1200000) {
-                        tax += 300000 * 0.05; // 5% on 3L to 6L
-                        tax += 300000 * 0.1;  // 10% on 6L to 9L
-                        const taxableAmount = income - 900000;
+                    } else if (taxableIncome <= 1200000) {
+                        tax += 15000; // 5% on 3L to 6L
+                        tax += 30000; // 10% on 6L to 9L (300000 * 0.1)
+                        const taxableAmount = taxableIncome - 900000;
                         const slabTax = taxableAmount * 0.15;
                         tax += slabTax;
                         taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
                         taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: 30000 });
                         taxBreakdown.push({ slab: '₹9L - ₹12L', rate: '15%', amount: slabTax });
-                    } else if (income <= 1500000) {
-                        tax += 300000 * 0.05 + 300000 * 0.1 + 300000 * 0.15;
-                        const taxableAmount = income - 1200000;
+                    } else if (taxableIncome <= 1500000) {
+                        tax += 15000 + 30000 + 45000; // Sum of previous slabs
+                        const taxableAmount = taxableIncome - 1200000;
                         const slabTax = taxableAmount * 0.2;
                         tax += slabTax;
                         taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
@@ -6981,8 +7034,8 @@
                         taxBreakdown.push({ slab: '₹9L - ₹12L', rate: '15%', amount: 45000 });
                         taxBreakdown.push({ slab: '₹12L - ₹15L', rate: '20%', amount: slabTax });
                     } else {
-                        tax += 300000 * 0.05 + 300000 * 0.1 + 300000 * 0.15 + 300000 * 0.2;
-                        const taxableAmount = income - 1500000;
+                        tax += 15000 + 30000 + 45000 + 60000; // Sum of previous slabs
+                        const taxableAmount = taxableIncome - 1500000;
                         const slabTax = taxableAmount * 0.3;
                         tax += slabTax;
                         taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
@@ -6991,6 +7044,12 @@
                         taxBreakdown.push({ slab: '₹12L - ₹15L', rate: '20%', amount: 60000 });
                         taxBreakdown.push({ slab: 'Above ₹15L', rate: '30%', amount: slabTax });
                     }
+                }
+                
+                // Section 87A Rebate for New Regime (up to ₹7L income) - FY 2024-25
+                if (income <= 700000) {
+                    rebateAmount = Math.min(tax, 25000);
+                    tax = Math.max(0, tax - rebateAmount);
                 }
             }
             
@@ -7001,15 +7060,17 @@
             
             return {
                 income,
+                grossIncome: income,
+                standardDeduction,
+                taxableIncome,
                 tax,
+                rebateAmount,
                 cess,
                 totalTax: totalTax,
                 totalTaxWithCess: totalTax,
                 effectiveRate,
                 taxBreakdown,
-                regime,
-                taxableIncome: income,
-                standardDeduction: regime === 'old' ? 50000 : 75000
+                regime
             };
         }
 
@@ -7423,6 +7484,65 @@
             
             html += '</div>';
             recommendationsDiv.innerHTML = html;
+        }
+
+        // Sample Data Function for Testing
+        function loadSampleTaxData() {
+            // Sample data for a typical salaried employee
+            document.getElementById('basic-salary').value = '800000';
+            document.getElementById('hra-received').value = '200000';
+            document.getElementById('special-allowances').value = '50000';
+            document.getElementById('bonus-incentives').value = '100000';
+            document.getElementById('other-income').value = '25000';
+            document.getElementById('city-type').value = 'metro';
+            document.getElementById('monthly-rent').value = '25000';
+            
+            // Old regime deductions
+            document.getElementById('epf-contribution').value = '21600';
+            document.getElementById('ppf-investment').value = '150000';
+            document.getElementById('elss-investment').value = '50000';
+            document.getElementById('life-insurance').value = '25000';
+            document.getElementById('home-loan-principal').value = '200000';
+            document.getElementById('other-80c').value = '0';
+            
+            document.getElementById('health-insurance-80d').value = '25000';
+            document.getElementById('parents-health-insurance').value = '50000';
+            document.getElementById('home-loan-interest').value = '200000';
+            document.getElementById('education-loan-interest').value = '0';
+            document.getElementById('nps-80ccd').value = '50000';
+            document.getElementById('donations-80g').value = '10000';
+            
+            // Trigger calculation
+            calculateAdvancedTax();
+            
+            // Show success message
+            const sampleInfo = document.createElement('div');
+            sampleInfo.innerHTML = `
+                <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin: 10px 0; border: 1px solid #c3e6cb;">
+                    <strong>Sample Data Loaded!</strong><br>
+                    <small>
+                        • Gross Salary: ₹11.75L (Basic: ₹8L + HRA: ₹2L + Allowances: ₹1.5L + Bonus: ₹1L + Other: ₹25K)<br>
+                        • Total 80C: ₹4.47L (EPF: ₹21.6K + PPF: ₹1.5L + ELSS: ₹50K + Insurance: ₹25K + Home Loan: ₹2L)<br>
+                        • Other Deductions: ₹3.35L (Health: ₹75K + Home Loan Interest: ₹2L + NPS: ₹50K + Donations: ₹10K)<br>
+                        • Try different regimes to see the comparison!
+                    </small>
+                </div>
+            `;
+            
+            const regimeInfo = document.getElementById('regime-info');
+            const existingSample = regimeInfo.querySelector('.sample-info');
+            if (existingSample) {
+                existingSample.remove();
+            }
+            sampleInfo.className = 'sample-info';
+            regimeInfo.appendChild(sampleInfo);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (sampleInfo.parentNode) {
+                    sampleInfo.remove();
+                }
+            }, 10000);
         }
 
         function generateReport() {

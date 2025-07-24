@@ -20,15 +20,21 @@
             --text-white: #ffffff;
             --text-gray: #aaaaaa;
             --accent-white: #ffffff;
-            --success-green: #00ff88;
-            --warning-orange: #ff9f43;
-            --error-red: #ff6b6b;
-            --info-blue: #00d4ff;
+            --accent-light: #f0f0f0;
+            --accent-silver: #c0c0c0;
+            --accent-gold: #ffd700;
+            --success-color: #ffffff;
+            --warning-color: #f0f0f0;
+            --info-color: #e0e0e0;
+            --highlight-color: #d0d0d0;
             --gradient-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
             --gradient-card: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
             --gradient-accent: linear-gradient(90deg, #ffffff 0%, #e0e0e0 100%);
+            --gradient-silver: linear-gradient(90deg, #c0c0c0 0%, #ffffff 100%);
+            --gradient-gold: linear-gradient(90deg, #ffd700 0%, #ffed4a 100%);
             --shadow-light: 0 4px 20px rgba(255, 255, 255, 0.1);
             --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.8);
+            --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.2);
             --border-radius-sm: 8px;
             --border-radius-md: 15px;
             --border-radius-lg: 25px;
@@ -1276,21 +1282,21 @@
                         
                         <!-- Results Summary -->
                         <div class="results-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
-                            <div class="result-card" style="background: rgba(0,255,136,0.1); border: 1px solid var(--success-green); border-radius: 8px; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 0.9rem; color: var(--success-green); margin-bottom: 0.5rem;">Total Investment</div>
-                                <div id="total-investment" style="font-size: 1.8rem; font-weight: bold; color: var(--success-green);">₹0</div>
+                            <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow-glow);">
+                                <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Total Investment</div>
+                                <div id="total-investment" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-white);">₹0</div>
                             </div>
-                            <div class="result-card" style="background: rgba(0,212,255,0.1); border: 1px solid var(--info-blue); border-radius: 8px; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 0.9rem; color: var(--info-blue); margin-bottom: 0.5rem;">Nominal Value</div>
-                                <div id="nominal-value" style="font-size: 1.8rem; font-weight: bold; color: var(--info-blue);">₹0</div>
+                            <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-light); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow-glow);">
+                                <div style="font-size: 0.9rem; color: var(--accent-light); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Nominal Value</div>
+                                <div id="nominal-value" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-white);">₹0</div>
                             </div>
-                            <div class="result-card" style="background: rgba(255,159,67,0.1); border: 1px solid var(--warning-orange); border-radius: 8px; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 0.9rem; color: var(--warning-orange); margin-bottom: 0.5rem;">Real Value (Inflation Adjusted)</div>
-                                <div id="real-value" style="font-size: 1.8rem; font-weight: bold; color: var(--warning-orange);">₹0</div>
+                            <div class="result-card" style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);">
+                                <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Real Value (Inflation Adjusted)</div>
+                                <div id="real-value" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-gold);">₹0</div>
                             </div>
-                            <div class="result-card" style="background: rgba(255,255,255,0.1); border: 1px solid var(--accent-white); border-radius: 8px; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem;">Total Returns</div>
-                                <div id="total-returns" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-white);">₹0</div>
+                            <div class="result-card" style="background: linear-gradient(135deg, #2a2a2a, #1a1a1a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow-glow);">
+                                <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Total Returns</div>
+                                <div id="total-returns" style="font-size: 1.8rem; font-weight: bold; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">₹0</div>
                             </div>
                         </div>
 
@@ -1642,28 +1648,272 @@
             }
         }
 
-        // Calculator functions
-        function calculateSIP() {
+        // Advanced SIP Calculator Functions
+        let sipChart = null;
+
+        // Show/hide lumpsum inputs based on calculation type
+        document.addEventListener('DOMContentLoaded', function() {
+            const calcType = document.getElementById('calc-type');
+            if (calcType) {
+                calcType.addEventListener('change', function() {
+                    const lumpsumInputs = document.getElementById('lumpsum-inputs');
+                    if (this.value === 'lumpsum') {
+                        lumpsumInputs.style.display = 'block';
+                    } else {
+                        lumpsumInputs.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        function calculateAdvancedSIP() {
             const amount = parseFloat(document.getElementById('sip-amount').value) || 0;
             const period = parseFloat(document.getElementById('sip-period').value) || 0;
             const rate = parseFloat(document.getElementById('sip-return').value) || 0;
+            const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 0;
+            const sipIncrease = parseFloat(document.getElementById('sip-increase').value) || 0;
+            const calcType = document.getElementById('calc-type').value;
+            const lumpsumAmount = parseFloat(document.getElementById('lumpsum-amount').value) || 0;
 
-            if (amount && period && rate) {
-                const monthlyRate = rate / 12 / 100;
-                const months = period * 12;
-                
-                const maturityAmount = amount * (((Math.pow(1 + monthlyRate, months)) - 1) / monthlyRate) * (1 + monthlyRate);
-                const totalInvestment = amount * months;
-                const totalGains = maturityAmount - totalInvestment;
-
-                document.getElementById('sip-total-investment').textContent = `₹${totalInvestment.toLocaleString('en-IN')}`;
-                document.getElementById('sip-maturity-amount').textContent = `₹${Math.round(maturityAmount).toLocaleString('en-IN')}`;
-                document.getElementById('sip-total-gains').textContent = `₹${Math.round(totalGains).toLocaleString('en-IN')}`;
-                
-                document.getElementById('sip-results').style.display = 'block';
-            } else {
-                alert('Please fill all SIP calculation fields');
+            if (!amount || !period || !rate) {
+                alert('Please fill all required SIP calculation fields');
+                return;
             }
+
+            const calculations = performAdvancedSIPCalculation(amount, period, rate, inflationRate, sipIncrease, calcType, lumpsumAmount);
+            displaySIPResults(calculations);
+            createSIPChart(calculations.yearlyData);
+            createYearlyBreakdown(calculations.yearlyData);
+            generateInvestmentInsights(calculations);
+        }
+
+        function performAdvancedSIPCalculation(monthlyAmount, years, annualRate, inflationRate, stepUpRate, calcType, lumpsumAmount) {
+            const monthlyRate = annualRate / 12 / 100;
+            const inflationMonthlyRate = inflationRate / 12 / 100;
+            const stepUpMonthlyRate = stepUpRate / 12 / 100;
+            
+            let totalInvestment = 0;
+            let nominalValue = 0;
+            let currentMonthlyAmount = monthlyAmount;
+            let lumpsumValue = lumpsumAmount;
+            
+            const yearlyData = [];
+            
+            for (let year = 1; year <= years; year++) {
+                let yearInvestment = 0;
+                let yearEndValue = nominalValue;
+                
+                // Add lumpsum in first year
+                if (year === 1 && calcType === 'lumpsum' && lumpsumAmount > 0) {
+                    yearEndValue += lumpsumAmount;
+                    totalInvestment += lumpsumAmount;
+                    yearInvestment += lumpsumAmount;
+                }
+                
+                // Calculate monthly SIPs for the year
+                for (let month = 1; month <= 12; month++) {
+                    // Adjust SIP amount for step-up
+                    if (calcType === 'step-up' && month === 1 && year > 1) {
+                        currentMonthlyAmount = currentMonthlyAmount * (1 + stepUpRate / 100);
+                    }
+                    
+                    yearEndValue = yearEndValue * (1 + monthlyRate) + currentMonthlyAmount;
+                    yearInvestment += currentMonthlyAmount;
+                    totalInvestment += currentMonthlyAmount;
+                }
+                
+                nominalValue = yearEndValue;
+                
+                // Calculate real value (inflation adjusted)
+                const realValue = nominalValue / Math.pow(1 + inflationRate / 100, year);
+                
+                yearlyData.push({
+                    year: year,
+                    investment: Math.round(yearInvestment),
+                    cumulativeInvestment: Math.round(totalInvestment),
+                    nominalValue: Math.round(nominalValue),
+                    realValue: Math.round(realValue),
+                    monthlyAmount: Math.round(currentMonthlyAmount)
+                });
+            }
+            
+            const finalNominalValue = nominalValue;
+            const finalRealValue = finalNominalValue / Math.pow(1 + inflationRate / 100, years);
+            const totalReturns = finalNominalValue - totalInvestment;
+            
+            return {
+                totalInvestment: Math.round(totalInvestment),
+                nominalValue: Math.round(finalNominalValue),
+                realValue: Math.round(finalRealValue),
+                totalReturns: Math.round(totalReturns),
+                yearlyData: yearlyData,
+                cagr: (Math.pow(finalNominalValue / totalInvestment, 1 / years) - 1) * 100,
+                realCAGR: (Math.pow(finalRealValue / totalInvestment, 1 / years) - 1) * 100
+            };
+        }
+
+        function displaySIPResults(calculations) {
+            document.getElementById('total-investment').textContent = `₹${calculations.totalInvestment.toLocaleString('en-IN')}`;
+            document.getElementById('nominal-value').textContent = `₹${calculations.nominalValue.toLocaleString('en-IN')}`;
+            document.getElementById('real-value').textContent = `₹${calculations.realValue.toLocaleString('en-IN')}`;
+            document.getElementById('total-returns').textContent = `₹${calculations.totalReturns.toLocaleString('en-IN')}`;
+            
+            document.getElementById('sip-results').style.display = 'block';
+            
+            // Animate the result cards
+            const resultCards = document.querySelectorAll('.result-card');
+            resultCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        card.style.transform = 'scale(1)';
+                    }, 200);
+                }, index * 100);
+            });
+        }
+
+        function createSIPChart(yearlyData) {
+            const ctx = document.getElementById('sipChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (sipChart) {
+                sipChart.destroy();
+            }
+            
+            const years = yearlyData.map(data => `Year ${data.year}`);
+            const investments = yearlyData.map(data => data.cumulativeInvestment);
+            const nominalValues = yearlyData.map(data => data.nominalValue);
+            const realValues = yearlyData.map(data => data.realValue);
+            
+            sipChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Total Investment',
+                            data: investments,
+                            borderColor: '#c0c0c0',
+                            backgroundColor: 'rgba(192, 192, 192, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Nominal Value',
+                            data: nominalValues,
+                            borderColor: '#ffffff',
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Real Value (Inflation Adjusted)',
+                            data: realValues,
+                            borderColor: '#ffd700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#aaaaaa'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#aaaaaa',
+                                callback: function(value) {
+                                    return '₹' + (value / 100000).toFixed(1) + 'L';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            radius: 4,
+                            hoverRadius: 6
+                        }
+                    }
+                }
+            });
+        }
+
+        function createYearlyBreakdown(yearlyData) {
+            const tbody = document.getElementById('breakdown-body');
+            tbody.innerHTML = '';
+            
+            yearlyData.forEach(data => {
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid var(--border-gray)';
+                row.innerHTML = `
+                    <td style="padding: 0.8rem; color: var(--text-white);">${data.year}</td>
+                    <td style="padding: 0.8rem; text-align: right; color: var(--accent-silver);">₹${data.investment.toLocaleString('en-IN')}</td>
+                    <td style="padding: 0.8rem; text-align: right; color: var(--accent-white);">₹${data.nominalValue.toLocaleString('en-IN')}</td>
+                    <td style="padding: 0.8rem; text-align: right; color: var(--accent-gold);">₹${data.realValue.toLocaleString('en-IN')}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function generateInvestmentInsights(calculations) {
+            const insights = document.getElementById('insights-content');
+            const nominalCAGR = calculations.cagr.toFixed(2);
+            const realCAGR = calculations.realCAGR.toFixed(2);
+            const inflationImpact = ((calculations.nominalValue - calculations.realValue) / calculations.nominalValue * 100).toFixed(1);
+            
+            insights.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                        <h5 style="color: var(--accent-white); margin-bottom: 0.5rem;">Compound Annual Growth Rate</h5>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-white);">${nominalCAGR}%</div>
+                        <div style="font-size: 0.9rem; color: var(--text-gray);">Nominal CAGR</div>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 8px;">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Real CAGR (Inflation Adjusted)</h5>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-gold);">${realCAGR}%</div>
+                        <div style="font-size: 0.9rem; color: var(--text-gray);">After inflation impact</div>
+                    </div>
+                    <div style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                        <h5 style="color: var(--text-gray); margin-bottom: 0.5rem;">Inflation Impact</h5>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-gray);">${inflationImpact}%</div>
+                        <div style="font-size: 0.9rem; color: var(--text-gray);">Purchasing power reduction</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.02); border-left: 3px solid var(--accent-gold); border-radius: 4px;">
+                    <h5 style="color: var(--accent-white); margin-bottom: 0.5rem;">💡 Key Insights:</h5>
+                    <ul style="color: var(--text-gray); line-height: 1.6; margin: 0; padding-left: 1.5rem;">
+                        <li>Your investment will grow ${(calculations.nominalValue / calculations.totalInvestment).toFixed(1)}x in nominal terms</li>
+                        <li>After adjusting for inflation, the real growth is ${(calculations.realValue / calculations.totalInvestment).toFixed(1)}x</li>
+                        <li>Inflation reduces your purchasing power by ₹${(calculations.nominalValue - calculations.realValue).toLocaleString('en-IN')}</li>
+                        <li>${realCAGR > 3 ? 'Excellent! Your real returns beat inflation significantly.' : realCAGR > 0 ? 'Good! Your returns are beating inflation.' : 'Warning! Your returns are not keeping pace with inflation.'}</li>
+                    </ul>
+                </div>
+            `;
         }
 
         function calculateEMI() {

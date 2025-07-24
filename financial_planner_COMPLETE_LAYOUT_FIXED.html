@@ -1700,8 +1700,14 @@
                                     <small style="color: var(--text-gray); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Your portfolio's expected annual return (CAGR)</small>
                                 </div>
                                 <div class="form-group">
+                                    <label>Initial Lumpsum Investment (₹)</label>
+                                    <input type="number" id="initial-lumpsum" class="form-input" placeholder="Initial lumpsum amount" onchange="calculatePortfolioMetrics()">
+                                    <small style="color: var(--text-gray); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Amount invested at the start date</small>
+                                </div>
+                                <div class="form-group">
                                     <label>Total Amount Invested (₹)</label>
-                                    <input type="number" id="total-invested" class="form-input" placeholder="Total amount invested" onchange="calculatePortfolioMetrics()">
+                                    <input type="number" id="total-invested" class="form-input" placeholder="Auto-calculated from all investments" readonly style="background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold);">
+                                    <small style="color: var(--accent-gold); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Auto-calculated: Initial + SIP + Additional investments</small>
                                 </div>
                                 <div class="form-group">
                                     <label>SIP Frequency</label>
@@ -1717,6 +1723,22 @@
                                     <label id="portfolio-sip-label">Monthly SIP Amount (₹)</label>
                                     <input type="number" id="monthly-sip" class="form-input" placeholder="Current monthly SIP" onchange="calculatePortfolioMetrics()">
                                     <small id="portfolio-sip-info" style="color: var(--text-gray); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Amount you invest every month</small>
+                                </div>
+                            </div>
+                            
+                            <h4 style="color: var(--accent-white); margin: 2rem 0 1rem 0;">Additional Lumpsum Investments</h4>
+                            <p style="color: var(--text-gray); margin-bottom: 1rem; font-size: 0.9rem;">Add any additional lumpsum investments made during your investment journey (optional).</p>
+                            
+                            <div id="additional-lumpsums">
+                                <!-- Additional lumpsum entries will be added here -->
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                                <button type="button" class="btn btn-secondary" onclick="addLumpsumEntry()">
+                                    <i class="fas fa-plus"></i> Add Lumpsum Investment
+                                </button>
+                                <div id="lumpsum-total" style="padding: 0.8rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 6px; color: var(--accent-gold); font-weight: bold;">
+                                    Additional Lumpsums: ₹0
                                 </div>
                             </div>
                             
@@ -4340,6 +4362,7 @@
         let portfolioPerformanceChart = null;
         let currentChartPeriod = 'yearly';
         let currentPortfolioData = null;
+        let lumpsumCounter = 0;
         
         function selectPortfolioSIPFrequency(frequency) {
             // Update hidden input
@@ -4385,6 +4408,80 @@
             calculatePortfolioMetrics();
         }
         
+        function addLumpsumEntry() {
+            lumpsumCounter++;
+            const lumpsumContainer = document.getElementById('additional-lumpsums');
+            
+            const lumpsumEntry = document.createElement('div');
+            lumpsumEntry.id = `lumpsum-entry-${lumpsumCounter}`;
+            lumpsumEntry.className = 'lumpsum-entry';
+            lumpsumEntry.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end; margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;';
+            
+            lumpsumEntry.innerHTML = `
+                <div class="form-group" style="margin: 0;">
+                    <label>Investment Date</label>
+                    <input type="date" id="lumpsum-date-${lumpsumCounter}" class="form-input" onchange="calculateLumpsumTotal()">
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label>Amount (₹)</label>
+                    <input type="number" id="lumpsum-amount-${lumpsumCounter}" class="form-input" placeholder="Lumpsum amount" onchange="calculateLumpsumTotal()">
+                </div>
+                <button type="button" class="btn btn-danger" onclick="removeLumpsumEntry(${lumpsumCounter})" style="height: fit-content; padding: 0.5rem;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            
+            lumpsumContainer.appendChild(lumpsumEntry);
+            
+            // Set max date to today
+            const dateInput = document.getElementById(`lumpsum-date-${lumpsumCounter}`);
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('max', today);
+        }
+        
+        function removeLumpsumEntry(id) {
+            const entry = document.getElementById(`lumpsum-entry-${id}`);
+            if (entry) {
+                entry.remove();
+                calculateLumpsumTotal();
+            }
+        }
+        
+        function calculateLumpsumTotal() {
+            let total = 0;
+            const entries = document.querySelectorAll('.lumpsum-entry');
+            
+            entries.forEach(entry => {
+                const amountInput = entry.querySelector('input[type="number"]');
+                if (amountInput) {
+                    total += parseFloat(amountInput.value) || 0;
+                }
+            });
+            
+            document.getElementById('lumpsum-total').textContent = `Additional Lumpsums: ₹${total.toLocaleString('en-IN')}`;
+            calculatePortfolioMetrics();
+        }
+        
+        function getAdditionalLumpsums() {
+            const lumpsums = [];
+            const entries = document.querySelectorAll('.lumpsum-entry');
+            
+            entries.forEach(entry => {
+                const dateInput = entry.querySelector('input[type="date"]');
+                const amountInput = entry.querySelector('input[type="number"]');
+                
+                if (dateInput && amountInput && dateInput.value && amountInput.value) {
+                    lumpsums.push({
+                        date: dateInput.value,
+                        amount: parseFloat(amountInput.value)
+                    });
+                }
+            });
+            
+            // Sort by date
+            return lumpsums.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+        
         function selectChartPeriod(period) {
             currentChartPeriod = period;
             
@@ -4426,13 +4523,22 @@
         }
         
         function autoCalculatePortfolioValue() {
-            const totalInvested = parseFloat(document.getElementById('total-invested').value) || 0;
+            const initialLumpsum = parseFloat(document.getElementById('initial-lumpsum').value) || 0;
             const monthlySIP = parseFloat(document.getElementById('monthly-sip').value) || 0;
             const sipFrequency = document.getElementById('portfolio-sip-frequency').value || 'monthly';
             const expectedReturn = parseFloat(document.getElementById('expected-return').value) || 12;
             const startDate = document.getElementById('investment-start-date').value;
+            const additionalLumpsums = getAdditionalLumpsums();
             
-            if (totalInvested > 0 && startDate) {
+            // Calculate total invested amount
+            const sipTotal = calculateTotalSIPInvested(monthlySIP, sipFrequency, startDate);
+            const additionalTotal = additionalLumpsums.reduce((sum, lumpsum) => sum + lumpsum.amount, 0);
+            const totalInvested = initialLumpsum + sipTotal + additionalTotal;
+            
+            // Update total invested field
+            document.getElementById('total-invested').value = Math.round(totalInvested);
+            
+            if ((initialLumpsum > 0 || additionalLumpsums.length > 0) && startDate) {
                 // Calculate investment period
                 const startDateObj = new Date(startDate);
                 const currentDate = new Date();
@@ -4440,9 +4546,25 @@
                                  (currentDate.getMonth() - startDateObj.getMonth());
                 
                 if (monthsDiff > 0) {
-                    // Calculate lumpsum growth
+                    // Calculate initial lumpsum growth
                     const years = monthsDiff / 12;
-                    const lumpsumGrowth = totalInvested * Math.pow(1 + expectedReturn / 100, years);
+                    const initialLumpsumGrowth = initialLumpsum * Math.pow(1 + expectedReturn / 100, years);
+                    
+                    // Calculate additional lumpsums growth
+                    let additionalLumpsumGrowth = 0;
+                    additionalLumpsums.forEach(lumpsum => {
+                        const lumpsumDate = new Date(lumpsum.date);
+                        if (lumpsumDate >= startDateObj && lumpsumDate <= currentDate) {
+                            const lumpsumMonths = (currentDate.getFullYear() - lumpsumDate.getFullYear()) * 12 + 
+                                                 (currentDate.getMonth() - lumpsumDate.getMonth());
+                            const lumpsumYears = lumpsumMonths / 12;
+                            if (lumpsumYears > 0) {
+                                additionalLumpsumGrowth += lumpsum.amount * Math.pow(1 + expectedReturn / 100, lumpsumYears);
+                            } else {
+                                additionalLumpsumGrowth += lumpsum.amount; // No growth if invested recently
+                            }
+                        }
+                    });
                     
                     // Calculate SIP growth
                     let sipGrowth = 0;

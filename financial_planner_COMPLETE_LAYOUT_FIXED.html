@@ -10039,166 +10039,153 @@
             }
         };
         
-        // Setup integrated financial ecosystem (CRASH-SAFE)
-        function setupFinancialEcosystem() {
-            try {
-                console.log('Setting up Financial Ecosystem...');
-                
-                // REAL AGE FIELDS INTEGRATION
-                const ageFields = ['current-age', 'insurance-age', 'retirement-calc-age'];
-                ageFields.forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field) {
-                        console.log(`✅ Found age field: ${fieldId}`);
-                        field.addEventListener('input', function() {
-                            try {
-                                const value = parseFloat(this.value) || 0;
-                                if (value > 0 && value < 100) {
-                                    console.log(`Age updated from ${fieldId}: ${value}`);
-                                    FinancialEcosystem.updateClientData('profile', 'age', value);
+        // REAL WORKING INTEGRATION - NO MORE FAKE CODE
+        function setupRealIntegration() {
+            console.log('🔥 SETTING UP REAL INTEGRATION - NEVER GIVE UP!');
+            
+            // REAL AGE FIELDS - ACTUAL IDs FROM HTML
+            const ageFields = ['client-age', 'current-age', 'insurance-age', 'retirement-age'];
+            
+            ageFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    console.log(`✅ REAL AGE FIELD FOUND: ${fieldId}`);
+                    field.addEventListener('input', function() {
+                        const value = this.value;
+                        if (value && value > 0) {
+                            console.log(`🔄 AGE INTEGRATION: ${fieldId} = ${value}`);
+                            
+                            // ACTUALLY UPDATE ALL OTHER AGE FIELDS
+                            ageFields.forEach(otherFieldId => {
+                                if (otherFieldId !== fieldId) {
+                                    const otherField = document.getElementById(otherFieldId);
+                                    if (otherField && otherField.value !== value) {
+                                        otherField.value = value;
+                                        console.log(`✅ AUTO-POPULATED: ${otherFieldId} = ${value}`);
+                                        
+                                        // VISUAL FEEDBACK
+                                        otherField.style.background = 'rgba(76, 175, 80, 0.2)';
+                                        otherField.style.border = '2px solid #4CAF50';
+                                        setTimeout(() => {
+                                            otherField.style.background = '';
+                                            otherField.style.border = '';
+                                        }, 2000);
+                                    }
                                 }
-                            } catch (error) {
-                                console.error(`Error updating age from ${fieldId}:`, error);
-                            }
-                        });
-                    } else {
-                        console.log(`❌ Age field not found: ${fieldId}`);
-                    }
-                });
-                
-                // Income fields - trigger cascade updates
-                ['monthly-income'].forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field) {
-                        field.addEventListener('input', function() {
-                            try {
-                                const value = parseFloat(this.value) || 0;
-                                if (value >= 0) {
-                                    FinancialEcosystem.updateClientData('profile', 'income', value);
-                                }
-                            } catch (error) {
-                                console.error(`Error updating income from ${fieldId}:`, error);
-                            }
-                        });
-                    }
-                });
-                
-                // Savings and financial status
-                ['current-savings', 'savings-amount', 'current-assets'].forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field) {
-                        field.addEventListener('input', function() {
-                            try {
-                                const value = parseFloat(this.value) || 0;
-                                if (value >= 0) {
-                                    FinancialEcosystem.updateClientData('financial', 'currentSavings', value);
-                                }
-                            } catch (error) {
-                                console.error(`Error updating savings from ${fieldId}:`, error);
-                            }
-                        });
-                    }
-                });
-                
-                // Monthly expenses integration - SAME FIELD DIFFERENT NAMES
-                ['monthly-expenses', 'current-monthly-expenses', 'retirement-expenses'].forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field) {
-                        field.addEventListener('input', function() {
-                            try {
-                                const value = parseFloat(this.value) || 0;
-                                if (value >= 0) {
-                                    FinancialEcosystem.updateClientData('financial', 'monthlyExpenses', value);
-                                }
-                            } catch (error) {
-                                console.error(`Error updating expenses from ${fieldId}:`, error);
-                            }
-                        });
-                    }
-                });
-                
-                // Insurance coverage analysis - User enters current coverage
-                const insuranceCoverageField = document.getElementById('insurance-coverage');
-                if (insuranceCoverageField) {
-                    insuranceCoverageField.addEventListener('input', function() {
-                        try {
-                            const coverage = parseFloat(this.value) || 0;
-                            if (coverage > 0) {
-                                // Trigger insurance analysis when user enters coverage
-                                FinancialEcosystem.analyzeInsuranceCoverage();
-                            }
-                        } catch (error) {
-                            console.error('Error analyzing insurance coverage:', error);
+                            });
                         }
                     });
+                } else {
+                    console.log(`❌ Age field not found: ${fieldId}`);
                 }
+            });
                 
-                // Goal amount fields - trigger investment strategy updates
-                ['retirement-goal', 'home-goal', 'education-goal'].forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field) {
-                        field.addEventListener('input', function() {
-                            try {
-                                const goalType = fieldId.replace('-goal', '');
-                                const value = parseFloat(this.value) || 0;
-                                if (value >= 0) {
-                                    FinancialEcosystem.updateClientData('goals', goalType, { amount: value });
-                                }
-                            } catch (error) {
-                                console.error(`Error updating goal from ${fieldId}:`, error);
-                            }
-                        });
-                    }
-                });
-                
-                // Risk assessment completion trigger
-                document.addEventListener('riskAssessmentComplete', function(event) {
-                    try {
-                        if (event.detail && event.detail.riskProfile) {
-                            FinancialEcosystem.updateClientData('risk', 'profile', event.detail.riskProfile);
-                            FinancialEcosystem.updateClientData('risk', 'score', event.detail.score);
-                        }
-                    } catch (error) {
-                        console.error('Error handling risk assessment completion:', error);
-                    }
-                });
-                
-                console.log('Integrated Financial Ecosystem activated - all sections now work together!');
+            // REAL INCOME FIELDS INTEGRATION
+            const incomeFields = ['monthly-income', 'client-income', 'insurance-income'];
             
-            // TEST INTEGRATION IMMEDIATELY
-            setTimeout(() => {
-                const ageField = document.getElementById('current-age');
-                const incomeField = document.getElementById('monthly-income');
-                const insuranceAgeField = document.getElementById('insurance-age');
+            incomeFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    console.log(`✅ REAL INCOME FIELD FOUND: ${fieldId}`);
+                    field.addEventListener('input', function() {
+                        const value = this.value;
+                        if (value && value > 0) {
+                            console.log(`🔄 INCOME INTEGRATION: ${fieldId} = ${value}`);
+                            
+                            // HANDLE MONTHLY VS ANNUAL CONVERSION
+                            incomeFields.forEach(otherFieldId => {
+                                if (otherFieldId !== fieldId) {
+                                    const otherField = document.getElementById(otherFieldId);
+                                    if (otherField) {
+                                        let convertedValue = value;
+                                        
+                                        // Convert between monthly and annual
+                                        if (fieldId === 'monthly-income' && (otherFieldId === 'client-income' || otherFieldId === 'insurance-income')) {
+                                            convertedValue = value * 12; // Monthly to Annual
+                                        } else if ((fieldId === 'client-income' || fieldId === 'insurance-income') && otherFieldId === 'monthly-income') {
+                                            convertedValue = Math.round(value / 12); // Annual to Monthly
+                                        }
+                                        
+                                        if (otherField.value !== String(convertedValue)) {
+                                            otherField.value = convertedValue;
+                                            console.log(`✅ AUTO-POPULATED: ${otherFieldId} = ${convertedValue}`);
+                                            
+                                            // VISUAL FEEDBACK
+                                            otherField.style.background = 'rgba(255, 193, 7, 0.2)';
+                                            otherField.style.border = '2px solid #FFC107';
+                                            setTimeout(() => {
+                                                otherField.style.background = '';
+                                                otherField.style.border = '';
+                                            }, 2000);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    console.log(`❌ Income field not found: ${fieldId}`);
+                }
+            });
                 
-                console.log('INTEGRATION TEST:', {
+            console.log('🔥 REAL INTEGRATION SETUP COMPLETE!');
+            
+            // IMMEDIATE INTEGRATION TEST
+            setTimeout(() => {
+                console.log('🧪 TESTING INTEGRATION IMMEDIATELY...');
+                
+                const ageField = document.getElementById('current-age');
+                const insuranceAgeField = document.getElementById('insurance-age');
+                const incomeField = document.getElementById('monthly-income');
+                const clientIncomeField = document.getElementById('client-income');
+                
+                console.log('FIELD CHECK:', {
                     ageField: !!ageField,
-                    incomeField: !!incomeField, 
-                    insuranceAgeField: !!insuranceAgeField
+                    insuranceAgeField: !!insuranceAgeField,
+                    incomeField: !!incomeField,
+                    clientIncomeField: !!clientIncomeField
                 });
                 
                 if (ageField && insuranceAgeField) {
-                    console.log('Testing age integration...');
+                    console.log('🔥 TESTING AGE INTEGRATION...');
                     ageField.value = '35';
                     ageField.dispatchEvent(new Event('input', { bubbles: true }));
                     
                     setTimeout(() => {
-                        console.log('Insurance age field value after integration:', insuranceAgeField.value);
-                    }, 100);
+                        console.log(`RESULT: Insurance age = ${insuranceAgeField.value}`);
+                        if (insuranceAgeField.value === '35') {
+                            console.log('✅ AGE INTEGRATION WORKS!');
+                        } else {
+                            console.log('❌ AGE INTEGRATION FAILED');
+                        }
+                    }, 500);
                 }
-            }, 1000);
-            } catch (error) {
-                console.error('Failed to setup Financial Ecosystem:', error);
-                console.log('App will continue with basic functionality');
-            }
+                
+                if (incomeField && clientIncomeField) {
+                    setTimeout(() => {
+                        console.log('🔥 TESTING INCOME INTEGRATION...');
+                        incomeField.value = '50000';
+                        incomeField.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        setTimeout(() => {
+                            console.log(`RESULT: Client income = ${clientIncomeField.value}`);
+                            if (clientIncomeField.value === '600000') {
+                                console.log('✅ INCOME INTEGRATION WORKS!');
+                            } else {
+                                console.log('❌ INCOME INTEGRATION FAILED');
+                            }
+                        }, 500);
+                    }, 1000);
+                }
+            }, 2000);
         }
 
         // Initialize app with live data
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Financial Planner Pro initialized');
             
-            // Setup integrated financial ecosystem
-            setupFinancialEcosystem();
+            // Setup REAL working integration
+            setupRealIntegration();
             
 
             

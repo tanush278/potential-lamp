@@ -1728,15 +1728,30 @@
                             <h3 class="card-title">Your Investment Profile</h3>
                             <p class="card-subtitle">Current risk assessment and investment preferences</p>
                         </div>
-                        <div id="profile-summary" style="text-align: center; color: var(--text-gray); padding: 2rem;">
-                            Complete your Risk Profile assessment first to get personalized recommendations.
-                            <br><br>
-                            <button class="btn btn-primary" onclick="showSection('risk-assessment')">Complete Risk Assessment</button>
+                        <div id="profile-summary">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Profile</div>
+                                    <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-gold);">Moderate</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Score</div>
+                                    <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-white);">60%</div>
+                                </div>
+                                <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                    <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Investment Horizon</div>
+                                    <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-silver);">Long Term</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,215,0,0.05); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
+                                <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Profile Summary</h5>
+                                <p style="color: var(--text-gray); line-height: 1.6; margin: 0;">Balanced investor seeking growth with moderate risk tolerance. Suitable for diversified portfolio with equity focus and debt stability.</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Asset Allocation -->
-                    <div class="card" id="asset-allocation-card" style="display: none; margin-top: 2rem;">
+                    <div class="card" id="asset-allocation-card" style="margin-top: 2rem;">
                         <div class="card-header">
                             <h3 class="card-title">Recommended Asset Allocation</h3>
                             <p class="card-subtitle">Optimal portfolio distribution based on your risk profile</p>
@@ -1745,11 +1760,48 @@
                         <div style="display: grid; grid-template-columns: 1fr 400px; gap: 2rem; align-items: start;">
                             <div>
                                 <div id="allocation-breakdown" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                                    <!-- Asset allocation cards will be populated by JavaScript -->
+                                    <div style="background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.05)); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                        <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem;">EQUITY</div>
+                                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-gold);">50%</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-gray);">Growth focused</div>
+                                    </div>
+                                    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                        <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem;">DEBT</div>
+                                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-white);">35%</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-gray);">Stability focused</div>
+                                    </div>
+                                    <div style="background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(192,192,192,0.05)); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                        <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem;">GOLD</div>
+                                        <div style="font-size: 2rem; font-weight: bold; color: var(--accent-silver);">10%</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-gray);">Hedge against inflation</div>
+                                    </div>
+                                    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--text-gray); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                                        <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">CASH</div>
+                                        <div style="font-size: 2rem; font-weight: bold; color: var(--text-gray);">5%</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-gray);">Emergency fund</div>
+                                    </div>
                                 </div>
                                 
                                 <div id="allocation-details" style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
-                                    <!-- Detailed allocation info will be populated by JavaScript -->
+                                    <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Allocation Strategy</h5>
+                                    <div style="display: grid; gap: 1rem;">
+                                        <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,215,0,0.05); border-radius: 8px;">
+                                            <span style="color: var(--text-gray);">Expected Return</span>
+                                            <span style="color: var(--accent-gold); font-weight: bold;">10-12%</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                            <span style="color: var(--text-gray);">Risk Level</span>
+                                            <span style="color: var(--accent-white); font-weight: bold;">Medium</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(192,192,192,0.05); border-radius: 8px;">
+                                            <span style="color: var(--text-gray);">Time Horizon</span>
+                                            <span style="color: var(--accent-silver); font-weight: bold;">5+ Years</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                            <span style="color: var(--text-gray);">Review Frequency</span>
+                                            <span style="color: var(--text-gray); font-weight: bold;">Quarterly</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1760,7 +1812,7 @@
                     </div>
 
                     <!-- Fund Recommendations -->
-                    <div class="card" id="fund-recommendations-card" style="display: none; margin-top: 2rem;">
+                    <div class="card" id="fund-recommendations-card" style="margin-top: 2rem;">
                         <div class="card-header">
                             <h3 class="card-title">Recommended Investment Options</h3>
                             <p class="card-subtitle">Curated funds and investment products matching your profile</p>
@@ -1772,7 +1824,108 @@
                         </div>
                         
                         <div id="fund-categories">
-                            <!-- Fund recommendations will be populated by JavaScript -->
+                            <div style="margin-bottom: 2rem;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Large Cap Funds (50% allocation)</h4>
+                                <div style="display: grid; gap: 1rem;">
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                                        <div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Axis Bluechip Fund</div>
+                                            <div style="color: var(--text-gray); font-size: 0.9rem;">Large Cap</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: var(--accent-gold); font-weight: bold;">12-15%</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: #ffc107; font-weight: bold;">Medium</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Details</button>
+                                        </div>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                                        <div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Mirae Asset Large Cap Fund</div>
+                                            <div style="color: var(--text-gray); font-size: 0.9rem;">Large Cap</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: var(--accent-gold); font-weight: bold;">12-15%</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: #ffc107; font-weight: bold;">Medium</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 2rem;">
+                                <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Debt Funds (35% allocation)</h4>
+                                <div style="display: grid; gap: 1rem;">
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-white);">
+                                        <div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Axis Strategic Bond Fund</div>
+                                            <div style="color: var(--text-gray); font-size: 0.9rem;">Debt</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: var(--accent-white); font-weight: bold;">7-9%</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: #17a2b8; font-weight: bold;">Low</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Details</button>
+                                        </div>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-white);">
+                                        <div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Kotak Dynamic Bond Fund</div>
+                                            <div style="color: var(--text-gray); font-size: 0.9rem;">Debt</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: var(--accent-white); font-weight: bold;">7-9%</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: #17a2b8; font-weight: bold;">Low</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 2rem;">
+                                <h4 style="color: var(--accent-silver); margin-bottom: 1rem;">Gold Investments (10% allocation)</h4>
+                                <div style="display: grid; gap: 1rem;">
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-silver);">
+                                        <div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">SBI Gold ETF</div>
+                                            <div style="color: var(--text-gray); font-size: 0.9rem;">Gold ETF</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: var(--accent-silver); font-weight: bold;">8-12%</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="color: #ffc107; font-weight: bold;">Medium</div>
+                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <button class="btn btn-primary" onclick="generateRecommendations()" style="margin-top: 1rem;">
@@ -1781,7 +1934,7 @@
                     </div>
 
                     <!-- Portfolio Rebalancing -->
-                    <div class="card" id="rebalancing-card" style="display: none; margin-top: 2rem;">
+                    <div class="card" id="rebalancing-card" style="margin-top: 2rem;">
                         <div class="card-header">
                             <h3 class="card-title">Portfolio Rebalancing</h3>
                             <p class="card-subtitle">Maintain optimal asset allocation with smart rebalancing</p>
@@ -1821,14 +1974,57 @@
                     </div>
 
                     <!-- Investment Strategy -->
-                    <div class="card" id="strategy-card" style="display: none; margin-top: 2rem;">
+                    <div class="card" id="strategy-card" style="margin-top: 2rem;">
                         <div class="card-header">
                             <h3 class="card-title">Investment Strategy & Insights</h3>
                             <p class="card-subtitle">Professional insights and market outlook for your portfolio</p>
                         </div>
                         
                         <div id="strategy-content">
-                            <!-- Strategy insights will be populated by JavaScript -->
+                            <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border-radius: 12px; padding: 2rem;">
+                                <h4 style="color: var(--accent-gold); margin-bottom: 1.5rem; text-align: center;">Balanced Growth Strategy</h4>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                                    <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 1.5rem;">
+                                        <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Strategy Focus</h5>
+                                        <p style="color: var(--text-gray); line-height: 1.6;">Balance between growth and stability</p>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 1.5rem;">
+                                        <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Investment Approach</h5>
+                                        <p style="color: var(--text-gray); line-height: 1.6;">Diversified allocation across asset classes</p>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 1.5rem;">
+                                        <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Time Horizon</h5>
+                                        <p style="color: var(--accent-gold); font-size: 1.2rem; font-weight: bold;">5-10 years</p>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                    <div>
+                                        <h5 style="color: var(--accent-silver); margin-bottom: 1rem;">Key Principles</h5>
+                                        <ul style="color: var(--text-gray); line-height: 1.8; padding-left: 1.5rem;">
+                                            <li>Balanced risk-return</li>
+                                            <li>Diversification</li>
+                                            <li>Regular reviews</li>
+                                            <li>Goal-based investing</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h5 style="color: var(--accent-silver); margin-bottom: 1rem;">Action Items</h5>
+                                        <ul style="color: var(--text-gray); line-height: 1.8; padding-left: 1.5rem;">
+                                            <li>SIP in diversified equity funds</li>
+                                            <li>Debt fund allocation</li>
+                                            <li>Annual rebalancing</li>
+                                            <li>Tax-efficient investing</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(255,215,0,0.05); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
+                                    <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Market Outlook</h5>
+                                    <p style="color: var(--text-gray); line-height: 1.6; margin: 0;">Mix of growth and value opportunities across market caps with focus on quality stocks and stable debt instruments.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -4438,6 +4634,13 @@
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Financial Planner Pro initialized');
+            
+            // Initialize Investment Recommendations chart
+            const defaultAllocation = { equity: 50, debt: 35, gold: 10, cash: 5 };
+            createAllocationChart(defaultAllocation);
+            
+            // Load saved goals
+            loadSavedGoals();
             
             // Initialize AOS if available
             if (typeof AOS !== 'undefined') {

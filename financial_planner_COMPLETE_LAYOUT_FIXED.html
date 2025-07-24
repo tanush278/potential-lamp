@@ -7203,27 +7203,27 @@
                             ${betterRegime === 'Old' ? '<div style="color: var(--text-white); text-align: center; margin-top: 15px; background: var(--accent-gold); padding: 10px; border-radius: 6px; font-weight: 600;">✓ Recommended</div>' : ''}
                         </div>
                         
-                        <div class="card" style="border: 2px solid ${betterRegime === 'New' ? '#1f2937' : '#e5e7eb'}; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: white;">
-                            <h4 style="color: #1f2937; margin-bottom: 15px; font-size: 16px; font-weight: 600;">
+                        <div class="card" style="border: 2px solid ${betterRegime === 'New' ? 'var(--accent-gold)' : 'var(--border-gray)'}; box-shadow: var(--shadow-light); background: var(--card-black);">
+                            <h4 style="color: var(--text-white); margin-bottom: 15px; font-size: 16px; font-weight: 600;">
                                 New Tax Regime
                             </h4>
-                            <div style="margin-bottom: 10px;">
+                            <div style="margin-bottom: 10px; color: var(--text-gray);">
                                 <span>Taxable Income:</span>
-                                <span style="float: right;"><strong>₹${Math.round(newRegimeTax.taxableIncome).toLocaleString('en-IN')}</strong></span>
+                                <span style="float: right; color: var(--text-white);"><strong>₹${Math.round(newRegimeTax.taxableIncome).toLocaleString('en-IN')}</strong></span>
                             </div>
-                            <div style="margin-bottom: 10px;">
+                            <div style="margin-bottom: 10px; color: var(--text-gray);">
                                 <span>Income Tax:</span>
-                                <span style="float: right;"><strong>₹${Math.round(newRegimeTax.totalTax).toLocaleString('en-IN')}</strong></span>
+                                <span style="float: right; color: var(--accent-gold);"><strong>₹${Math.round(newRegimeTax.totalTax).toLocaleString('en-IN')}</strong></span>
                             </div>
-                            <div style="margin-bottom: 10px;">
+                            <div style="margin-bottom: 10px; color: var(--text-gray);">
                                 <span>Health & Education Cess:</span>
-                                <span style="float: right;"><strong>₹${Math.round(newRegimeTax.cess).toLocaleString('en-IN')}</strong></span>
+                                <span style="float: right; color: var(--text-white);"><strong>₹${Math.round(newRegimeTax.cess).toLocaleString('en-IN')}</strong></span>
                             </div>
-                            <div style="border-top: 2px solid #ddd; padding-top: 10px; margin-top: 15px;">
+                            <div style="border-top: 2px solid var(--border-gray); padding-top: 10px; margin-top: 15px; color: var(--text-gray);">
                                 <span><strong>Total Tax:</strong></span>
-                                <span style="float: right;"><strong>₹${Math.round(newRegimeTax.totalTaxWithCess).toLocaleString('en-IN')}</strong></span>
+                                <span style="float: right; color: var(--accent-gold);"><strong>₹${Math.round(newRegimeTax.totalTaxWithCess).toLocaleString('en-IN')}</strong></span>
                             </div>
-                            ${betterRegime === 'New' ? '<div style="color: #1f2937; text-align: center; margin-top: 15px; background: #f3f4f6; padding: 10px; border-radius: 6px; font-weight: 600;">✓ Recommended</div>' : ''}
+                            ${betterRegime === 'New' ? '<div style="color: var(--text-white); text-align: center; margin-top: 15px; background: var(--accent-gold); padding: 10px; border-radius: 6px; font-weight: 600;">✓ Recommended</div>' : ''}
                         </div>
                     </div>
                     
@@ -7239,13 +7239,13 @@
                             </div>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-                            <div style="text-align: center; background: white; padding: 15px; border-radius: 6px; border-top: 3px solid #6b7280;">
-                                <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Effective Tax Rate</div>
-                                <div style="font-size: 18px; font-weight: 600; color: #1f2937;">${betterRegime === 'Old' ? ((oldRegimeTax.totalTaxWithCess / grossSalary) * 100).toFixed(2) : ((newRegimeTax.totalTaxWithCess / grossSalary) * 100).toFixed(2)}%</div>
+                            <div style="text-align: center; background: var(--primary-black); padding: 15px; border-radius: 6px; border-top: 3px solid var(--text-gray);">
+                                <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 5px;">Effective Tax Rate</div>
+                                <div style="font-size: 18px; font-weight: 600; color: var(--text-white);">${betterRegime === 'Old' ? ((oldRegimeTax.totalTaxWithCess / grossSalary) * 100).toFixed(2) : ((newRegimeTax.totalTaxWithCess / grossSalary) * 100).toFixed(2)}%</div>
                             </div>
-                            <div style="text-align: center; background: white; padding: 15px; border-radius: 6px; border-top: 3px solid #10b981;">
-                                <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Monthly Savings</div>
-                                <div style="font-size: 18px; font-weight: 600; color: #1f2937;">₹${Math.round(savingsAmount/12).toLocaleString('en-IN')}</div>
+                            <div style="text-align: center; background: var(--primary-black); padding: 15px; border-radius: 6px; border-top: 3px solid var(--accent-gold);">
+                                <div style="font-size: 12px; color: var(--text-gray); margin-bottom: 5px;">Monthly Savings</div>
+                                <div style="font-size: 18px; font-weight: 600; color: var(--accent-gold);">₹${Math.round(savingsAmount/12).toLocaleString('en-IN')}</div>
                             </div>
                         </div>
                     </div>

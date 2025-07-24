@@ -4413,6 +4413,9 @@
             
             const allocatedTotal = equity + debt + gold + cash;
             
+            // Validate that allocated total matches portfolio value
+            validateAllocationTotal(totalValue, allocatedTotal);
+            
             // Check if user has entered any real data
             if (totalValue > 0 || allocatedTotal > 0) {
                 updatePortfolioNoticeForUserData();
@@ -4465,6 +4468,81 @@
                     document.getElementById('total-portfolio-value').value = calculatedValue;
                 }
             }
+        }
+        
+        function validateAllocationTotal(portfolioValue, allocatedTotal) {
+            const validationDiv = document.getElementById('allocation-validation') || createValidationDiv();
+            
+            if (portfolioValue > 0 && allocatedTotal > 0) {
+                const difference = Math.abs(portfolioValue - allocatedTotal);
+                const percentageDiff = (difference / portfolioValue) * 100;
+                
+                if (difference < 1000) { // Within ₹1000 tolerance
+                    validationDiv.innerHTML = `
+                        <div style="background: rgba(0,255,0,0.1); border: 1px solid #00ff00; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                            <div style="color: #00ff00; font-weight: bold; margin-bottom: 0.5rem;">
+                                <i class="fas fa-check-circle"></i> Allocation Validated
+                            </div>
+                            <div style="color: var(--text-gray); font-size: 0.9rem;">
+                                Portfolio Value: ₹${portfolioValue.toLocaleString('en-IN')} | 
+                                Allocated Total: ₹${allocatedTotal.toLocaleString('en-IN')} | 
+                                Difference: ₹${difference.toLocaleString('en-IN')}
+                            </div>
+                        </div>
+                    `;
+                    validationDiv.style.display = 'block';
+                } else if (allocatedTotal > portfolioValue) {
+                    validationDiv.innerHTML = `
+                        <div style="background: rgba(255,107,107,0.1); border: 1px solid #ff6b6b; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                            <div style="color: #ff6b6b; font-weight: bold; margin-bottom: 0.5rem;">
+                                <i class="fas fa-exclamation-triangle"></i> Allocation Exceeds Portfolio Value
+                            </div>
+                            <div style="color: var(--text-gray); font-size: 0.9rem;">
+                                Portfolio Value: ₹${portfolioValue.toLocaleString('en-IN')} | 
+                                Allocated Total: ₹${allocatedTotal.toLocaleString('en-IN')} | 
+                                Excess: ₹${difference.toLocaleString('en-IN')} (${percentageDiff.toFixed(1)}%)
+                            </div>
+                            <div style="color: #ff6b6b; font-size: 0.85rem; margin-top: 0.5rem;">
+                                Your asset values add up to more than your total portfolio. Please check your entries.
+                            </div>
+                        </div>
+                    `;
+                    validationDiv.style.display = 'block';
+                } else {
+                    validationDiv.innerHTML = `
+                        <div style="background: rgba(255,215,0,0.1); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                            <div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> Allocation Incomplete
+                            </div>
+                            <div style="color: var(--text-gray); font-size: 0.9rem;">
+                                Portfolio Value: ₹${portfolioValue.toLocaleString('en-IN')} | 
+                                Allocated Total: ₹${allocatedTotal.toLocaleString('en-IN')} | 
+                                Missing: ₹${difference.toLocaleString('en-IN')} (${percentageDiff.toFixed(1)}%)
+                            </div>
+                            <div style="color: var(--accent-gold); font-size: 0.85rem; margin-top: 0.5rem;">
+                                Please allocate the remaining amount to complete your portfolio breakdown.
+                            </div>
+                        </div>
+                    `;
+                    validationDiv.style.display = 'block';
+                }
+            } else {
+                validationDiv.style.display = 'none';
+            }
+        }
+        
+        function createValidationDiv() {
+            const validationDiv = document.createElement('div');
+            validationDiv.id = 'allocation-validation';
+            validationDiv.style.display = 'none';
+            
+            // Insert after the asset allocation form
+            const assetForm = document.querySelector('#portfolio-input-section .form-grid:last-of-type');
+            if (assetForm && assetForm.parentNode) {
+                assetForm.parentNode.insertBefore(validationDiv, assetForm.nextSibling);
+            }
+            
+            return validationDiv;
         }
         
         function updateAdvancedAnalytics() {
@@ -4735,6 +4813,22 @@
                 if (totalAllocation <= 0) {
                     alert('Please enter your asset allocation details');
                     return;
+                }
+                
+                // Validate that allocation matches portfolio value
+                const difference = Math.abs(totalValue - totalAllocation);
+                const percentageDiff = (difference / totalValue) * 100;
+                
+                if (difference >= 1000) { // More than ₹1000 difference
+                    if (totalAllocation > totalValue) {
+                        alert(`Allocation Error: Your asset values (₹${totalAllocation.toLocaleString('en-IN')}) exceed your portfolio value (₹${totalValue.toLocaleString('en-IN')}) by ₹${difference.toLocaleString('en-IN')}. Please check your entries.`);
+                        return;
+                    } else {
+                        const proceed = confirm(`Allocation Warning: You have ₹${difference.toLocaleString('en-IN')} (${percentageDiff.toFixed(1)}%) unallocated in your portfolio. Do you want to proceed with the analysis?`);
+                        if (!proceed) {
+                            return;
+                        }
+                    }
                 }
             
             // Calculate portfolio metrics

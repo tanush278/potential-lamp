@@ -779,8 +779,14 @@
         .comparison-table th,
         .comparison-table td {
             padding: 1rem;
-            text-align: left;
+            text-align: center;
             border-bottom: 1px solid var(--border-gray);
+            vertical-align: middle;
+        }
+        
+        .comparison-table th:first-child,
+        .comparison-table td:first-child {
+            text-align: left;
         }
 
         .comparison-table th {
@@ -3141,7 +3147,7 @@
                             </h3>
                             
                             <!-- Filter Controls -->
-                            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center;">
+                            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <label style="color: var(--text-gray); font-size: 0.9rem; white-space: nowrap;">Fund Type:</label>
                                     <select id="fund-type-filter" onchange="filterMutualFunds()" style="padding: 0.5rem; border-radius: 5px; border: 1px solid var(--border-gray); background: var(--card-black); color: var(--text-white);">
@@ -8468,11 +8474,35 @@
         
         function detectRiskLevel(schemeName, type) {
             const name = schemeName.toLowerCase();
+            
+            // Debt funds are always low risk
             if (type === 'debt') return 'low';
-            if (type === 'hybrid') return 'medium';
-            if (name.includes('small') || name.includes('sectoral') || name.includes('thematic')) {
+            
+            // High risk indicators
+            if (name.includes('small') || name.includes('sectoral') || name.includes('thematic') || 
+                name.includes('micro') || name.includes('emerging') || name.includes('aggressive')) {
                 return 'high';
             }
+            
+            // Low risk equity indicators  
+            if (name.includes('conservative') || name.includes('stable') || name.includes('dividend') ||
+                name.includes('value') || name.includes('quality')) {
+                return 'low';
+            }
+            
+            // Hybrid funds
+            if (type === 'hybrid') {
+                if (name.includes('conservative') || name.includes('debt')) return 'low';
+                if (name.includes('aggressive') || name.includes('equity')) return 'medium';
+                return 'medium';
+            }
+            
+            // Large cap equity funds - generally medium risk
+            if (name.includes('large') || name.includes('blue') || name.includes('top')) {
+                return 'medium';
+            }
+            
+            // Default for equity
             return 'medium';
         }
         
@@ -8876,21 +8906,48 @@
             const fundTypeFilter = document.getElementById('fund-type-filter').value;
             const riskLevelFilter = document.getElementById('risk-level-filter').value;
             
+            console.log('Filter applied:', { fundTypeFilter, riskLevelFilter });
+            
             const rows = document.querySelectorAll('#mutual-funds-table tbody tr');
+            let visibleCount = 0;
             
             rows.forEach(row => {
                 const fundType = row.getAttribute('data-type');
                 const riskLevel = row.getAttribute('data-risk');
+                
+                console.log('Row data:', { fundType, riskLevel });
                 
                 const showFundType = fundTypeFilter === 'all' || fundType === fundTypeFilter;
                 const showRiskLevel = riskLevelFilter === 'all' || riskLevel === riskLevelFilter;
                 
                 if (showFundType && showRiskLevel) {
                     row.style.display = '';
+                    visibleCount++;
                 } else {
                     row.style.display = 'none';
                 }
             });
+            
+            console.log(`Filter result: ${visibleCount} funds visible`);
+            
+            // Show message if no funds match
+            const tableContainer = document.getElementById('mutual-funds-table');
+            let noResultsMsg = tableContainer.querySelector('.no-results-message');
+            
+            if (visibleCount === 0) {
+                if (!noResultsMsg) {
+                    noResultsMsg = document.createElement('div');
+                    noResultsMsg.className = 'no-results-message';
+                    noResultsMsg.style.cssText = 'text-align: center; padding: 2rem; color: var(--text-gray); font-style: italic;';
+                    noResultsMsg.innerHTML = '<i class="fas fa-search"></i> No funds match your filter criteria. Try adjusting the filters.';
+                    tableContainer.appendChild(noResultsMsg);
+                }
+                noResultsMsg.style.display = 'block';
+            } else {
+                if (noResultsMsg) {
+                    noResultsMsg.style.display = 'none';
+                }
+            }
         }
 
         function resetMutualFundsFilters() {

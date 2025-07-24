@@ -5277,7 +5277,8 @@
                             borderWidth: 2,
                             fill: true,
                             tension: 0.4,
-                            pointRadius: 0
+                            pointRadius: 0,
+                            pointHoverRadius: 6
                         },
                         {
                             label: 'Nominal Portfolio Value',
@@ -5287,7 +5288,8 @@
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
-                            pointRadius: 0
+                            pointRadius: 0,
+                            pointHoverRadius: 8
                         },
                         {
                             label: 'Real Portfolio Value (Inflation-Adjusted)',
@@ -5298,13 +5300,22 @@
                             fill: false,
                             tension: 0.4,
                             borderDash: [5, 5],
-                            pointRadius: 0
+                            pointRadius: 0,
+                            pointHoverRadius: 6
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     plugins: {
                         legend: {
                             labels: {

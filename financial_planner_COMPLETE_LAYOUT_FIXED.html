@@ -1785,6 +1785,171 @@
                      </div>
                  </section>
 
+                <!-- Capital Gains Tax Section -->
+                <section id="capital-gains-tax" class="section">
+                    <div class="section-header">
+                        <h1 class="section-title">Capital Gains Tax Calculator</h1>
+                        <p class="section-subtitle">Calculate tax on your investment gains with STCG & LTCG support</p>
+                    </div>
+                    
+                    <!-- Workflow Guide -->
+                    <div class="card" style="background: linear-gradient(135deg, var(--accent-gold), #ffed4a); color: #000; margin-bottom: 2rem;">
+                        <div style="text-align: center; padding: 1rem;">
+                            <h3 style="margin: 0 0 1rem 0; font-size: 18px; font-weight: 600;">Tax Planning Workflow</h3>
+                            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center;">
+                                <div style="text-align: center;">
+                                    <div style="background: rgba(0,0,0,0.1); padding: 1rem; border-radius: 8px;">
+                                        <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                        <div style="font-weight: 600;">Step 1: Capital Gains</div>
+                                        <div style="font-size: 12px; opacity: 0.8;">Calculate investment gains tax</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <i class="fas fa-arrow-right" style="font-size: 1.5rem; opacity: 0.6;"></i>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="background: rgba(0,0,0,0.1); padding: 1rem; border-radius: 8px;">
+                                        <i class="fas fa-calculator" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                        <div style="font-weight: 600;">Step 2: Tax Planning</div>
+                                        <div style="font-size: 12px; opacity: 0.8;">Combine with income tax</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Asset Details Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Investment Asset Details</h3>
+                            <p class="card-subtitle">Enter your investment purchase and sale information</p>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Asset Type</label>
+                                <select id="cg-asset-type" class="form-input" onchange="calculateStandaloneCapitalGains()">
+                                    <option value="equity-mutual-funds">Equity/Equity Mutual Funds</option>
+                                    <option value="debt-mutual-funds">Debt Mutual Funds</option>
+                                    <option value="real-estate">Real Estate</option>
+                                    <option value="gold">Gold/Gold ETF</option>
+                                    <option value="crypto">Cryptocurrency</option>
+                                    <option value="other">Other Assets</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Purchase Date</label>
+                                <input type="date" id="cg-purchase-date" class="form-input" onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                            <div class="form-group">
+                                <label>Sale Date</label>
+                                <input type="date" id="cg-sale-date" class="form-input" onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                            <div class="form-group">
+                                <label>Purchase Price (₹)</label>
+                                <input type="number" id="cg-purchase-price" class="form-input" placeholder="Total purchase cost" onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                            <div class="form-group">
+                                <label>Sale Price (₹)</label>
+                                <input type="number" id="cg-sale-price" class="form-input" placeholder="Total sale proceeds" onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                            <div class="form-group">
+                                <label>Improvement Cost (₹)</label>
+                                <input type="number" id="cg-improvement-cost" class="form-input" placeholder="Brokerage, stamp duty, etc." onchange="calculateStandaloneCapitalGains()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Capital Gains Results -->
+                    <div class="card" id="cg-results-card" style="display: none;">
+                        <div class="card-header">
+                            <h3 class="card-title">Capital Gains Tax Calculation</h3>
+                            <p class="card-subtitle">Your tax liability on investment gains</p>
+                        </div>
+                        
+                        <div id="cg-results-content">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Multiple Assets Portfolio -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Portfolio Capital Gains Summary</h3>
+                            <p class="card-subtitle">Track multiple assets and total capital gains tax</p>
+                        </div>
+                        
+                        <div id="cg-portfolio-list" style="margin-bottom: 2rem;">
+                            <!-- Portfolio assets will be listed here -->
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                            <button type="button" class="btn btn-primary" onclick="addCurrentAssetToPortfolio()">
+                                <i class="fas fa-plus"></i> Add Current Asset to Portfolio
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="clearCapitalGainsPortfolio()">
+                                <i class="fas fa-trash"></i> Clear Portfolio
+                            </button>
+                        </div>
+                        
+                        <div id="cg-portfolio-summary" style="display: none;">
+                            <!-- Portfolio summary will be shown here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Tax Integration -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Step 2: Proceed to Tax Planning</h3>
+                            <p class="card-subtitle">Ready to combine capital gains tax with income tax? Go to the next section!</p>
+                        </div>
+                        
+                        <div id="cg-tax-integration">
+                            <div style="text-align: center; padding: 2rem; color: var(--text-gray);">
+                                <i class="fas fa-link" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <p><strong>Workflow:</strong> Calculate your capital gains above → Add to portfolio → Integrate → Go to Tax Planning section for total tax liability.</p>
+                                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                                    <button type="button" class="btn btn-accent" onclick="integrateWithTaxPlanning()">
+                                        <i class="fas fa-link"></i> Integrate Capital Gains
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="showSection('tax-planning')">
+                                        <i class="fas fa-arrow-down"></i> Go to Tax Planning
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tax Optimization Tips -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Capital Gains Tax Optimization</h3>
+                            <p class="card-subtitle">Strategic tips to minimize your capital gains tax</p>
+                        </div>
+                        
+                        <div id="cg-optimization-tips">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                                    <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Long Term Benefits</h4>
+                                    <ul style="color: var(--text-gray); line-height: 1.6;">
+                                        <li>Hold equity investments for >12 months to get 10% LTCG rate</li>
+                                        <li>Utilize ₹1,00,000 annual LTCG exemption on equity</li>
+                                        <li>Plan asset sales across financial years</li>
+                                    </ul>
+                                </div>
+                                <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                                    <h4 style="color: #ff6b6b; margin-bottom: 1rem;">Tax Loss Harvesting</h4>
+                                    <ul style="color: var(--text-gray); line-height: 1.6;">
+                                        <li>Offset capital gains with capital losses</li>
+                                        <li>STCG losses can offset both STCG and LTCG</li>
+                                        <li>Carry forward unused losses for 8 years</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Advanced Tax Planning Section -->
                 <section id="tax" class="section">
                     <div class="section-header">
@@ -2031,171 +2196,6 @@
                             <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Tax Saving Recommendations</h4>
                             <div id="recommendations-content">
                                 <!-- Recommendations will be populated here -->
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Capital Gains Tax Section -->
-                <section id="capital-gains-tax" class="section">
-                    <div class="section-header">
-                        <h1 class="section-title">Capital Gains Tax Calculator</h1>
-                        <p class="section-subtitle">Calculate tax on your investment gains with STCG & LTCG support</p>
-                    </div>
-                    
-                    <!-- Workflow Guide -->
-                    <div class="card" style="background: linear-gradient(135deg, var(--accent-gold), #ffed4a); color: #000; margin-bottom: 2rem;">
-                        <div style="text-align: center; padding: 1rem;">
-                            <h3 style="margin: 0 0 1rem 0; font-size: 18px; font-weight: 600;">Tax Planning Workflow</h3>
-                            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center;">
-                                <div style="text-align: center;">
-                                    <div style="background: rgba(0,0,0,0.1); padding: 1rem; border-radius: 8px;">
-                                        <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
-                                        <div style="font-weight: 600;">Step 1: Capital Gains</div>
-                                        <div style="font-size: 12px; opacity: 0.8;">Calculate investment gains tax</div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <i class="fas fa-arrow-right" style="font-size: 1.5rem; opacity: 0.6;"></i>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="background: rgba(0,0,0,0.1); padding: 1rem; border-radius: 8px;">
-                                        <i class="fas fa-calculator" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
-                                        <div style="font-weight: 600;">Step 2: Tax Planning</div>
-                                        <div style="font-size: 12px; opacity: 0.8;">Combine with income tax</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Asset Details Card -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Investment Asset Details</h3>
-                            <p class="card-subtitle">Enter your investment purchase and sale information</p>
-                        </div>
-                        
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Asset Type</label>
-                                <select id="cg-asset-type" class="form-input" onchange="calculateStandaloneCapitalGains()">
-                                    <option value="equity-mutual-funds">Equity/Equity Mutual Funds</option>
-                                    <option value="debt-mutual-funds">Debt Mutual Funds</option>
-                                    <option value="real-estate">Real Estate</option>
-                                    <option value="gold">Gold/Gold ETF</option>
-                                    <option value="crypto">Cryptocurrency</option>
-                                    <option value="other">Other Assets</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Purchase Date</label>
-                                <input type="date" id="cg-purchase-date" class="form-input" onchange="calculateStandaloneCapitalGains()">
-                            </div>
-                            <div class="form-group">
-                                <label>Sale Date</label>
-                                <input type="date" id="cg-sale-date" class="form-input" onchange="calculateStandaloneCapitalGains()">
-                            </div>
-                            <div class="form-group">
-                                <label>Purchase Price (₹)</label>
-                                <input type="number" id="cg-purchase-price" class="form-input" placeholder="Total purchase cost" onchange="calculateStandaloneCapitalGains()">
-                            </div>
-                            <div class="form-group">
-                                <label>Sale Price (₹)</label>
-                                <input type="number" id="cg-sale-price" class="form-input" placeholder="Total sale proceeds" onchange="calculateStandaloneCapitalGains()">
-                            </div>
-                            <div class="form-group">
-                                <label>Improvement Cost (₹)</label>
-                                <input type="number" id="cg-improvement-cost" class="form-input" placeholder="Brokerage, stamp duty, etc." onchange="calculateStandaloneCapitalGains()">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Capital Gains Results -->
-                    <div class="card" id="cg-results-card" style="display: none;">
-                        <div class="card-header">
-                            <h3 class="card-title">Capital Gains Tax Calculation</h3>
-                            <p class="card-subtitle">Your tax liability on investment gains</p>
-                        </div>
-                        
-                        <div id="cg-results-content">
-                            <!-- Results will be populated here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Multiple Assets Portfolio -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Portfolio Capital Gains Summary</h3>
-                            <p class="card-subtitle">Track multiple assets and total capital gains tax</p>
-                        </div>
-                        
-                        <div id="cg-portfolio-list" style="margin-bottom: 2rem;">
-                            <!-- Portfolio assets will be listed here -->
-                        </div>
-                        
-                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                            <button type="button" class="btn btn-primary" onclick="addCurrentAssetToPortfolio()">
-                                <i class="fas fa-plus"></i> Add Current Asset to Portfolio
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="clearCapitalGainsPortfolio()">
-                                <i class="fas fa-trash"></i> Clear Portfolio
-                            </button>
-                        </div>
-                        
-                        <div id="cg-portfolio-summary" style="display: none;">
-                            <!-- Portfolio summary will be shown here -->
-                        </div>
-                    </div>
-                    
-                    <!-- Tax Integration -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Step 2: Proceed to Tax Planning</h3>
-                            <p class="card-subtitle">Ready to combine capital gains tax with income tax? Go to the next section!</p>
-                        </div>
-                        
-                        <div id="cg-tax-integration">
-                            <div style="text-align: center; padding: 2rem; color: var(--text-gray);">
-                                <i class="fas fa-link" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                                <p><strong>Workflow:</strong> Calculate your capital gains above → Add to portfolio → Integrate → Go to Tax Planning section for total tax liability.</p>
-                                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
-                                    <button type="button" class="btn btn-accent" onclick="integrateWithTaxPlanning()">
-                                        <i class="fas fa-link"></i> Integrate Capital Gains
-                                    </button>
-                                    <button type="button" class="btn btn-primary" onclick="showSection('tax-planning')">
-                                        <i class="fas fa-arrow-down"></i> Go to Tax Planning
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Tax Optimization Tips -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Capital Gains Tax Optimization</h3>
-                            <p class="card-subtitle">Strategic tips to minimize your capital gains tax</p>
-                        </div>
-                        
-                        <div id="cg-optimization-tips">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                                <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--accent-gold);">
-                                    <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Long Term Benefits</h4>
-                                    <ul style="color: var(--text-gray); line-height: 1.6;">
-                                        <li>Hold equity investments for >12 months to get 10% LTCG rate</li>
-                                        <li>Utilize ₹1,00,000 annual LTCG exemption on equity</li>
-                                        <li>Plan asset sales across financial years</li>
-                                    </ul>
-                                </div>
-                                <div style="background: var(--primary-black); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ff6b6b;">
-                                    <h4 style="color: #ff6b6b; margin-bottom: 1rem;">Tax Loss Harvesting</h4>
-                                    <ul style="color: var(--text-gray); line-height: 1.6;">
-                                        <li>Offset capital gains with capital losses</li>
-                                        <li>STCG losses can offset both STCG and LTCG</li>
-                                        <li>Carry forward unused losses for 8 years</li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -1329,10 +1329,15 @@
                         </div>
 
                         <!-- Investment Insights -->
-                        <div id="investment-insights" style="margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                            <h4>Investment Insights</h4>
+                        <div id="investment-insights" style="margin-top: 2rem;">
+                            <h4 style="color: var(--accent-white); margin-bottom: 1rem; font-size: 1.4rem;">💡 Advanced Investment Analysis</h4>
                             <div id="insights-content">
-                                <!-- Will be populated by JS -->
+                                <!-- Insights will be populated by JavaScript -->
+                            </div>
+                            
+                            <!-- Additional SIP Strategy Insights -->
+                            <div id="strategy-insights" style="margin-top: 2rem;">
+                                <!-- Strategy-specific insights will be populated by JavaScript -->
                             </div>
                         </div>
                     </div>
@@ -1685,6 +1690,7 @@
             createSIPChart(calculations.yearlyData);
             createYearlyBreakdown(calculations.yearlyData);
             generateInvestmentInsights(calculations);
+            generateStrategyInsights(calculations, calcType, amount, period, sipIncrease, lumpsumAmount);
         }
 
         function performAdvancedSIPCalculation(monthlyAmount, years, annualRate, inflationRate, stepUpRate, calcType, lumpsumAmount) {
@@ -1783,6 +1789,19 @@
             const nominalValues = yearlyData.map(data => data.nominalValue);
             const realValues = yearlyData.map(data => data.realValue);
             
+            // Calculate gradient fills
+            const gradientNominal = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientNominal.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+            gradientNominal.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+            
+            const gradientReal = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientReal.addColorStop(0, 'rgba(255, 215, 0, 0.3)');
+            gradientReal.addColorStop(1, 'rgba(255, 215, 0, 0.05)');
+            
+            const gradientInvestment = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientInvestment.addColorStop(0, 'rgba(192, 192, 192, 0.2)');
+            gradientInvestment.addColorStop(1, 'rgba(192, 192, 192, 0.05)');
+            
             sipChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -1792,40 +1811,78 @@
                             label: 'Total Investment',
                             data: investments,
                             borderColor: '#c0c0c0',
-                            backgroundColor: 'rgba(192, 192, 192, 0.1)',
+                            backgroundColor: gradientInvestment,
                             borderWidth: 2,
-                            fill: false,
-                            tension: 0.4
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#c0c0c0',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 8
                         },
                         {
-                            label: 'Nominal Value',
+                            label: 'Portfolio Value (at Expected CAGR)',
                             data: nominalValues,
                             borderColor: '#ffffff',
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            backgroundColor: gradientNominal,
                             borderWidth: 3,
-                            fill: false,
-                            tension: 0.4
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#000000',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 10
                         },
                         {
                             label: 'Real Value (Inflation Adjusted)',
                             data: realValues,
                             borderColor: '#ffd700',
-                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                            borderWidth: 2,
-                            fill: false,
-                            tension: 0.4
+                            backgroundColor: gradientReal,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ffd700',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 10
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
                     plugins: {
                         legend: {
+                            position: 'top',
                             labels: {
                                 color: '#ffffff',
                                 font: {
-                                    size: 12
+                                    size: 13,
+                                    weight: '500'
+                                },
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffd700',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN');
                                 }
                             }
                         }
@@ -1833,28 +1890,47 @@
                     scales: {
                         x: {
                             ticks: {
-                                color: '#aaaaaa'
+                                color: '#aaaaaa',
+                                font: {
+                                    size: 11
+                                }
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                                color: 'rgba(255, 255, 255, 0.08)',
+                                lineWidth: 1
                             }
                         },
                         y: {
                             ticks: {
                                 color: '#aaaaaa',
+                                font: {
+                                    size: 11
+                                },
                                 callback: function(value) {
-                                    return '₹' + (value / 100000).toFixed(1) + 'L';
+                                    if (value >= 10000000) {
+                                        return '₹' + (value / 10000000).toFixed(1) + 'Cr';
+                                    } else if (value >= 100000) {
+                                        return '₹' + (value / 100000).toFixed(1) + 'L';
+                                    } else {
+                                        return '₹' + (value / 1000).toFixed(0) + 'K';
+                                    }
                                 }
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                                color: 'rgba(255, 255, 255, 0.08)',
+                                lineWidth: 1
                             }
                         }
                     },
                     elements: {
                         point: {
                             radius: 4,
-                            hoverRadius: 6
+                            hoverRadius: 8,
+                            borderWidth: 2
+                        },
+                        line: {
+                            borderCapStyle: 'round',
+                            borderJoinStyle: 'round'
                         }
                     }
                 }
@@ -1865,14 +1941,27 @@
             const tbody = document.getElementById('breakdown-body');
             tbody.innerHTML = '';
             
-            yearlyData.forEach(data => {
+            yearlyData.forEach((data, index) => {
                 const row = document.createElement('tr');
                 row.style.borderBottom = '1px solid var(--border-gray)';
+                row.style.transition = 'all 0.3s ease';
+                row.style.background = index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
+                
+                // Add hover effect
+                row.addEventListener('mouseenter', function() {
+                    this.style.background = 'rgba(255,255,255,0.05)';
+                    this.style.transform = 'scale(1.01)';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.background = index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
+                    this.style.transform = 'scale(1)';
+                });
+                
                 row.innerHTML = `
-                    <td style="padding: 0.8rem; color: var(--text-white);">${data.year}</td>
-                    <td style="padding: 0.8rem; text-align: right; color: var(--accent-silver);">₹${data.investment.toLocaleString('en-IN')}</td>
-                    <td style="padding: 0.8rem; text-align: right; color: var(--accent-white);">₹${data.nominalValue.toLocaleString('en-IN')}</td>
-                    <td style="padding: 0.8rem; text-align: right; color: var(--accent-gold);">₹${data.realValue.toLocaleString('en-IN')}</td>
+                    <td style="padding: 1rem 0.8rem; color: var(--text-white); font-weight: 500;">Year ${data.year}</td>
+                    <td style="padding: 1rem 0.8rem; text-align: right; color: var(--accent-silver); font-weight: 500;">₹${data.investment.toLocaleString('en-IN')}</td>
+                    <td style="padding: 1rem 0.8rem; text-align: right; color: var(--accent-white); font-weight: 600;">₹${data.nominalValue.toLocaleString('en-IN')}</td>
+                    <td style="padding: 1rem 0.8rem; text-align: right; color: var(--accent-gold); font-weight: 600;">₹${data.realValue.toLocaleString('en-IN')}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -1927,6 +2016,107 @@
                     </div>
                 </div>
             `;
+        }
+
+        function generateStrategyInsights(calculations, calcType, monthlyAmount, years, sipIncrease, lumpsumAmount) {
+            const strategyInsights = document.getElementById('strategy-insights');
+            const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 0;
+            const annualRate = parseFloat(document.getElementById('sip-return').value) || 0;
+            
+            let strategyContent = '';
+            
+            if (calcType === 'step-up') {
+                const finalMonthlyAmount = monthlyAmount * Math.pow(1 + sipIncrease/100, years - 1);
+                const totalWithoutStepUp = monthlyAmount * 12 * years * Math.pow(1 + annualRate/12/100, years * 12);
+                const stepUpBenefit = calculations.nominalValue - totalWithoutStepUp;
+                
+                strategyContent = `
+                    <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 2rem;">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.2rem;">🚀 Step-up SIP Strategy Analysis</h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
+                                <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Monthly SIP Growth</h6>
+                                <div style="font-size: 1.1rem; color: var(--text-gray); margin-bottom: 0.5rem;">Starting: <span style="color: var(--accent-white); font-weight: bold;">₹${monthlyAmount.toLocaleString('en-IN')}</span></div>
+                                <div style="font-size: 1.1rem; color: var(--text-gray); margin-bottom: 0.5rem;">Final: <span style="color: var(--accent-gold); font-weight: bold;">₹${Math.round(finalMonthlyAmount).toLocaleString('en-IN')}</span></div>
+                                <div style="font-size: 0.9rem; color: var(--text-gray);">Annual increase: ${sipIncrease}%</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
+                                <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Step-up Advantage</h6>
+                                <div style="font-size: 1.5rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;">₹${Math.round(stepUpBenefit).toLocaleString('en-IN')}</div>
+                                <div style="font-size: 0.9rem; color: var(--text-gray);">Extra corpus vs standard SIP</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 6px;">
+                            <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
+                                <strong style="color: var(--accent-gold);">💡 Strategy Benefit:</strong> By increasing your SIP by ${sipIncrease}% annually, 
+                                you're building a corpus that's ₹${Math.round(stepUpBenefit).toLocaleString('en-IN')} larger than a standard SIP. 
+                                This strategy helps you keep pace with inflation and salary increments!
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else if (calcType === 'lumpsum' && lumpsumAmount > 0) {
+                const sipOnlyValue = monthlyAmount * 12 * years * Math.pow(1 + annualRate/12/100, years * 12);
+                const lumpsumGrowth = lumpsumAmount * Math.pow(1 + annualRate/100, years);
+                const lumpsumContribution = ((lumpsumGrowth / calculations.nominalValue) * 100);
+                
+                strategyContent = `
+                    <div style="background: linear-gradient(135deg, rgba(192,192,192,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 2rem;">
+                        <h5 style="color: var(--accent-silver); margin-bottom: 1.5rem; font-size: 1.2rem;">💰 Lumpsum + SIP Hybrid Strategy</h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
+                                <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Lumpsum Impact</h6>
+                                <div style="font-size: 1.1rem; color: var(--text-gray); margin-bottom: 0.5rem;">Initial: <span style="color: var(--accent-white); font-weight: bold;">₹${lumpsumAmount.toLocaleString('en-IN')}</span></div>
+                                <div style="font-size: 1.1rem; color: var(--text-gray); margin-bottom: 0.5rem;">Growth: <span style="color: var(--accent-silver); font-weight: bold;">₹${Math.round(lumpsumGrowth).toLocaleString('en-IN')}</span></div>
+                                <div style="font-size: 0.9rem; color: var(--text-gray);">Contributes ${lumpsumContribution.toFixed(1)}% to total corpus</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
+                                <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Time Value Benefit</h6>
+                                <div style="font-size: 1.5rem; color: var(--accent-silver); font-weight: bold; margin-bottom: 0.5rem;">${((lumpsumGrowth / lumpsumAmount) - 1).toFixed(1)}x</div>
+                                <div style="font-size: 0.9rem; color: var(--text-gray);">Lumpsum growth multiple over ${years} years</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(192,192,192,0.1); border-radius: 6px;">
+                            <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
+                                <strong style="color: var(--accent-silver);">💡 Strategy Benefit:</strong> Your lumpsum investment of ₹${lumpsumAmount.toLocaleString('en-IN')} 
+                                gets the maximum time to compound, growing to ₹${Math.round(lumpsumGrowth).toLocaleString('en-IN')}. 
+                                Combined with systematic SIPs, this creates a powerful wealth-building strategy!
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Standard SIP
+                const monthlyCompounding = ((Math.pow(1 + annualRate/12/100, 12) - 1) * 100);
+                const powerOfCompounding = calculations.nominalValue - calculations.totalInvestment;
+                
+                strategyContent = `
+                    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--accent-white); border-radius: 12px; padding: 2rem;">
+                        <h5 style="color: var(--accent-white); margin-bottom: 1.5rem; font-size: 1.2rem;">📈 Standard SIP Strategy Analysis</h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
+                                <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Compounding Power</h6>
+                                <div style="font-size: 1.5rem; color: var(--accent-white); font-weight: bold; margin-bottom: 0.5rem;">₹${powerOfCompounding.toLocaleString('en-IN')}</div>
+                                <div style="font-size: 0.9rem; color: var(--text-gray);">Wealth created by compounding</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
+                                <h6 style="color: var(--accent-white); margin-bottom: 1rem;">Effective Annual Return</h6>
+                                <div style="font-size: 1.5rem; color: var(--accent-white); font-weight: bold; margin-bottom: 0.5rem;">${monthlyCompounding.toFixed(2)}%</div>
+                                <div style="font-size: 0.9rem; color: var(--text-gray);">With monthly compounding</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.08); border-radius: 6px;">
+                            <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">
+                                <strong style="color: var(--accent-white);">💡 SIP Advantage:</strong> Your disciplined monthly investment of ₹${monthlyAmount.toLocaleString('en-IN')} 
+                                creates ₹${powerOfCompounding.toLocaleString('en-IN')} of additional wealth through the power of compounding. 
+                                Consistency and time are your greatest allies in wealth creation!
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            strategyInsights.innerHTML = strategyContent;
         }
 
         function calculateEMI() {

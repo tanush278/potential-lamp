@@ -1689,6 +1689,16 @@
                                     <input type="number" id="inflation-rate" class="form-input" placeholder="Annual inflation rate" value="6" step="0.1" min="0" max="20" onchange="calculatePortfolioMetrics()">
                                 </div>
                                 <div class="form-group">
+                                    <label>Portfolio Goal Target (₹)</label>
+                                    <input type="number" id="portfolio-goal" class="form-input" placeholder="Your target portfolio value" onchange="calculatePortfolioMetrics()">
+                                    <small style="color: var(--text-gray); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Optional: Set your financial goal to track progress</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Expected Annual Return (%)</label>
+                                    <input type="number" id="expected-return" class="form-input" placeholder="Expected CAGR" value="12" step="0.1" min="0" max="30" onchange="calculatePortfolioMetrics()">
+                                    <small style="color: var(--text-gray); font-size: 0.85rem; margin-top: 0.5rem; display: block;">Your portfolio's expected annual return (CAGR)</small>
+                                </div>
+                                <div class="form-group">
                                     <label>Total Amount Invested (₹)</label>
                                     <input type="number" id="total-invested" class="form-input" placeholder="Total amount invested" onchange="calculatePortfolioMetrics()">
                                 </div>
@@ -1742,7 +1752,7 @@
                     <div class="card" id="portfolio-overview" style="margin-top: 2rem; display: none;">
                         <div class="card-header">
                             <h3 class="card-title">Portfolio Overview</h3>
-                            <p class="card-subtitle">Key metrics and performance indicators</p>
+                            <p class="card-subtitle">Advanced metrics and performance indicators</p>
                         </div>
                         
                         <div id="portfolio-notice-area">
@@ -1769,6 +1779,30 @@
                                 <div style="font-size: 0.9rem; color: var(--accent-light); margin-bottom: 0.5rem; text-transform: uppercase;">Investment Duration</div>
                                 <div id="portfolio-duration" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-light);">24</div>
                                 <div style="font-size: 0.9rem; color: var(--text-gray);">Months</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Goal Progress Section -->
+                        <div id="goal-progress-section" style="display: none; margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,215,0,0.03), rgba(0,0,0,0.3)); border: 1px solid var(--accent-gold); border-radius: 12px;">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem;"><i class="fas fa-bullseye"></i> Goal Progress Tracking</h4>
+                            <div id="goal-progress-content">
+                                <!-- Goal progress will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Advanced Analytics -->
+                        <div id="advanced-analytics" style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border: 1px solid var(--border-gray); border-radius: 12px;">
+                            <h4 style="color: var(--accent-white); margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Advanced Analytics</h4>
+                            <div id="analytics-content">
+                                <!-- Advanced analytics will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Benchmark Comparison -->
+                        <div id="benchmark-comparison" style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(192,192,192,0.03), rgba(0,0,0,0.3)); border: 1px solid var(--accent-silver); border-radius: 12px;">
+                            <h4 style="color: var(--accent-silver); margin-bottom: 1rem;"><i class="fas fa-balance-scale"></i> Benchmark Comparison</h4>
+                            <div id="benchmark-content">
+                                <!-- Benchmark comparison will be populated here -->
                             </div>
                         </div>
                     </div>
@@ -4427,6 +4461,223 @@
                 document.getElementById('portfolio-gold').value = Math.round(totalValue * 0.1);
                 document.getElementById('portfolio-cash').value = Math.round(totalValue * 0.05);
             }
+            
+            // Update advanced analytics in real-time
+            updateAdvancedAnalytics();
+        }
+        
+        function updateAdvancedAnalytics() {
+            const totalValue = parseFloat(document.getElementById('total-portfolio-value').value) || 0;
+            const totalInvested = parseFloat(document.getElementById('total-invested').value) || 0;
+            const goalTarget = parseFloat(document.getElementById('portfolio-goal').value) || 0;
+            const expectedReturn = parseFloat(document.getElementById('expected-return').value) || 12;
+            const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 6;
+            
+            if (totalValue > 0) {
+                // Calculate advanced metrics
+                const absoluteReturns = totalValue - totalInvested;
+                const returnsPercentage = totalInvested > 0 ? ((absoluteReturns / totalInvested) * 100) : 0;
+                const realReturn = expectedReturn - inflationRate;
+                
+                // Update goal progress if goal is set
+                if (goalTarget > 0) {
+                    updateGoalProgress(totalValue, goalTarget, expectedReturn, inflationRate);
+                }
+                
+                // Update benchmark comparison
+                updateBenchmarkComparison(returnsPercentage, expectedReturn);
+                
+                // Update analytics content
+                updateAnalyticsContent(absoluteReturns, returnsPercentage, realReturn, expectedReturn, inflationRate);
+            }
+        }
+        
+        function updateGoalProgress(currentValue, goalTarget, expectedReturn, inflationRate) {
+            const progressPercentage = (currentValue / goalTarget) * 100;
+            const remainingAmount = goalTarget - currentValue;
+            
+            // Calculate time to goal with current SIP
+            const monthlySIP = parseFloat(document.getElementById('monthly-sip').value) || 0;
+            const sipFrequency = document.getElementById('portfolio-sip-frequency').value || 'monthly';
+            
+            const frequencyMultiplier = {
+                'monthly': 12,
+                'quarterly': 4,
+                'semi-annually': 2,
+                'annually': 1
+            };
+            
+            const annualSIP = monthlySIP * frequencyMultiplier[sipFrequency];
+            
+            let timeToGoal = 'N/A';
+            if (annualSIP > 0 && expectedReturn > 0) {
+                // PMT formula to calculate time
+                const monthlyRate = expectedReturn / 12 / 100;
+                const pv = currentValue;
+                const fv = goalTarget;
+                const pmt = monthlySIP * (sipFrequency === 'monthly' ? 1 : frequencyMultiplier[sipFrequency] / 12);
+                
+                if (pmt > 0) {
+                    const months = Math.log((fv * monthlyRate + pmt) / (pv * monthlyRate + pmt)) / Math.log(1 + monthlyRate);
+                    const years = Math.floor(months / 12);
+                    const remainingMonths = Math.floor(months % 12);
+                    timeToGoal = years > 0 ? `${years}y ${remainingMonths}m` : `${remainingMonths}m`;
+                }
+            }
+            
+            const goalProgressHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-gray);">Progress</span>
+                                <span style="color: var(--accent-gold); font-weight: bold;">${progressPercentage.toFixed(1)}%</span>
+                            </div>
+                            <div style="background: var(--primary-black); border-radius: 10px; height: 20px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, var(--accent-gold), #ffed4a); height: 100%; width: ${Math.min(progressPercentage, 100)}%; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center;">
+                            <div style="padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 8px;">
+                                <div style="color: var(--accent-gold); font-size: 1.2rem; font-weight: bold;">₹${currentValue.toLocaleString('en-IN')}</div>
+                                <div style="color: var(--text-gray); font-size: 0.85rem;">Current Value</div>
+                            </div>
+                            <div style="padding: 1rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px;">
+                                <div style="color: var(--accent-gold); font-size: 1.2rem; font-weight: bold;">₹${goalTarget.toLocaleString('en-IN')}</div>
+                                <div style="color: var(--text-gray); font-size: 0.85rem;">Target Goal</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; text-align: center;">
+                                <div style="color: var(--accent-white); font-size: 1.2rem; font-weight: bold;">₹${remainingAmount.toLocaleString('en-IN')}</div>
+                                <div style="color: var(--text-gray); font-size: 0.85rem;">Remaining Amount</div>
+                            </div>
+                            <div style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; text-align: center;">
+                                <div style="color: var(--accent-white); font-size: 1.2rem; font-weight: bold;">${timeToGoal}</div>
+                                <div style="color: var(--text-gray); font-size: 0.85rem;">Time to Goal</div>
+                            </div>
+                        </div>
+                        
+                        ${progressPercentage >= 100 ? 
+                            '<div style="margin-top: 1rem; padding: 1rem; background: rgba(0,255,0,0.1); border: 1px solid #00ff00; border-radius: 8px; text-align: center;"><div style="color: #00ff00; font-weight: bold;"><i class="fas fa-trophy"></i> Goal Achieved!</div></div>' :
+                            progressPercentage >= 75 ? 
+                            '<div style="margin-top: 1rem; padding: 1rem; background: rgba(255,215,0,0.1); border: 1px solid var(--accent-gold); border-radius: 8px; text-align: center;"><div style="color: var(--accent-gold); font-weight: bold;"><i class="fas fa-fire"></i> Almost There!</div></div>' :
+                            '<div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; text-align: center;"><div style="color: var(--text-gray);"><i class="fas fa-chart-line"></i> Keep Building!</div></div>'
+                        }
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('goal-progress-content').innerHTML = goalProgressHTML;
+            document.getElementById('goal-progress-section').style.display = 'block';
+        }
+        
+        function updateBenchmarkComparison(portfolioReturn, expectedReturn) {
+            const niftyReturn = 12; // Nifty 50 historical average
+            const sensexReturn = 11.5; // Sensex historical average
+            const fdReturn = 6.5; // FD average return
+            
+            const benchmarkHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="padding: 1rem; background: ${portfolioReturn > niftyReturn ? 'rgba(0,255,0,0.1)' : 'rgba(255,107,107,0.1)'}; border: 1px solid ${portfolioReturn > niftyReturn ? '#00ff00' : '#ff6b6b'}; border-radius: 8px; text-align: center;">
+                        <div style="color: var(--text-gray); font-size: 0.85rem; margin-bottom: 0.5rem;">vs Nifty 50</div>
+                        <div style="color: ${portfolioReturn > niftyReturn ? '#00ff00' : '#ff6b6b'}; font-size: 1.2rem; font-weight: bold;">
+                            ${portfolioReturn > niftyReturn ? '+' : ''}${(portfolioReturn - niftyReturn).toFixed(1)}%
+                        </div>
+                        <div style="color: var(--text-gray); font-size: 0.8rem;">${portfolioReturn.toFixed(1)}% vs ${niftyReturn}%</div>
+                    </div>
+                    
+                    <div style="padding: 1rem; background: ${portfolioReturn > sensexReturn ? 'rgba(0,255,0,0.1)' : 'rgba(255,107,107,0.1)'}; border: 1px solid ${portfolioReturn > sensexReturn ? '#00ff00' : '#ff6b6b'}; border-radius: 8px; text-align: center;">
+                        <div style="color: var(--text-gray); font-size: 0.85rem; margin-bottom: 0.5rem;">vs Sensex</div>
+                        <div style="color: ${portfolioReturn > sensexReturn ? '#00ff00' : '#ff6b6b'}; font-size: 1.2rem; font-weight: bold;">
+                            ${portfolioReturn > sensexReturn ? '+' : ''}${(portfolioReturn - sensexReturn).toFixed(1)}%
+                        </div>
+                        <div style="color: var(--text-gray); font-size: 0.8rem;">${portfolioReturn.toFixed(1)}% vs ${sensexReturn}%</div>
+                    </div>
+                    
+                    <div style="padding: 1rem; background: ${portfolioReturn > fdReturn ? 'rgba(0,255,0,0.1)' : 'rgba(255,107,107,0.1)'}; border: 1px solid ${portfolioReturn > fdReturn ? '#00ff00' : '#ff6b6b'}; border-radius: 8px; text-align: center;">
+                        <div style="color: var(--text-gray); font-size: 0.85rem; margin-bottom: 0.5rem;">vs Fixed Deposits</div>
+                        <div style="color: ${portfolioReturn > fdReturn ? '#00ff00' : '#ff6b6b'}; font-size: 1.2rem; font-weight: bold;">
+                            ${portfolioReturn > fdReturn ? '+' : ''}${(portfolioReturn - fdReturn).toFixed(1)}%
+                        </div>
+                        <div style="color: var(--text-gray); font-size: 0.8rem;">${portfolioReturn.toFixed(1)}% vs ${fdReturn}%</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                    <div style="color: var(--accent-silver); font-weight: bold; margin-bottom: 0.5rem;"><i class="fas fa-info-circle"></i> Performance Analysis</div>
+                    <div style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.5;">
+                        ${portfolioReturn > niftyReturn && portfolioReturn > sensexReturn ? 
+                            'Excellent! Your portfolio is outperforming major market indices. Keep up the good work!' :
+                            portfolioReturn > fdReturn ?
+                            'Good performance! Your portfolio is beating traditional investments like FDs, but there\'s room for improvement against market indices.' :
+                            'Your portfolio needs attention. Consider reviewing your asset allocation and investment strategy.'
+                        }
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('benchmark-content').innerHTML = benchmarkHTML;
+        }
+        
+        function updateAnalyticsContent(absoluteReturns, returnsPercentage, realReturn, expectedReturn, inflationRate) {
+            const analyticsHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div style="padding: 1rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px;">
+                        <div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;"><i class="fas fa-chart-line"></i> Return Analysis</div>
+                        <div style="display: grid; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-gray);">Absolute Returns:</span>
+                                <span style="color: var(--accent-gold); font-weight: bold;">₹${absoluteReturns.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-gray);">Returns %:</span>
+                                <span style="color: var(--accent-gold); font-weight: bold;">${returnsPercentage.toFixed(2)}%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-gray);">Real Return:</span>
+                                <span style="color: var(--accent-white); font-weight: bold;">${realReturn.toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-gray); border-radius: 8px;">
+                        <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.5rem;"><i class="fas fa-calculator"></i> Risk Metrics</div>
+                        <div style="display: grid; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-gray);">Expected Return:</span>
+                                <span style="color: var(--accent-white); font-weight: bold;">${expectedReturn}%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-gray);">Inflation Rate:</span>
+                                <span style="color: var(--accent-silver); font-weight: bold;">${inflationRate}%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-gray);">Risk Premium:</span>
+                                <span style="color: var(--accent-gold); font-weight: bold;">${(expectedReturn - 6.5).toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(192,192,192,0.03); border: 1px solid var(--accent-silver); border-radius: 8px;">
+                    <div style="color: var(--accent-silver); font-weight: bold; margin-bottom: 0.5rem;"><i class="fas fa-lightbulb"></i> Smart Insights</div>
+                    <div style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.5;">
+                        ${realReturn > 6 ? 
+                            'Your portfolio is generating strong real returns after inflation. This is excellent for long-term wealth building.' :
+                            realReturn > 3 ?
+                            'Your portfolio is beating inflation moderately. Consider optimizing for higher real returns.' :
+                            'Your portfolio may not be keeping pace with inflation effectively. Review your asset allocation strategy.'
+                        }
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('analytics-content').innerHTML = analyticsHTML;
         }
 
         function analyzePortfolio() {

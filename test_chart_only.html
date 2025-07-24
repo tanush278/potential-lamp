@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retirement Corpus Growth Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .test-card {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #444;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background: #333;
+            color: #fff;
+        }
+        button {
+            background: #ffd700;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #ffed4a;
+        }
+        .chart-container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            height: 500px;
+        }
+        .results {
+            background: #1e3a1e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #4caf50;
+        }
+        .error {
+            background: #3a1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #f44336;
+            color: #ffcdd2;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .summary-card {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #555;
+        }
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+        .summary-label {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>📈 Retirement Corpus Growth Chart - Focused Test</h1>
+    
+    <div class="test-card">
+        <h2>🎯 Chart Functionality Test</h2>
+        <p>This test focuses specifically on the retirement corpus growth chart to ensure it works correctly after the UX fixes.</p>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Current Age</label>
+                <input type="number" id="current-age" value="30" min="18" max="65">
+            </div>
+            <div class="form-group">
+                <label>Retirement Age</label>
+                <input type="number" id="retirement-age" value="60" min="40" max="80">
+            </div>
+            <div class="form-group">
+                <label>Life Expectancy</label>
+                <input type="number" id="life-expectancy" value="85" min="65" max="100">
+            </div>
+            <div class="form-group">
+                <label>Current Expenses (₹)</label>
+                <input type="number" id="current-expenses" value="50000" min="0">
+            </div>
+            <div class="form-group">
+                <label>Current Savings (₹)</label>
+                <input type="number" id="current-savings" value="500000" min="0">
+            </div>
+            <div class="form-group">
+                <label>Monthly SIP (₹)</label>
+                <input type="number" id="monthly-sip" value="15000" min="0">
+            </div>
+            <div class="form-group">
+                <label>Expected Return (%)</label>
+                <input type="number" id="expected-return" value="12" min="1" max="30" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Inflation Rate (%)</label>
+                <input type="number" id="inflation-rate" value="6" min="1" max="15" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Post-Retirement Return (%)</label>
+                <input type="number" id="post-retirement-return" value="8" min="1" max="20" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Lifestyle</label>
+                <select id="lifestyle-choice">
+                    <option value="conservative">Conservative (70%)</option>
+                    <option value="moderate" selected>Moderate (85%)</option>
+                    <option value="comfortable">Comfortable (100%)</option>
+                    <option value="luxurious">Luxurious (120%)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Healthcare Buffer (%)</label>
+                <input type="number" id="healthcare-buffer" value="20" min="0" max="100">
+            </div>
+            <div class="form-group">
+                <label>Emergency Buffer (Months)</label>
+                <input type="number" id="emergency-buffer" value="12" min="6" max="36">
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button onclick="testRetirementChart()">📊 Test Chart Generation</button>
+            <button onclick="clearResults()">🗑️ Clear Results</button>
+            <button onclick="loadDifferentScenario()">🔄 Load Different Scenario</button>
+        </div>
+    </div>
+
+    <div id="results-summary" style="display: none;"></div>
+
+    <div class="chart-container">
+        <h3 style="color: #ffd700; margin-bottom: 20px;">📈 Retirement Corpus Growth Chart</h3>
+        <canvas id="retirement-growth-chart"></canvas>
+    </div>
+
+    <div id="log-messages"></div>
+
+    <script>
+        let retirementChart = null;
+        let logDiv = document.getElementById('log-messages');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type === 'error' ? 'error' : 'results';
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logDiv.appendChild(div);
+            console.log(message);
+        }
+
+        function clearResults() {
+            document.getElementById('results-summary').style.display = 'none';
+            logDiv.innerHTML = '';
+            if (retirementChart) {
+                retirementChart.destroy();
+                retirementChart = null;
+            }
+        }
+
+        function loadDifferentScenario() {
+            // Load a high-income scenario
+            document.getElementById('current-age').value = '25';
+            document.getElementById('retirement-age').value = '55';
+            document.getElementById('current-expenses').value = '100000';
+            document.getElementById('current-savings').value = '2000000';
+            document.getElementById('monthly-sip').value = '25000';
+            document.getElementById('expected-return').value = '14';
+            document.getElementById('lifestyle-choice').value = 'luxurious';
+            log('🔄 Loaded high-income scenario for testing');
+        }
+
+        function testRetirementChart() {
+            try {
+                log('🚀 Starting retirement chart test...', 'info');
+                clearResults();
+                
+                // Get input values
+                const currentAge = parseFloat(document.getElementById('current-age').value) || 0;
+                const retirementAge = parseFloat(document.getElementById('retirement-age').value) || 0;
+                const lifeExpectancy = parseFloat(document.getElementById('life-expectancy').value) || 85;
+                const currentExpenses = parseFloat(document.getElementById('current-expenses').value) || 0;
+                const currentSavings = parseFloat(document.getElementById('current-savings').value) || 0;
+                const monthlySip = parseFloat(document.getElementById('monthly-sip').value) || 0;
+                const expectedReturn = parseFloat(document.getElementById('expected-return').value) || 12;
+                const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 6;
+                const postRetirementReturn = parseFloat(document.getElementById('post-retirement-return').value) || 8;
+                const lifestyleChoice = document.getElementById('lifestyle-choice').value || 'moderate';
+                const healthcareBuffer = parseFloat(document.getElementById('healthcare-buffer').value) || 20;
+                const emergencyBuffer = parseFloat(document.getElementById('emergency-buffer').value) || 12;
+
+                log(`📊 Testing with: Age ${currentAge}-${retirementAge}, Expenses ₹${currentExpenses.toLocaleString()}, SIP ₹${monthlySip.toLocaleString()}`);
+
+                // Validation
+                if (currentAge >= retirementAge) {
+                    throw new Error('Current age must be less than retirement age');
+                }
+                if (currentExpenses <= 0) {
+                    throw new Error('Current expenses must be greater than 0');
+                }
+
+                // Calculate key metrics
+                const yearsToRetirement = retirementAge - currentAge;
+                const retirementDuration = lifeExpectancy - retirementAge;
+                
+                // Calculate lifestyle multiplier
+                const lifestyleMultipliers = {
+                    'conservative': 0.70, 'moderate': 0.85, 'comfortable': 1.00, 'luxurious': 1.20
+                };
+                const lifestyleMultiplier = lifestyleMultipliers[lifestyleChoice] || 0.85;
+
+                // Calculate future expenses
+                const inflationMultiplier = Math.pow(1 + inflationRate/100, yearsToRetirement);
+                const futureMonthlyExpenses = currentExpenses * inflationMultiplier;
+                const adjustedMonthlyExpenses = futureMonthlyExpenses * lifestyleMultiplier;
+                const healthcareExpenses = adjustedMonthlyExpenses * (healthcareBuffer/100);
+                const totalMonthlyExpenses = adjustedMonthlyExpenses + healthcareExpenses;
+
+                log(`💰 Future monthly expenses: ₹${Math.round(totalMonthlyExpenses).toLocaleString()}`);
+
+                // Calculate corpus requirements
+                const realReturnRate = ((1 + postRetirementReturn/100) / (1 + inflationRate/100)) - 1;
+                const monthlyRealReturn = realReturnRate / 12;
+                const totalRetirementMonths = retirementDuration * 12;
+                
+                let requiredCorpus;
+                if (monthlyRealReturn <= 0) {
+                    requiredCorpus = totalMonthlyExpenses * totalRetirementMonths;
+                } else {
+                    const pvFactor = (1 - Math.pow(1 + monthlyRealReturn, -totalRetirementMonths)) / monthlyRealReturn;
+                    requiredCorpus = totalMonthlyExpenses * pvFactor;
+                }
+
+                // Calculate projected corpus
+                const futureValueCurrentSavings = currentSavings * Math.pow(1 + expectedReturn/100, yearsToRetirement);
+                const monthlyReturn = expectedReturn / 100 / 12;
+                const totalSipMonths = yearsToRetirement * 12;
+                let futureValueSip = 0;
+                if (monthlySip > 0 && monthlyReturn > 0) {
+                    futureValueSip = monthlySip * ((Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn);
+                }
+                const totalCorpusAtRetirement = futureValueCurrentSavings + futureValueSip;
+                const adequacyPercentage = (totalCorpusAtRetirement / requiredCorpus) * 100;
+
+                log(`🎯 Required: ₹${(requiredCorpus/10000000).toFixed(2)}Cr, Projected: ₹${(totalCorpusAtRetirement/10000000).toFixed(2)}Cr`);
+                log(`📈 Adequacy: ${Math.round(adequacyPercentage)}%`);
+
+                // Generate chart data
+                log('📊 Generating chart data...');
+                const chartData = generateRetirementChartData({
+                    currentAge, retirementAge, lifeExpectancy, currentSavings, monthlySip,
+                    expectedReturn, postRetirementReturn, inflationRate, totalMonthlyExpenses
+                });
+
+                if (chartData.length === 0) {
+                    throw new Error('Failed to generate chart data');
+                }
+
+                log(`✅ Generated ${chartData.length} chart data points`);
+
+                // Create chart
+                log('🎨 Creating chart...');
+                createRetirementChart(chartData);
+
+                // Display summary
+                displaySummary({
+                    requiredCorpus, totalCorpusAtRetirement, adequacyPercentage,
+                    yearsToRetirement, retirementDuration, totalMonthlyExpenses
+                });
+
+                log('🎉 Chart test completed successfully!', 'info');
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                console.error('Detailed error:', error);
+            }
+        }
+
+        function generateRetirementChartData(params) {
+            try {
+                const { currentAge, retirementAge, lifeExpectancy, currentSavings, monthlySip, 
+                        expectedReturn, postRetirementReturn, inflationRate, totalMonthlyExpenses } = params;
+                
+                const data = [];
+                let corpus = currentSavings || 0;
+                const monthlyReturn = (expectedReturn || 12) / 100 / 12;
+                const postRetirementMonthlyReturn = (postRetirementReturn || 8) / 100 / 12;
+                const monthlyExpenses = totalMonthlyExpenses || 0;
+
+                // Accumulation phase
+                for (let age = currentAge; age <= retirementAge; age++) {
+                    if (age < retirementAge) {
+                        for (let month = 0; month < 12; month++) {
+                            corpus = corpus * (1 + monthlyReturn) + (monthlySip || 0);
+                        }
+                    }
+                    data.push({
+                        age: age,
+                        corpus: Math.max(0, corpus),
+                        phase: age < retirementAge ? 'accumulation' : 'retirement'
+                    });
+                }
+
+                // Retirement phase
+                let retirementCorpus = corpus;
+                for (let age = retirementAge + 1; age <= lifeExpectancy; age++) {
+                    for (let month = 0; month < 12; month++) {
+                        retirementCorpus = retirementCorpus * (1 + postRetirementMonthlyReturn) - monthlyExpenses;
+                        if (retirementCorpus < 0) retirementCorpus = 0;
+                    }
+                    data.push({
+                        age: age,
+                        corpus: Math.max(0, retirementCorpus),
+                        phase: 'retirement'
+                    });
+                }
+
+                return data;
+            } catch (error) {
+                throw new Error(`Chart data generation failed: ${error.message}`);
+            }
+        }
+
+        function createRetirementChart(chartData) {
+            try {
+                const canvas = document.getElementById('retirement-growth-chart');
+                if (!canvas) {
+                    throw new Error('Chart canvas not found');
+                }
+
+                const ctx = canvas.getContext('2d');
+                
+                if (retirementChart) {
+                    retirementChart.destroy();
+                }
+
+                const ages = chartData.map(d => d.age);
+                const corpusValues = chartData.map(d => d.corpus);
+
+                // Find retirement age for color change
+                const retirementAgeIndex = chartData.findIndex(d => d.phase === 'retirement');
+
+                retirementChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ages,
+                        datasets: [{
+                            label: 'Retirement Corpus (₹ Crores)',
+                            data: corpusValues,
+                            borderColor: '#ffd700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 2,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#ffd700',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    color: '#ffffff',
+                                    font: { size: 14, weight: '600' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                titleColor: '#ffd700',
+                                bodyColor: '#ffffff',
+                                borderColor: '#ffd700',
+                                borderWidth: 2,
+                                cornerRadius: 8,
+                                padding: 12,
+                                callbacks: {
+                                    title: function(context) {
+                                        return `Age: ${context[0].label}`;
+                                    },
+                                    label: function(context) {
+                                        const value = context.raw;
+                                        const phase = chartData[context.dataIndex]?.phase || 'unknown';
+                                        const crores = (value / 10000000).toFixed(2);
+                                        return `Corpus: ₹${crores}Cr (${phase})`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Age (Years)',
+                                    color: '#ffffff',
+                                    font: { size: 14, weight: '600' }
+                                },
+                                ticks: {
+                                    color: '#cccccc',
+                                    font: { size: 12 }
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Corpus (₹ Crores)',
+                                    color: '#ffffff',
+                                    font: { size: 14, weight: '600' }
+                                },
+                                ticks: {
+                                    color: '#cccccc',
+                                    font: { size: 12 },
+                                    callback: function(value) {
+                                        return '₹' + (value/10000000).toFixed(1) + 'Cr';
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeInOutQuart'
+                        }
+                    }
+                });
+
+                log('✅ Chart created successfully with animation!');
+            } catch (error) {
+                throw new Error(`Chart creation failed: ${error.message}`);
+            }
+        }
+
+        function displaySummary(data) {
+            const summaryDiv = document.getElementById('results-summary');
+            const isAdequate = data.adequacyPercentage >= 100;
+            
+            summaryDiv.innerHTML = `
+                <div class="test-card">
+                    <h3 style="color: #ffd700;">📊 Calculation Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="summary-label">Status</div>
+                            <div class="summary-value" style="color: ${isAdequate ? '#4caf50' : '#f44336'}">
+                                ${isAdequate ? '✅ On Track' : '⚠️ Needs Attention'}
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Years to Retirement</div>
+                            <div class="summary-value">${data.yearsToRetirement}</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Required Corpus</div>
+                            <div class="summary-value">₹${(data.requiredCorpus/10000000).toFixed(1)}Cr</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Projected Corpus</div>
+                            <div class="summary-value">₹${(data.totalCorpusAtRetirement/10000000).toFixed(1)}Cr</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Adequacy</div>
+                            <div class="summary-value" style="color: ${isAdequate ? '#4caf50' : '#f44336'}">
+                                ${Math.round(data.adequacyPercentage)}%
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Monthly Retirement Expenses</div>
+                            <div class="summary-value">₹${Math.round(data.totalMonthlyExpenses).toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            summaryDiv.style.display = 'block';
+        }
+
+        // Auto-run test on page load
+        window.onload = function() {
+            log('🔧 Chart test page loaded. Click "Test Chart Generation" to verify functionality.');
+        };
+    </script>
+</body>
+</html>

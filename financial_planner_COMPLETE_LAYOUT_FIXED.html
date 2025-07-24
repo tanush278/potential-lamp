@@ -715,6 +715,110 @@
             font-size: 1.2rem;
         }
 
+        /* PRODUCT COMPARISON STYLES */
+        .comparison-category-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1.5rem;
+            background: var(--card-black);
+            border: 2px solid var(--border-gray);
+            border-radius: 12px;
+            color: var(--text-white);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-align: center;
+        }
+
+        .comparison-category-btn:hover {
+            border-color: var(--accent-gold);
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .comparison-category-btn.active {
+            border-color: var(--accent-gold);
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        .comparison-category-btn i {
+            font-size: 2rem;
+            color: var(--accent-gold);
+        }
+
+        .comparison-category-btn span {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .comparison-category-btn small {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            line-height: 1.3;
+        }
+
+        .comparison-content {
+            display: none;
+        }
+
+        .comparison-content.active {
+            display: block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: var(--card-black);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--accent-gold);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .comparison-table td {
+            color: var(--text-white);
+            font-size: 0.9rem;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .risk-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .risk-very-low { background: rgba(139, 195, 74, 0.2); color: #8BC34A; }
+        .risk-low { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+        .risk-medium { background: rgba(255, 193, 7, 0.2); color: #FFC107; }
+        .risk-high { background: rgba(244, 67, 54, 0.2); color: #F44336; }
+
+        .rating-stars {
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 768px) {
             .sidebar {
@@ -2943,8 +3047,9 @@
 
                         <!-- Retirement Progression Chart -->
                         <div class="card" style="margin-bottom: 2rem;">
-                            <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-chart-area"></i> Retirement Corpus Growth
+                            <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: 0.02em;">
+                                <i class="fas fa-chart-area" style="font-size: 1.2rem;"></i> 
+                                <span style="font-family: 'Inter', sans-serif; font-weight: 600;">Retirement Corpus Growth</span>
                             </h3>
                             <div style="position: relative; height: 400px;">
                                 <canvas id="retirement-growth-chart"></canvas>
@@ -2972,14 +3077,116 @@
                 <section id="comparison" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Product Comparison</h1>
-                        <p class="section-subtitle">Compare different financial products</p>
+                        <p class="section-subtitle">Compare financial products side-by-side to make informed decisions</p>
                     </div>
-                    <div class="card">
-                        <h3>Financial Product Comparison</h3>
-                        <p>Compare mutual funds, insurance products, and investment options.</p>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-balance-scale"></i> Compare Products
-                        </button>
+
+                    <!-- Product Category Selection -->
+                    <div class="card" style="margin-bottom: 2rem;">
+                        <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 600;">
+                            <i class="fas fa-layer-group" style="font-size: 1.2rem;"></i>
+                            <span>Select Product Category</span>
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                            <button class="comparison-category-btn active" onclick="showComparisonCategory('mutual-funds')" data-category="mutual-funds">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Mutual Funds</span>
+                                <small>Compare equity, debt & hybrid funds</small>
+                            </button>
+                            <button class="comparison-category-btn" onclick="showComparisonCategory('insurance')" data-category="insurance">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Insurance</span>
+                                <small>Compare term, whole life & ULIPs</small>
+                            </button>
+                            <button class="comparison-category-btn" onclick="showComparisonCategory('loans')" data-category="loans">
+                                <i class="fas fa-home"></i>
+                                <span>Loans</span>
+                                <small>Compare home, personal & car loans</small>
+                            </button>
+                            <button class="comparison-category-btn" onclick="showComparisonCategory('investments')" data-category="investments">
+                                <i class="fas fa-coins"></i>
+                                <span>Investments</span>
+                                <small>Compare FD, PPF, ELSS & Gold</small>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mutual Funds Comparison -->
+                    <div id="mutual-funds-comparison" class="comparison-content active">
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent-white); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 600;">
+                                <i class="fas fa-chart-line" style="font-size: 1.1rem;"></i>
+                                <span>Mutual Funds Comparison</span>
+                            </h3>
+                            
+                            <!-- Filter Controls -->
+                            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <label style="color: var(--text-gray); font-size: 0.9rem; white-space: nowrap;">Fund Type:</label>
+                                    <select id="fund-type-filter" onchange="filterMutualFunds()" style="padding: 0.5rem; border-radius: 5px; border: 1px solid var(--border-gray); background: var(--card-black); color: var(--text-white);">
+                                        <option value="all">All Types</option>
+                                        <option value="equity">Equity</option>
+                                        <option value="debt">Debt</option>
+                                        <option value="hybrid">Hybrid</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <label style="color: var(--text-gray); font-size: 0.9rem; white-space: nowrap;">Risk Level:</label>
+                                    <select id="risk-level-filter" onchange="filterMutualFunds()" style="padding: 0.5rem; border-radius: 5px; border: 1px solid var(--border-gray); background: var(--card-black); color: var(--text-white);">
+                                        <option value="all">All Risk Levels</option>
+                                        <option value="low">Low Risk</option>
+                                        <option value="medium">Medium Risk</option>
+                                        <option value="high">High Risk</option>
+                                    </select>
+                                </div>
+                                <button onclick="resetMutualFundsFilters()" style="padding: 0.5rem 1rem; background: var(--accent-gold); color: var(--primary-black); border: none; border-radius: 5px; font-weight: 600;">
+                                    <i class="fas fa-undo"></i> Reset
+                                </button>
+                            </div>
+
+                            <!-- Comparison Table -->
+                            <div id="mutual-funds-table" style="overflow-x: auto;">
+                                <!-- Table will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Insurance Comparison -->
+                    <div id="insurance-comparison" class="comparison-content">
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent-white); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 600;">
+                                <i class="fas fa-shield-alt" style="font-size: 1.1rem;"></i>
+                                <span>Insurance Products Comparison</span>
+                            </h3>
+                            <div id="insurance-table" style="overflow-x: auto;">
+                                <!-- Insurance comparison table -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loans Comparison -->
+                    <div id="loans-comparison" class="comparison-content">
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent-white); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 600;">
+                                <i class="fas fa-home" style="font-size: 1.1rem;"></i>
+                                <span>Loan Products Comparison</span>
+                            </h3>
+                            <div id="loans-table" style="overflow-x: auto;">
+                                <!-- Loans comparison table -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Investments Comparison -->
+                    <div id="investments-comparison" class="comparison-content">
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent-white); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; font-family: 'Inter', sans-serif; font-size: 1.3rem; font-weight: 600;">
+                                <i class="fas fa-coins" style="font-size: 1.1rem;"></i>
+                                <span>Investment Options Comparison</span>
+                            </h3>
+                            <div id="investments-table" style="overflow-x: auto;">
+                                <!-- Investments comparison table -->
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -8146,6 +8353,410 @@
 
         function goBackToProfiles() {
             alert('Profile navigation functionality coming soon!');
+        }
+
+        // PRODUCT COMPARISON FUNCTIONALITY
+        let mutualFundsData = [
+            {
+                name: "HDFC Top 100 Fund",
+                type: "equity",
+                category: "Large Cap",
+                risk: "medium",
+                expenseRatio: 2.05,
+                returns1Y: 12.5,
+                returns3Y: 15.8,
+                returns5Y: 14.2,
+                aum: 15420,
+                rating: 4,
+                minInvestment: 5000
+            },
+            {
+                name: "SBI Small Cap Fund",
+                type: "equity", 
+                category: "Small Cap",
+                risk: "high",
+                expenseRatio: 1.85,
+                returns1Y: 18.7,
+                returns3Y: 22.1,
+                returns5Y: 19.5,
+                aum: 8750,
+                rating: 5,
+                minInvestment: 1000
+            },
+            {
+                name: "ICICI Prudential Debt Fund",
+                type: "debt",
+                category: "Medium Duration",
+                risk: "low",
+                expenseRatio: 1.25,
+                returns1Y: 7.2,
+                returns3Y: 8.1,
+                returns5Y: 7.8,
+                aum: 12300,
+                rating: 3,
+                minInvestment: 5000
+            },
+            {
+                name: "Axis Hybrid Equity Fund",
+                type: "hybrid",
+                category: "Aggressive Hybrid",
+                risk: "medium",
+                expenseRatio: 1.95,
+                returns1Y: 10.8,
+                returns3Y: 13.2,
+                returns5Y: 12.1,
+                aum: 6850,
+                rating: 4,
+                minInvestment: 5000
+            },
+            {
+                name: "Mirae Asset Large Cap Fund",
+                type: "equity",
+                category: "Large Cap", 
+                risk: "medium",
+                expenseRatio: 1.75,
+                returns1Y: 13.2,
+                returns3Y: 16.5,
+                returns5Y: 15.1,
+                aum: 18900,
+                rating: 5,
+                minInvestment: 1000
+            },
+            {
+                name: "Franklin India Debt Fund",
+                type: "debt",
+                category: "Long Duration",
+                risk: "low",
+                expenseRatio: 1.35,
+                returns1Y: 6.8,
+                returns3Y: 7.5,
+                returns5Y: 7.2,
+                aum: 9200,
+                rating: 3,
+                minInvestment: 5000
+            }
+        ];
+
+        let insuranceData = [
+            {
+                name: "HDFC Life Click 2 Protect Plus",
+                type: "Term Life",
+                coverage: 10000000,
+                premium: 8500,
+                claimRatio: 98.5,
+                features: "Online, Medical checkup waiver up to 40L",
+                riders: "Accidental Death, Critical Illness",
+                taxBenefit: "80C + 80D",
+                rating: 4.5
+            },
+            {
+                name: "SBI Life eShield",
+                type: "Term Life",
+                coverage: 10000000,
+                premium: 7800,
+                claimRatio: 97.2,
+                features: "Affordable premiums, Return of premium option",
+                riders: "Waiver of premium, Accidental disability",
+                taxBenefit: "80C",
+                rating: 4.2
+            },
+            {
+                name: "ICICI Pru iProtect Smart",
+                type: "Term Life",
+                coverage: 10000000,
+                premium: 9200,
+                claimRatio: 96.8,
+                features: "Increasing cover option, Health checkup benefit",
+                riders: "Critical illness, Income benefit",
+                taxBenefit: "80C + 80D",
+                rating: 4.3
+            }
+        ];
+
+        let loansData = [
+            {
+                name: "SBI Home Loan",
+                type: "Home Loan",
+                interestRate: 8.5,
+                processingFee: 0.35,
+                maxTenure: 30,
+                maxAmount: 100000000,
+                features: "Balance transfer facility, Top-up loan available",
+                eligibility: "Salaried/Self-employed, Age 18-70",
+                rating: 4.1
+            },
+            {
+                name: "HDFC Personal Loan",
+                type: "Personal Loan", 
+                interestRate: 10.5,
+                processingFee: 2.5,
+                maxTenure: 6,
+                maxAmount: 2000000,
+                features: "Quick approval, Minimal documentation",
+                eligibility: "Salaried, Min income 25K/month",
+                rating: 4.3
+            },
+            {
+                name: "Axis Bank Car Loan",
+                type: "Car Loan",
+                interestRate: 7.75,
+                processingFee: 1.0,
+                maxTenure: 7,
+                maxAmount: 5000000,
+                features: "Up to 100% financing, Flexible EMI options",
+                eligibility: "Age 21-65, Min income 20K/month",
+                rating: 4.2
+            }
+        ];
+
+        let investmentsData = [
+            {
+                name: "Fixed Deposit",
+                type: "FD",
+                returns: 6.5,
+                liquidity: "Medium",
+                taxBenefit: "None",
+                risk: "very-low",
+                minInvestment: 1000,
+                lockIn: "Varies",
+                features: "Guaranteed returns, Premature withdrawal penalty"
+            },
+            {
+                name: "Public Provident Fund",
+                type: "PPF",
+                returns: 7.1,
+                liquidity: "Low",
+                taxBenefit: "EEE (80C)",
+                risk: "very-low", 
+                minInvestment: 500,
+                lockIn: "15 years",
+                features: "Tax-free returns, Loan facility after 6 years"
+            },
+            {
+                name: "ELSS Mutual Funds",
+                type: "ELSS",
+                returns: 12.5,
+                liquidity: "High",
+                taxBenefit: "80C",
+                risk: "high",
+                minInvestment: 500,
+                lockIn: "3 years",
+                features: "Market-linked returns, Shortest lock-in for 80C"
+            },
+            {
+                name: "Gold ETF",
+                type: "Gold",
+                returns: 8.5,
+                liquidity: "High",
+                taxBenefit: "LTCG after 3 years",
+                risk: "medium",
+                minInvestment: 1000,
+                lockIn: "None",
+                features: "Hedge against inflation, Portfolio diversification"
+            }
+        ];
+
+        function showComparisonCategory(category) {
+            // Update active button
+            document.querySelectorAll('.comparison-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+
+            // Show/hide content sections
+            document.querySelectorAll('.comparison-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${category}-comparison`).classList.add('active');
+
+            // Load data for the selected category
+            switch(category) {
+                case 'mutual-funds':
+                    loadMutualFundsComparison();
+                    break;
+                case 'insurance':
+                    loadInsuranceComparison();
+                    break;
+                case 'loans':
+                    loadLoansComparison();
+                    break;
+                case 'investments':
+                    loadInvestmentsComparison();
+                    break;
+            }
+        }
+
+        function loadMutualFundsComparison() {
+            const tableHTML = `
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Fund Name</th>
+                            <th>Category</th>
+                            <th>Risk</th>
+                            <th>Expense Ratio</th>
+                            <th>1Y Return</th>
+                            <th>3Y Return</th>
+                            <th>5Y Return</th>
+                            <th>AUM (Cr)</th>
+                            <th>Rating</th>
+                            <th>Min Investment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${mutualFundsData.map(fund => `
+                            <tr data-type="${fund.type}" data-risk="${fund.risk}">
+                                <td><strong>${fund.name}</strong></td>
+                                <td>${fund.category}</td>
+                                <td><span class="risk-badge risk-${fund.risk}">${fund.risk}</span></td>
+                                <td>${fund.expenseRatio}%</td>
+                                <td style="color: ${fund.returns1Y > 10 ? '#4CAF50' : fund.returns1Y > 5 ? '#FFC107' : '#F44336'}">${fund.returns1Y}%</td>
+                                <td style="color: ${fund.returns3Y > 12 ? '#4CAF50' : fund.returns3Y > 8 ? '#FFC107' : '#F44336'}">${fund.returns3Y}%</td>
+                                <td style="color: ${fund.returns5Y > 12 ? '#4CAF50' : fund.returns5Y > 8 ? '#FFC107' : '#F44336'}">${fund.returns5Y}%</td>
+                                <td>₹${fund.aum.toLocaleString()}</td>
+                                <td class="rating-stars">${'★'.repeat(fund.rating)}${'☆'.repeat(5-fund.rating)}</td>
+                                <td>₹${fund.minInvestment.toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('mutual-funds-table').innerHTML = tableHTML;
+        }
+
+        function loadInsuranceComparison() {
+            const tableHTML = `
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Type</th>
+                            <th>Coverage (₹1Cr)</th>
+                            <th>Annual Premium</th>
+                            <th>Claim Ratio</th>
+                            <th>Key Features</th>
+                            <th>Available Riders</th>
+                            <th>Tax Benefits</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${insuranceData.map(product => `
+                            <tr>
+                                <td><strong>${product.name}</strong></td>
+                                <td>${product.type}</td>
+                                <td>₹${(product.coverage/10000000).toFixed(0)}Cr</td>
+                                <td style="color: #4CAF50">₹${product.premium.toLocaleString()}</td>
+                                <td style="color: ${product.claimRatio > 97 ? '#4CAF50' : '#FFC107'}">${product.claimRatio}%</td>
+                                <td style="font-size: 0.8rem; max-width: 200px;">${product.features}</td>
+                                <td style="font-size: 0.8rem; max-width: 150px;">${product.riders}</td>
+                                <td>${product.taxBenefit}</td>
+                                <td class="rating-stars">${'★'.repeat(Math.floor(product.rating))}${product.rating % 1 !== 0 ? '½' : ''}${'☆'.repeat(5-Math.ceil(product.rating))}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('insurance-table').innerHTML = tableHTML;
+        }
+
+        function loadLoansComparison() {
+            const tableHTML = `
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Loan Product</th>
+                            <th>Type</th>
+                            <th>Interest Rate</th>
+                            <th>Processing Fee</th>
+                            <th>Max Tenure</th>
+                            <th>Max Amount</th>
+                            <th>Key Features</th>
+                            <th>Eligibility</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${loansData.map(loan => `
+                            <tr>
+                                <td><strong>${loan.name}</strong></td>
+                                <td>${loan.type}</td>
+                                <td style="color: ${loan.interestRate < 8 ? '#4CAF50' : loan.interestRate < 10 ? '#FFC107' : '#F44336'}">${loan.interestRate}%</td>
+                                <td>${loan.processingFee}%</td>
+                                <td>${loan.maxTenure} years</td>
+                                <td>₹${(loan.maxAmount/10000000).toFixed(0)}Cr</td>
+                                <td style="font-size: 0.8rem; max-width: 200px;">${loan.features}</td>
+                                <td style="font-size: 0.8rem; max-width: 150px;">${loan.eligibility}</td>
+                                <td class="rating-stars">${'★'.repeat(Math.floor(loan.rating))}${loan.rating % 1 !== 0 ? '½' : ''}${'☆'.repeat(5-Math.ceil(loan.rating))}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('loans-table').innerHTML = tableHTML;
+        }
+
+        function loadInvestmentsComparison() {
+            const tableHTML = `
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Investment Option</th>
+                            <th>Type</th>
+                            <th>Expected Returns</th>
+                            <th>Liquidity</th>
+                            <th>Tax Benefits</th>
+                            <th>Risk Level</th>
+                            <th>Min Investment</th>
+                            <th>Lock-in Period</th>
+                            <th>Key Features</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${investmentsData.map(investment => `
+                            <tr>
+                                <td><strong>${investment.name}</strong></td>
+                                <td>${investment.type}</td>
+                                <td style="color: ${investment.returns > 10 ? '#4CAF50' : investment.returns > 7 ? '#FFC107' : '#F44336'}">${investment.returns}%</td>
+                                <td>${investment.liquidity}</td>
+                                <td>${investment.taxBenefit}</td>
+                                <td><span class="risk-badge risk-${investment.risk}">${investment.risk.replace('-', ' ')}</span></td>
+                                <td>₹${investment.minInvestment.toLocaleString()}</td>
+                                <td>${investment.lockIn}</td>
+                                <td style="font-size: 0.8rem; max-width: 200px;">${investment.features}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('investments-table').innerHTML = tableHTML;
+        }
+
+        function filterMutualFunds() {
+            const fundTypeFilter = document.getElementById('fund-type-filter').value;
+            const riskLevelFilter = document.getElementById('risk-level-filter').value;
+            
+            const rows = document.querySelectorAll('#mutual-funds-table tbody tr');
+            
+            rows.forEach(row => {
+                const fundType = row.getAttribute('data-type');
+                const riskLevel = row.getAttribute('data-risk');
+                
+                const showFundType = fundTypeFilter === 'all' || fundType === fundTypeFilter;
+                const showRiskLevel = riskLevelFilter === 'all' || riskLevel === riskLevelFilter;
+                
+                if (showFundType && showRiskLevel) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function resetMutualFundsFilters() {
+            document.getElementById('fund-type-filter').value = 'all';
+            document.getElementById('risk-level-filter').value = 'all';
+            filterMutualFunds();
         }
 
         // Initialize app

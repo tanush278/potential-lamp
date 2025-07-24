@@ -547,6 +547,38 @@
             font-weight: 600;
         }
 
+        /* Tax Regime Button Styles */
+        .regime-btn {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3));
+            border: 2px solid var(--border-gray);
+            color: var(--text-gray);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .regime-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+        }
+
+        .regime-btn.active {
+            background: var(--accent-gold);
+            color: #000000;
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
         /* BUTTONS */
         .btn {
             padding: 0.8rem 1.5rem;
@@ -1753,33 +1785,202 @@
                      </div>
                  </section>
 
-                <!-- Tax Planning Section -->
+                <!-- Advanced Tax Planning Section -->
                 <section id="tax" class="section">
                     <div class="section-header">
-                        <h1 class="section-title">Tax Planning</h1>
-                        <p class="section-subtitle">Optimize your tax savings and plan your investments</p>
+                        <h1 class="section-title">Advanced Tax Planning</h1>
+                        <p class="section-subtitle">Comprehensive tax optimization with regime comparison and smart recommendations</p>
                     </div>
                     
+                    <!-- Tax Regime Selection -->
                     <div class="card">
-                        <h3>Tax Optimization Strategies</h3>
-                        <p>Plan your tax-saving investments and deductions to minimize your tax liability.</p>
+                        <div class="card-header">
+                            <h3 class="card-title">Tax Regime Selection</h3>
+                            <p class="card-subtitle">Choose your preferred tax regime for calculations</p>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                            <button type="button" class="regime-btn active" data-regime="old" onclick="selectTaxRegime('old')">
+                                <i class="fas fa-university"></i> Old Tax Regime
+                            </button>
+                            <button type="button" class="regime-btn" data-regime="new" onclick="selectTaxRegime('new')">
+                                <i class="fas fa-coins"></i> New Tax Regime
+                            </button>
+                            <button type="button" class="regime-btn" data-regime="compare" onclick="selectTaxRegime('compare')">
+                                <i class="fas fa-balance-scale"></i> Compare Both
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="selected-tax-regime" value="old">
+                    </div>
+                    
+                    <!-- Income Details -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Income Details</h3>
+                            <p class="card-subtitle">Enter your complete income information</p>
+                        </div>
+                        
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>Annual Income</label>
-                                <input type="number" class="form-input" placeholder="Enter annual income">
+                                <label>Basic Salary (₹)</label>
+                                <input type="number" id="basic-salary" class="form-input" placeholder="Annual basic salary" onchange="calculateAdvancedTax()">
                             </div>
                             <div class="form-group">
-                                <label>Current 80C Investments</label>
-                                <input type="number" class="form-input" placeholder="Enter 80C investments">
+                                <label>HRA Received (₹)</label>
+                                <input type="number" id="hra-received" class="form-input" placeholder="Annual HRA received" onchange="calculateAdvancedTax()">
                             </div>
                             <div class="form-group">
-                                <label>HRA Received</label>
-                                <input type="number" class="form-input" placeholder="Enter HRA amount">
+                                <label>Special Allowances (₹)</label>
+                                <input type="number" id="special-allowances" class="form-input" placeholder="Other allowances" onchange="calculateAdvancedTax()">
+                            </div>
+                            <div class="form-group">
+                                <label>Bonus & Incentives (₹)</label>
+                                <input type="number" id="bonus-incentives" class="form-input" placeholder="Annual bonus/incentives" onchange="calculateAdvancedTax()">
+                            </div>
+                            <div class="form-group">
+                                <label>Other Income (₹)</label>
+                                <input type="number" id="other-income" class="form-input" placeholder="Interest, dividends, etc." onchange="calculateAdvancedTax()">
+                            </div>
+                            <div class="form-group">
+                                <label>City Type</label>
+                                <select id="city-type" class="form-input" onchange="calculateAdvancedTax()">
+                                    <option value="metro">Metro City</option>
+                                    <option value="non-metro">Non-Metro City</option>
+                                </select>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="calculateTaxSavings()">
-                            <i class="fas fa-file-invoice-dollar"></i> Calculate Tax Savings
-                        </button>
+                    </div>
+                    
+                    <!-- Deductions (Old Regime) -->
+                    <div class="card" id="old-regime-deductions">
+                        <div class="card-header">
+                            <h3 class="card-title">Tax Deductions (Old Regime)</h3>
+                            <p class="card-subtitle">Enter your eligible deductions and investments</p>
+                        </div>
+                        
+                        <!-- Section 80C Deductions -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-piggy-bank"></i> Section 80C Deductions (Max: ₹1,50,000)
+                            </h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>EPF Contribution (₹)</label>
+                                    <input type="number" id="epf-contribution" class="form-input" placeholder="Employee PF contribution" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>PPF Investment (₹)</label>
+                                    <input type="number" id="ppf-investment" class="form-input" placeholder="PPF annual investment" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>ELSS Mutual Funds (₹)</label>
+                                    <input type="number" id="elss-investment" class="form-input" placeholder="ELSS fund investment" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Life Insurance Premium (₹)</label>
+                                    <input type="number" id="life-insurance" class="form-input" placeholder="Life insurance premium" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Home Loan Principal (₹)</label>
+                                    <input type="number" id="home-loan-principal" class="form-input" placeholder="Principal repayment" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Other 80C Investments (₹)</label>
+                                    <input type="number" id="other-80c" class="form-input" placeholder="NSC, FD, etc." onchange="calculateAdvancedTax()">
+                                </div>
+                            </div>
+                            <div id="80c-summary" style="margin-top: 1rem; padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--accent-gold); font-weight: bold;">Total 80C Investments:</span>
+                                    <span id="total-80c" style="color: var(--accent-white); font-weight: bold;">₹0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                                    <span style="color: var(--text-gray); font-size: 0.9rem;">Eligible Deduction:</span>
+                                    <span id="eligible-80c" style="color: var(--accent-gold); font-weight: bold;">₹0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Other Deductions -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-heartbeat"></i> Other Deductions
+                            </h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Health Insurance - 80D (₹)</label>
+                                    <input type="number" id="health-insurance-80d" class="form-input" placeholder="Max ₹25,000" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Parents Health Insurance - 80D (₹)</label>
+                                    <input type="number" id="parents-health-insurance" class="form-input" placeholder="Max ₹50,000" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Home Loan Interest - 24(b) (₹)</label>
+                                    <input type="number" id="home-loan-interest" class="form-input" placeholder="Max ₹2,00,000" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Education Loan Interest - 80E (₹)</label>
+                                    <input type="number" id="education-loan-interest" class="form-input" placeholder="No limit" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>NPS - 80CCD(1B) (₹)</label>
+                                    <input type="number" id="nps-80ccd" class="form-input" placeholder="Max ₹50,000" onchange="calculateAdvancedTax()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Donations - 80G (₹)</label>
+                                    <input type="number" id="donations-80g" class="form-input" placeholder="Eligible donations" onchange="calculateAdvancedTax()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- HRA Calculation -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-home"></i> HRA Exemption Calculation
+                            </h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Monthly Rent Paid (₹)</label>
+                                    <input type="number" id="monthly-rent" class="form-input" placeholder="Actual rent paid per month" onchange="calculateAdvancedTax()">
+                                </div>
+                            </div>
+                            <div id="hra-calculation" style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.5rem;">HRA Exemption Calculation:</div>
+                                <div id="hra-breakdown" style="color: var(--text-gray); font-size: 0.9rem;">
+                                    Enter salary and rent details to calculate HRA exemption
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tax Calculation Results -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Tax Calculation Results</h3>
+                            <p class="card-subtitle">Your comprehensive tax analysis</p>
+                        </div>
+                        
+                        <div id="tax-results" style="display: none;">
+                            <!-- Results will be populated here -->
+                        </div>
+                        
+                        <!-- Tax Breakdown Chart -->
+                        <div id="tax-breakdown-section" style="display: none; margin-top: 2rem;">
+                            <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Tax Breakdown Analysis</h4>
+                            <div style="position: relative; height: 400px; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1rem;">
+                                <canvas id="tax-breakdown-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Tax Saving Recommendations -->
+                        <div id="tax-recommendations" style="display: none; margin-top: 2rem;">
+                            <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Tax Saving Recommendations</h4>
+                            <div id="recommendations-content">
+                                <!-- Recommendations will be populated here -->
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -6569,7 +6770,263 @@
         }
 
         function calculateTaxSavings() {
-            alert('Tax calculation functionality will be implemented');
+            // Legacy function - redirects to new advanced function
+            calculateAdvancedTax();
+        }
+
+        // Advanced Tax Planning Functions - NEW FEATURE v6.0
+        let taxBreakdownChart = null;
+
+        function selectTaxRegime(regime) {
+            // Update button states
+            document.querySelectorAll('.regime-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-regime="${regime}"]`).classList.add('active');
+            
+            // Update hidden input
+            document.getElementById('selected-tax-regime').value = regime;
+            
+            // Show/hide deduction sections based on regime
+            const oldRegimeDeductions = document.getElementById('old-regime-deductions');
+            if (regime === 'new') {
+                oldRegimeDeductions.style.display = 'none';
+            } else {
+                oldRegimeDeductions.style.display = 'block';
+            }
+            
+            // Recalculate tax
+            calculateAdvancedTax();
+        }
+
+        function calculateAdvancedTax() {
+            try {
+                // Get income details
+                const basicSalary = parseFloat(document.getElementById('basic-salary')?.value) || 0;
+                const hraReceived = parseFloat(document.getElementById('hra-received')?.value) || 0;
+                const specialAllowances = parseFloat(document.getElementById('special-allowances')?.value) || 0;
+                const bonusIncentives = parseFloat(document.getElementById('bonus-incentives')?.value) || 0;
+                const otherIncome = parseFloat(document.getElementById('other-income')?.value) || 0;
+                const cityType = document.getElementById('city-type')?.value || 'metro';
+                
+                const grossSalary = basicSalary + hraReceived + specialAllowances + bonusIncentives + otherIncome;
+                
+                // Get deductions (80C)
+                const epfContribution = parseFloat(document.getElementById('epf-contribution')?.value) || 0;
+                const ppfInvestment = parseFloat(document.getElementById('ppf-investment')?.value) || 0;
+                const elssInvestment = parseFloat(document.getElementById('elss-investment')?.value) || 0;
+                const lifeInsurance = parseFloat(document.getElementById('life-insurance')?.value) || 0;
+                const homeLoanPrincipal = parseFloat(document.getElementById('home-loan-principal')?.value) || 0;
+                const other80c = parseFloat(document.getElementById('other-80c')?.value) || 0;
+                
+                const total80c = epfContribution + ppfInvestment + elssInvestment + lifeInsurance + homeLoanPrincipal + other80c;
+                const eligible80c = Math.min(total80c, 150000);
+                
+                // Update 80C summary
+                document.getElementById('total-80c').textContent = `₹${total80c.toLocaleString('en-IN')}`;
+                document.getElementById('eligible-80c').textContent = `₹${eligible80c.toLocaleString('en-IN')}`;
+                
+                // Get other deductions
+                const healthInsurance80d = Math.min(parseFloat(document.getElementById('health-insurance-80d')?.value) || 0, 25000);
+                const parentsHealthInsurance = Math.min(parseFloat(document.getElementById('parents-health-insurance')?.value) || 0, 50000);
+                const homeLoanInterest = Math.min(parseFloat(document.getElementById('home-loan-interest')?.value) || 0, 200000);
+                const educationLoanInterest = parseFloat(document.getElementById('education-loan-interest')?.value) || 0;
+                const nps80ccd = Math.min(parseFloat(document.getElementById('nps-80ccd')?.value) || 0, 50000);
+                const donations80g = parseFloat(document.getElementById('donations-80g')?.value) || 0;
+                
+                // Calculate HRA exemption
+                const monthlyRent = parseFloat(document.getElementById('monthly-rent')?.value) || 0;
+                const hraExemption = calculateHRAExemption(basicSalary, hraReceived, monthlyRent, cityType);
+                
+                // Update HRA breakdown
+                updateHRABreakdown(basicSalary, hraReceived, monthlyRent, cityType, hraExemption);
+                
+                // Calculate taxable income
+                const totalDeductions = eligible80c + healthInsurance80d + parentsHealthInsurance + 
+                                      homeLoanInterest + educationLoanInterest + nps80ccd + donations80g;
+                
+                const taxableIncome = Math.max(0, grossSalary - hraExemption - totalDeductions);
+                
+                // Get selected regime
+                const selectedRegime = document.getElementById('selected-tax-regime')?.value || 'old';
+                
+                // Calculate tax based on regime
+                let taxCalculation;
+                if (selectedRegime === 'compare') {
+                    const oldRegimeTax = calculateTaxByRegime(taxableIncome, 'old');
+                    const newRegimeTax = calculateTaxByRegime(grossSalary, 'new'); // New regime uses gross salary
+                    taxCalculation = { oldRegime: oldRegimeTax, newRegime: newRegimeTax, comparison: true };
+                } else {
+                    const income = selectedRegime === 'new' ? grossSalary : taxableIncome;
+                    taxCalculation = calculateTaxByRegime(income, selectedRegime);
+                }
+                
+                // Display results
+                displayTaxResults({
+                    grossSalary,
+                    taxableIncome,
+                    totalDeductions,
+                    hraExemption,
+                    taxCalculation,
+                    selectedRegime
+                });
+                
+                // Create chart
+                if (selectedRegime !== 'compare') {
+                    createTaxBreakdownChart(taxCalculation);
+                }
+                
+                // Generate recommendations
+                generateTaxRecommendations({
+                    grossSalary,
+                    taxableIncome,
+                    totalDeductions,
+                    total80c,
+                    eligible80c,
+                    taxCalculation,
+                    selectedRegime
+                });
+                
+            } catch (error) {
+                console.error('Error calculating advanced tax:', error);
+            }
+        }
+
+        function calculateHRAExemption(basicSalary, hraReceived, monthlyRent, cityType) {
+            if (hraReceived === 0 || monthlyRent === 0) return 0;
+            
+            const annualRent = monthlyRent * 12;
+            const hraPercentage = cityType === 'metro' ? 0.5 : 0.4;
+            
+            const option1 = hraReceived; // Actual HRA received
+            const option2 = basicSalary * hraPercentage; // 50% or 40% of basic salary
+            const option3 = Math.max(0, annualRent - (basicSalary * 0.1)); // Rent paid minus 10% of basic salary
+            
+            return Math.min(option1, option2, option3);
+        }
+
+        function updateHRABreakdown(basicSalary, hraReceived, monthlyRent, cityType, hraExemption) {
+            const breakdownDiv = document.getElementById('hra-breakdown');
+            if (!breakdownDiv) return;
+            
+            if (hraReceived === 0 || monthlyRent === 0) {
+                breakdownDiv.innerHTML = 'Enter salary and rent details to calculate HRA exemption';
+                return;
+            }
+            
+            const annualRent = monthlyRent * 12;
+            const hraPercentage = cityType === 'metro' ? 50 : 40;
+            
+            const option1 = hraReceived;
+            const option2 = basicSalary * (hraPercentage / 100);
+            const option3 = Math.max(0, annualRent - (basicSalary * 0.1));
+            
+            breakdownDiv.innerHTML = `
+                <div style="display: grid; gap: 0.5rem;">
+                    <div>1. Actual HRA received: ₹${option1.toLocaleString('en-IN')}</div>
+                    <div>2. ${hraPercentage}% of basic salary: ₹${option2.toLocaleString('en-IN')}</div>
+                    <div>3. Rent paid minus 10% of basic: ₹${option3.toLocaleString('en-IN')}</div>
+                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-gray); color: var(--accent-gold); font-weight: bold;">
+                        HRA Exemption (Minimum): ₹${hraExemption.toLocaleString('en-IN')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateTaxByRegime(income, regime) {
+            let tax = 0;
+            let cess = 0;
+            let totalTax = 0;
+            let effectiveRate = 0;
+            let taxBreakdown = [];
+            
+            if (regime === 'old') {
+                // Old tax regime slabs
+                if (income > 250000) {
+                    if (income <= 500000) {
+                        const taxableAmount = income - 250000;
+                        const slabTax = taxableAmount * 0.05;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: slabTax });
+                    } else if (income <= 1000000) {
+                        tax += 250000 * 0.05; // 5% on 2.5L to 5L
+                        const taxableAmount = income - 500000;
+                        const slabTax = taxableAmount * 0.2;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: 12500 });
+                        taxBreakdown.push({ slab: '₹5L - ₹10L', rate: '20%', amount: slabTax });
+                    } else {
+                        tax += 250000 * 0.05; // 5% on 2.5L to 5L
+                        tax += 500000 * 0.2;  // 20% on 5L to 10L
+                        const taxableAmount = income - 1000000;
+                        const slabTax = taxableAmount * 0.3;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹2.5L - ₹5L', rate: '5%', amount: 12500 });
+                        taxBreakdown.push({ slab: '₹5L - ₹10L', rate: '20%', amount: 100000 });
+                        taxBreakdown.push({ slab: 'Above ₹10L', rate: '30%', amount: slabTax });
+                    }
+                }
+            } else {
+                // New tax regime slabs (2023-24)
+                if (income > 300000) {
+                    if (income <= 600000) {
+                        const taxableAmount = income - 300000;
+                        const slabTax = taxableAmount * 0.05;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: slabTax });
+                    } else if (income <= 900000) {
+                        tax += 300000 * 0.05; // 5% on 3L to 6L
+                        const taxableAmount = income - 600000;
+                        const slabTax = taxableAmount * 0.1;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
+                        taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: slabTax });
+                    } else if (income <= 1200000) {
+                        tax += 300000 * 0.05; // 5% on 3L to 6L
+                        tax += 300000 * 0.1;  // 10% on 6L to 9L
+                        const taxableAmount = income - 900000;
+                        const slabTax = taxableAmount * 0.15;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
+                        taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: 30000 });
+                        taxBreakdown.push({ slab: '₹9L - ₹12L', rate: '15%', amount: slabTax });
+                    } else if (income <= 1500000) {
+                        tax += 300000 * 0.05 + 300000 * 0.1 + 300000 * 0.15;
+                        const taxableAmount = income - 1200000;
+                        const slabTax = taxableAmount * 0.2;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
+                        taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: 30000 });
+                        taxBreakdown.push({ slab: '₹9L - ₹12L', rate: '15%', amount: 45000 });
+                        taxBreakdown.push({ slab: '₹12L - ₹15L', rate: '20%', amount: slabTax });
+                    } else {
+                        tax += 300000 * 0.05 + 300000 * 0.1 + 300000 * 0.15 + 300000 * 0.2;
+                        const taxableAmount = income - 1500000;
+                        const slabTax = taxableAmount * 0.3;
+                        tax += slabTax;
+                        taxBreakdown.push({ slab: '₹3L - ₹6L', rate: '5%', amount: 15000 });
+                        taxBreakdown.push({ slab: '₹6L - ₹9L', rate: '10%', amount: 30000 });
+                        taxBreakdown.push({ slab: '₹9L - ₹12L', rate: '15%', amount: 45000 });
+                        taxBreakdown.push({ slab: '₹12L - ₹15L', rate: '20%', amount: 60000 });
+                        taxBreakdown.push({ slab: 'Above ₹15L', rate: '30%', amount: slabTax });
+                    }
+                }
+            }
+            
+            // Calculate cess (4% of tax)
+            cess = tax * 0.04;
+            totalTax = tax + cess;
+            effectiveRate = income > 0 ? (totalTax / income * 100) : 0;
+            
+            return {
+                income,
+                tax,
+                cess,
+                totalTax,
+                effectiveRate,
+                taxBreakdown,
+                regime
+            };
         }
 
         function generateReport() {
@@ -7368,7 +7825,7 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <span style="color: var(--accent-gold);">Financial Planner Pro v5.3 - Save Snapshot Fixed</span>
+                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.0 - Advanced Tax Planning (Part 1)</span>
             <span>•</span>
                             <span>Last Updated: Dec 24, 2024 - 11:30 UTC</span>
             <span>•</span>

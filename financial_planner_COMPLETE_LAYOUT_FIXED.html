@@ -1698,9 +1698,7 @@
                                 <button class="btn btn-primary" onclick="analyzePortfolio()">
                                     Analyze Portfolio
                                 </button>
-                                                        <button class="btn btn-secondary" onclick="refreshPortfolioIntegration()" id="refresh-portfolio-btn" style="display: none;">
-                            <i class="fas fa-sync-alt"></i> Refresh from Investment Recommendations
-                        </button>
+                                                        <!-- Refresh button removed - was confusing and not needed -->
                             </div>
                         </div>
                     </div>
@@ -3219,20 +3217,21 @@
         function displayDefaultProfileSummary() {
             const profileSummary = document.getElementById('profile-summary');
             profileSummary.innerHTML = `
-                <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border-radius: 12px; border: 2px solid var(--accent-gold);">
-                    <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Sample Investment Recommendations</h4>
-                    <p style="color: var(--text-gray); margin-bottom: 1.5rem;">Below are sample recommendations for a moderate investor. Complete your Risk Assessment to get personalized recommendations tailored to your profile.</p>
-                    <button class="btn btn-primary" onclick="showSection('risk-assessment')" style="margin-right: 1rem;">Complete Risk Assessment</button>
-                    <button class="btn btn-secondary" onclick="showSection('profile')">Update Profile</button>
+                <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, rgba(255,69,0,0.1), rgba(0,0,0,0.3)); border-radius: 12px; border: 2px solid #ff4500;">
+                    <h4 style="color: #ff4500; margin-bottom: 1rem;"><i class="fas fa-exclamation-triangle"></i> Get Your Personalized Recommendations</h4>
+                    <p style="color: var(--text-gray); margin-bottom: 1.5rem;">The recommendations below are generic samples. To get recommendations tailored specifically for your financial situation and risk tolerance, please complete your risk assessment.</p>
+                    <button class="btn btn-primary" onclick="showSection('risk-assessment')" style="background: #ff4500; border-color: #ff4500;">
+                        <i class="fas fa-user-check"></i> Complete Risk Assessment Now
+                    </button>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
                     <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
                         <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Profile</div>
-                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-gold);">Moderate (Sample)</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--text-gray);">Generic Sample</div>
                     </div>
                     <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
                         <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Score</div>
-                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-white);">60% (Sample)</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--text-gray);">Not Assessed</div>
                     </div>
                     <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
                         <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Investment Horizon</div>
@@ -4231,21 +4230,7 @@
             }
         }
 
-        function refreshPortfolioIntegration() {
-            // Clear current values and reload from Investment Recommendations
-            const inputs = ['total-portfolio-value', 'total-invested', 'monthly-sip', 'investment-start-date', 'portfolio-equity', 'portfolio-debt', 'portfolio-gold', 'portfolio-cash'];
-            inputs.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.value = '';
-                    element.style.backgroundColor = '';
-                    element.style.border = '';
-                }
-            });
-            
-            // Reinitialize with fresh data
-            initializePortfolioAnalysis();
-        }
+        // Function removed - refresh button was confusing and not needed
 
         function showSamplePortfolioWithPrompt() {
             // Show sample notice
@@ -4295,9 +4280,9 @@
             const noticeArea = document.getElementById('portfolio-notice-area');
             if (noticeArea) {
                 noticeArea.innerHTML = `
-                    <div style="text-align: center; padding: 1.5rem; background: rgba(192,192,192,0.05); border: 1px solid var(--accent-silver); border-radius: 8px; margin-bottom: 2rem;">
-                        <h5 style="color: var(--accent-silver); margin-bottom: 0.5rem;">Sample Portfolio Analysis</h5>
-                        <p style="color: var(--text-gray); margin: 0;">Enter your portfolio details above to get personalized analysis. Below is a sample analysis for demonstration.</p>
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,69,0,0.1); border: 2px solid #ff4500; border-radius: 8px; margin-bottom: 2rem;">
+                        <h5 style="color: #ff4500; margin-bottom: 0.5rem;"><i class="fas fa-info-circle"></i> Enter Your Portfolio Details</h5>
+                        <p style="color: var(--text-gray); margin: 0;">Fill in your actual portfolio values above to get personalized analysis. The data below is just a sample for demonstration purposes.</p>
                     </div>
                 `;
             }

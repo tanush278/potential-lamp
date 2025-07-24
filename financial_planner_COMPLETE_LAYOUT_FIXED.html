@@ -9665,87 +9665,149 @@
                 });
             },
             
-            // INTELLIGENT CASCADE UPDATES - Make sections work together
+            // INTELLIGENT CASCADE UPDATES - Make sections work together (CRASH-SAFE)
             cascadeUpdates(section, field, value) {
-                // When age changes, update insurance calculations
-                if (field === 'age') {
-                    this.updateInsuranceNeeds();
-                    this.updateRetirementTimeline();
-                }
-                
-                // When income changes, update all financial calculations
-                if (field === 'income') {
-                    this.updateEmergencyFundNeeds();
-                    this.updateInvestmentCapacity();
-                    this.updateLoanEligibility();
-                }
-                
-                // When risk profile changes, update all recommendations
-                if (section === 'risk') {
-                    this.updateAllRecommendations();
-                }
-                
-                // When goals change, update investment strategy
-                if (section === 'goals') {
-                    this.updateInvestmentStrategy();
+                try {
+                    // When age changes, update insurance calculations
+                    if (field === 'age') {
+                        this.updateInsuranceNeeds();
+                        if (this.updateRetirementTimeline) {
+                            this.updateRetirementTimeline();
+                        }
+                    }
+                    
+                    // When income changes, update all financial calculations
+                    if (field === 'income') {
+                        this.updateEmergencyFundNeeds();
+                        this.updateInvestmentCapacity();
+                        this.updateLoanEligibility();
+                    }
+                    
+                    // When risk profile changes, update all recommendations
+                    if (section === 'risk') {
+                        this.updateAllRecommendations();
+                    }
+                    
+                    // When goals change, update investment strategy
+                    if (section === 'goals') {
+                        if (this.updateInvestmentStrategy) {
+                            this.updateInvestmentStrategy();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Cascade update error:', error);
+                    // Don't let one calculation failure break the entire app
                 }
             },
             
-            // INSURANCE NEEDS CALCULATION based on profile
+            // SMART INSURANCE NEEDS CALCULATION with explanation
             updateInsuranceNeeds() {
                 const age = this.clientData.profile.age;
-                const income = this.clientData.profile.income;
+                const monthlyIncome = this.clientData.profile.income;
                 const dependents = this.clientData.profile.dependents || 2;
                 
-                if (age && income) {
-                    // Rule: 10-15x annual income for term life insurance
-                    const annualIncome = income * 12;
-                    const recommendedCoverage = annualIncome * (age < 30 ? 15 : age < 40 ? 12 : 10);
+                if (age && monthlyIncome) {
+                    // CORRECT CALCULATION: Monthly income to annual, then multiply
+                    const annualIncome = monthlyIncome * 12;
+                    
+                    // Smart multiplier based on age and dependents
+                    let multiplier;
+                    if (age < 30) {
+                        multiplier = dependents > 2 ? 15 : 12;
+                    } else if (age < 40) {
+                        multiplier = dependents > 2 ? 12 : 10;
+                    } else {
+                        multiplier = dependents > 1 ? 10 : 8;
+                    }
+                    
+                    const recommendedCoverage = annualIncome * multiplier;
+                    
+                    // Only suggest if coverage is reasonable (not less than 5 lakh)
+                    const finalCoverage = Math.max(recommendedCoverage, 500000);
+                    
+                    // Show explanation to user
+                    this.showInsuranceExplanation(monthlyIncome, annualIncome, multiplier, finalCoverage, dependents);
                     
                     // Auto-update insurance coverage field
                     const coverageField = document.getElementById('insurance-coverage');
                     if (coverageField) {
-                        coverageField.value = recommendedCoverage;
+                        coverageField.value = finalCoverage;
                     }
                     
-                    console.log(`Auto-calculated insurance need: Rs ${recommendedCoverage.toLocaleString()}`);
+                    console.log(`Smart insurance calculation: Monthly ${monthlyIncome} -> Annual ${annualIncome} -> Coverage ${finalCoverage.toLocaleString()} (${multiplier}x)`);
                 }
             },
             
-            // EMERGENCY FUND CALCULATION
+            // Show insurance explanation to user
+            showInsuranceExplanation(monthlyIncome, annualIncome, multiplier, coverage, dependents) {
+                const explanationDiv = document.getElementById('insurance-explanation');
+                if (explanationDiv) {
+                    explanationDiv.innerHTML = `
+                        <div style="background: rgba(255,215,0,0.1); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Insurance Coverage Calculation:</h5>
+                            <div style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.5;">
+                                <div>Monthly Income: Rs ${monthlyIncome.toLocaleString()}</div>
+                                <div>Annual Income: Rs ${annualIncome.toLocaleString()}</div>
+                                <div>Dependents: ${dependents} people</div>
+                                <div>Multiplier: ${multiplier}x (based on age & dependents)</div>
+                                <div style="color: var(--accent-white); font-weight: bold; margin-top: 0.5rem;">
+                                    Recommended Coverage: Rs ${coverage.toLocaleString()}
+                                </div>
+                                <div style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;">
+                                    This ensures your family can maintain lifestyle for ${multiplier} years if something happens to you.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            
+            // EMERGENCY FUND CALCULATION (CRASH-SAFE)
             updateEmergencyFundNeeds() {
-                const income = this.clientData.profile.income;
-                if (income) {
-                    // Rule: 6-12 months of expenses (assume 70% of income)
-                    const monthlyExpenses = income * 0.7;
-                    const emergencyFund = monthlyExpenses * 8; // 8 months
-                    
-                    this.clientData.goals.emergency.amount = emergencyFund;
-                    
-                    const emergencyField = document.getElementById('emergency-fund-goal');
-                    if (emergencyField) {
-                        emergencyField.value = emergencyFund;
+                try {
+                    const income = this.clientData.profile.income;
+                    if (income && income > 0) {
+                        // Rule: 6-12 months of expenses (assume 70% of income)
+                        const monthlyExpenses = income * 0.7;
+                        const emergencyFund = monthlyExpenses * 8; // 8 months
+                        
+                        // Ensure emergency fund is reasonable (min 50k, max 50 lakh)
+                        const finalEmergencyFund = Math.min(Math.max(emergencyFund, 50000), 5000000);
+                        
+                        this.clientData.goals.emergency = this.clientData.goals.emergency || {};
+                        this.clientData.goals.emergency.amount = finalEmergencyFund;
+                        
+                        const emergencyField = document.getElementById('emergency-fund-goal');
+                        if (emergencyField) {
+                            emergencyField.value = finalEmergencyFund;
+                        }
+                        
+                        console.log(`Auto-calculated emergency fund: Rs ${finalEmergencyFund.toLocaleString()}`);
                     }
-                    
-                    console.log(`Auto-calculated emergency fund: Rs ${emergencyFund.toLocaleString()}`);
+                } catch (error) {
+                    console.error('Emergency fund calculation error:', error);
                 }
             },
             
-            // INVESTMENT CAPACITY CALCULATION
+            // INVESTMENT CAPACITY CALCULATION (CRASH-SAFE)
             updateInvestmentCapacity() {
-                const income = this.clientData.profile.income;
-                const savings = this.clientData.financial.currentSavings;
-                
-                if (income) {
-                    // Rule: 20% of income for investments
-                    const monthlyInvestmentCapacity = income * 0.2;
+                try {
+                    const income = this.clientData.profile.income;
                     
-                    const sipField = document.getElementById('sip-amount');
-                    if (sipField && !sipField.value) {
-                        sipField.value = monthlyInvestmentCapacity;
+                    if (income && income > 0) {
+                        // Rule: 20% of income for investments (but reasonable limits)
+                        const monthlyInvestmentCapacity = Math.min(income * 0.2, 100000); // Max 1L per month
+                        const minInvestment = Math.max(monthlyInvestmentCapacity, 1000); // Min 1k per month
+                        
+                        const sipField = document.getElementById('sip-amount');
+                        if (sipField && !sipField.value) {
+                            sipField.value = minInvestment;
+                        }
+                        
+                        console.log(`Suggested monthly investment: Rs ${minInvestment.toLocaleString()}`);
                     }
-                    
-                    console.log(`Suggested monthly investment: Rs ${monthlyInvestmentCapacity.toLocaleString()}`);
+                } catch (error) {
+                    console.error('Investment capacity calculation error:', error);
                 }
             },
             
@@ -9809,56 +9871,95 @@
             }
         };
         
-        // Setup integrated financial ecosystem
+        // Setup integrated financial ecosystem (CRASH-SAFE)
         function setupFinancialEcosystem() {
-            // Profile section listeners
-            ['current-age', 'client-age', 'insurance-age'].forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.addEventListener('input', function() {
-                        FinancialEcosystem.updateClientData('profile', 'age', this.value);
-                    });
-                }
-            });
-            
-            // Income fields - trigger cascade updates
-            ['monthly-income'].forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.addEventListener('input', function() {
-                        FinancialEcosystem.updateClientData('profile', 'income', this.value);
-                    });
-                }
-            });
-            
-            // Savings and financial status
-            ['current-savings', 'savings-amount', 'current-assets'].forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.addEventListener('input', function() {
-                        FinancialEcosystem.updateClientData('financial', 'currentSavings', this.value);
-                    });
-                }
-            });
-            
-            // Goal amount fields - trigger investment strategy updates
-            ['retirement-goal', 'home-goal', 'education-goal'].forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.addEventListener('input', function() {
-                        const goalType = fieldId.replace('-goal', '');
-                        FinancialEcosystem.updateClientData('goals', goalType, { amount: this.value });
-                    });
-                }
-            });
-            
-            // Risk assessment completion trigger
-            document.addEventListener('riskAssessmentComplete', function(event) {
-                FinancialEcosystem.updateClientData('risk', 'profile', event.detail.riskProfile);
-                FinancialEcosystem.updateClientData('risk', 'score', event.detail.score);
-            });
-            
-            console.log('Integrated Financial Ecosystem activated - all sections now work together!');
+            try {
+                // Profile section listeners
+                ['current-age', 'client-age', 'insurance-age'].forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('input', function() {
+                            try {
+                                const value = parseFloat(this.value) || 0;
+                                if (value > 0 && value < 100) {
+                                    FinancialEcosystem.updateClientData('profile', 'age', value);
+                                }
+                            } catch (error) {
+                                console.error(`Error updating age from ${fieldId}:`, error);
+                            }
+                        });
+                    }
+                });
+                
+                // Income fields - trigger cascade updates
+                ['monthly-income'].forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('input', function() {
+                            try {
+                                const value = parseFloat(this.value) || 0;
+                                if (value >= 0) {
+                                    FinancialEcosystem.updateClientData('profile', 'income', value);
+                                }
+                            } catch (error) {
+                                console.error(`Error updating income from ${fieldId}:`, error);
+                            }
+                        });
+                    }
+                });
+                
+                // Savings and financial status
+                ['current-savings', 'savings-amount', 'current-assets'].forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('input', function() {
+                            try {
+                                const value = parseFloat(this.value) || 0;
+                                if (value >= 0) {
+                                    FinancialEcosystem.updateClientData('financial', 'currentSavings', value);
+                                }
+                            } catch (error) {
+                                console.error(`Error updating savings from ${fieldId}:`, error);
+                            }
+                        });
+                    }
+                });
+                
+                // Goal amount fields - trigger investment strategy updates
+                ['retirement-goal', 'home-goal', 'education-goal'].forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('input', function() {
+                            try {
+                                const goalType = fieldId.replace('-goal', '');
+                                const value = parseFloat(this.value) || 0;
+                                if (value >= 0) {
+                                    FinancialEcosystem.updateClientData('goals', goalType, { amount: value });
+                                }
+                            } catch (error) {
+                                console.error(`Error updating goal from ${fieldId}:`, error);
+                            }
+                        });
+                    }
+                });
+                
+                // Risk assessment completion trigger
+                document.addEventListener('riskAssessmentComplete', function(event) {
+                    try {
+                        if (event.detail && event.detail.riskProfile) {
+                            FinancialEcosystem.updateClientData('risk', 'profile', event.detail.riskProfile);
+                            FinancialEcosystem.updateClientData('risk', 'score', event.detail.score);
+                        }
+                    } catch (error) {
+                        console.error('Error handling risk assessment completion:', error);
+                    }
+                });
+                
+                console.log('Integrated Financial Ecosystem activated - all sections now work together!');
+            } catch (error) {
+                console.error('Failed to setup Financial Ecosystem:', error);
+                console.log('App will continue with basic functionality');
+            }
         }
 
         // Initialize app with live data

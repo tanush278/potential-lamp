@@ -5011,17 +5011,22 @@
 
         function analyzeAssetAllocation(data) {
             const allocation = data.allocation;
-            const total = allocation.equity + allocation.debt + allocation.gold + allocation.cash;
+            const portfolioValue = data.totalValue;
+            const allocatedTotal = allocation.equity + allocation.debt + allocation.gold + allocation.cash;
             
-            if (total <= 0) return;
+            if (portfolioValue <= 0) return;
             
-            // Calculate current allocation percentages
+            // Calculate current allocation percentages based on portfolio value
             const currentAllocation = {
-                equity: ((allocation.equity / total) * 100).toFixed(1),
-                debt: ((allocation.debt / total) * 100).toFixed(1),
-                gold: ((allocation.gold / total) * 100).toFixed(1),
-                cash: ((allocation.cash / total) * 100).toFixed(1)
+                equity: ((allocation.equity / portfolioValue) * 100).toFixed(1),
+                debt: ((allocation.debt / portfolioValue) * 100).toFixed(1),
+                gold: ((allocation.gold / portfolioValue) * 100).toFixed(1),
+                cash: ((allocation.cash / portfolioValue) * 100).toFixed(1)
             };
+            
+            // Calculate unallocated percentage if any
+            const unallocatedAmount = portfolioValue - allocatedTotal;
+            const unallocatedPercent = ((unallocatedAmount / portfolioValue) * 100).toFixed(1);
             
             // Get recommended allocation
             const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
@@ -5054,6 +5059,12 @@
                         <span style="color: var(--text-gray);">Cash</span>
                         <span style="color: var(--text-gray); font-weight: bold;">${currentAllocation.cash}%</span>
                     </div>
+                    ${Math.abs(unallocatedAmount) > 1000 ? `
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,215,0,0.1); border: 1px solid var(--accent-gold); border-radius: 8px;">
+                        <span style="color: var(--accent-gold);">Unallocated</span>
+                        <span style="color: var(--accent-gold); font-weight: bold;">${unallocatedPercent}% (₹${Math.abs(unallocatedAmount).toLocaleString('en-IN')})</span>
+                    </div>
+                    ` : ''}
                 </div>
             `;
             

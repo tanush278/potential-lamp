@@ -1623,7 +1623,7 @@
                             <h3 class="card-title">Portfolio Holdings</h3>
                             <p class="card-subtitle">Enter your current investment holdings for analysis</p>
                             <div id="portfolio-integration-notice" style="display: none; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 6px; padding: 1rem; margin-top: 1rem;">
-                                <div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;">🔗 Smart Integration Active</div>
+                                <div style="color: var(--accent-gold); font-weight: bold; margin-bottom: 0.5rem;"><i class="fas fa-link"></i> Smart Integration Active</div>
                                 <div style="color: var(--text-gray); font-size: 0.9rem;">Fields auto-populated based on your Investment Recommendations. You can modify any values for personalized analysis.</div>
                             </div>
                         </div>
@@ -1698,9 +1698,9 @@
                                 <button class="btn btn-primary" onclick="analyzePortfolio()">
                                     Analyze Portfolio
                                 </button>
-                                <button class="btn btn-secondary" onclick="refreshPortfolioIntegration()" id="refresh-portfolio-btn" style="display: none;">
-                                    🔄 Refresh from Investment Recommendations
-                                </button>
+                                                        <button class="btn btn-secondary" onclick="refreshPortfolioIntegration()" id="refresh-portfolio-btn" style="display: none;">
+                            <i class="fas fa-sync-alt"></i> Refresh from Investment Recommendations
+                        </button>
                             </div>
                         </div>
                     </div>
@@ -4254,7 +4254,7 @@
             const loadingMessage = document.createElement('div');
             loadingMessage.id = 'portfolio-loading';
             loadingMessage.style.cssText = 'text-align: center; padding: 2rem; color: var(--accent-gold); font-size: 1.2rem;';
-            loadingMessage.innerHTML = '⏳ Analyzing your portfolio...';
+            loadingMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing your portfolio...';
             document.getElementById('portfolio-overview').style.display = 'block';
             document.getElementById('portfolio-overview').appendChild(loadingMessage);
             
@@ -5136,10 +5136,10 @@
             const resultsContainer = document.getElementById('personality-result');
             resultsContainer.innerHTML = `
                 <div style="text-align: center; margin-bottom: 2rem;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">
-                        ${personalityType === 'Conservative Investor' ? '🛡️' : 
-                          personalityType === 'Moderate Investor' ? '⚖️' : 
-                          personalityType === 'Growth-Oriented Investor' ? '📈' : '🚀'}
+                    <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--accent-gold);">
+                        ${personalityType === 'Conservative Investor' ? '<i class="fas fa-shield-alt"></i>' : 
+                          personalityType === 'Moderate Investor' ? '<i class="fas fa-balance-scale"></i>' : 
+                          personalityType === 'Growth-Oriented Investor' ? '<i class="fas fa-chart-line"></i>' : '<i class="fas fa-rocket"></i>'}
                     </div>
                     <h2 style="color: var(--accent-white); margin-bottom: 0.5rem;">${personalityType}</h2>
                     <div style="font-size: 1.2rem; color: var(--text-gray);">Risk Score: ${Math.round(averageScore * 10) / 10}/7.0</div>
@@ -5293,11 +5293,11 @@
             const resultsContainer = document.getElementById('risk-profile-result');
             resultsContainer.innerHTML = `
                 <div style="text-align: center; margin-bottom: 2rem;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">
-                        ${riskCategory === 'Conservative' ? '🛡️' : 
-                          riskCategory === 'Moderate Conservative' ? '🏦' : 
-                          riskCategory === 'Moderate' ? '⚖️' : 
-                          riskCategory === 'Moderate Aggressive' ? '📈' : '🚀'}
+                    <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--accent-gold);">
+                        ${riskCategory === 'Conservative' ? '<i class="fas fa-shield-alt"></i>' : 
+                          riskCategory === 'Moderate Conservative' ? '<i class="fas fa-university"></i>' : 
+                          riskCategory === 'Moderate' ? '<i class="fas fa-balance-scale"></i>' : 
+                          riskCategory === 'Moderate Aggressive' ? '<i class="fas fa-chart-line"></i>' : '<i class="fas fa-rocket"></i>'}
                     </div>
                     <h2 style="color: var(--accent-white); margin-bottom: 0.5rem;">${riskCategory} Investor</h2>
                     <div style="font-size: 1.2rem; color: var(--text-gray);">Risk Score: ${riskPercentage}/100</div>

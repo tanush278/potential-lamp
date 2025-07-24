@@ -1782,7 +1782,9 @@
                             <div>
                                 <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Current vs Target Allocation</h4>
                                 <div id="rebalancing-comparison">
-                                    <!-- Will show current vs recommended allocation -->
+                                    <div style="text-align: center; color: var(--text-gray); padding: 2rem;">
+                                        Enter your portfolio details above and click "Analyze Portfolio" first to see rebalancing comparison.
+                                    </div>
                                 </div>
                                 <button class="btn btn-primary" onclick="calculateSmartRebalancing()" style="margin-top: 1rem;">
                                     Calculate Rebalancing Actions
@@ -4072,76 +4074,120 @@
         let portfolioPerformanceChart = null;
 
         function calculatePortfolioMetrics() {
-            // Real-time calculation as user types
-            const totalValue = parseFloat(document.getElementById('total-portfolio-value').value) || 0;
-            const equity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
-            const debt = parseFloat(document.getElementById('portfolio-debt').value) || 0;
-            const gold = parseFloat(document.getElementById('portfolio-gold').value) || 0;
-            const cash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
-            
-            const allocatedTotal = equity + debt + gold + cash;
-            
-            // Check if user has entered any real data
-            if (totalValue > 0 || allocatedTotal > 0) {
-                updatePortfolioNoticeForUserData();
-            }
-            
-            // Auto-adjust total portfolio value if allocation is entered
-            if (allocatedTotal > 0 && totalValue === 0) {
-                document.getElementById('total-portfolio-value').value = allocatedTotal;
-            }
-            
-            // Auto-distribute if total is entered but allocation is empty
-            if (totalValue > 0 && allocatedTotal === 0) {
-                // Use default moderate allocation
-                document.getElementById('portfolio-equity').value = Math.round(totalValue * 0.5);
-                document.getElementById('portfolio-debt').value = Math.round(totalValue * 0.35);
-                document.getElementById('portfolio-gold').value = Math.round(totalValue * 0.1);
-                document.getElementById('portfolio-cash').value = Math.round(totalValue * 0.05);
+            try {
+                // Real-time calculation as user types
+                const totalValue = parseFloat(document.getElementById('total-portfolio-value').value) || 0;
+                const equity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
+                const debt = parseFloat(document.getElementById('portfolio-debt').value) || 0;
+                const gold = parseFloat(document.getElementById('portfolio-gold').value) || 0;
+                const cash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
+                
+                const allocatedTotal = equity + debt + gold + cash;
+                
+                // Check if user has entered any real data
+                if (totalValue > 0 || allocatedTotal > 0) {
+                    updatePortfolioNoticeForUserData();
+                }
+                
+                // Auto-adjust total portfolio value if allocation is entered
+                if (allocatedTotal > 0 && totalValue === 0) {
+                    document.getElementById('total-portfolio-value').value = allocatedTotal;
+                }
+                
+                // Auto-distribute if total is entered but allocation is empty
+                if (totalValue > 0 && allocatedTotal === 0) {
+                    // Use default moderate allocation
+                    document.getElementById('portfolio-equity').value = Math.round(totalValue * 0.5);
+                    document.getElementById('portfolio-debt').value = Math.round(totalValue * 0.35);
+                    document.getElementById('portfolio-gold').value = Math.round(totalValue * 0.1);
+                    document.getElementById('portfolio-cash').value = Math.round(totalValue * 0.05);
+                }
+                
+                // Validate allocation percentages
+                if (allocatedTotal > 0 && totalValue > 0) {
+                    const difference = Math.abs(allocatedTotal - totalValue);
+                    if (difference > totalValue * 0.01) { // More than 1% difference
+                        console.warn('Portfolio allocation mismatch:', { allocatedTotal, totalValue, difference });
+                    }
+                }
+            } catch (error) {
+                console.error('Error in calculatePortfolioMetrics:', error);
             }
         }
 
         function analyzePortfolio() {
-            const totalValue = parseFloat(document.getElementById('total-portfolio-value').value) || 0;
-            const totalInvested = parseFloat(document.getElementById('total-invested').value) || 0;
-            const monthlySIP = parseFloat(document.getElementById('monthly-sip').value) || 0;
-            const startDate = document.getElementById('investment-start-date').value;
-            
-            const equity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
-            const debt = parseFloat(document.getElementById('portfolio-debt').value) || 0;
-            const gold = parseFloat(document.getElementById('portfolio-gold').value) || 0;
-            const cash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
-            
-            if (totalValue <= 0) {
-                alert('Please enter your portfolio details');
-                return;
+            try {
+                const totalValue = parseFloat(document.getElementById('total-portfolio-value').value) || 0;
+                const totalInvested = parseFloat(document.getElementById('total-invested').value) || 0;
+                const monthlySIP = parseFloat(document.getElementById('monthly-sip').value) || 0;
+                const startDate = document.getElementById('investment-start-date').value;
+                
+                const equity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
+                const debt = parseFloat(document.getElementById('portfolio-debt').value) || 0;
+                const gold = parseFloat(document.getElementById('portfolio-gold').value) || 0;
+                const cash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
+                
+                // Validation
+                if (totalValue <= 0) {
+                    alert('Please enter your portfolio total value');
+                    return;
+                }
+                
+                const allocationTotal = equity + debt + gold + cash;
+                if (allocationTotal <= 0) {
+                    alert('Please enter your asset allocation details');
+                    return;
+                }
+                
+                // Calculate portfolio metrics
+                const actualInvested = totalInvested || (totalValue * 0.8); // Default to 80% if not provided (assume 20% returns)
+                const portfolioData = {
+                    totalValue: totalValue,
+                    totalInvested: actualInvested,
+                    monthlySIP: monthlySIP,
+                    startDate: startDate,
+                    allocation: { equity, debt, gold, cash },
+                    totalReturns: totalValue - actualInvested
+                };
+                
+                // Update notice to show this is user's real data analysis
+                updatePortfolioNoticeForUserData();
+                
+                // Perform analysis with error handling
+                try {
+                    generatePortfolioOverview(portfolioData);
+                } catch (error) {
+                    console.error('Error in generatePortfolioOverview:', error);
+                }
+                
+                try {
+                    analyzeAssetAllocation(portfolioData);
+                } catch (error) {
+                    console.error('Error in analyzeAssetAllocation:', error);
+                }
+                
+                try {
+                    generatePortfolioHealthCheck(portfolioData);
+                } catch (error) {
+                    console.error('Error in generatePortfolioHealthCheck:', error);
+                }
+                
+                try {
+                    createPerformanceChart(portfolioData);
+                } catch (error) {
+                    console.error('Error in createPerformanceChart:', error);
+                }
+                
+                // Show analysis sections
+                document.getElementById('portfolio-overview').style.display = 'block';
+                document.getElementById('allocation-analysis').style.display = 'block';
+                document.getElementById('portfolio-health').style.display = 'block';
+                document.getElementById('performance-chart').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error in analyzePortfolio:', error);
+                alert('An error occurred while analyzing your portfolio. Please check your inputs and try again.');
             }
-            
-            // Calculate portfolio metrics
-            const actualInvested = totalInvested || (totalValue * 0.8); // Default to 80% if not provided (assume 20% returns)
-            const portfolioData = {
-                totalValue: totalValue,
-                totalInvested: actualInvested,
-                monthlySIP: monthlySIP,
-                startDate: startDate,
-                allocation: { equity, debt, gold, cash },
-                totalReturns: totalValue - actualInvested
-            };
-            
-            // Update notice to show this is user's real data analysis
-            updatePortfolioNoticeForUserData();
-            
-            // Perform analysis
-            generatePortfolioOverview(portfolioData);
-            analyzeAssetAllocation(portfolioData);
-            generatePortfolioHealthCheck(portfolioData);
-            createPerformanceChart(portfolioData);
-            
-            // Show analysis sections
-            document.getElementById('portfolio-overview').style.display = 'block';
-            document.getElementById('allocation-analysis').style.display = 'block';
-            document.getElementById('portfolio-health').style.display = 'block';
-            document.getElementById('performance-chart').style.display = 'block';
         }
 
         function generatePortfolioOverview(data) {
@@ -4343,6 +4389,9 @@
             
             // Generate allocation insights
             generateAllocationInsights(currentAllocation, recommendedAllocation, data.totalValue);
+            
+            // Update rebalancing comparison
+            updateRebalancingComparison(currentAllocation, recommendedAllocation);
         }
 
         function createPortfolioAllocationChart(allocation) {
@@ -4398,6 +4447,308 @@
             
             // Calculate rebalancing needs
             const rebalanceActions = [];
+            Object.keys(recommended).forEach(asset => {
+                const currentPercent = parseFloat(current[asset]);
+                const recommendedPercent = recommended[asset];
+                const difference = recommendedPercent - currentPercent;
+                const amount = Math.round((totalValue * difference) / 100);
+                
+                if (Math.abs(difference) > 5) { // Only show if > 5% difference
+                    rebalanceActions.push({
+                        asset: asset,
+                        action: difference > 0 ? 'Increase' : 'Decrease',
+                        amount: Math.abs(amount),
+                        percentage: Math.abs(difference).toFixed(1)
+                    });
+                }
+            });
+            
+            let insightsHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Allocation Analysis</h5>
+            `;
+            
+            if (rebalanceActions.length > 0) {
+                insightsHTML += `
+                    <div style="margin-bottom: 1.5rem;">
+                        <h6 style="color: var(--accent-gold); margin-bottom: 1rem;">Rebalancing Recommendations</h6>
+                        <div style="display: grid; gap: 0.8rem;">
+                `;
+                rebalanceActions.forEach(action => {
+                    const color = action.action === 'Increase' ? 'var(--accent-gold)' : 'var(--accent-silver)';
+                    insightsHTML += `
+                        <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,255,255,0.02); border-radius: 6px;">
+                            <span style="color: var(--text-gray); text-transform: capitalize;">${action.asset}</span>
+                            <span style="color: ${color}; font-weight: bold;">${action.action} by ${action.percentage}% (₹${action.amount.toLocaleString('en-IN')})</span>
+                        </div>
+                    `;
+                });
+                insightsHTML += '</div></div>';
+            } else {
+                insightsHTML += `
+                    <div style="text-align: center; padding: 1rem; background: rgba(0,255,0,0.1); border-radius: 8px; margin-bottom: 1rem;">
+                        <span style="color: var(--accent-gold); font-weight: bold;">Portfolio is well-balanced! No major rebalancing needed.</span>
+                    </div>
+                `;
+            }
+            
+            insightsHTML += `
+                    <div style="padding: 1rem; background: rgba(255,215,0,0.05); border-left: 4px solid var(--accent-gold); border-radius: 4px;">
+                        <h6 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Portfolio Insights</h6>
+                        <ul style="color: var(--text-gray); line-height: 1.6; margin: 0; padding-left: 1.5rem;">
+                            <li>Current allocation shows ${parseFloat(current.equity) > 50 ? 'growth-oriented' : 'conservative'} approach</li>
+                            <li>${parseFloat(current.debt) > 40 ? 'Strong debt allocation provides stability' : 'Consider increasing debt for stability'}</li>
+                            <li>${parseFloat(current.gold) > 5 ? 'Good inflation hedge with gold allocation' : 'Consider adding gold for diversification'}</li>
+                            <li>Review allocation quarterly to maintain optimal balance</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            insights.innerHTML = insightsHTML;
+        }
+
+        function generatePortfolioHealthCheck(data) {
+            const healthScore = calculatePortfolioHealthScore(data);
+            const returnPercentage = (data.totalReturns / data.totalInvested) * 100;
+            
+            // Health metrics
+            const metrics = document.getElementById('health-metrics');
+            metrics.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Performance Rating</h5>
+                    <div style="font-size: 2rem; font-weight: bold; color: var(--accent-gold); text-align: center; margin: 1rem 0;">
+                        ${healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Good' : healthScore >= 40 ? 'Average' : 'Needs Improvement'}
+                    </div>
+                    <div style="background: var(--border-gray); border-radius: 10px; height: 10px; overflow: hidden;">
+                        <div style="background: var(--accent-gold); height: 100%; width: ${healthScore}%; transition: width 0.3s ease;"></div>
+                    </div>
+                    <div style="text-align: center; color: var(--text-gray); margin-top: 0.5rem;">${healthScore}/100</div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-white); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Risk Assessment</h5>
+                    <div style="display: grid; gap: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-gray);">Volatility Risk</span>
+                            <span style="color: var(--accent-white);">${parseFloat(document.getElementById('portfolio-equity').value || 0) > 70 ? 'High' : parseFloat(document.getElementById('portfolio-equity').value || 0) > 40 ? 'Medium' : 'Low'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-gray);">Diversification</span>
+                            <span style="color: var(--accent-white);">${Object.values(data.allocation).filter(v => v > 0).length >= 3 ? 'Good' : 'Needs Improvement'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-gray);">Return Potential</span>
+                            <span style="color: var(--accent-white);">${returnPercentage > 12 ? 'High' : returnPercentage > 8 ? 'Medium' : 'Low'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(192,192,192,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-silver); margin-bottom: 1rem;">Portfolio Statistics</h5>
+                    <div style="display: grid; gap: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-gray);">Total Assets</span>
+                            <span style="color: var(--accent-silver);">${Object.values(data.allocation).filter(v => v > 0).length}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-gray);">Largest Holding</span>
+                            <span style="color: var(--accent-silver);">${Math.max(...Object.values(data.allocation)) === data.allocation.equity ? 'Equity' : Math.max(...Object.values(data.allocation)) === data.allocation.debt ? 'Debt' : Math.max(...Object.values(data.allocation)) === data.allocation.gold ? 'Gold' : 'Cash'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-gray);">Risk Level</span>
+                            <span style="color: var(--accent-silver);">${parseFloat(document.getElementById('portfolio-equity').value || 0) / data.totalValue * 100 > 60 ? 'Aggressive' : parseFloat(document.getElementById('portfolio-equity').value || 0) / data.totalValue * 100 > 40 ? 'Moderate' : 'Conservative'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Generate recommendations
+            const recommendations = document.getElementById('portfolio-recommendations');
+            let recommendationHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-left: 4px solid var(--accent-gold); border-radius: 8px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Portfolio Recommendations</h5>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                        <div>
+                            <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Immediate Actions</h6>
+                            <ul style="color: var(--text-gray); line-height: 1.6; margin: 0; padding-left: 1.2rem;">
+            `;
+            
+            if (healthScore < 60) {
+                recommendationHTML += '<li>Rebalance portfolio to align with risk profile</li>';
+            }
+            if (returnPercentage < 8) {
+                recommendationHTML += '<li>Consider increasing equity allocation for better returns</li>';
+            }
+            if (Object.values(data.allocation).filter(v => v > 0).length < 3) {
+                recommendationHTML += '<li>Improve diversification across asset classes</li>';
+            }
+            if (data.monthlySIP === 0) {
+                recommendationHTML += '<li>Start regular SIP investments for better accumulation</li>';
+            }
+            
+            recommendationHTML += `
+                            </ul>
+                        </div>
+                        <div>
+                            <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Long-term Strategy</h6>
+                            <ul style="color: var(--text-gray); line-height: 1.6; margin: 0; padding-left: 1.2rem;">
+                                <li>Review portfolio quarterly for rebalancing</li>
+                                <li>Increase SIP amount with salary increments</li>
+                                <li>Monitor fund performance and replace underperformers</li>
+                                <li>Maintain emergency fund separate from investments</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            recommendations.innerHTML = recommendationHTML;
+        }
+
+        function createPerformanceChart(data) {
+            const ctx = document.getElementById('portfolioPerformanceChart').getContext('2d');
+            
+            if (portfolioPerformanceChart) {
+                portfolioPerformanceChart.destroy();
+            }
+            
+            // Get inflation rate
+            const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 6;
+            
+            // Generate historical performance simulation
+            const months = data.startDate ? Math.round((new Date() - new Date(data.startDate)) / (1000 * 60 * 60 * 24 * 30.44)) : 12;
+            const monthlyData = [];
+            const monthlyReturn = 0.01; // Assume 12% annual return
+            const monthlyInflation = inflationRate / 12 / 100; // Monthly inflation rate
+            
+            let invested = 0;
+            let nominalValue = 0;
+            let realValue = 0;
+            
+            for (let i = 0; i <= months; i++) {
+                invested += data.monthlySIP || (data.totalInvested / months);
+                nominalValue = invested * Math.pow(1 + monthlyReturn, i);
+                // Calculate real value (inflation-adjusted)
+                realValue = nominalValue / Math.pow(1 + monthlyInflation, i);
+                
+                monthlyData.push({
+                    month: i,
+                    invested: invested,
+                    nominalValue: nominalValue,
+                    realValue: realValue
+                });
+            }
+            
+            // Adjust final values to match current portfolio
+            const adjustmentFactor = data.totalValue / nominalValue;
+            monthlyData.forEach(point => {
+                point.nominalValue *= adjustmentFactor;
+                point.realValue *= adjustmentFactor;
+            });
+            
+            portfolioPerformanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthlyData.map(d => `Month ${d.month}`),
+                    datasets: [
+                        {
+                            label: 'Amount Invested',
+                            data: monthlyData.map(d => d.invested),
+                            borderColor: '#c0c0c0',
+                            backgroundColor: 'rgba(192, 192, 192, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Nominal Portfolio Value',
+                            data: monthlyData.map(d => d.nominalValue),
+                            borderColor: '#ffd700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Real Portfolio Value (Inflation-Adjusted)',
+                            data: monthlyData.map(d => d.realValue),
+                            borderColor: '#ff6b6b',
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            borderDash: [5, 5],
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff',
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffd700',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + Math.round(context.parsed.y).toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#aaaaaa' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#aaaaaa',
+                                callback: function(value) {
+                                    return '₹' + (value / 100000).toFixed(1) + 'L';
+                                }
+                            },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+            
+            // Generate performance insights
+            const insights = document.getElementById('performance-insights');
+            const totalGrowth = ((data.totalValue / data.totalInvested - 1) * 100).toFixed(2);
+            insights.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Performance Analysis</h5>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                            <div style="color: var(--text-gray); font-size: 0.9rem;">Total Growth</div>
+                            <div style="color: var(--accent-gold); font-size: 1.8rem; font-weight: bold;">${totalGrowth}%</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                            <div style="color: var(--text-gray); font-size: 0.9rem;">Wealth Multiplier</div>
+                            <div style="color: var(--accent-white); font-size: 1.8rem; font-weight: bold;">${(data.totalValue / data.totalInvested).toFixed(2)}x</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                            <div style="color: var(--text-gray); font-size: 0.9rem;">Monthly Growth</div>
+                            <div style="color: var(--accent-silver); font-size: 1.8rem; font-weight: bold;">${(totalGrowth / months).toFixed(2)}%</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
             Object.keys(recommended).forEach(asset => {
                 const currentPercent = parseFloat(current[asset]);
                 const recommendedPercent = recommended[asset];
@@ -5328,7 +5679,16 @@
             initializePortfolioAnalysis();
             
             // Load saved goals
-            loadSavedGoals();
+            const savedGoals = localStorage.getItem('userGoals');
+            if (savedGoals) {
+                try {
+                    userGoals = JSON.parse(savedGoals);
+                    displayGoals();
+                } catch (e) {
+                    console.warn('Error loading saved goals:', e);
+                    userGoals = [];
+                }
+            }
             
             // Initialize AOS if available
             if (typeof AOS !== 'undefined') {
@@ -5397,6 +5757,40 @@
         const style = document.createElement('style');
         style.textContent = additionalCSS;
         document.head.appendChild(style);
+
+        // Additional Portfolio Analysis Functions
+        function updateRebalancingComparison(current, recommended) {
+            const comparison = document.getElementById('rebalancing-comparison');
+            if (!comparison) return;
+            
+            comparison.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Allocation Comparison</h5>
+                    <div style="display: grid; gap: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Asset</span>
+                            <span style="color: var(--text-gray);">Current → Target</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Equity</span>
+                            <span style="color: var(--accent-gold); font-weight: bold;">${current.equity}% → ${recommended.equity}%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Debt</span>
+                            <span style="color: var(--accent-white); font-weight: bold;">${current.debt}% → ${recommended.debt}%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Gold</span>
+                            <span style="color: var(--accent-silver); font-weight: bold;">${current.gold}% → ${recommended.gold}%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem;">
+                            <span style="color: var(--text-gray);">Cash</span>
+                            <span style="color: var(--text-gray); font-weight: bold;">${current.cash}% → ${recommended.cash}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
     </script>
 
     <!-- Version Footer -->

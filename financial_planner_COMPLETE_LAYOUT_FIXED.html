@@ -97,7 +97,7 @@
 
         /* SIDEBAR HEADER - FIXED LAYOUT */
         .sidebar-header {
-            padding: 1.5rem;
+            padding: 1.2rem 1rem;
             border-bottom: 1px solid var(--border-gray);
             background: var(--card-black);
             position: sticky;
@@ -106,6 +106,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
         }
 
         .sidebar.collapsed .sidebar-header {
@@ -115,13 +116,15 @@
 
         .sidebar-logo {
             font-family: 'Poppins', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--text-white);
             display: flex;
             align-items: center;
             gap: 0.5rem;
             white-space: nowrap;
+            flex: 1;
+            min-width: 0;
         }
 
         .sidebar.collapsed .sidebar-logo .sidebar-text {
@@ -142,8 +145,8 @@
             background: var(--border-gray);
             border: none;
             color: var(--text-white);
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -151,6 +154,7 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             font-size: 14px;
+            flex-shrink: 0;
         }
 
         .sidebar.collapsed .sidebar-toggle {

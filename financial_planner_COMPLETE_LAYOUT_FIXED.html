@@ -1728,6 +1728,40 @@
                             <!-- Performance insights will be populated by JavaScript -->
                         </div>
                     </div>
+
+                    <!-- Portfolio Rebalancing -->
+                    <div class="card" id="rebalancing-card" style="margin-top: 2rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">Portfolio Rebalancing</h3>
+                            <p class="card-subtitle">Rebalance your portfolio according to Investment Recommendations</p>
+                        </div>
+                        
+                        <div style="background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Smart Rebalancing</h5>
+                            <p style="color: var(--text-gray); margin: 0;">Uses your current portfolio holdings (from above) and compares with your recommended allocation from Investment Recommendations to suggest buy/sell actions.</p>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <div>
+                                <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Current vs Target Allocation</h4>
+                                <div id="rebalancing-comparison">
+                                    <!-- Will show current vs recommended allocation -->
+                                </div>
+                                <button class="btn btn-primary" onclick="calculateSmartRebalancing()" style="margin-top: 1rem;">
+                                    Calculate Rebalancing Actions
+                                </button>
+                            </div>
+                            
+                            <div>
+                                <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Rebalancing Actions</h4>
+                                <div id="rebalancing-results">
+                                    <div style="text-align: center; color: var(--text-gray); padding: 2rem;">
+                                        Click "Calculate Rebalancing Actions" to see what adjustments are needed.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <section id="recommendations" class="section">
@@ -1947,45 +1981,6 @@
                         </button>
                     </div>
 
-                    <!-- Portfolio Rebalancing -->
-                    <div class="card" id="rebalancing-card" style="margin-top: 2rem;">
-                        <div class="card-header">
-                            <h3 class="card-title">Portfolio Rebalancing</h3>
-                            <p class="card-subtitle">Maintain optimal asset allocation with smart rebalancing</p>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                            <div>
-                                <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Current Portfolio</h4>
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label>Equity Holdings (₹)</label>
-                                        <input type="number" id="current-equity" class="form-input" placeholder="Current equity value">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Debt Holdings (₹)</label>
-                                        <input type="number" id="current-debt" class="form-input" placeholder="Current debt value">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Gold Holdings (₹)</label>
-                                        <input type="number" id="current-gold" class="form-input" placeholder="Current gold value">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Cash Holdings (₹)</label>
-                                        <input type="number" id="current-cash" class="form-input" placeholder="Current cash value">
-                                    </div>
-                                </div>
-                                <button class="btn btn-secondary" onclick="calculateRebalancing()">Calculate Rebalancing</button>
-                            </div>
-                            
-                            <div id="rebalancing-results" style="display: none;">
-                                <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Rebalancing Actions</h4>
-                                <div id="rebalancing-actions">
-                                    <!-- Rebalancing recommendations will be populated by JavaScript -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Investment Strategy -->
                     <div class="card" id="strategy-card" style="margin-top: 2rem;">
@@ -3528,11 +3523,12 @@
             alert(`Investment Allocation for ₹${amount.toLocaleString('en-IN')}:\n\nEquity: ₹${equityAmount.toLocaleString('en-IN')} (${allocation.equity}%)\nDebt: ₹${debtAmount.toLocaleString('en-IN')} (${allocation.debt}%)\nGold: ₹${goldAmount.toLocaleString('en-IN')} (${allocation.gold}%)\nCash: ₹${cashAmount.toLocaleString('en-IN')} (${allocation.cash}%)\n\nThis allocation matches your ${riskProfile.riskCategory} risk profile.`);
         }
 
-        function calculateRebalancing() {
-            const currentEquity = parseFloat(document.getElementById('current-equity').value) || 0;
-            const currentDebt = parseFloat(document.getElementById('current-debt').value) || 0;
-            const currentGold = parseFloat(document.getElementById('current-gold').value) || 0;
-            const currentCash = parseFloat(document.getElementById('current-cash').value) || 0;
+        function calculateSmartRebalancing() {
+            // Get current portfolio from Portfolio Analysis input fields
+            const currentEquity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
+            const currentDebt = parseFloat(document.getElementById('portfolio-debt').value) || 0;
+            const currentGold = parseFloat(document.getElementById('portfolio-gold').value) || 0;
+            const currentCash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
             
             const totalPortfolio = currentEquity + currentDebt + currentGold + currentCash;
             
@@ -3836,6 +3832,28 @@
             if (notice) {
                 notice.style.display = 'block';
             }
+            
+            // Show refresh button
+            const refreshBtn = document.getElementById('refresh-portfolio-btn');
+            if (refreshBtn) {
+                refreshBtn.style.display = 'block';
+            }
+        }
+
+        function refreshPortfolioIntegration() {
+            // Clear current values and reload from Investment Recommendations
+            const inputs = ['total-portfolio-value', 'total-invested', 'monthly-sip', 'investment-start-date', 'portfolio-equity', 'portfolio-debt', 'portfolio-gold', 'portfolio-cash'];
+            inputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = '';
+                    element.style.backgroundColor = '';
+                    element.style.border = '';
+                }
+            });
+            
+            // Reinitialize with fresh data
+            initializePortfolioAnalysis();
         }
 
         function showSamplePortfolioWithPrompt() {

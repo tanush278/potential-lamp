@@ -2382,26 +2382,37 @@
         });
 
         function calculateAdvancedSIP() {
-            const amount = parseFloat(document.getElementById('sip-amount').value) || 0;
-            const period = parseFloat(document.getElementById('sip-period').value) || 0;
-            const rate = parseFloat(document.getElementById('sip-return').value) || 0;
-            const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 0;
-            const sipIncrease = parseFloat(document.getElementById('sip-increase').value) || 0;
-            const calcType = document.getElementById('calc-type').value;
-            const lumpsumAmount = parseFloat(document.getElementById('lumpsum-amount').value) || 0;
-            const frequency = document.getElementById('sip-frequency').value;
+            try {
+                const amount = parseFloat(document.getElementById('sip-amount').value) || 0;
+                const period = parseFloat(document.getElementById('sip-period').value) || 0;
+                const rate = parseFloat(document.getElementById('sip-return').value) || 0;
+                const inflationRate = parseFloat(document.getElementById('inflation-rate').value) || 0;
+                const sipIncrease = parseFloat(document.getElementById('sip-increase').value) || 0;
+                const calcType = document.getElementById('calc-type').value;
+                const lumpsumAmount = parseFloat(document.getElementById('lumpsum-amount').value) || 0;
+                const frequency = document.getElementById('sip-frequency').value;
 
-            if (!amount || !period || !rate) {
-                alert('Please fill all required SIP calculation fields');
-                return;
+                if (!amount || !period || !rate) {
+                    alert('Please fill all required SIP calculation fields');
+                    return;
+                }
+
+                console.log('SIP Calculation Input:', { amount, period, rate, inflationRate, sipIncrease, calcType, lumpsumAmount, frequency });
+
+                const calculations = performAdvancedSIPCalculation(amount, period, rate, inflationRate, sipIncrease, calcType, lumpsumAmount, frequency);
+                
+                console.log('SIP Calculation Result:', calculations);
+                
+                displaySIPResults(calculations);
+                createSIPChart(calculations.yearlyData);
+                createYearlyBreakdown(calculations.yearlyData);
+                generateInvestmentInsights(calculations);
+                generateStrategyInsights(calculations, calcType, amount, period, sipIncrease, lumpsumAmount);
+                
+            } catch (error) {
+                console.error('Error in SIP calculation:', error);
+                alert('An error occurred during SIP calculation. Please check your inputs and try again.');
             }
-
-            const calculations = performAdvancedSIPCalculation(amount, period, rate, inflationRate, sipIncrease, calcType, lumpsumAmount, frequency);
-            displaySIPResults(calculations);
-            createSIPChart(calculations.yearlyData);
-            createYearlyBreakdown(calculations.yearlyData);
-            generateInvestmentInsights(calculations);
-            generateStrategyInsights(calculations, calcType, amount, period, sipIncrease, lumpsumAmount);
         }
 
         function performAdvancedSIPCalculation(sipAmount, years, annualRate, inflationRate, stepUpRate, calcType, lumpsumAmount, frequency) {
@@ -2468,7 +2479,7 @@
                     cumulativeInvestment: Math.round(totalInvestment),
                     nominalValue: Math.round(nominalValue),
                     realValue: Math.round(realValue),
-                    monthlyAmount: Math.round(currentMonthlyAmount)
+                    sipAmount: Math.round(currentSIPAmount)
                 });
             }
             

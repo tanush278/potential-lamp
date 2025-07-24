@@ -1655,8 +1655,9 @@
                         <div id="portfolio-input-section">
                             <div class="form-grid">
                                 <div class="form-group">
-                                    <label>Total Portfolio Value (₹)</label>
-                                    <input type="number" id="total-portfolio-value" class="form-input" placeholder="Enter total portfolio value" onchange="calculatePortfolioMetrics()">
+                                    <label>Current Portfolio Value (₹)</label>
+                                    <input type="number" id="total-portfolio-value" class="form-input" placeholder="Auto-calculated from investments" readonly style="background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold);">
+                                    <small style="color: var(--accent-gold); font-size: 0.85rem; margin-top: 0.5rem; display: block;">This value is automatically calculated based on your investments and returns</small>
                                 </div>
                                 <div class="form-group">
                                     <label>Investment Start Date</label>
@@ -1719,23 +1720,24 @@
                                 </div>
                             </div>
                             
-                            <h4 style="color: var(--accent-white); margin: 2rem 0 1rem 0;">Asset Allocation</h4>
+                            <h4 style="color: var(--accent-white); margin: 2rem 0 1rem 0;">Current Asset Allocation</h4>
+                            <p style="color: var(--text-gray); margin-bottom: 1rem; font-size: 0.9rem;">Enter your ACTUAL current portfolio values (not percentages). This shows how your money is currently distributed.</p>
                             <div class="form-grid">
                                 <div class="form-group">
-                                    <label>Equity Holdings (₹)</label>
-                                    <input type="number" id="portfolio-equity" class="form-input" placeholder="Equity investments" onchange="calculatePortfolioMetrics()">
+                                    <label>Current Equity Value (₹)</label>
+                                    <input type="number" id="portfolio-equity" class="form-input" placeholder="Your actual equity holdings today" onchange="calculatePortfolioMetrics()">
                                 </div>
                                 <div class="form-group">
-                                    <label>Debt Holdings (₹)</label>
-                                    <input type="number" id="portfolio-debt" class="form-input" placeholder="Debt investments" onchange="calculatePortfolioMetrics()">
+                                    <label>Current Debt Value (₹)</label>
+                                    <input type="number" id="portfolio-debt" class="form-input" placeholder="Your actual debt holdings today" onchange="calculatePortfolioMetrics()">
                                 </div>
                                 <div class="form-group">
-                                    <label>Gold Holdings (₹)</label>
-                                    <input type="number" id="portfolio-gold" class="form-input" placeholder="Gold investments" onchange="calculatePortfolioMetrics()">
+                                    <label>Current Gold Value (₹)</label>
+                                    <input type="number" id="portfolio-gold" class="form-input" placeholder="Your actual gold holdings today" onchange="calculatePortfolioMetrics()">
                                 </div>
                                 <div class="form-group">
-                                    <label>Cash & Others (₹)</label>
-                                    <input type="number" id="portfolio-cash" class="form-input" placeholder="Cash and other investments" onchange="calculatePortfolioMetrics()">
+                                    <label>Current Cash Value (₹)</label>
+                                    <input type="number" id="portfolio-cash" class="form-input" placeholder="Your actual cash holdings today" onchange="calculatePortfolioMetrics()">
                                 </div>
                             </div>
                             
@@ -4399,6 +4401,9 @@
         }
 
         function calculatePortfolioMetrics() {
+            // Auto-calculate portfolio value from investment inputs
+            autoCalculatePortfolioValue();
+            
             // Real-time calculation as user types
             const totalValue = parseFloat(document.getElementById('total-portfolio-value').value) || 0;
             const equity = parseFloat(document.getElementById('portfolio-equity').value) || 0;
@@ -4413,10 +4418,53 @@
                 updatePortfolioNoticeForUserData();
             }
             
-            // Removed auto-fill functionality - users must enter their own allocation values
-            
             // Update advanced analytics in real-time
             updateAdvancedAnalytics();
+        }
+        
+        function autoCalculatePortfolioValue() {
+            const totalInvested = parseFloat(document.getElementById('total-invested').value) || 0;
+            const monthlySIP = parseFloat(document.getElementById('monthly-sip').value) || 0;
+            const sipFrequency = document.getElementById('portfolio-sip-frequency').value || 'monthly';
+            const expectedReturn = parseFloat(document.getElementById('expected-return').value) || 12;
+            const startDate = document.getElementById('investment-start-date').value;
+            
+            if (totalInvested > 0 && startDate) {
+                // Calculate investment period
+                const startDateObj = new Date(startDate);
+                const currentDate = new Date();
+                const monthsDiff = (currentDate.getFullYear() - startDateObj.getFullYear()) * 12 + 
+                                 (currentDate.getMonth() - startDateObj.getMonth());
+                
+                if (monthsDiff > 0) {
+                    // Calculate lumpsum growth
+                    const years = monthsDiff / 12;
+                    const lumpsumGrowth = totalInvested * Math.pow(1 + expectedReturn / 100, years);
+                    
+                    // Calculate SIP growth
+                    let sipGrowth = 0;
+                    if (monthlySIP > 0) {
+                        const monthlyRate = expectedReturn / 12 / 100;
+                        const frequencyMultiplier = {
+                            'monthly': 1,
+                            'quarterly': 3,
+                            'semi-annually': 6,
+                            'annually': 12
+                        };
+                        const actualSIPAmount = monthlySIP * frequencyMultiplier[sipFrequency];
+                        const sipMonths = Math.floor(monthsDiff / frequencyMultiplier[sipFrequency]);
+                        
+                        if (sipMonths > 0) {
+                            sipGrowth = actualSIPAmount * (Math.pow(1 + monthlyRate * frequencyMultiplier[sipFrequency], sipMonths) - 1) / 
+                                       (monthlyRate * frequencyMultiplier[sipFrequency]);
+                        }
+                    }
+                    
+                    // Set calculated portfolio value
+                    const calculatedValue = Math.round(lumpsumGrowth + sipGrowth);
+                    document.getElementById('total-portfolio-value').value = calculatedValue;
+                }
+            }
         }
         
         function updateAdvancedAnalytics() {

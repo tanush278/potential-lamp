@@ -9064,18 +9064,25 @@
         }
         
         function validateUserData() {
+            // Use the integrated ecosystem to check profile completeness
+            const clientProfile = FinancialEcosystem.getClientProfile();
             const missingFields = [];
             
-            // DEBUG: Log what we're checking
-            console.log('VALIDATION DEBUG:');
+            console.log('VALIDATION DEBUG - Client Profile:', clientProfile);
             
-            // Check Profile Section - MULTIPLE POSSIBLE IDs
+            // Check if ecosystem has complete data
+            if (clientProfile.isComplete) {
+                console.log('VALIDATION RESULT: Profile is complete!');
+                return { isValid: true, missingFields: [] };
+            }
+            
+            // If ecosystem data is incomplete, check individual fields as fallback
             const age = document.getElementById('current-age')?.value || 
                        document.getElementById('client-age')?.value ||
                        document.getElementById('insurance-age')?.value;
             const income = document.getElementById('monthly-income')?.value;
             
-            console.log('Age found:', age, 'Income found:', income);
+            console.log('Fallback check - Age found:', age, 'Income found:', income);
             
             if (!age || !income) {
                 missingFields.push('Complete your Personal Profile (Age, Income)');
@@ -9091,9 +9098,12 @@
                 missingFields.push('Complete Risk Assessment');
             }
             
-            // Check Goals - More flexible
+            // Check Goals - More flexible  
             const goalsData = localStorage.getItem('financialGoals');
-            const hasGoals = document.querySelector('#financial-goals input[type="number"]')?.value;
+            const hasGoals = document.querySelector('#financial-goals input[type="number"]')?.value ||
+                            document.getElementById('retirement-goal')?.value ||
+                            document.getElementById('home-goal')?.value ||
+                            document.getElementById('education-goal')?.value;
             
             console.log('Goals localStorage:', !!goalsData, 'Has goals input:', !!hasGoals);
             
@@ -9585,20 +9595,54 @@
             ];
         }
 
-        // AUTO-POPULATION SYSTEM FOR SEAMLESS UX
-        const UserDataManager = {
-            // Central data store
-            userData: {
-                profile: {},
-                financial: {},
-                goals: {},
-                risk: {}
+        // INTEGRATED FINANCIAL ECOSYSTEM - All sections work together
+        const FinancialEcosystem = {
+            // Central client data store
+            clientData: {
+                profile: {
+                    age: null,
+                    income: null,
+                    dependents: null,
+                    occupation: null
+                },
+                financial: {
+                    currentSavings: null,
+                    monthlyExpenses: null,
+                    existingInvestments: null,
+                    debts: null
+                },
+                goals: {
+                    retirement: { amount: null, timeline: null },
+                    homebuying: { amount: null, timeline: null },
+                    education: { amount: null, timeline: null },
+                    emergency: { amount: null }
+                },
+                risk: {
+                    profile: null, // conservative, moderate, aggressive
+                    score: null,
+                    preferences: {}
+                },
+                recommendations: {
+                    mutualFunds: [],
+                    insurance: [],
+                    loans: [],
+                    investments: []
+                }
             },
             
-            // Update central store and auto-populate
-            updateField(section, field, value) {
-                this.userData[section][field] = value;
+            // SMART DATA INTEGRATION - Each section feeds the next
+            updateClientData(section, field, value) {
+                // Update central store
+                if (this.clientData[section]) {
+                    this.clientData[section][field] = value;
+                }
+                
+                // Auto-populate related fields across all sections
                 this.autoPopulateFields(field, value);
+                
+                // Trigger intelligent updates based on data changes
+                this.cascadeUpdates(section, field, value);
+                
                 console.log(`Updated ${section}.${field} = ${value}`);
             },
             
@@ -9621,61 +9665,208 @@
                 });
             },
             
-            // Get consolidated user data
-            getConsolidatedData() {
+            // INTELLIGENT CASCADE UPDATES - Make sections work together
+            cascadeUpdates(section, field, value) {
+                // When age changes, update insurance calculations
+                if (field === 'age') {
+                    this.updateInsuranceNeeds();
+                    this.updateRetirementTimeline();
+                }
+                
+                // When income changes, update all financial calculations
+                if (field === 'income') {
+                    this.updateEmergencyFundNeeds();
+                    this.updateInvestmentCapacity();
+                    this.updateLoanEligibility();
+                }
+                
+                // When risk profile changes, update all recommendations
+                if (section === 'risk') {
+                    this.updateAllRecommendations();
+                }
+                
+                // When goals change, update investment strategy
+                if (section === 'goals') {
+                    this.updateInvestmentStrategy();
+                }
+            },
+            
+            // INSURANCE NEEDS CALCULATION based on profile
+            updateInsuranceNeeds() {
+                const age = this.clientData.profile.age;
+                const income = this.clientData.profile.income;
+                const dependents = this.clientData.profile.dependents || 2;
+                
+                if (age && income) {
+                    // Rule: 10-15x annual income for term life insurance
+                    const annualIncome = income * 12;
+                    const recommendedCoverage = annualIncome * (age < 30 ? 15 : age < 40 ? 12 : 10);
+                    
+                    // Auto-update insurance coverage field
+                    const coverageField = document.getElementById('insurance-coverage');
+                    if (coverageField) {
+                        coverageField.value = recommendedCoverage;
+                    }
+                    
+                    console.log(`Auto-calculated insurance need: Rs ${recommendedCoverage.toLocaleString()}`);
+                }
+            },
+            
+            // EMERGENCY FUND CALCULATION
+            updateEmergencyFundNeeds() {
+                const income = this.clientData.profile.income;
+                if (income) {
+                    // Rule: 6-12 months of expenses (assume 70% of income)
+                    const monthlyExpenses = income * 0.7;
+                    const emergencyFund = monthlyExpenses * 8; // 8 months
+                    
+                    this.clientData.goals.emergency.amount = emergencyFund;
+                    
+                    const emergencyField = document.getElementById('emergency-fund-goal');
+                    if (emergencyField) {
+                        emergencyField.value = emergencyFund;
+                    }
+                    
+                    console.log(`Auto-calculated emergency fund: Rs ${emergencyFund.toLocaleString()}`);
+                }
+            },
+            
+            // INVESTMENT CAPACITY CALCULATION
+            updateInvestmentCapacity() {
+                const income = this.clientData.profile.income;
+                const savings = this.clientData.financial.currentSavings;
+                
+                if (income) {
+                    // Rule: 20% of income for investments
+                    const monthlyInvestmentCapacity = income * 0.2;
+                    
+                    const sipField = document.getElementById('sip-amount');
+                    if (sipField && !sipField.value) {
+                        sipField.value = monthlyInvestmentCapacity;
+                    }
+                    
+                    console.log(`Suggested monthly investment: Rs ${monthlyInvestmentCapacity.toLocaleString()}`);
+                }
+            },
+            
+            // LOAN ELIGIBILITY CALCULATION
+            updateLoanEligibility() {
+                const income = this.clientData.profile.income;
+                if (income) {
+                    // Rule: EMI should not exceed 40% of income
+                    const maxEMI = income * 0.4;
+                    // Assuming 8.5% interest for 20 years
+                    const maxLoanAmount = maxEMI * 12 * 20 * 0.8; // Rough calculation
+                    
+                    console.log(`Max loan eligibility: Rs ${maxLoanAmount.toLocaleString()}`);
+                }
+            },
+            
+            // UPDATE ALL RECOMMENDATIONS based on complete profile
+            updateAllRecommendations() {
+                // This will trigger when risk assessment is complete
+                this.generatePersonalizedRecommendations();
+            },
+            
+            // GENERATE PERSONALIZED RECOMMENDATIONS
+            generatePersonalizedRecommendations() {
+                const profile = this.clientData.profile;
+                const risk = this.clientData.risk.profile;
+                const goals = this.clientData.goals;
+                
+                if (profile.age && profile.income && risk) {
+                    // Filter mutual funds based on risk profile
+                    this.recommendMutualFunds(risk, profile.age);
+                    
+                    // Recommend insurance based on profile
+                    this.recommendInsurance(profile);
+                    
+                    // Recommend investment strategy
+                    this.recommendInvestmentStrategy(risk, goals);
+                    
+                    console.log('Generated personalized recommendations for complete profile');
+                }
+            },
+            
+            // Get consolidated client data
+            getClientProfile() {
                 return {
-                    age: document.getElementById('current-age')?.value || 
-                         document.getElementById('client-age')?.value ||
-                         document.getElementById('insurance-age')?.value,
-                    income: document.getElementById('monthly-income')?.value,
-                    savings: document.getElementById('current-savings')?.value ||
-                            document.getElementById('savings-amount')?.value ||
-                            document.getElementById('current-assets')?.value
+                    ...this.clientData,
+                    isComplete: this.isProfileComplete()
                 };
+            },
+            
+            // Check if profile is complete for recommendations
+            isProfileComplete() {
+                return !!(
+                    this.clientData.profile.age &&
+                    this.clientData.profile.income &&
+                    this.clientData.risk.profile &&
+                    (this.clientData.goals.retirement.amount || 
+                     this.clientData.goals.homebuying.amount ||
+                     this.clientData.goals.education.amount)
+                );
             }
         };
         
-        // Setup auto-population listeners
-        function setupAutoPopulation() {
-            // Age fields
+        // Setup integrated financial ecosystem
+        function setupFinancialEcosystem() {
+            // Profile section listeners
             ['current-age', 'client-age', 'insurance-age'].forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
                     field.addEventListener('input', function() {
-                        UserDataManager.updateField('profile', 'age', this.value);
+                        FinancialEcosystem.updateClientData('profile', 'age', this.value);
                     });
                 }
             });
             
-            // Income fields
+            // Income fields - trigger cascade updates
             ['monthly-income'].forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
                     field.addEventListener('input', function() {
-                        UserDataManager.updateField('financial', 'income', this.value);
+                        FinancialEcosystem.updateClientData('profile', 'income', this.value);
                     });
                 }
             });
             
-            // Savings fields
+            // Savings and financial status
             ['current-savings', 'savings-amount', 'current-assets'].forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
                     field.addEventListener('input', function() {
-                        UserDataManager.updateField('financial', 'savings', this.value);
+                        FinancialEcosystem.updateClientData('financial', 'currentSavings', this.value);
                     });
                 }
             });
             
-            console.log('Auto-population system activated!');
+            // Goal amount fields - trigger investment strategy updates
+            ['retirement-goal', 'home-goal', 'education-goal'].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        const goalType = fieldId.replace('-goal', '');
+                        FinancialEcosystem.updateClientData('goals', goalType, { amount: this.value });
+                    });
+                }
+            });
+            
+            // Risk assessment completion trigger
+            document.addEventListener('riskAssessmentComplete', function(event) {
+                FinancialEcosystem.updateClientData('risk', 'profile', event.detail.riskProfile);
+                FinancialEcosystem.updateClientData('risk', 'score', event.detail.score);
+            });
+            
+            console.log('Integrated Financial Ecosystem activated - all sections now work together!');
         }
 
         // Initialize app with live data
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Financial Planner Pro initialized');
             
-            // Setup auto-population system
-            setupAutoPopulation();
+            // Setup integrated financial ecosystem
+            setupFinancialEcosystem();
             
             // Try to load live mutual funds data
             try {

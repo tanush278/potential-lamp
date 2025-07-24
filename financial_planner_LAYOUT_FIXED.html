@@ -56,20 +56,20 @@
             display: flex;
             height: 100vh;
             width: 100vw;
-            position: fixed;
-            top: 0;
-            left: 0;
         }
 
-        /* FIXED SIDEBAR */
+        /* FIXED SIDEBAR - NO OVERLAPPING */
         .sidebar {
             width: 280px;
             min-width: 280px;
+            max-width: 280px;
             background: var(--gradient-primary);
             border-right: 2px solid var(--border-gray);
             height: 100vh;
             overflow-y: auto;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
             z-index: 1000;
             transition: var(--transition-smooth);
         }
@@ -77,6 +77,7 @@
         .sidebar.collapsed {
             width: 70px;
             min-width: 70px;
+            max-width: 70px;
         }
 
         /* SIDEBAR HEADER - FIXED POSITIONING */
@@ -121,17 +122,17 @@
             flex-shrink: 0;
         }
 
-        /* TOGGLE BUTTON - FIXED POSITIONING */
+        /* TOGGLE BUTTON - PROPER POSITIONING */
         .sidebar-toggle {
             position: absolute;
-            top: 1.5rem;
-            right: -15px;
+            top: 1.2rem;
+            right: 1rem;
             background: var(--card-black);
             border: 2px solid var(--border-gray);
             color: var(--text-white);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -264,13 +265,20 @@
             text-align: center;
         }
 
-        /* MAIN CONTENT AREA - FIXED POSITIONING */
+        /* MAIN CONTENT AREA - NO OVERLAP */
         .main-content {
-            flex: 1;
+            margin-left: 280px;
+            width: calc(100vw - 280px);
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: 70px;
+            width: calc(100vw - 70px);
         }
 
         /* HEADER - FIXED AT TOP */

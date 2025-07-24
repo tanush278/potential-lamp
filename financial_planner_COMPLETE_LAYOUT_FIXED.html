@@ -2054,6 +2054,16 @@
                         <button class="btn btn-primary" onclick="generateRecommendations()" style="margin-top: 1rem;">
                             Generate Detailed Recommendations
                         </button>
+                        
+                        <!-- Generated Recommendations Display -->
+                        <div id="generated-recommendations" style="display: none; margin-top: 2rem; padding: 2rem; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; border: 1px solid var(--accent-gold);">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 1.5rem; text-align: center;">
+                                <i class="fas fa-chart-pie"></i> Your Personalized Investment Recommendations
+                            </h4>
+                            <div id="recommendation-content">
+                                <!-- Dynamic content will be inserted here -->
+                            </div>
+                        </div>
                     </div>
 
 
@@ -3675,34 +3685,149 @@
         }
 
         function generateRecommendations() {
-            const amount = parseFloat(document.getElementById('investment-amount').value) || 0;
-            if (amount <= 0) {
-                alert('Please enter a valid investment amount');
-                return;
+            try {
+                const amount = parseFloat(document.getElementById('investment-amount').value) || 0;
+                if (amount <= 0) {
+                    alert('Please enter a valid investment amount');
+                    return;
+                }
+                
+                const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+                const riskProfile = clientData.riskProfile;
+                
+                if (!riskProfile) {
+                    alert('Please complete your risk assessment first');
+                    return;
+                }
+                
+                const allocation = {
+                    'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
+                    'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
+                    'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
+                    'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
+                    'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
+                }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
+                
+                const equityAmount = Math.round(amount * allocation.equity / 100);
+                const debtAmount = Math.round(amount * allocation.debt / 100);
+                const goldAmount = Math.round(amount * allocation.gold / 100);
+                const cashAmount = Math.round(amount * allocation.cash / 100);
+                
+                // Display recommendations in interface
+                displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, cashAmount, riskProfile);
+                
+            } catch (error) {
+                console.error('Error generating recommendations:', error);
+                alert('An error occurred while generating recommendations. Please try again.');
             }
+        }
+        
+        function displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, cashAmount, riskProfile) {
+            const recommendationContent = document.getElementById('recommendation-content');
             
-            const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
-            const riskProfile = clientData.riskProfile;
+            recommendationContent.innerHTML = `
+                <div style="display: grid; gap: 2rem;">
+                    <!-- Investment Summary -->
+                    <div style="background: rgba(255,215,0,0.05); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--accent-gold);">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">
+                            <i class="fas fa-coins"></i> Investment Summary
+                        </h5>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                <div style="color: var(--text-gray); font-size: 0.9rem;">Total Investment</div>
+                                <div style="color: var(--accent-gold); font-size: 1.5rem; font-weight: bold;">₹${amount.toLocaleString('en-IN')}</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                <div style="color: var(--text-gray); font-size: 0.9rem;">Risk Profile</div>
+                                <div style="color: var(--accent-white); font-size: 1.2rem; font-weight: bold;">${riskProfile.riskCategory}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Asset Allocation Breakdown -->
+                    <div style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 1.5rem;">
+                        <h5 style="color: var(--accent-white); margin-bottom: 1rem;">
+                            <i class="fas fa-chart-pie"></i> Recommended Asset Allocation
+                        </h5>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--accent-gold); font-weight: bold;">Equity</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Growth-oriented investments</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: var(--accent-gold); font-size: 1.3rem; font-weight: bold;">₹${equityAmount.toLocaleString('en-IN')}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.equity}%</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--accent-white); font-weight: bold;">Debt</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Stable income investments</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: var(--accent-white); font-size: 1.3rem; font-weight: bold;">₹${debtAmount.toLocaleString('en-IN')}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.debt}%</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(192,192,192,0.05); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--accent-silver); font-weight: bold;">Gold</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Inflation hedge</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: var(--accent-silver); font-size: 1.3rem; font-weight: bold;">₹${goldAmount.toLocaleString('en-IN')}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.gold}%</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                <div>
+                                    <div style="color: var(--text-gray); font-weight: bold;">Cash</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Emergency fund</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: var(--text-gray); font-size: 1.3rem; font-weight: bold;">₹${cashAmount.toLocaleString('en-IN')}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.cash}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Steps -->
+                    <div style="background: rgba(255,215,0,0.05); border-radius: 12px; padding: 1.5rem; border-left: 4px solid var(--accent-gold);">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">
+                            <i class="fas fa-tasks"></i> Next Steps
+                        </h5>
+                        <div style="display: grid; gap: 0.8rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-check-circle" style="color: var(--accent-gold);"></i>
+                                <span style="color: var(--text-gray);">Start with ${allocation.equity}% equity allocation through diversified mutual funds</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-check-circle" style="color: var(--accent-gold);"></i>
+                                <span style="color: var(--text-gray);">Allocate ${allocation.debt}% to debt instruments for stability</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-check-circle" style="color: var(--accent-gold);"></i>
+                                <span style="color: var(--text-gray);">Maintain ${allocation.gold}% gold exposure for portfolio diversification</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-check-circle" style="color: var(--accent-gold);"></i>
+                                <span style="color: var(--text-gray);">Keep ${allocation.cash}% in liquid funds for emergency needs</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            if (!riskProfile) {
-                alert('Please complete your risk assessment first');
-                return;
-            }
+            // Show the recommendations section
+            document.getElementById('generated-recommendations').style.display = 'block';
             
-            const allocation = {
-                'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
-                'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
-                'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
-                'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
-                'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
-            }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
-            
-            const equityAmount = Math.round(amount * allocation.equity / 100);
-            const debtAmount = Math.round(amount * allocation.debt / 100);
-            const goldAmount = Math.round(amount * allocation.gold / 100);
-            const cashAmount = Math.round(amount * allocation.cash / 100);
-            
-            alert(`Investment Allocation for ₹${amount.toLocaleString('en-IN')}:\n\nEquity: ₹${equityAmount.toLocaleString('en-IN')} (${allocation.equity}%)\nDebt: ₹${debtAmount.toLocaleString('en-IN')} (${allocation.debt}%)\nGold: ₹${goldAmount.toLocaleString('en-IN')} (${allocation.gold}%)\nCash: ₹${cashAmount.toLocaleString('en-IN')} (${allocation.cash}%)\n\nThis allocation matches your ${riskProfile.riskCategory} risk profile.`);
+            // Smooth scroll to recommendations
+            document.getElementById('generated-recommendations').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
         }
 
         function calculateSmartRebalancing() {
@@ -4490,6 +4615,9 @@
             
             // Generate allocation insights
             generateAllocationInsights(currentAllocation, recommendedAllocation, data.totalValue);
+            
+            // Update rebalancing comparison
+            updateRebalancingComparison(currentAllocation, recommendedAllocation);
         }
 
         function createPortfolioAllocationChart(allocation) {
@@ -4604,6 +4732,41 @@
             `;
             
             insights.innerHTML = insightsHTML;
+        }
+        
+        function updateRebalancingComparison(current, recommended) {
+            const comparison = document.getElementById('rebalancing-comparison');
+            if (!comparison) return;
+            
+            comparison.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Current vs Target Allocation</h5>
+                    <div style="display: grid; gap: 1rem;">
+                        ${Object.keys(recommended).map(asset => {
+                            const currentPercent = parseFloat(current[asset]);
+                            const targetPercent = recommended[asset];
+                            const difference = targetPercent - currentPercent;
+                            const status = Math.abs(difference) <= 2 ? 'balanced' : difference > 0 ? 'underweight' : 'overweight';
+                            const statusColor = status === 'balanced' ? 'var(--accent-gold)' : status === 'underweight' ? 'var(--accent-white)' : 'var(--accent-silver)';
+                            
+                            return `
+                                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                    <div style="text-transform: capitalize; color: var(--accent-white); font-weight: bold;">${asset}</div>
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="flex: 1; background: var(--border-gray); height: 8px; border-radius: 4px; overflow: hidden;">
+                                            <div style="background: var(--accent-gold); height: 100%; width: ${currentPercent}%; transition: width 0.3s ease;"></div>
+                                        </div>
+                                        <div style="color: var(--text-gray); font-size: 0.9rem; min-width: 80px;">${currentPercent}% → ${targetPercent}%</div>
+                                    </div>
+                                    <div style="color: ${statusColor}; font-weight: bold; text-align: center; font-size: 0.9rem;">
+                                        ${status === 'balanced' ? 'Balanced' : status === 'underweight' ? `+${Math.abs(difference).toFixed(1)}%` : `-${Math.abs(difference).toFixed(1)}%`}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
         }
 
         function generatePortfolioHealthCheck(data) {

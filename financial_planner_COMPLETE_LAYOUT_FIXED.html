@@ -9788,9 +9788,12 @@
                                     <div style="color: var(--accent-white); font-size: 1.2rem; font-weight: bold;">
                                         Rs ${analysis.currentCoverage.toLocaleString()}
                                     </div>
-                                    <div style="color: var(--text-gray); font-size: 0.8rem; margin-top: 0.3rem;">
-                                        Family Survival: ${analysis.familySurvivalYears.toFixed(1)} years
-                                    </div>
+                                                                         <div style="color: var(--text-gray); font-size: 0.8rem; margin-top: 0.3rem;">
+                                         Family Survival: ${analysis.familySurvivalYears.toFixed(1)} years
+                                     </div>
+                                     <div style="color: var(--accent-silver); font-size: 0.7rem; margin-top: 0.2rem;">
+                                         ${(analysis.currentCoverage / analysis.annualIncome).toFixed(1)}x annual income
+                                     </div>
                                 </div>
                                 
                                 <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
@@ -9798,9 +9801,12 @@
                                     <div style="color: var(--accent-gold); font-size: 1.2rem; font-weight: bold;">
                                         Rs ${analysis.idealCoverage.toLocaleString()}
                                     </div>
-                                    <div style="color: var(--text-gray); font-size: 0.8rem; margin-top: 0.3rem;">
-                                        Recommended Survival: ${analysis.idealSurvivalYears.toFixed(1)} years
-                                    </div>
+                                                                         <div style="color: var(--text-gray); font-size: 0.8rem; margin-top: 0.3rem;">
+                                         Recommended Survival: ${analysis.idealSurvivalYears.toFixed(1)} years
+                                     </div>
+                                     <div style="color: var(--accent-gold); font-size: 0.7rem; margin-top: 0.2rem;">
+                                         ${analysis.idealMultiplier}x annual income (Professional Standard)
+                                     </div>
                                 </div>
                             </div>
                             
@@ -9848,20 +9854,26 @@
                             </div>
                         `;
                     } else {
-                        return `
-                            <div style="color: var(--accent-gold); font-weight: bold; padding: 0.8rem; background: rgba(255,215,0,0.1); border-radius: 6px;">
-                                EXCELLENT: Your insurance coverage is adequate! 
-                                Your family is well-protected for ${analysis.familySurvivalYears.toFixed(1)} years.
-                            </div>
-                        `;
+                                                 return `
+                             <div style="color: var(--accent-gold); font-weight: bold; padding: 0.8rem; background: rgba(255,215,0,0.1); border-radius: 6px;">
+                                 EXCELLENT: Your insurance coverage is adequate! 
+                                 Your family is well-protected for ${analysis.familySurvivalYears.toFixed(1)} years.
+                                 <div style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.9;">
+                                     Review coverage annually as income and family needs change.
+                                 </div>
+                             </div>
+                         `;
                     }
                 } else {
-                    return `
-                        <div style="color: #F44336; font-weight: bold; padding: 0.8rem; background: rgba(244,67,54,0.1); border-radius: 6px;">
-                            URGENT: You need additional Rs ${Math.abs(analysis.coverageGap).toLocaleString()} coverage. 
-                            Current protection lasts only ${analysis.familySurvivalYears.toFixed(1)} years vs recommended ${analysis.idealSurvivalYears.toFixed(1)} years.
-                        </div>
-                    `;
+                                         return `
+                         <div style="color: #F44336; font-weight: bold; padding: 0.8rem; background: rgba(244,67,54,0.1); border-radius: 6px;">
+                             URGENT: You need additional Rs ${Math.abs(analysis.coverageGap).toLocaleString()} coverage. 
+                             Current protection lasts only ${analysis.familySurvivalYears.toFixed(1)} years vs recommended ${analysis.idealSurvivalYears.toFixed(1)} years.
+                             <div style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.9;">
+                                 Consider term life insurance for cost-effective coverage increase.
+                             </div>
+                         </div>
+                     `;
                 }
             },
             

@@ -3881,8 +3881,20 @@
             if (overviewHeader && data.riskProfile) {
                 overviewHeader.innerHTML = `
                     <div style="text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; margin-bottom: 2rem;">
-                        <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Integrated Portfolio Analysis</h5>
-                        <p style="color: var(--text-gray); margin: 0;">Portfolio analysis based on your ${data.riskProfile.riskCategory} risk profile from Investment Recommendations. Adjust portfolio values above for personalized analysis.</p>
+                        <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Your Portfolio Analysis</h5>
+                        <p style="color: var(--text-gray); margin: 0;">Portfolio analysis based on your ${data.riskProfile.riskCategory} risk profile from Investment Recommendations. Values auto-populated from your risk assessment.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updatePortfolioNoticeForUserData() {
+            const overviewHeader = document.querySelector('#portfolio-overview .card-header + div');
+            if (overviewHeader) {
+                overviewHeader.innerHTML = `
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; margin-bottom: 2rem;">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Your Portfolio Analysis</h5>
+                        <p style="color: var(--text-gray); margin: 0;">Analysis based on your entered portfolio details. Results calculated using your actual investment data.</p>
                     </div>
                 `;
             }
@@ -3901,6 +3913,11 @@
             const cash = parseFloat(document.getElementById('portfolio-cash').value) || 0;
             
             const allocatedTotal = equity + debt + gold + cash;
+            
+            // Check if user has entered any real data
+            if (totalValue > 0 || allocatedTotal > 0) {
+                updatePortfolioNoticeForUserData();
+            }
             
             // Auto-adjust total portfolio value if allocation is entered
             if (allocatedTotal > 0 && totalValue === 0) {
@@ -3942,6 +3959,9 @@
                 allocation: { equity, debt, gold, cash },
                 totalReturns: totalValue - (totalInvested || totalValue)
             };
+            
+            // Update notice to show this is user's real data analysis
+            updatePortfolioNoticeForUserData();
             
             // Perform analysis
             generatePortfolioOverview(portfolioData);

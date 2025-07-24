@@ -8727,17 +8727,18 @@
 
         function determineIsLongTerm(assetType, holdingPeriodMonths) {
             switch (assetType) {
+                case 'equity-mutual-funds':
+                    return holdingPeriodMonths > 12;
                 case 'real-estate':
                     return holdingPeriodMonths > 24;
-                case 'equity-mutual-funds':
                 case 'gold':
-                    return holdingPeriodMonths > 12;
                 case 'debt-mutual-funds':
+                case 'other':
                     return holdingPeriodMonths > 36;
                 case 'crypto':
                     return false; // Always short term
                 default:
-                    return holdingPeriodMonths > 12;
+                    return holdingPeriodMonths > 36; // Conservative default
             }
         }
 
@@ -8749,26 +8750,40 @@
             if (isLongTerm) {
                 switch (assetType) {
                     case 'equity-mutual-funds':
-                        exemption = Math.min(capitalGain, 100000); // 1L exemption
+                        exemption = Math.min(capitalGain, 100000); // ₹1L exemption
                         taxableGain = Math.max(0, capitalGain - exemption);
-                        tax = taxableGain * 0.10; // 10% tax
+                        tax = taxableGain * 0.10; // 10% LTCG tax
                         break;
                     case 'debt-mutual-funds':
                         tax = capitalGain * 0.20; // 20% with indexation benefit
                         break;
                     case 'real-estate':
-                        tax = capitalGain * 0.20; // 20% with indexation
+                        tax = capitalGain * 0.20; // 20% with indexation benefit
                         break;
                     case 'gold':
-                        tax = capitalGain * 0.20; // 20% with indexation
+                        tax = capitalGain * 0.20; // 20% with indexation benefit
+                        break;
+                    case 'crypto':
+                        tax = capitalGain * 0.30; // 30% flat (no LTCG for crypto)
                         break;
                     default:
-                        tax = capitalGain * 0.20;
+                        tax = capitalGain * 0.20; // 20% for other assets
                 }
             } else {
-                // Short term - taxed as per income tax slabs
-                // For simplicity, using 30% (highest slab)
-                tax = capitalGain * 0.30;
+                // Short Term Capital Gains (STCG) - Added to income and taxed at slab rates
+                switch (assetType) {
+                    case 'equity-mutual-funds':
+                        tax = capitalGain * 0.15; // 15% flat STCG tax
+                        break;
+                    case 'crypto':
+                        tax = capitalGain * 0.30; // 30% flat tax on crypto
+                        break;
+                    default:
+                        // For debt MF, gold, real estate, other assets
+                        // STCG is added to income and taxed at slab rates
+                        // Using estimated 30% (will be integrated with income tax)
+                        tax = capitalGain * 0.30; // Estimated - actual rate depends on total income
+                }
             }
 
             return {

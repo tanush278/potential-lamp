@@ -9761,6 +9761,17 @@
                 // Total corpus at retirement
                 const totalCorpusAtRetirement = futureValueCurrentSavings + futureValueSip;
 
+                console.log('Corpus calculation debug:', {
+                    currentSavings,
+                    monthlySip,
+                    yearsToRetirement,
+                    expectedReturn,
+                    monthlyReturn,
+                    futureValueCurrentSavings: Math.round(futureValueCurrentSavings),
+                    futureValueSip: Math.round(futureValueSip),
+                    totalCorpusAtRetirement: Math.round(totalCorpusAtRetirement)
+                });
+
                 // Gap analysis
                 const corpusGap = requiredCorpus - totalCorpusAtRetirement;
                 let additionalMonthlySipNeeded = 0;
@@ -10037,32 +10048,35 @@
                         </div>
                     </div>
 
-                    <!-- Returns Analysis -->
-                    <div style="background: rgba(255,215,0,0.05); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2);">
-                        <h5 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-percentage"></i> Returns Analysis
-                        </h5>
-                        <div style="margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span style="color: var(--text-gray);">Pre-Retirement Return:</span>
-                                <span style="color: var(--text-white); font-weight: 600;">${data.expectedReturn}% p.a.</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span style="color: var(--text-gray);">Post-Retirement Return:</span>
-                                <span style="color: var(--text-white); font-weight: 600;">${data.postRetirementReturn}% p.a.</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span style="color: var(--text-gray);">Inflation Rate:</span>
-                                <span style="color: var(--text-white); font-weight: 600;">${data.inflationRate}% p.a.</span>
-                            </div>
-                            <div style="border-top: 1px solid #333; padding-top: 0.5rem; margin-top: 1rem;">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: var(--accent-gold); font-weight: 600;">Real Return (Post-Retirement):</span>
-                                    <span style="color: var(--accent-gold); font-weight: 700;">${((data.postRetirementReturn - data.inflationRate)).toFixed(1)}% p.a.</span>
+                                            <!-- Returns Analysis -->
+                        <div style="background: rgba(255,215,0,0.05); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,215,0,0.2);">
+                            <h5 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-percentage"></i> Investment Returns Analysis
+                            </h5>
+                            <div style="margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: var(--text-gray);">📈 Growth Phase Return (Age ${data.currentAge}-${data.retirementAge}):</span>
+                                    <span style="color: var(--text-white); font-weight: 600;">${data.expectedReturn}% per year</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: var(--text-gray);">🏖️ Retirement Phase Return (Age ${data.retirementAge}-${data.lifeExpectancy}):</span>
+                                    <span style="color: var(--text-white); font-weight: 600;">${data.postRetirementReturn}% per year</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: var(--text-gray);">📊 Expected Inflation Rate:</span>
+                                    <span style="color: var(--text-white); font-weight: 600;">${data.inflationRate}% per year</span>
+                                </div>
+                                <div style="border-top: 1px solid #333; padding-top: 0.5rem; margin-top: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="color: var(--accent-gold); font-weight: 600;">💰 Real Return After Inflation:</span>
+                                        <span style="color: var(--accent-gold); font-weight: 700;">${((data.postRetirementReturn - data.inflationRate)).toFixed(1)}% per year</span>
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: var(--text-gray); margin-top: 0.5rem; font-style: italic;">
+                                        Real return = Post-retirement return (${data.postRetirementReturn}%) - Inflation (${data.inflationRate}%) = ${((data.postRetirementReturn - data.inflationRate)).toFixed(1)}%
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             `;
         }
@@ -10099,19 +10113,19 @@
                         datasets: [{
                             label: 'Retirement Corpus (₹ Crores)',
                             data: corpusValues,
-                            borderColor: 'var(--accent-gold)',
-                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                            borderWidth: 3,
+                            borderColor: '#FFD700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                            borderWidth: 4,
                             fill: true,
                             tension: 0.4,
-                            pointRadius: 4,
-                            pointHoverRadius: 8,
-                            pointBackgroundColor: 'var(--accent-gold)',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointHoverBackgroundColor: 'var(--accent-gold)',
-                            pointHoverBorderColor: '#ffffff',
-                            pointHoverBorderWidth: 3
+                            pointRadius: 5,
+                            pointHoverRadius: 10,
+                            pointBackgroundColor: '#FFD700',
+                            pointBorderColor: '#FFFFFF',
+                            pointBorderWidth: 3,
+                            pointHoverBackgroundColor: '#FFD700',
+                            pointHoverBorderColor: '#FFFFFF',
+                            pointHoverBorderWidth: 4
                         }]
                     },
                     options: {
@@ -10121,27 +10135,34 @@
                             legend: {
                                 display: true,
                                 labels: {
-                                    color: 'var(--text-white)',
-                                    font: { size: 14, weight: '600' }
+                                    color: '#FFFFFF',
+                                    font: { size: 16, weight: 'bold' }
                                 }
                             },
                             tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                                titleColor: 'var(--accent-gold)',
-                                bodyColor: 'var(--text-white)',
-                                borderColor: 'var(--accent-gold)',
-                                borderWidth: 2,
-                                cornerRadius: 8,
-                                padding: 12,
+                                backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                                titleColor: '#FFD700',
+                                bodyColor: '#FFFFFF',
+                                borderColor: '#FFD700',
+                                borderWidth: 3,
+                                cornerRadius: 10,
+                                padding: 15,
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 13 },
                                 callbacks: {
                                     title: function(context) {
-                                        return `Age: ${context[0].label}`;
+                                        return `Age: ${context[0].label} years`;
                                     },
                                     label: function(context) {
                                         const value = context.raw;
                                         const phase = chartData[context.dataIndex]?.phase || 'unknown';
                                         const crores = (value / 10000000).toFixed(2);
-                                        return `Corpus: ₹${crores}Cr (${phase})`;
+                                        const lakhs = (value / 100000).toFixed(0);
+                                        return [
+                                            `Corpus: ₹${crores} Crores`,
+                                            `(₹${lakhs} Lakhs)`,
+                                            `Phase: ${phase.charAt(0).toUpperCase() + phase.slice(1)}`
+                                        ];
                                     }
                                 }
                             }
@@ -10151,38 +10172,40 @@
                                 title: {
                                     display: true,
                                     text: 'Age (Years)',
-                                    color: 'var(--text-white)',
-                                    font: { size: 14, weight: '600' }
+                                    color: '#FFFFFF',
+                                    font: { size: 16, weight: 'bold' }
                                 },
                                 ticks: {
-                                    color: 'var(--text-gray)',
-                                    font: { size: 12 }
+                                    color: '#FFFFFF',
+                                    font: { size: 14, weight: 'bold' }
                                 },
                                 grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
+                                    color: 'rgba(255, 255, 255, 0.3)',
+                                    lineWidth: 1
                                 }
                             },
                             y: {
                                 title: {
                                     display: true,
                                     text: 'Corpus (₹ Crores)',
-                                    color: 'var(--text-white)',
-                                    font: { size: 14, weight: '600' }
+                                    color: '#FFFFFF',
+                                    font: { size: 16, weight: 'bold' }
                                 },
                                 ticks: {
-                                    color: 'var(--text-gray)',
-                                    font: { size: 12 },
+                                    color: '#FFFFFF',
+                                    font: { size: 14, weight: 'bold' },
                                     callback: function(value) {
                                         return '₹' + (value/10000000).toFixed(1) + 'Cr';
                                     }
                                 },
                                 grid: {
-                                    color: 'rgba(255, 255, 255, 0.1)'
+                                    color: 'rgba(255, 255, 255, 0.3)',
+                                    lineWidth: 1
                                 }
                             }
                         },
                         animation: {
-                            duration: 1500,
+                            duration: 2000,
                             easing: 'easeInOutQuart'
                         }
                     }

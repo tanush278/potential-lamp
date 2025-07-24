@@ -1742,7 +1742,7 @@
                          <div id="networth-tracking" style="display: none; margin-top: 2rem;">
                              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                                  <h4 style="color: var(--accent-white); margin: 0;">Net Worth Tracking</h4>
-                                 <button class="btn btn-secondary" onclick="saveNetWorthSnapshot()">
+                                 <button class="btn btn-secondary" onclick="saveNetWorthSnapshot(this)">
                                      <i class="fas fa-save"></i> Save Current Snapshot
                                  </button>
                              </div>
@@ -7274,7 +7274,7 @@
             });
         }
 
-        function saveNetWorthSnapshot() {
+        function saveNetWorthSnapshot(buttonElement) {
             try {
                 // Calculate current net worth first
                 calculateAdvancedNetWorth();
@@ -7289,17 +7289,27 @@
                     
                     // Get current values from the displayed summary
                     const assetElements = summaryDiv.querySelectorAll('.result-card');
-                    if (assetElements.length < 3) return;
+                    if (assetElements.length < 3) {
+                        alert('Unable to read net worth values. Please try again.');
+                        return;
+                    }
                     
                     const totalAssets = parseFloat(assetElements[0].querySelector('div:nth-child(2)').textContent.replace(/[₹,]/g, '')) || 0;
                     const totalLiabilities = parseFloat(assetElements[1].querySelector('div:nth-child(2)').textContent.replace(/[₹,]/g, '')) || 0;
                     const netWorth = totalAssets - totalLiabilities;
                     
+                    // Validate the data
+                    if (totalAssets === 0 && totalLiabilities === 0) {
+                        alert('Please enter some asset or liability values before saving a snapshot.');
+                        return;
+                    }
+                    
                     const snapshot = {
                         date: new Date().toISOString(),
                         netWorth: netWorth,
                         totalAssets: totalAssets,
-                        totalLiabilities: totalLiabilities
+                        totalLiabilities: totalLiabilities,
+                        timestamp: Date.now()
                     };
                     
                     const savedData = JSON.parse(localStorage.getItem('networthHistory') || '[]');
@@ -7316,21 +7326,29 @@
                     createNetWorthTrendChart(savedData);
                     
                     // Show success message
-                    if (typeof event !== 'undefined' && event.target) {
-                        const button = event.target;
+                    const button = buttonElement || document.querySelector('button[onclick*="saveNetWorthSnapshot"]');
+                    if (button) {
                         const originalText = button.innerHTML;
+                        const originalColor = button.style.backgroundColor;
+                        
                         button.innerHTML = '<i class="fas fa-check"></i> Saved!';
-                        button.style.background = 'var(--accent-gold)';
+                        button.style.backgroundColor = 'var(--accent-gold)';
+                        button.style.color = '#000000';
                         
                         setTimeout(() => {
                             button.innerHTML = originalText;
-                            button.style.background = '';
+                            button.style.backgroundColor = originalColor;
+                            button.style.color = '';
                         }, 2000);
                     }
+                    
+                    // Also show a console message for debugging
+                    console.log('Net Worth Snapshot Saved:', snapshot);
+                    
                 }, 100);
             } catch (error) {
                 console.error('Error saving snapshot:', error);
-                // Fail silently to not crash the app
+                alert('Error saving snapshot: ' + error.message);
             }
         }
     </script>
@@ -7350,7 +7368,7 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <span style="color: var(--accent-gold);">Financial Planner Pro v5.2 - Enhanced Chart Quality</span>
+                            <span style="color: var(--accent-gold);">Financial Planner Pro v5.3 - Save Snapshot Fixed</span>
             <span>•</span>
                             <span>Last Updated: Dec 24, 2024 - 11:30 UTC</span>
             <span>•</span>

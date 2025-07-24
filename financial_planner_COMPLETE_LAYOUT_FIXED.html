@@ -1640,9 +1640,8 @@
                             <p class="card-subtitle">Key metrics and performance indicators</p>
                         </div>
                         
-                        <div style="text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; margin-bottom: 2rem;">
-                            <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Sample Portfolio Analysis</h5>
-                            <p style="color: var(--text-gray); margin: 0;">Enter your portfolio details above to get personalized analysis. Below is a sample analysis for demonstration.</p>
+                        <div id="portfolio-notice-area">
+                            <!-- Dynamic notice will be inserted here -->
                         </div>
                         
                         <div class="results-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
@@ -3632,6 +3631,53 @@
             results.style.display = 'block';
         }
 
+        function getInvestmentGuidance(riskCategory) {
+            const guidance = {
+                'Conservative': 'Focus on capital preservation with stable, low-risk investments. Consider high-grade corporate bonds, government securities, and liquid funds for steady returns with minimal volatility.',
+                'Moderate Conservative': 'Balance safety with modest growth through conservative equity exposure. Allocate 70% to debt and 30% to large-cap equity funds for steady growth with controlled risk.',
+                'Moderate': 'Achieve balanced growth through diversified portfolio. Equal focus on equity and debt instruments with systematic investment approach for optimal risk-adjusted returns.',
+                'Moderate Aggressive': 'Target higher growth with strategic equity allocation. Emphasize quality mid-cap and large-cap funds while maintaining some debt for stability during market cycles.',
+                'Aggressive': 'Maximize wealth creation through high equity exposure. Focus on growth-oriented funds across market caps, accepting short-term volatility for superior long-term wealth generation.'
+            };
+            return guidance[riskCategory] || guidance['Moderate'];
+        }
+
+        function getActionItems(riskCategory) {
+            const actions = {
+                'Conservative': [
+                    'Start SIP in high-grade debt funds',
+                    'Maintain 6-month emergency fund',
+                    'Review portfolio every 6 months',
+                    'Consider PPF for tax benefits'
+                ],
+                'Moderate Conservative': [
+                    'Begin with large-cap equity SIPs',
+                    'Allocate 70% debt, 30% equity gradually',
+                    'Review and rebalance quarterly',
+                    'Use debt funds for tax efficiency'
+                ],
+                'Moderate': [
+                    'Start balanced SIP in equity & debt',
+                    'Maintain 50-35-10-5 allocation',
+                    'Rebalance portfolio annually',
+                    'Track performance against benchmarks'
+                ],
+                'Moderate Aggressive': [
+                    'Focus on diversified equity SIPs',
+                    'Include mid-cap funds for growth',
+                    'Rebalance during major market movements',
+                    'Increase SIP amount annually'
+                ],
+                'Aggressive': [
+                    'Maximize equity SIP allocation',
+                    'Include small & mid-cap opportunities',
+                    'Stay invested through market cycles',
+                    'Top-up investments during market dips'
+                ]
+            };
+            return actions[riskCategory] || actions['Moderate'];
+        }
+
         function generateInvestmentStrategy(riskProfile) {
             const strategy = document.getElementById('strategy-content');
             const strategies = {
@@ -3732,22 +3778,18 @@
                 </div>
                 
                 <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-left: 4px solid var(--accent-gold); border-radius: 8px;">
-                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Market Outlook & Recommendations</h5>
+                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Personalized Recommendations for ${riskProfile.riskCategory} Investor</h5>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                         <div>
-                            <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Current Market Environment</h6>
+                            <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Investment Guidance</h6>
                             <p style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.6; margin: 0;">
-                                Markets are showing mixed signals with global uncertainties. Focus on quality investments
-                                and maintain disciplined approach to achieve long-term financial goals.
+                                ${getInvestmentGuidance(riskProfile.riskCategory)}
                             </p>
                         </div>
                         <div>
-                            <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Action Items</h6>
+                            <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Key Action Items</h6>
                             <ul style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.6; margin: 0; padding-left: 1.2rem;">
-                                <li>Start SIP in recommended funds</li>
-                                <li>Review portfolio quarterly</li>
-                                <li>Rebalance annually or on major life events</li>
-                                <li>Maintain emergency fund separately</li>
+                                ${getActionItems(riskProfile.riskCategory).map(item => `<li>${item}</li>`).join('')}
                             </ul>
                         </div>
                     </div>
@@ -3886,6 +3928,9 @@
         }
 
         function showSamplePortfolioWithPrompt() {
+            // Show sample notice
+            showSamplePortfolioNotice();
+            
             // Sample portfolio data for demonstration
             const sampleData = {
                 totalValue: 1250000,
@@ -3903,9 +3948,9 @@
         }
 
         function updatePortfolioOverviewWithIntegration(data) {
-            const overviewHeader = document.querySelector('#portfolio-overview .card-header + div');
-            if (overviewHeader && data.riskProfile) {
-                overviewHeader.innerHTML = `
+            const noticeArea = document.getElementById('portfolio-notice-area');
+            if (noticeArea && data.riskProfile) {
+                noticeArea.innerHTML = `
                     <div style="text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; margin-bottom: 2rem;">
                         <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Your Portfolio Analysis</h5>
                         <p style="color: var(--text-gray); margin: 0;">Portfolio analysis based on your ${data.riskProfile.riskCategory} risk profile from Investment Recommendations. Values auto-populated from your risk assessment.</p>
@@ -3915,12 +3960,24 @@
         }
 
         function updatePortfolioNoticeForUserData() {
-            const overviewHeader = document.querySelector('#portfolio-overview .card-header + div');
-            if (overviewHeader) {
-                overviewHeader.innerHTML = `
+            const noticeArea = document.getElementById('portfolio-notice-area');
+            if (noticeArea) {
+                noticeArea.innerHTML = `
                     <div style="text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px; margin-bottom: 2rem;">
                         <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Your Portfolio Analysis</h5>
                         <p style="color: var(--text-gray); margin: 0;">Analysis based on your entered portfolio details. Results calculated using your actual investment data.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function showSamplePortfolioNotice() {
+            const noticeArea = document.getElementById('portfolio-notice-area');
+            if (noticeArea) {
+                noticeArea.innerHTML = `
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(192,192,192,0.05); border: 1px solid var(--accent-silver); border-radius: 8px; margin-bottom: 2rem;">
+                        <h5 style="color: var(--accent-silver); margin-bottom: 0.5rem;">Sample Portfolio Analysis</h5>
+                        <p style="color: var(--text-gray); margin: 0;">Enter your portfolio details above to get personalized analysis. Below is a sample analysis for demonstration.</p>
                     </div>
                 `;
             }

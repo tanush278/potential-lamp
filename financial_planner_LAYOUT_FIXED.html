@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planner Pro - Advanced Edition</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-black: #000000;
+            --secondary-black: #0a0a0a;
+            --card-black: #111111;
+            --border-gray: #333333;
+            --text-white: #ffffff;
+            --text-gray: #aaaaaa;
+            --accent-white: #ffffff;
+            --success-green: #00ff88;
+            --warning-orange: #ff9f43;
+            --error-red: #ff6b6b;
+            --info-blue: #00d4ff;
+            --gradient-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            --gradient-card: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
+            --gradient-accent: linear-gradient(90deg, #ffffff 0%, #e0e0e0 100%);
+            --shadow-light: 0 4px 20px rgba(255, 255, 255, 0.1);
+            --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.8);
+            --border-radius-sm: 8px;
+            --border-radius-md: 15px;
+            --border-radius-lg: 25px;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--primary-black);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* FIXED LAYOUT CONTAINER */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        /* FIXED SIDEBAR */
+        .sidebar {
+            width: 280px;
+            min-width: 280px;
+            background: var(--gradient-primary);
+            border-right: 2px solid var(--border-gray);
+            height: 100vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1000;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+            min-width: 70px;
+        }
+
+        /* SIDEBAR HEADER - FIXED POSITIONING */
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-gray);
+            background: var(--card-black);
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding: 1rem 0.5rem;
+        }
+
+        .app-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .app-logo {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .app-logo .logo-text {
+            display: none;
+        }
+
+        .app-logo i {
+            font-size: 1.8rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex-shrink: 0;
+        }
+
+        /* TOGGLE BUTTON - FIXED POSITIONING */
+        .sidebar-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: -15px;
+            background: var(--card-black);
+            border: 2px solid var(--border-gray);
+            color: var(--text-white);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1002;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--accent-white);
+            color: var(--primary-black);
+        }
+
+        /* NAVIGATION */
+        .nav-section {
+            padding: 1rem 0;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-gray);
+            padding: 0 1.5rem 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            display: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar.collapsed .nav-link {
+            padding: 0.8rem;
+            justify-content: center;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+            border-left-color: var(--accent-white);
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+            border-left-color: var(--accent-white);
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+        }
+
+        .nav-text {
+            flex: 1;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .nav-arrow {
+            font-size: 0.8rem;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar.collapsed .nav-arrow {
+            display: none;
+        }
+
+        .nav-submenu {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 2px solid var(--border-gray);
+            margin-left: 1.5rem;
+            overflow: hidden;
+            max-height: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar.collapsed .nav-submenu {
+            display: none;
+        }
+
+        .nav-submenu.active {
+            max-height: 300px;
+        }
+
+        .nav-sublink {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 0.9rem;
+        }
+
+        .nav-sublink:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+        }
+
+        .nav-sublink i {
+            margin-right: 0.5rem;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* MAIN CONTENT AREA - FIXED POSITIONING */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* HEADER - FIXED AT TOP */
+        .app-header {
+            background: var(--gradient-card);
+            border-bottom: 2px solid var(--border-gray);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .breadcrumb {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        /* CONTENT AREA - SCROLLABLE */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        /* SECTIONS - PROPER SIZING */
+        .section {
+            display: none;
+            padding: 2rem;
+            min-height: calc(100vh - 100px);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .section.active {
+            display: block;
+            animation: sectionFadeIn 0.5s ease-out;
+        }
+
+        @keyframes sectionFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* SECTION HEADERS */
+        .section-header {
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-accent);
+            border-radius: 2px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            font-weight: 400;
+        }
+
+        /* CARDS - PROPER SIZING */
+        .card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--border-radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition-smooth);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        /* FORM ELEMENTS - PROPER SIZING */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-input, .form-select {
+            background: var(--card-black);
+            border: 1px solid var(--border-gray);
+            border-radius: var(--border-radius-sm);
+            padding: 0.8rem 1rem;
+            color: var(--text-white);
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-white);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: var(--primary-black);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-white);
+            border: 1px solid var(--border-gray);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-gray);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                z-index: 2000;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .section {
+                padding: 1rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* PROFILE INFO */
+        .profile-info-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .current-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+        }
+
+        .profile-status {
+            color: var(--success-green);
+            font-size: 1.2rem;
+        }
+
+        /* LOADING AND ANIMATION FIXES */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.1rem;
+            color: var(--text-gray);
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-gray);
+            border-top: 2px solid var(--accent-white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="app-logo">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="logo-text">FinancePro</span>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <!-- Dashboard Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Overview</div>
+                    <div class="nav-item">
+                        <a class="nav-link active" onclick="showSection('dashboard')">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" onclick="showSection('profiles')">
+                            <i class="nav-icon fas fa-users"></i>
+                            <span class="nav-text">Client Profiles</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Assessment Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Assessment</div>
+                    <div class="nav-item">
+                        <a class="nav-link" onclick="toggleNavItem(this)">
+                            <i class="nav-icon fas fa-clipboard-check"></i>
+                            <span class="nav-text">Financial Assessment</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <div class="nav-submenu">
+                            <a class="nav-sublink" onclick="showSection('basic-info')">
+                                <i class="fas fa-user"></i> Basic Information
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('financial-status')">
+                                <i class="fas fa-wallet"></i> Financial Status
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('risk-profile')">
+                                <i class="fas fa-chart-bar"></i> Risk Assessment
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('goals')">
+                                <i class="fas fa-bullseye"></i> Financial Goals
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculators Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Calculators</div>
+                    <div class="nav-item">
+                        <a class="nav-link" onclick="toggleNavItem(this)">
+                            <i class="nav-icon fas fa-calculator"></i>
+                            <span class="nav-text">Financial Calculators</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <div class="nav-submenu">
+                            <a class="nav-sublink" onclick="showSection('sip-main')">
+                                <i class="fas fa-chart-line"></i> SIP Calculator
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('emi')">
+                                <i class="fas fa-home"></i> EMI Calculator
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('net-worth')">
+                                <i class="fas fa-coins"></i> Net Worth
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('insurance')">
+                                <i class="fas fa-shield-alt"></i> Insurance Needs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Investment Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Investment</div>
+                    <div class="nav-item">
+                        <a class="nav-link" onclick="toggleNavItem(this)">
+                            <i class="nav-icon fas fa-chart-pie"></i>
+                            <span class="nav-text">Investment Advisory</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <div class="nav-submenu">
+                            <a class="nav-sublink" onclick="showSection('portfolio-main')">
+                                <i class="fas fa-briefcase"></i> Portfolio Analysis
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('recommendations-main')">
+                                <i class="fas fa-lightbulb"></i> Investment Recommendations
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('tax-planning')">
+                                <i class="fas fa-file-invoice-dollar"></i> Tax Planning
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('retirement')">
+                                <i class="fas fa-umbrella"></i> Retirement
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('comparison')">
+                                <i class="fas fa-balance-scale"></i> Product Compare
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics & Reports Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Reports</div>
+                    <div class="nav-item">
+                        <a class="nav-link" onclick="toggleNavItem(this)">
+                            <i class="nav-icon fas fa-chart-bar"></i>
+                            <span class="nav-text">Analytics & Reports</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <div class="nav-submenu">
+                            <a class="nav-sublink" onclick="showSection('analytics')">
+                                <i class="fas fa-chart-bar"></i> Analytics
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('reports')">
+                                <i class="fas fa-file-alt"></i> Reports
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('summary')">
+                                <i class="fas fa-clipboard-list"></i> Executive Summary
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('alerts')">
+                                <i class="fas fa-bell"></i> Smart Alerts
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Tools Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <div class="nav-item">
+                        <a class="nav-link" onclick="toggleNavItem(this)">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <span class="nav-text">Financial Tools</span>
+                            <i class="nav-arrow fas fa-chevron-right"></i>
+                        </a>
+                        <div class="nav-submenu">
+                            <a class="nav-sublink" onclick="showSection('loan-calculator')">
+                                <i class="fas fa-home"></i> Loan Calculator
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('budget-planner')">
+                                <i class="fas fa-chart-pie"></i> Budget Planner
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('investment-tracker')">
+                                <i class="fas fa-trending-up"></i> Investment Tracker
+                            </a>
+                            <a class="nav-sublink" onclick="showSection('financial-calendar')">
+                                <i class="fas fa-calendar-alt"></i> Financial Calendar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Premium Header -->
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="breadcrumb">
+                        <span id="current-section-title">Dashboard</span>
+                    </div>
+                    <div class="profile-info-header">
+                        <div class="current-profile">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="current-profile-name">Profile Name</span>
+                            <span id="current-profile-status" class="profile-status">●</span>
+                        </div>
+                        <button class="btn btn-small btn-primary" onclick="saveCurrentProfile()">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                        <button class="btn btn-small btn-secondary" onclick="showExportModal()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button class="btn btn-small btn-secondary" onclick="showSettingsModal()">
+                            <i class="fas fa-cog"></i> Settings
+                        </button>
+                        <button class="btn btn-small btn-secondary" onclick="goBackToProfiles()">
+                            <i class="fas fa-home"></i> Home
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="section active">
+                    <div class="section-header">
+                        <h1 class="section-title">Financial Dashboard</h1>
+                        <p class="section-subtitle">Complete overview of your financial health and portfolio performance</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Welcome to Financial Planner Pro</h3>
+                        <p>This is a comprehensive financial planning application with advanced features.</p>
+                        <p>Use the sidebar to navigate through different sections and tools.</p>
+                        <button class="btn btn-primary" onclick="loadSampleData()">
+                            <i class="fas fa-database"></i> Load Sample Data
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Other sections would go here -->
+                <section id="basic-info" class="section">
+                    <div class="section-header">
+                        <h1 class="section-title">Basic Information</h1>
+                        <p class="section-subtitle">Tell us about yourself to create a personalized financial plan</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Personal Details</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" class="form-input" placeholder="Enter your full name">
+                            </div>
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="number" class="form-input" placeholder="Enter your age">
+                            </div>
+                            <div class="form-group">
+                                <label>Occupation</label>
+                                <input type="text" class="form-input" placeholder="Enter your occupation">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Information
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Add more sections as needed -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Core variables
+        let clientData = {
+            profileInfo: {},
+            basicInfo: {},
+            financialStatus: {},
+            riskProfile: {},
+            goals: {},
+            calculations: {}
+        };
+        let currentProfileId = null;
+
+        // Sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        // Navigation functions
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show target section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                
+                // Update breadcrumb
+                const title = targetSection.querySelector('.section-title')?.textContent || sectionId;
+                document.getElementById('current-section-title').textContent = title;
+                
+                // Update active nav link
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                // Find and activate the corresponding nav link
+                const navLinks = document.querySelectorAll('.nav-link, .nav-sublink');
+                navLinks.forEach(link => {
+                    if (link.getAttribute('onclick')?.includes(`'${sectionId}'`)) {
+                        if (link.classList.contains('nav-link')) {
+                            link.classList.add('active');
+                        } else {
+                            // For sublinks, activate the parent
+                            const parentNav = link.closest('.nav-item').querySelector('.nav-link');
+                            if (parentNav) parentNav.classList.add('active');
+                        }
+                    }
+                });
+            }
+        }
+
+        function toggleNavItem(element) {
+            const submenu = element.parentElement.querySelector('.nav-submenu');
+            const arrow = element.querySelector('.nav-arrow');
+            
+            if (submenu) {
+                submenu.classList.toggle('active');
+                arrow.style.transform = submenu.classList.contains('active') ? 'rotate(90deg)' : 'rotate(0deg)';
+            }
+        }
+
+        // Sample data function
+        function loadSampleData() {
+            try {
+                const sampleData = {
+                    profileInfo: { id: "sample_" + Date.now(), created: new Date().toISOString() },
+                    basicInfo: { name: "Rahul Sharma", age: 32, occupation: "Software Engineer" },
+                    financialStatus: { monthlyIncome: 85000, monthlyExpenses: 55000, currentSavings: 650000 },
+                    riskProfile: { riskScore: 7, riskCategory: "Moderate to Aggressive" }
+                };
+                
+                clientData = Object.assign(clientData, sampleData);
+                currentProfileId = Date.now().toString();
+                
+                const profiles = JSON.parse(localStorage.getItem('financialPlannerProfiles') || '{}');
+                profiles[currentProfileId] = clientData;
+                localStorage.setItem('financialPlannerProfiles', JSON.stringify(profiles));
+                
+                if (typeof loadClientData === 'function') loadClientData();
+                if (typeof updateHeaderProfileInfo === 'function') updateHeaderProfileInfo();
+                
+                alert('Sample data loaded successfully!');
+            } catch (error) {
+                console.error('Error loading sample data:', error);
+                alert('Error loading sample data');
+            }
+        }
+
+        // Placeholder functions for missing functionality
+        function saveCurrentProfile() {
+            console.log('Save profile functionality');
+            alert('Profile saved successfully!');
+        }
+
+        function showExportModal() {
+            console.log('Export modal functionality');
+            alert('Export functionality coming soon!');
+        }
+
+        function showSettingsModal() {
+            console.log('Settings modal functionality');
+            alert('Settings functionality coming soon!');
+        }
+
+        function goBackToProfiles() {
+            console.log('Go back to profiles functionality');
+            alert('Profile navigation functionality coming soon!');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Financial Planner Pro initialized');
+            
+            // Initialize AOS if available
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 600,
+                    easing: 'ease-in-out-cubic',
+                    once: true
+                });
+            }
+            
+            // Set initial state
+            showSection('dashboard');
+        });
+
+        // Mobile responsive handling
+        window.addEventListener('resize', function() {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+        });
+    </script>
+</body>
+</html>

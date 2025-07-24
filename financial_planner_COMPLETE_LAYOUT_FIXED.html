@@ -1812,6 +1812,10 @@
                                 <i class="fas fa-balance-scale"></i> Compare Both
                                 <small style="display: block; font-size: 11px; margin-top: 4px;">Side-by-Side Analysis</small>
                             </button>
+                            <button type="button" class="regime-btn" data-regime="capital-gains" onclick="selectTaxRegime('capital-gains')" title="Calculate capital gains tax on investments">
+                                <i class="fas fa-chart-line"></i> Capital Gains Tax
+                                <small style="display: block; font-size: 11px; margin-top: 4px;">STCG & LTCG Calculator</small>
+                            </button>
                         </div>
                         
                         <!-- Regime Information -->
@@ -1838,6 +1842,14 @@
                                     <strong>Analysis:</strong> Compare both regimes to find which saves more tax based on your income and deductions<br>
                                     <strong>Recommendation:</strong> System will automatically suggest the better option for your situation<br>
                                     <strong>Note:</strong> You can switch between regimes annually (except for business income taxpayers)
+                                </p>
+                            </div>
+                            <div id="capital-gains-info" style="display: none;">
+                                <h4 style="color: var(--accent-gold); margin: 0 0 10px 0;"><i class="fas fa-info-circle"></i> Capital Gains Tax (FY 2024-25)</h4>
+                                <p style="margin: 0; color: var(--text-gray); line-height: 1.5;">
+                                    <strong>Short Term (STCG):</strong> Assets held ≤12 months (≤24 months for real estate). Taxed as per income tax slabs<br>
+                                    <strong>Long Term (LTCG):</strong> Assets held >12 months (>24 months for real estate). Equity: 10% above ₹1L exemption, Debt: 20% with indexation<br>
+                                    <strong>Note:</strong> Calculate tax liability on your investment gains and plan your portfolio exits strategically
                                 </p>
                             </div>
                         </div>
@@ -1984,6 +1996,80 @@
                                 <div id="hra-breakdown" style="color: var(--text-gray); font-size: 0.9rem;">
                                     Enter salary and rent details to calculate HRA exemption
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Capital Gains Tax Calculator -->
+                    <div class="card" id="capital-gains-section" style="display: none;">
+                        <div class="card-header">
+                            <h3 class="card-title">Capital Gains Tax Calculator</h3>
+                            <p class="card-subtitle">Calculate tax on your investment gains (STCG & LTCG)</p>
+                        </div>
+                        
+                        <!-- Asset Type Selection -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-chart-line"></i> Investment Details
+                            </h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Asset Type</label>
+                                    <select id="asset-type" class="form-input" onchange="calculateCapitalGains()">
+                                        <option value="equity-mutual-funds">Equity/Equity Mutual Funds</option>
+                                        <option value="debt-mutual-funds">Debt Mutual Funds</option>
+                                        <option value="real-estate">Real Estate</option>
+                                        <option value="gold">Gold/Gold ETF</option>
+                                        <option value="crypto">Cryptocurrency</option>
+                                        <option value="other">Other Assets</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Purchase Date</label>
+                                    <input type="date" id="purchase-date" class="form-input" onchange="calculateCapitalGains()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sale Date</label>
+                                    <input type="date" id="sale-date" class="form-input" onchange="calculateCapitalGains()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Purchase Price (₹)</label>
+                                    <input type="number" id="purchase-price" class="form-input" placeholder="Total purchase cost" onchange="calculateCapitalGains()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sale Price (₹)</label>
+                                    <input type="number" id="sale-price" class="form-input" placeholder="Total sale proceeds" onchange="calculateCapitalGains()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Improvement Cost (₹)</label>
+                                    <input type="number" id="improvement-cost" class="form-input" placeholder="Brokerage, stamp duty, etc." onchange="calculateCapitalGains()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Capital Gains Results -->
+                        <div id="capital-gains-results" style="display: none;">
+                            <!-- Results will be populated here -->
+                        </div>
+                        
+                        <!-- Multiple Assets Calculator -->
+                        <div style="margin-top: 2rem;">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-plus-circle"></i> Multiple Assets Calculator
+                            </h4>
+                            <div id="multiple-assets-list">
+                                <!-- Dynamic asset list will be populated here -->
+                            </div>
+                            <button type="button" class="btn btn-secondary" onclick="addAssetForCapitalGains()" style="margin-top: 1rem;">
+                                <i class="fas fa-plus"></i> Add Another Asset
+                            </button>
+                        </div>
+                        
+                        <!-- Tax Optimization Tips -->
+                        <div id="capital-gains-tips" style="margin-top: 2rem; padding: 1.5rem; background: var(--card-black); border-radius: 8px; border: 1px solid var(--border-gray);">
+                            <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Tax Optimization Tips</h4>
+                            <div id="optimization-tips" style="color: var(--text-gray); line-height: 1.6;">
+                                <!-- Tips will be populated based on calculations -->
                             </div>
                         </div>
                     </div>
@@ -6824,17 +6910,30 @@
             document.getElementById('old-regime-info').style.display = regime === 'old' ? 'block' : 'none';
             document.getElementById('new-regime-info').style.display = regime === 'new' ? 'block' : 'none';
             document.getElementById('compare-regime-info').style.display = regime === 'compare' ? 'block' : 'none';
+            document.getElementById('capital-gains-info').style.display = regime === 'capital-gains' ? 'block' : 'none';
             
-            // Show/hide deduction sections based on regime
+            // Show/hide sections based on regime
             const oldRegimeDeductions = document.getElementById('old-regime-deductions');
-            if (regime === 'new') {
-                oldRegimeDeductions.style.display = 'none';
-            } else {
-                oldRegimeDeductions.style.display = 'block';
-            }
+            const capitalGainsSection = document.getElementById('capital-gains-section');
+            const incomeDetailsSection = document.querySelector('.card:has(#basic-salary)').parentElement;
             
-            // Recalculate tax
-            calculateAdvancedTax();
+            if (regime === 'capital-gains') {
+                // Hide income tax sections, show capital gains
+                if (oldRegimeDeductions) oldRegimeDeductions.style.display = 'none';
+                if (incomeDetailsSection) incomeDetailsSection.style.display = 'none';
+                if (capitalGainsSection) capitalGainsSection.style.display = 'block';
+                calculateCapitalGains();
+            } else {
+                // Show income tax sections, hide capital gains
+                if (capitalGainsSection) capitalGainsSection.style.display = 'none';
+                if (incomeDetailsSection) incomeDetailsSection.style.display = 'block';
+                if (regime === 'new') {
+                    if (oldRegimeDeductions) oldRegimeDeductions.style.display = 'none';
+                } else {
+                    if (oldRegimeDeductions) oldRegimeDeductions.style.display = 'block';
+                }
+                calculateAdvancedTax();
+            }
         }
 
         function calculateAdvancedTax() {

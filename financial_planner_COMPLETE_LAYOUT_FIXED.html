@@ -9677,9 +9677,9 @@
             // INTELLIGENT CASCADE UPDATES - Make sections work together (CRASH-SAFE)
             cascadeUpdates(section, field, value) {
                 try {
-                    // When age changes, update insurance calculations
+                    // When age changes, update insurance analysis
                     if (field === 'age') {
-                        this.updateInsuranceNeeds();
+                        this.analyzeInsuranceCoverage();
                         if (this.updateRetirementTimeline) {
                             this.updateRetirementTimeline();
                         }
@@ -9709,63 +9709,157 @@
                 }
             },
             
-            // SMART INSURANCE NEEDS CALCULATION with explanation
-            updateInsuranceNeeds() {
+            // INSURANCE COVERAGE ANALYSIS (User enters current coverage)
+            analyzeInsuranceCoverage() {
                 const age = this.clientData.profile.age;
                 const monthlyIncome = this.clientData.profile.income;
                 const dependents = this.clientData.profile.dependents || 2;
                 
-                if (age && monthlyIncome) {
-                    // CORRECT CALCULATION: Monthly income to annual, then multiply
+                // Get user's ACTUAL current insurance coverage
+                const currentCoverage = parseFloat(document.getElementById('insurance-coverage')?.value) || 0;
+                
+                if (age && monthlyIncome && currentCoverage > 0) {
                     const annualIncome = monthlyIncome * 12;
                     
-                    // Smart multiplier based on age and dependents
-                    let multiplier;
+                    // Calculate IDEAL coverage based on professional standards
+                    let idealMultiplier;
                     if (age < 30) {
-                        multiplier = dependents > 2 ? 15 : 12;
+                        idealMultiplier = dependents > 2 ? 15 : 12;
                     } else if (age < 40) {
-                        multiplier = dependents > 2 ? 12 : 10;
+                        idealMultiplier = dependents > 2 ? 12 : 10;
                     } else {
-                        multiplier = dependents > 1 ? 10 : 8;
+                        idealMultiplier = dependents > 1 ? 10 : 8;
                     }
                     
-                    const recommendedCoverage = annualIncome * multiplier;
+                    const idealCoverage = annualIncome * idealMultiplier;
                     
-                    // Only suggest if coverage is reasonable (not less than 5 lakh)
-                    const finalCoverage = Math.max(recommendedCoverage, 500000);
+                    // ANALYSIS: Compare current vs ideal
+                    const coverageGap = currentCoverage - idealCoverage;
+                    const isAdequate = coverageGap >= 0;
+                    const gapPercentage = Math.abs(coverageGap / idealCoverage * 100);
                     
-                    // Show explanation to user
-                    this.showInsuranceExplanation(monthlyIncome, annualIncome, multiplier, finalCoverage, dependents);
+                    // SURVIVAL ANALYSIS: How long will family survive
+                    const familySurvivalYears = currentCoverage / annualIncome;
+                    const idealSurvivalYears = idealCoverage / annualIncome;
                     
-                    // Auto-update insurance coverage field
-                    const coverageField = document.getElementById('insurance-coverage');
-                    if (coverageField) {
-                        coverageField.value = finalCoverage;
-                    }
+                    // Show comprehensive analysis
+                    this.showInsuranceAnalysis({
+                        monthlyIncome,
+                        annualIncome,
+                        currentCoverage,
+                        idealCoverage,
+                        coverageGap,
+                        isAdequate,
+                        gapPercentage,
+                        familySurvivalYears,
+                        idealSurvivalYears,
+                        dependents,
+                        idealMultiplier
+                    });
                     
-                    console.log(`Smart insurance calculation: Monthly ${monthlyIncome} -> Annual ${annualIncome} -> Coverage ${finalCoverage.toLocaleString()} (${multiplier}x)`);
+                    console.log(`Insurance Analysis: Current ${currentCoverage.toLocaleString()} vs Ideal ${idealCoverage.toLocaleString()}, Gap: ${coverageGap.toLocaleString()}`);
                 }
             },
             
-            // Show insurance explanation to user
-            showInsuranceExplanation(monthlyIncome, annualIncome, multiplier, coverage, dependents) {
+            // Show comprehensive insurance analysis
+            showInsuranceAnalysis(analysis) {
                 const explanationDiv = document.getElementById('insurance-explanation');
                 if (explanationDiv) {
+                    const statusColor = analysis.isAdequate ? 
+                        (analysis.gapPercentage > 50 ? 'var(--accent-silver)' : 'var(--accent-gold)') : 
+                        '#F44336';
+                    
+                    const statusText = analysis.isAdequate ? 
+                        (analysis.gapPercentage > 50 ? 'OVER-INSURED' : 'ADEQUATE') : 
+                        'UNDER-INSURED';
+                    
                     explanationDiv.innerHTML = `
-                        <div style="background: rgba(255,215,0,0.1); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem; margin-top: 1rem;">
-                            <h5 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Insurance Coverage Calculation:</h5>
-                            <div style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.5;">
-                                <div>Monthly Income: Rs ${monthlyIncome.toLocaleString()}</div>
-                                <div>Annual Income: Rs ${annualIncome.toLocaleString()}</div>
-                                <div>Dependents: ${dependents} people</div>
-                                <div>Multiplier: ${multiplier}x (based on age & dependents)</div>
-                                <div style="color: var(--accent-white); font-weight: bold; margin-top: 0.5rem;">
-                                    Recommended Coverage: Rs ${coverage.toLocaleString()}
+                        <div style="background: rgba(255,255,255,0.02); border: 2px solid ${statusColor}; border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="background: ${statusColor}; color: var(--primary-black); padding: 0.5rem 1rem; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
+                                    ${statusText}
                                 </div>
-                                <div style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;">
-                                    This ensures your family can maintain lifestyle for ${multiplier} years if something happens to you.
+                                <h5 style="color: var(--accent-white); margin: 0;">Insurance Coverage Analysis</h5>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+                                    <h6 style="color: var(--accent-silver); margin-bottom: 0.5rem;">Current Coverage</h6>
+                                    <div style="color: var(--accent-white); font-size: 1.2rem; font-weight: bold;">
+                                        Rs ${analysis.currentCoverage.toLocaleString()}
+                                    </div>
+                                    <div style="color: var(--text-gray); font-size: 0.8rem; margin-top: 0.3rem;">
+                                        Family Survival: ${analysis.familySurvivalYears.toFixed(1)} years
+                                    </div>
+                                </div>
+                                
+                                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+                                    <h6 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Ideal Coverage</h6>
+                                    <div style="color: var(--accent-gold); font-size: 1.2rem; font-weight: bold;">
+                                        Rs ${analysis.idealCoverage.toLocaleString()}
+                                    </div>
+                                    <div style="color: var(--text-gray); font-size: 0.8rem; margin-top: 0.3rem;">
+                                        Recommended Survival: ${analysis.idealSurvivalYears.toFixed(1)} years
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <div style="background: rgba(255,215,0,0.05); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-gold);">
+                                <h6 style="color: var(--accent-white); margin-bottom: 0.8rem;">Professional Analysis:</h6>
+                                <div style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.6;">
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <strong style="color: var(--accent-white);">Income Replacement:</strong> 
+                                        ${analysis.idealMultiplier}x annual income (Rs ${analysis.annualIncome.toLocaleString()})
+                                    </div>
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <strong style="color: var(--accent-white);">Coverage Gap:</strong> 
+                                        Rs ${Math.abs(analysis.coverageGap).toLocaleString()} 
+                                        ${analysis.isAdequate ? '(Excess)' : '(Shortfall)'}
+                                    </div>
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <strong style="color: var(--accent-white);">Gap Percentage:</strong> 
+                                        ${analysis.gapPercentage.toFixed(1)}% ${analysis.isAdequate ? 'over-covered' : 'under-covered'}
+                                    </div>
+                                    <div style="margin-bottom: 1rem;">
+                                        <strong style="color: var(--accent-white);">Family Protection:</strong> 
+                                        Your current coverage will support ${analysis.dependents} dependents for 
+                                        <span style="color: ${analysis.familySurvivalYears >= analysis.idealSurvivalYears ? 'var(--accent-gold)' : '#F44336'}; font-weight: bold;">
+                                            ${analysis.familySurvivalYears.toFixed(1)} years
+                                        </span>
+                                    </div>
+                                    
+                                    ${this.getInsuranceRecommendation(analysis)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            
+            // Get specific recommendation based on analysis
+            getInsuranceRecommendation(analysis) {
+                if (analysis.isAdequate) {
+                    if (analysis.gapPercentage > 50) {
+                        return `
+                            <div style="color: var(--accent-silver); font-weight: bold; padding: 0.8rem; background: rgba(192,192,192,0.1); border-radius: 6px;">
+                                RECOMMENDATION: You're over-insured by ${analysis.gapPercentage.toFixed(1)}%. 
+                                Consider reducing coverage by Rs ${Math.abs(analysis.coverageGap).toLocaleString()} 
+                                and investing the saved premiums for better returns.
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div style="color: var(--accent-gold); font-weight: bold; padding: 0.8rem; background: rgba(255,215,0,0.1); border-radius: 6px;">
+                                EXCELLENT: Your insurance coverage is adequate! 
+                                Your family is well-protected for ${analysis.familySurvivalYears.toFixed(1)} years.
+                            </div>
+                        `;
+                    }
+                } else {
+                    return `
+                        <div style="color: #F44336; font-weight: bold; padding: 0.8rem; background: rgba(244,67,54,0.1); border-radius: 6px;">
+                            URGENT: You need additional Rs ${Math.abs(analysis.coverageGap).toLocaleString()} coverage. 
+                            Current protection lasts only ${analysis.familySurvivalYears.toFixed(1)} years vs recommended ${analysis.idealSurvivalYears.toFixed(1)} years.
                         </div>
                     `;
                 }
@@ -9950,6 +10044,22 @@
                         });
                     }
                 });
+                
+                // Insurance coverage analysis - User enters current coverage
+                const insuranceCoverageField = document.getElementById('insurance-coverage');
+                if (insuranceCoverageField) {
+                    insuranceCoverageField.addEventListener('input', function() {
+                        try {
+                            const coverage = parseFloat(this.value) || 0;
+                            if (coverage > 0) {
+                                // Trigger insurance analysis when user enters coverage
+                                FinancialEcosystem.analyzeInsuranceCoverage();
+                            }
+                        } catch (error) {
+                            console.error('Error analyzing insurance coverage:', error);
+                        }
+                    });
+                }
                 
                 // Goal amount fields - trigger investment strategy updates
                 ['retirement-goal', 'home-goal', 'education-goal'].forEach(fieldId => {

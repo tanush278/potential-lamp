@@ -824,6 +824,34 @@
             color: var(--accent-gold);
             font-size: 0.9rem;
         }
+        
+        /* INVESTMENT CARD ALIGNMENT FIX */
+        .investment-card-cell {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px;
+        }
+        
+        .investment-card-value {
+            font-weight: bold;
+            white-space: nowrap;
+            margin-bottom: 0.2rem;
+        }
+        
+        .investment-card-label {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            white-space: nowrap;
+        }
+        
+        .investment-card-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
         /* RESPONSIVE */
         @media (max-width: 768px) {
@@ -2760,15 +2788,15 @@
                                             <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Axis Bluechip Fund</div>
                                             <div style="color: var(--text-gray); font-size: 0.9rem;">Large Cap</div>
                                         </div>
-                                        <div style="text-align: center;">
-                                            <div style="color: var(--accent-gold); font-weight: bold;">12-15%</div>
-                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                        <div class="investment-card-cell">
+                                            <div class="investment-card-value" style="color: var(--accent-gold);">12-15%</div>
+                                            <div class="investment-card-label">Expected Return</div>
                                         </div>
-                                        <div style="text-align: center;">
-                                            <div style="color: #ffc107; font-weight: bold;">Medium</div>
-                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                        <div class="investment-card-cell">
+                                            <div class="investment-card-value" style="color: #ffc107;">Medium</div>
+                                            <div class="investment-card-label">Risk Level</div>
                                         </div>
-                                        <div style="text-align: center;">
+                                        <div class="investment-card-button">
                                             <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Details</button>
                                         </div>
                                     </div>
@@ -2777,15 +2805,15 @@
                                             <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Mirae Asset Large Cap Fund</div>
                                             <div style="color: var(--text-gray); font-size: 0.9rem;">Large Cap</div>
                                         </div>
-                                        <div style="text-align: center;">
-                                            <div style="color: var(--accent-gold); font-weight: bold;">12-15%</div>
-                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Expected Return</div>
+                                        <div class="investment-card-cell">
+                                            <div class="investment-card-value" style="color: var(--accent-gold);">12-15%</div>
+                                            <div class="investment-card-label">Expected Return</div>
                                         </div>
-                                        <div style="text-align: center;">
-                                            <div style="color: #ffc107; font-weight: bold;">Medium</div>
-                                            <div style="color: var(--text-gray); font-size: 0.8rem;">Risk Level</div>
+                                        <div class="investment-card-cell">
+                                            <div class="investment-card-value" style="color: #ffc107;">Medium</div>
+                                            <div class="investment-card-label">Risk Level</div>
                                         </div>
-                                        <div style="text-align: center;">
+                                        <div class="investment-card-button">
                                             <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">View Details</button>
                                         </div>
                                     </div>
@@ -9542,12 +9570,16 @@
                     mutualFundsData = liveFunds;
                     console.log(`🎉 Successfully loaded ${liveFunds.length} live mutual funds!`);
                     
+                    // CRITICAL FIX: RELOAD TABLE WITH LIVE DATA
+                    loadMutualFundsComparison();
+                    
                     // Add a detailed indicator that live data is loaded
                     const liveIndicator = document.createElement('div');
                     liveIndicator.innerHTML = `
                         <div style="position: fixed; top: 20px; right: 20px; background: rgba(76, 175, 80, 0.9); color: white; padding: 0.8rem 1.2rem; border-radius: 20px; font-size: 0.9rem; z-index: 10000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); cursor: pointer;" onclick="this.parentNode.removeChild(this)">
                             <div><i class="fas fa-wifi"></i> <strong>Live Data Connected</strong></div>
                             <div style="font-size: 0.7rem; margin-top: 0.2rem;">${liveFunds.length} funds loaded • Click to dismiss</div>
+                            <div style="font-size: 0.6rem; margin-top: 0.2rem; opacity: 0.8;">✅ Filtering now works!</div>
                         </div>
                     `;
                     document.body.appendChild(liveIndicator);

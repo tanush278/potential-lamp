@@ -9809,20 +9809,39 @@
                 // Calculate corpus adequacy percentage
                 const adequacyPercentage = requiredCorpus > 0 ? (totalCorpusAtRetirement / requiredCorpus) * 100 : 0;
 
-                // Calculate inflation-adjusted corpus (real value in today's terms)
-                const inflationAdjustedCorpus = totalCorpusAtRetirement / Math.pow(1 + inflationRate/100, yearsToRetirement);
-                const inflationAdjustedRequired = requiredCorpus / Math.pow(1 + inflationRate/100, yearsToRetirement);
-
-                // Calculate purchasing power loss due to inflation
-                const inflationImpact = ((totalCorpusAtRetirement - inflationAdjustedCorpus) / totalCorpusAtRetirement) * 100;
+                // CLEAR SEPARATION: Present Value vs Future Value Analysis
+                
+                // 1. FUTURE VALUES (at retirement time)
+                const requiredCorpusFuture = requiredCorpus; // This is already in future terms
+                const accumulatedCorpusFuture = totalCorpusAtRetirement; // This is in future terms
+                
+                // 2. PRESENT VALUES (in today's purchasing power)
+                const requiredCorpusPresent = requiredCorpus / Math.pow(1 + inflationRate/100, yearsToRetirement);
+                const accumulatedCorpusPresent = totalCorpusAtRetirement / Math.pow(1 + inflationRate/100, yearsToRetirement);
+                
+                // 3. PROPER COMPARISONS
+                const adequacyFuture = (accumulatedCorpusFuture / requiredCorpusFuture) * 100;
+                const adequacyPresent = (accumulatedCorpusPresent / requiredCorpusPresent) * 100;
+                
+                // 4. INFLATION IMPACT
+                const inflationImpactAccumulated = ((accumulatedCorpusFuture - accumulatedCorpusPresent) / accumulatedCorpusFuture) * 100;
+                const inflationImpactRequired = ((requiredCorpusFuture - requiredCorpusPresent) / requiredCorpusFuture) * 100;
 
                 console.log('Final calculations:', {
-                    requiredCorpus: Math.round(requiredCorpus),
-                    totalCorpusAtRetirement: Math.round(totalCorpusAtRetirement),
-                    inflationAdjustedCorpus: Math.round(inflationAdjustedCorpus),
-                    corpusGap: Math.round(corpusGap),
-                    adequacyPercentage: Math.round(adequacyPercentage),
-                    inflationImpact: Math.round(inflationImpact)
+                    'FUTURE VALUES': {
+                        requiredCorpusFuture: Math.round(requiredCorpusFuture),
+                        accumulatedCorpusFuture: Math.round(accumulatedCorpusFuture),
+                        adequacyFuture: Math.round(adequacyFuture)
+                    },
+                    'PRESENT VALUES': {
+                        requiredCorpusPresent: Math.round(requiredCorpusPresent),
+                        accumulatedCorpusPresent: Math.round(accumulatedCorpusPresent),
+                        adequacyPresent: Math.round(adequacyPresent)
+                    },
+                    'INFLATION IMPACT': {
+                        inflationImpactAccumulated: Math.round(inflationImpactAccumulated),
+                        inflationImpactRequired: Math.round(inflationImpactRequired)
+                    }
                 });
 
                 // Generate year-wise data for chart
@@ -9837,10 +9856,18 @@
                 const retirementData = {
                     currentAge, retirementAge, lifeExpectancy, yearsToRetirement, retirementDuration,
                     currentExpenses, futureMonthlyExpenses, adjustedMonthlyExpenses, healthcareExpenses,
-                    totalMonthlyExpenses, emergencyCorpus, requiredCorpus, totalCorpusAtRetirement,
-                    corpusGap, additionalMonthlySipNeeded, adequacyPercentage, lifestyleChoice,
+                    totalMonthlyExpenses, emergencyCorpus, corpusGap, additionalMonthlySipNeeded, lifestyleChoice,
                     expectedReturn, inflationRate, postRetirementReturn, chartData,
-                    inflationAdjustedCorpus, inflationAdjustedRequired, inflationImpact
+                    // Future Values (at retirement time)
+                    requiredCorpusFuture, accumulatedCorpusFuture, adequacyFuture,
+                    // Present Values (today's purchasing power)
+                    requiredCorpusPresent, accumulatedCorpusPresent, adequacyPresent,
+                    // Inflation Impact
+                    inflationImpactAccumulated, inflationImpactRequired,
+                    // Legacy compatibility
+                    requiredCorpus: requiredCorpusFuture,
+                    totalCorpusAtRetirement: accumulatedCorpusFuture,
+                    adequacyPercentage: adequacyFuture
                 };
 
                 // Display results
@@ -9951,49 +9978,81 @@
             const statusText = isAdequate ? 'On Track' : 'Needs Attention';
 
             document.getElementById('retirement-summary-cards').innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                    <div style="text-align: center; padding: 1.2rem; background: rgba(255,215,0,0.1); border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
-                        <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem; font-weight: 600;">RETIREMENT STATUS</div>
-                        <div style="font-size: 1.8rem; font-weight: bold; color: ${statusColor};">${statusText}</div>
-                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">${Math.round(data.adequacyPercentage || 0)}% Adequate</div>
+                <!-- Main Status Card -->
+                <div style="grid-column: 1 / -1; text-align: center; padding: 1.5rem; background: rgba(255,215,0,0.1); border-radius: 12px; border: 2px solid rgba(255,215,0,0.3); margin-bottom: 1.5rem;">
+                    <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem; font-weight: 600;">RETIREMENT READINESS STATUS</div>
+                    <div style="font-size: 2.2rem; font-weight: bold; color: ${statusColor}; margin-bottom: 0.5rem;">${statusText}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-gray);">Based on ${Math.round(data.adequacyFuture || 0)}% adequacy in future terms</div>
+                </div>
+
+                <!-- Comparison Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Future Values Section -->
+                    <div style="background: rgba(255,107,107,0.1); border-radius: 12px; border: 1px solid rgba(255,107,107,0.3); padding: 1.5rem;">
+                        <h4 style="color: #FF6B6B; margin-bottom: 1rem; text-align: center; font-size: 16px;">FUTURE VALUES (At Retirement)</h4>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Required Corpus:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">₹${((data.requiredCorpusFuture || 0)/10000000).toFixed(1)}Cr</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Accumulated Corpus:</span>
+                                <span style="color: var(--accent-gold); font-weight: 600;">₹${((data.accumulatedCorpusFuture || 0)/10000000).toFixed(1)}Cr</span>
+                            </div>
+                            <div style="border-top: 1px solid #333; padding-top: 0.8rem; margin-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #FF6B6B; font-weight: 600;">Adequacy:</span>
+                                    <span style="color: ${(data.adequacyFuture || 0) >= 100 ? '#4CAF50' : '#FF6B6B'}; font-weight: 700; font-size: 1.1rem;">${Math.round(data.adequacyFuture || 0)}%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div style="text-align: center; padding: 1.2rem; background: rgba(192,192,192,0.1); border-radius: 8px; border: 1px solid rgba(192,192,192,0.3);">
-                        <div style="font-size: 0.8rem; color: var(--accent-silver); margin-bottom: 0.5rem; font-weight: 600;">YEARS TO RETIREMENT</div>
-                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--accent-silver);">${data.yearsToRetirement || 0}</div>
-                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">Age ${data.currentAge || 0} to ${data.retirementAge || 0}</div>
-                    </div>
-                    <div style="text-align: center; padding: 1.2rem; background: rgba(255,255,255,0.1); border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
-                        <div style="font-size: 0.8rem; color: var(--accent-white); margin-bottom: 0.5rem; font-weight: 600;">REQUIRED CORPUS</div>
-                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-white);">₹${((data.requiredCorpus || 0)/10000000).toFixed(1)}Cr</div>
-                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">₹${Math.round(data.requiredCorpus || 0).toLocaleString('en-IN')}</div>
-                    </div>
-                    <div style="text-align: center; padding: 1.2rem; background: rgba(255,215,0,0.1); border-radius: 8px; border: 1px solid rgba(255,215,0,0.3);">
-                        <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem; font-weight: 600;">PROJECTED CORPUS</div>
-                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-gold);">₹${((data.totalCorpusAtRetirement || 0)/10000000).toFixed(1)}Cr</div>
-                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">₹${Math.round(data.totalCorpusAtRetirement || 0).toLocaleString('en-IN')}</div>
-                    </div>
-                    <div style="text-align: center; padding: 1.2rem; background: rgba(0,150,255,0.1); border-radius: 8px; border: 1px solid rgba(0,150,255,0.3);">
-                        <div style="font-size: 0.8rem; color: #0096FF; margin-bottom: 0.5rem; font-weight: 600;">TODAY'S VALUE</div>
-                        <div style="font-size: 1.4rem; font-weight: bold; color: #0096FF;">₹${((data.inflationAdjustedCorpus || 0)/10000000).toFixed(1)}Cr</div>
-                        <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">Inflation Adjusted</div>
+
+                    <!-- Present Values Section -->
+                    <div style="background: rgba(0,150,255,0.1); border-radius: 12px; border: 1px solid rgba(0,150,255,0.3); padding: 1.5rem;">
+                        <h4 style="color: #0096FF; margin-bottom: 1rem; text-align: center; font-size: 16px;">TODAY'S VALUES (Present Worth)</h4>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Required Corpus:</span>
+                                <span style="color: var(--text-white); font-weight: 600;">₹${((data.requiredCorpusPresent || 0)/10000000).toFixed(1)}Cr</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Accumulated Corpus:</span>
+                                <span style="color: #0096FF; font-weight: 600;">₹${((data.accumulatedCorpusPresent || 0)/10000000).toFixed(1)}Cr</span>
+                            </div>
+                            <div style="border-top: 1px solid #333; padding-top: 0.8rem; margin-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #0096FF; font-weight: 600;">Adequacy:</span>
+                                    <span style="color: ${(data.adequacyPresent || 0) >= 100 ? '#4CAF50' : '#FF6B6B'}; font-weight: 700; font-size: 1.1rem;">${Math.round(data.adequacyPresent || 0)}%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Inflation Impact Alert -->
-                ${(data.inflationImpact || 0) > 0 ? `
-                <div style="background: rgba(0,150,255,0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #0096FF; margin-bottom: 1rem;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <div>
-                            <h5 style="color: #0096FF; margin: 0; font-size: 16px;">Inflation Impact Analysis</h5>
-                            <p style="color: var(--text-gray); margin: 0; font-size: 14px;">Your ₹${((data.totalCorpusAtRetirement || 0)/10000000).toFixed(1)}Cr will have purchasing power of ₹${((data.inflationAdjustedCorpus || 0)/10000000).toFixed(1)}Cr in today's terms</p>
+                <!-- Key Insights Section -->
+                <div style="background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--accent-white); margin-bottom: 1rem; text-align: center; font-size: 16px;">KEY INSIGHTS</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,215,0,0.1); border-radius: 8px;">
+                            <div style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 0.5rem;">YEARS TO RETIREMENT</div>
+                            <div style="font-size: 1.6rem; font-weight: bold; color: var(--accent-gold);">${data.yearsToRetirement || 0}</div>
+                            <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">Age ${data.currentAge || 0} to ${data.retirementAge || 0}</div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.2rem; font-weight: bold; color: #FF6B6B;">-${Math.round(data.inflationImpact || 0)}%</div>
-                            <div style="font-size: 0.7rem; color: var(--text-gray);">Purchasing Power Loss</div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,107,107,0.1); border-radius: 8px;">
+                            <div style="font-size: 0.8rem; color: #FF6B6B; margin-bottom: 0.5rem;">INFLATION IMPACT</div>
+                            <div style="font-size: 1.6rem; font-weight: bold; color: #FF6B6B;">-${Math.round(data.inflationImpactAccumulated || 0)}%</div>
+                            <div style="font-size: 0.7rem; color: var(--text-gray); margin-top: 0.3rem;">Purchasing Power Loss</div>
                         </div>
                     </div>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid #0096FF;">
+                        <p style="color: var(--text-gray); margin: 0; font-size: 14px; line-height: 1.4;">
+                            <strong style="color: #0096FF;">Understanding the Numbers:</strong> 
+                            Future values show what you'll have at retirement time, while present values show the equivalent purchasing power in today's money. 
+                            Both adequacy percentages should be similar, confirming our calculations account for inflation properly.
+                        </p>
+                    </div>
                 </div>
-                ` : ''}
 
                 ${data.corpusGap > 0 ? `
                 <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-white); margin-top: 1rem;">

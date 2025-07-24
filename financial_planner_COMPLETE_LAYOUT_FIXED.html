@@ -6861,31 +6861,12 @@
                     taxCalculation = calculateTaxByRegime(income, selectedRegime);
                 }
                 
-                // Display results
-                displayTaxResults({
-                    grossSalary,
-                    taxableIncome,
-                    totalDeductions,
-                    hraExemption,
-                    taxCalculation,
-                    selectedRegime
-                });
-                
-                // Create chart
-                if (selectedRegime !== 'compare') {
-                    createTaxBreakdownChart(taxCalculation);
+                // Display results using new Part 2 functions
+                if (selectedRegime === 'compare') {
+                    displayTaxResults(taxCalculation.oldRegime, taxCalculation.newRegime, selectedRegime, grossSalary, taxableIncome);
+                } else {
+                    displayTaxResults(taxCalculation, null, selectedRegime, grossSalary, taxableIncome);
                 }
-                
-                // Generate recommendations
-                generateTaxRecommendations({
-                    grossSalary,
-                    taxableIncome,
-                    totalDeductions,
-                    total80c,
-                    eligible80c,
-                    taxCalculation,
-                    selectedRegime
-                });
                 
             } catch (error) {
                 console.error('Error calculating advanced tax:', error);
@@ -7022,11 +7003,426 @@
                 income,
                 tax,
                 cess,
-                totalTax,
+                totalTax: totalTax,
+                totalTaxWithCess: totalTax,
                 effectiveRate,
                 taxBreakdown,
-                regime
+                regime,
+                taxableIncome: income,
+                standardDeduction: regime === 'old' ? 50000 : 75000
             };
+        }
+
+        // Tax Planning Part 2 Functions - Advanced Results Display
+        function displayTaxResults(oldRegimeTax, newRegimeTax, selectedRegime, grossSalary, taxableIncome) {
+            const resultsDiv = document.getElementById('tax-results');
+            
+            if (selectedRegime === 'compare') {
+                // Comparison view
+                const savings = oldRegimeTax.totalTaxWithCess - newRegimeTax.totalTaxWithCess;
+                const betterRegime = savings > 0 ? 'New' : 'Old';
+                const savingsAmount = Math.abs(savings);
+                
+                resultsDiv.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div class="card" style="border: 2px solid ${betterRegime === 'Old' ? '#28a745' : '#dc3545'};">
+                            <h4 style="color: #333; margin-bottom: 15px;">Old Tax Regime</h4>
+                            <div style="margin-bottom: 10px;">
+                                <span>Taxable Income:</span>
+                                <span style="float: right;"><strong>₹${Math.round(oldRegimeTax.taxableIncome).toLocaleString('en-IN')}</strong></span>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <span>Income Tax:</span>
+                                <span style="float: right;"><strong>₹${Math.round(oldRegimeTax.totalTax).toLocaleString('en-IN')}</strong></span>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <span>Health & Education Cess:</span>
+                                <span style="float: right;"><strong>₹${Math.round(oldRegimeTax.cess).toLocaleString('en-IN')}</strong></span>
+                            </div>
+                            <div style="border-top: 2px solid #ddd; padding-top: 10px; margin-top: 15px;">
+                                <span><strong>Total Tax:</strong></span>
+                                <span style="float: right;"><strong>₹${Math.round(oldRegimeTax.totalTaxWithCess).toLocaleString('en-IN')}</strong></span>
+                            </div>
+                            ${betterRegime === 'Old' ? '<div style="color: #28a745; text-align: center; margin-top: 10px;"><strong>✓ Better Choice</strong></div>' : ''}
+                        </div>
+                        
+                        <div class="card" style="border: 2px solid ${betterRegime === 'New' ? '#28a745' : '#dc3545'};">
+                            <h4 style="color: #333; margin-bottom: 15px;">New Tax Regime</h4>
+                            <div style="margin-bottom: 10px;">
+                                <span>Taxable Income:</span>
+                                <span style="float: right;"><strong>₹${Math.round(newRegimeTax.taxableIncome).toLocaleString('en-IN')}</strong></span>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <span>Income Tax:</span>
+                                <span style="float: right;"><strong>₹${Math.round(newRegimeTax.totalTax).toLocaleString('en-IN')}</strong></span>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <span>Health & Education Cess:</span>
+                                <span style="float: right;"><strong>₹${Math.round(newRegimeTax.cess).toLocaleString('en-IN')}</strong></span>
+                            </div>
+                            <div style="border-top: 2px solid #ddd; padding-top: 10px; margin-top: 15px;">
+                                <span><strong>Total Tax:</strong></span>
+                                <span style="float: right;"><strong>₹${Math.round(newRegimeTax.totalTaxWithCess).toLocaleString('en-IN')}</strong></span>
+                            </div>
+                            ${betterRegime === 'New' ? '<div style="color: #28a745; text-align: center; margin-top: 10px;"><strong>✓ Better Choice</strong></div>' : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="background: ${savings > 0 ? '#d4edda' : '#f8d7da'}; border: 1px solid ${savings > 0 ? '#c3e6cb' : '#f5c6cb'};">
+                        <h4 style="color: #333; text-align: center; margin-bottom: 15px;">Comparison Summary</h4>
+                        <div style="text-align: center; font-size: 18px;">
+                            <strong>${betterRegime} Tax Regime</strong> saves you <strong>₹${savingsAmount.toLocaleString('en-IN')}</strong> annually
+                        </div>
+                        <div style="text-align: center; margin-top: 10px; color: #666;">
+                            Effective Tax Rate: ${betterRegime === 'Old' ? ((oldRegimeTax.totalTaxWithCess / grossSalary) * 100).toFixed(2) : ((newRegimeTax.totalTaxWithCess / grossSalary) * 100).toFixed(2)}%
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <canvas id="tax-breakdown-chart" width="400" height="200"></canvas>
+                    </div>
+                `;
+                
+                // Create comparison chart
+                createTaxComparisonChart(oldRegimeTax, newRegimeTax);
+                
+            } else {
+                // Single regime view
+                const taxData = selectedRegime === 'old' ? oldRegimeTax : newRegimeTax;
+                const effectiveRate = ((taxData.totalTaxWithCess / grossSalary) * 100).toFixed(2);
+                
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <h4 style="color: #333; margin-bottom: 20px;">${selectedRegime === 'old' ? 'Old' : 'New'} Tax Regime Results</h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <div style="margin-bottom: 10px;">
+                                    <span>Gross Salary:</span>
+                                    <span style="float: right;"><strong>₹${grossSalary.toLocaleString('en-IN')}</strong></span>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <span>Standard Deduction:</span>
+                                    <span style="float: right;"><strong>₹${taxData.standardDeduction.toLocaleString('en-IN')}</strong></span>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <span>Taxable Income:</span>
+                                    <span style="float: right;"><strong>₹${Math.round(taxData.taxableIncome).toLocaleString('en-IN')}</strong></span>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="margin-bottom: 10px;">
+                                    <span>Income Tax:</span>
+                                    <span style="float: right;"><strong>₹${Math.round(taxData.totalTax).toLocaleString('en-IN')}</strong></span>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <span>Health & Education Cess:</span>
+                                    <span style="float: right;"><strong>₹${Math.round(taxData.cess).toLocaleString('en-IN')}</strong></span>
+                                </div>
+                                <div style="border-top: 2px solid #ddd; padding-top: 10px;">
+                                    <span><strong>Total Tax:</strong></span>
+                                    <span style="float: right;"><strong>₹${Math.round(taxData.totalTaxWithCess).toLocaleString('en-IN')}</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 18px; margin-bottom: 5px;">
+                                <strong>Effective Tax Rate: ${effectiveRate}%</strong>
+                            </div>
+                            <div style="color: #666;">
+                                Take-home Salary: ₹${Math.round(grossSalary - taxData.totalTaxWithCess).toLocaleString('en-IN')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 20px;">
+                        <h4 style="color: #333; margin-bottom: 15px;">Tax Slab Breakdown</h4>
+                        <div id="tax-slab-breakdown"></div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <canvas id="tax-breakdown-chart" width="400" height="200"></canvas>
+                    </div>
+                `;
+                
+                // Display tax slab breakdown
+                displayTaxSlabBreakdown(taxData);
+                
+                // Create single regime chart
+                createTaxBreakdownChart(taxData, grossSalary);
+            }
+            
+            // Show tax recommendations
+            displayTaxRecommendations(oldRegimeTax, newRegimeTax, selectedRegime);
+            
+            // Show results section
+            resultsDiv.style.display = 'block';
+        }
+
+        function displayTaxSlabBreakdown(taxData) {
+            const breakdownDiv = document.getElementById('tax-slab-breakdown');
+            if (!breakdownDiv) return;
+            
+            let html = '';
+            
+            taxData.taxBreakdown.forEach(slab => {
+                const percentage = ((slab.amount / taxData.tax) * 100).toFixed(1);
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee;">
+                        <div>
+                            <strong>${slab.slab}</strong> @ ${slab.rate}
+                        </div>
+                        <div style="text-align: right;">
+                            <strong>₹${Math.round(slab.amount).toLocaleString('en-IN')}</strong>
+                            <div style="font-size: 12px; color: #666;">${percentage}% of total tax</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            breakdownDiv.innerHTML = html;
+        }
+
+        function createTaxComparisonChart(oldRegimeTax, newRegimeTax) {
+            const canvas = document.getElementById('tax-breakdown-chart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.taxChart) {
+                window.taxChart.destroy();
+            }
+            
+            window.taxChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Old Regime', 'New Regime'],
+                    datasets: [{
+                        label: 'Income Tax',
+                        data: [oldRegimeTax.totalTax, newRegimeTax.totalTax],
+                        backgroundColor: ['#4facfe', '#43e97b'],
+                        borderColor: ['#4facfe', '#43e97b'],
+                        borderWidth: 2
+                    }, {
+                        label: 'Health & Education Cess',
+                        data: [oldRegimeTax.cess, newRegimeTax.cess],
+                        backgroundColor: ['#ffa726', '#ef5350'],
+                        borderColor: ['#ffa726', '#ef5350'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Tax Regime Comparison',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + Math.round(context.parsed.y).toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + (value/1000).toFixed(0) + 'K';
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        function createTaxBreakdownChart(taxData, grossSalary) {
+            const canvas = document.getElementById('tax-breakdown-chart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.taxChart) {
+                window.taxChart.destroy();
+            }
+            
+            const takeHome = grossSalary - taxData.totalTaxWithCess;
+            
+            window.taxChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Take-home Salary', 'Income Tax', 'Health & Education Cess'],
+                    datasets: [{
+                        data: [takeHome, taxData.totalTax, taxData.cess],
+                        backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Salary Breakdown',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = ((context.parsed / grossSalary) * 100).toFixed(1);
+                                    return context.label + ': ₹' + Math.round(context.parsed).toLocaleString('en-IN') + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%',
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        function displayTaxRecommendations(oldRegimeTax, newRegimeTax, selectedRegime) {
+            const recommendationsDiv = document.getElementById('tax-recommendations');
+            if (!recommendationsDiv) return;
+            
+            let recommendations = [];
+            
+            if (selectedRegime === 'compare') {
+                const savings = oldRegimeTax.totalTaxWithCess - newRegimeTax.totalTaxWithCess;
+                const betterRegime = savings > 0 ? 'new' : 'old';
+                
+                if (betterRegime === 'old') {
+                    recommendations.push({
+                        title: 'Maximize Section 80C Deductions',
+                        description: 'Continue investing in EPF, PPF, ELSS, and life insurance to save up to ₹46,800 annually (₹1.5L × 30% tax rate).',
+                        priority: 'high'
+                    });
+                    recommendations.push({
+                        title: 'Health Insurance Premium',
+                        description: 'Invest in health insurance (₹25K limit) and parents\' health insurance (₹50K limit) for additional tax savings.',
+                        priority: 'medium'
+                    });
+                    recommendations.push({
+                        title: 'Home Loan Benefits',
+                        description: 'If you have a home loan, claim deductions for principal (80C) and interest (24b) up to ₹2L annually.',
+                        priority: 'medium'
+                    });
+                } else {
+                    recommendations.push({
+                        title: 'Switch to New Tax Regime',
+                        description: `You can save ₹${Math.abs(savings).toLocaleString('en-IN')} annually by switching to the new tax regime.`,
+                        priority: 'high'
+                    });
+                    recommendations.push({
+                        title: 'Higher Standard Deduction',
+                        description: 'New regime offers ₹75,000 standard deduction vs ₹50,000 in old regime.',
+                        priority: 'medium'
+                    });
+                }
+            } else {
+                const taxData = selectedRegime === 'old' ? oldRegimeTax : newRegimeTax;
+                const effectiveRate = (taxData.totalTaxWithCess / (taxData.taxableIncome + taxData.standardDeduction)) * 100;
+                
+                if (selectedRegime === 'old') {
+                    recommendations.push({
+                        title: 'Optimize 80C Investments',
+                        description: 'Ensure you\'re utilizing the full ₹1.5L limit across EPF, PPF, ELSS, and life insurance premiums.',
+                        priority: 'high'
+                    });
+                    recommendations.push({
+                        title: 'Health Insurance Deduction',
+                        description: 'Claim up to ₹25,000 for self/family health insurance and ₹50,000 for parents under Section 80D.',
+                        priority: 'medium'
+                    });
+                    if (effectiveRate > 20) {
+                        recommendations.push({
+                            title: 'Consider NPS Investment',
+                            description: 'Additional ₹50,000 deduction available under Section 80CCD(1B) for NPS investments.',
+                            priority: 'medium'
+                        });
+                    }
+                } else {
+                    recommendations.push({
+                        title: 'Focus on Take-home Salary',
+                        description: 'New regime offers simplicity with higher standard deduction. Focus on salary negotiations and performance bonuses.',
+                        priority: 'high'
+                    });
+                    if (effectiveRate > 15) {
+                        recommendations.push({
+                            title: 'Consider Old Regime',
+                            description: 'With your income level, old regime with deductions might be more beneficial. Use the comparison feature.',
+                            priority: 'medium'
+                        });
+                    }
+                }
+            }
+            
+            // Add capital gains recommendations
+            recommendations.push({
+                title: 'Capital Gains Planning',
+                description: 'Long-term equity gains above ₹1L are taxed at 10%. Plan your investment exits strategically.',
+                priority: 'low'
+            });
+            
+            let html = '<div class="card" style="margin-top: 20px;"><h4 style="color: #333; margin-bottom: 15px;">Tax Saving Recommendations</h4>';
+            
+            recommendations.forEach(rec => {
+                const priorityColor = rec.priority === 'high' ? '#dc3545' : rec.priority === 'medium' ? '#ffc107' : '#28a745';
+                html += `
+                    <div style="border-left: 4px solid ${priorityColor}; padding: 15px; margin-bottom: 15px; background: #f8f9fa; border-radius: 0 8px 8px 0;">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 5px;">
+                            <strong style="color: #333;">${rec.title}</strong>
+                            <span style="background: ${priorityColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; text-transform: uppercase;">${rec.priority}</span>
+                        </div>
+                        <p style="margin: 0; color: #666; line-height: 1.4;">${rec.description}</p>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            recommendationsDiv.innerHTML = html;
         }
 
         function generateReport() {
@@ -7825,7 +8221,7 @@
         backdrop-filter: blur(10px);
     ">
         <div style="display: flex; gap: 1rem; align-items: center;">
-                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.0 - Advanced Tax Planning (Part 1)</span>
+                            <span style="color: var(--accent-gold);">Financial Planner Pro v6.1 - Complete Advanced Tax Planning</span>
             <span>•</span>
                             <span>Last Updated: Dec 24, 2024 - 11:30 UTC</span>
             <span>•</span>

@@ -10218,56 +10218,120 @@
         }
 
         function displayRetirementScenarios(data) {
-            // Calculate scenarios with different return rates
-            const scenarios = [
-                { name: 'Conservative', return: data.expectedReturn - 2, color: 'var(--accent-white)' },
-                { name: 'Expected', return: data.expectedReturn, color: 'var(--accent-gold)' },
-                { name: 'Optimistic', return: data.expectedReturn + 2, color: 'var(--accent-silver)' }
-            ];
+            try {
+                const scenariosDiv = document.getElementById('retirement-scenarios');
+                if (!scenariosDiv) {
+                    console.error('Scenarios div not found');
+                    return;
+                }
 
-            let scenarioHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">';
+                // Calculate scenarios with different return rates
+                const scenarios = [
+                    { name: 'Conservative', return: Math.max(1, data.expectedReturn - 2), color: '#ff6b6b' },
+                    { name: 'Expected', return: data.expectedReturn, color: '#FFD700' },
+                    { name: 'Optimistic', return: data.expectedReturn + 2, color: '#C0C0C0' }
+                ];
 
-            scenarios.forEach(scenario => {
-                // Recalculate corpus for this scenario
-                const monthlyReturn = scenario.return / 100 / 12;
-                const yearsToRetirement = data.retirementAge - data.currentAge;
-                const totalSipMonths = yearsToRetirement * 12;
-                const currentSavings = parseFloat(document.getElementById('current-savings').value) || 0;
-                const monthlySip = parseFloat(document.getElementById('monthly-sip').value) || 0;
-                
-                const futureValueCurrentSavings = currentSavings * Math.pow(1 + scenario.return/100, yearsToRetirement);
-                const futureValueSip = monthlySip * (Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn;
-                const scenarioCorpus = futureValueCurrentSavings + futureValueSip;
-                const adequacy = (scenarioCorpus / data.requiredCorpus) * 100;
+                let scenarioHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">';
 
-                scenarioHtml += `
-                    <div style="padding: 1.5rem; background: rgba(${scenario.color === 'var(--accent-gold)' ? '255,215,0' : scenario.color === 'var(--accent-silver)' ? '192,192,192' : '255,255,255'},0.1); border-radius: 8px; border: 1px solid rgba(${scenario.color === 'var(--accent-gold)' ? '255,215,0' : scenario.color === 'var(--accent-silver)' ? '192,192,192' : '255,255,255'},0.3);">
-                        <h5 style="color: ${scenario.color}; margin-bottom: 1rem; text-align: center;">${scenario.name} Scenario</h5>
-                        <div style="text-align: center; margin-bottom: 1rem;">
-                            <div style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 0.5rem;">Expected Return</div>
-                            <div style="font-size: 1.4rem; font-weight: bold; color: ${scenario.color};">${scenario.return}% p.a.</div>
-                        </div>
-                        <div style="margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span style="color: var(--text-gray); font-size: 0.9rem;">Projected Corpus:</span>
-                                <span style="color: var(--text-white); font-weight: 600; font-size: 0.9rem;">₹${(scenarioCorpus/10000000).toFixed(1)}Cr</span>
+                scenarios.forEach(scenario => {
+                    try {
+                        // Get current input values safely
+                        const currentSavings = parseFloat(document.getElementById('current-savings')?.value) || 0;
+                        const monthlySip = parseFloat(document.getElementById('monthly-sip')?.value) || 0;
+                        
+                        // Recalculate corpus for this scenario
+                        const monthlyReturn = scenario.return / 100 / 12;
+                        const yearsToRetirement = data.retirementAge - data.currentAge;
+                        const totalSipMonths = yearsToRetirement * 12;
+                        
+                        // Calculate future value of current savings
+                        const futureValueCurrentSavings = currentSavings * Math.pow(1 + scenario.return/100, yearsToRetirement);
+                        
+                        // Calculate future value of SIP with proper error handling
+                        let futureValueSip = 0;
+                        if (monthlySip > 0 && monthlyReturn > 0) {
+                            futureValueSip = monthlySip * ((Math.pow(1 + monthlyReturn, totalSipMonths) - 1) / monthlyReturn);
+                        } else if (monthlySip > 0) {
+                            // If return is 0 or negative, use simple multiplication
+                            futureValueSip = monthlySip * totalSipMonths;
+                        }
+                        
+                        const scenarioCorpus = futureValueCurrentSavings + futureValueSip;
+                        const adequacy = data.requiredCorpus > 0 ? (scenarioCorpus / data.requiredCorpus) * 100 : 0;
+
+                        console.log(`Scenario ${scenario.name}:`, {
+                            return: scenario.return,
+                            currentSavings,
+                            monthlySip,
+                            futureValueCurrentSavings: Math.round(futureValueCurrentSavings),
+                            futureValueSip: Math.round(futureValueSip),
+                            scenarioCorpus: Math.round(scenarioCorpus),
+                            adequacy: Math.round(adequacy)
+                        });
+
+                        const bgColor = scenario.name === 'Expected' ? 'rgba(255,215,0,0.1)' : 
+                                       scenario.name === 'Optimistic' ? 'rgba(192,192,192,0.1)' : 
+                                       'rgba(255,107,107,0.1)';
+                        const borderColor = scenario.name === 'Expected' ? 'rgba(255,215,0,0.3)' : 
+                                           scenario.name === 'Optimistic' ? 'rgba(192,192,192,0.3)' : 
+                                           'rgba(255,107,107,0.3)';
+
+                        scenarioHtml += `
+                            <div style="padding: 1.5rem; background: ${bgColor}; border-radius: 8px; border: 1px solid ${borderColor};">
+                                <h5 style="color: ${scenario.color}; margin-bottom: 1rem; text-align: center;">${scenario.name} Scenario</h5>
+                                <div style="text-align: center; margin-bottom: 1rem;">
+                                    <div style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 0.5rem;">Expected Return</div>
+                                    <div style="font-size: 1.4rem; font-weight: bold; color: ${scenario.color};">${scenario.return}% p.a.</div>
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span style="color: var(--text-gray); font-size: 0.9rem;">Projected Corpus:</span>
+                                        <span style="color: var(--text-white); font-weight: 600; font-size: 0.9rem;">₹${(scenarioCorpus/10000000).toFixed(1)}Cr</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="color: var(--text-gray); font-size: 0.9rem;">Adequacy:</span>
+                                        <span style="color: ${adequacy >= 100 ? '#4CAF50' : '#FF6B6B'}; font-weight: 600; font-size: 0.9rem;">${Math.round(adequacy)}%</span>
+                                    </div>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 4px; text-align: center;">
+                                    <span style="color: ${adequacy >= 100 ? '#4CAF50' : '#FF6B6B'}; font-size: 0.8rem; font-weight: 600;">
+                                        ${adequacy >= 100 ? '✅ Goal Achieved' : '⚠️ Needs Adjustment'}
+                                    </span>
+                                </div>
                             </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-gray); font-size: 0.9rem;">Adequacy:</span>
-                                <span style="color: ${adequacy >= 100 ? 'var(--accent-gold)' : 'var(--accent-white)'}; font-weight: 600; font-size: 0.9rem;">${Math.round(adequacy)}%</span>
+                        `;
+                    } catch (error) {
+                        console.error(`Error calculating scenario ${scenario.name}:`, error);
+                        scenarioHtml += `
+                            <div style="padding: 1.5rem; background: rgba(255,107,107,0.1); border-radius: 8px; border: 1px solid rgba(255,107,107,0.3);">
+                                <h5 style="color: #ff6b6b; margin-bottom: 1rem; text-align: center;">${scenario.name} Scenario</h5>
+                                <div style="text-align: center; color: #ff6b6b;">
+                                    <div>❌ Calculation Error</div>
+                                    <div style="font-size: 0.8rem; margin-top: 0.5rem;">Check console for details</div>
+                                </div>
                             </div>
-                        </div>
-                        <div style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 4px; text-align: center;">
-                            <span style="color: ${adequacy >= 100 ? 'var(--accent-gold)' : 'var(--accent-white)'}; font-size: 0.8rem; font-weight: 600;">
-                                ${adequacy >= 100 ? 'Goal Achieved' : 'Needs Adjustment'}
-                            </span>
-                        </div>
-                    </div>
-                `;
+                        `;
+                    }
+                });
             });
 
-            scenarioHtml += '</div>';
-            document.getElementById('retirement-scenarios').innerHTML = scenarioHtml;
+                scenarioHtml += '</div>';
+                scenariosDiv.innerHTML = scenarioHtml;
+
+                console.log('Scenarios displayed successfully');
+            } catch (error) {
+                console.error('Error displaying scenarios:', error);
+                const scenariosDiv = document.getElementById('retirement-scenarios');
+                if (scenariosDiv) {
+                    scenariosDiv.innerHTML = `
+                        <div style="background: rgba(255,107,107,0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                            <h5 style="color: #ff6b6b; margin: 0;">❌ Scenario Analysis Error</h5>
+                            <p style="color: var(--text-gray); margin: 0.5rem 0 0 0;">Unable to calculate scenarios. Check console for details.</p>
+                        </div>
+                    `;
+                }
+            }
         }
 
         function displayRetirementRecommendations(data) {

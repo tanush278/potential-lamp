@@ -1578,14 +1578,117 @@
                 <section id="recommendations" class="section">
                     <div class="section-header">
                         <h1 class="section-title">Investment Recommendations</h1>
-                        <p class="section-subtitle">Advanced investment recommendations based on your profile</p>
+                        <p class="section-subtitle">Personalized investment strategies based on your risk profile and financial goals</p>
                     </div>
+
+                    <!-- Risk Profile Summary -->
                     <div class="card">
-                        <h3>Personalized Recommendations</h3>
-                        <p>Get personalized investment recommendations based on your risk profile and goals.</p>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-lightbulb"></i> Get Recommendations
+                        <div class="card-header">
+                            <h3 class="card-title">Your Investment Profile</h3>
+                            <p class="card-subtitle">Current risk assessment and investment preferences</p>
+                        </div>
+                        <div id="profile-summary" style="text-align: center; color: var(--text-gray); padding: 2rem;">
+                            Complete your Risk Profile assessment first to get personalized recommendations.
+                            <br><br>
+                            <button class="btn btn-primary" onclick="showSection('risk-assessment')">Complete Risk Assessment</button>
+                        </div>
+                    </div>
+
+                    <!-- Asset Allocation -->
+                    <div class="card" id="asset-allocation-card" style="display: none; margin-top: 2rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">Recommended Asset Allocation</h3>
+                            <p class="card-subtitle">Optimal portfolio distribution based on your risk profile</p>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 400px; gap: 2rem; align-items: start;">
+                            <div>
+                                <div id="allocation-breakdown" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                                    <!-- Asset allocation cards will be populated by JavaScript -->
+                                </div>
+                                
+                                <div id="allocation-details" style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                                    <!-- Detailed allocation info will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center;">
+                                <canvas id="allocationChart" width="350" height="350"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fund Recommendations -->
+                    <div class="card" id="fund-recommendations-card" style="display: none; margin-top: 2rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">Recommended Investment Options</h3>
+                            <p class="card-subtitle">Curated funds and investment products matching your profile</p>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 2rem;">
+                            <label>Investment Amount (₹)</label>
+                            <input type="number" id="investment-amount" class="form-input" placeholder="Enter amount to invest" value="100000">
+                        </div>
+                        
+                        <div id="fund-categories">
+                            <!-- Fund recommendations will be populated by JavaScript -->
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="generateRecommendations()" style="margin-top: 1rem;">
+                            Generate Detailed Recommendations
                         </button>
+                    </div>
+
+                    <!-- Portfolio Rebalancing -->
+                    <div class="card" id="rebalancing-card" style="display: none; margin-top: 2rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">Portfolio Rebalancing</h3>
+                            <p class="card-subtitle">Maintain optimal asset allocation with smart rebalancing</p>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <div>
+                                <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Current Portfolio</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Equity Holdings (₹)</label>
+                                        <input type="number" id="current-equity" class="form-input" placeholder="Current equity value">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Debt Holdings (₹)</label>
+                                        <input type="number" id="current-debt" class="form-input" placeholder="Current debt value">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Gold Holdings (₹)</label>
+                                        <input type="number" id="current-gold" class="form-input" placeholder="Current gold value">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Cash Holdings (₹)</label>
+                                        <input type="number" id="current-cash" class="form-input" placeholder="Current cash value">
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary" onclick="calculateRebalancing()">Calculate Rebalancing</button>
+                            </div>
+                            
+                            <div id="rebalancing-results" style="display: none;">
+                                <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Rebalancing Actions</h4>
+                                <div id="rebalancing-actions">
+                                    <!-- Rebalancing recommendations will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Investment Strategy -->
+                    <div class="card" id="strategy-card" style="display: none; margin-top: 2rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">Investment Strategy & Insights</h3>
+                            <p class="card-subtitle">Professional insights and market outlook for your portfolio</p>
+                        </div>
+                        
+                        <div id="strategy-content">
+                            <!-- Strategy insights will be populated by JavaScript -->
+                        </div>
                     </div>
                 </section>
 
@@ -1809,6 +1912,9 @@
                 userGoals = JSON.parse(savedGoals);
                 displayGoals();
             }
+            
+            // Load investment recommendations if risk profile exists
+            loadInvestmentRecommendations();
         });
 
         function calculateAdvancedSIP() {
@@ -2573,6 +2679,531 @@
                             <li>Maintain emergency fund alongside insurance coverage</li>
                             ${income > 1000000 ? '<li>Consider additional critical illness coverage given higher income</li>' : ''}
                         </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Investment Recommendations Functions
+        let allocationChart = null;
+
+        // Check if user has completed risk assessment and load recommendations
+        function loadInvestmentRecommendations() {
+            const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+            const riskProfile = clientData.riskProfile;
+            
+            if (riskProfile && riskProfile.riskCategory) {
+                displayProfileSummary(riskProfile);
+                generateAssetAllocation(riskProfile);
+                generateFundRecommendations(riskProfile);
+                generateInvestmentStrategy(riskProfile);
+                
+                // Show recommendation cards
+                document.getElementById('asset-allocation-card').style.display = 'block';
+                document.getElementById('fund-recommendations-card').style.display = 'block';
+                document.getElementById('rebalancing-card').style.display = 'block';
+                document.getElementById('strategy-card').style.display = 'block';
+            }
+        }
+
+        function displayProfileSummary(riskProfile) {
+            const summary = document.getElementById('profile-summary');
+            const riskColors = {
+                'Conservative': 'var(--accent-silver)',
+                'Moderate Conservative': 'var(--accent-light)',
+                'Moderate': 'var(--accent-white)',
+                'Moderate Aggressive': 'var(--accent-gold)',
+                'Aggressive': 'var(--accent-gold)'
+            };
+            
+            summary.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid ${riskColors[riskProfile.riskCategory]}; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Profile</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: ${riskColors[riskProfile.riskCategory]};">${riskProfile.riskCategory}</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Risk Score</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-white);">${riskProfile.riskPercentage}%</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Investment Horizon</div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-silver);">Long Term</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateAssetAllocation(riskProfile) {
+            // Asset allocation based on risk profile
+            const allocations = {
+                'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
+                'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
+                'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
+                'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
+                'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
+            };
+            
+            const allocation = allocations[riskProfile.riskCategory] || allocations['Moderate'];
+            
+            // Display allocation breakdown
+            const breakdown = document.getElementById('allocation-breakdown');
+            breakdown.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.05)); border: 2px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 0.9rem; color: var(--accent-gold); margin-bottom: 0.5rem;">EQUITY</div>
+                    <div style="font-size: 2rem; font-weight: bold; color: var(--accent-gold);">${allocation.equity}%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-gray);">Growth focused</div>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); border: 2px solid var(--accent-white); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 0.9rem; color: var(--accent-white); margin-bottom: 0.5rem;">DEBT</div>
+                    <div style="font-size: 2rem; font-weight: bold; color: var(--accent-white);">${allocation.debt}%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-gray);">Stability focused</div>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(192,192,192,0.05)); border: 2px solid var(--accent-silver); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 0.9rem; color: var(--accent-silver); margin-bottom: 0.5rem;">GOLD</div>
+                    <div style="font-size: 2rem; font-weight: bold; color: var(--accent-silver);">${allocation.gold}%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-gray);">Hedge against inflation</div>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 2px solid var(--text-gray); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">CASH</div>
+                    <div style="font-size: 2rem; font-weight: bold; color: var(--text-gray);">${allocation.cash}%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-gray);">Emergency fund</div>
+                </div>
+            `;
+            
+            // Display allocation details
+            const details = document.getElementById('allocation-details');
+            details.innerHTML = `
+                <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Allocation Strategy</h5>
+                <div style="display: grid; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,215,0,0.05); border-radius: 8px;">
+                        <span style="color: var(--text-gray);">Equity (${allocation.equity}%)</span>
+                        <span style="color: var(--accent-gold);">High growth potential, higher volatility</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                        <span style="color: var(--text-gray);">Debt (${allocation.debt}%)</span>
+                        <span style="color: var(--accent-white);">Stable returns, capital protection</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(192,192,192,0.05); border-radius: 8px;">
+                        <span style="color: var(--text-gray);">Gold (${allocation.gold}%)</span>
+                        <span style="color: var(--accent-silver);">Portfolio diversification, inflation hedge</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                        <span style="color: var(--text-gray);">Cash (${allocation.cash}%)</span>
+                        <span style="color: var(--text-gray);">Liquidity and opportunities</span>
+                    </div>
+                </div>
+            `;
+            
+            // Create allocation chart
+            createAllocationChart(allocation);
+        }
+
+        function createAllocationChart(allocation) {
+            const ctx = document.getElementById('allocationChart').getContext('2d');
+            
+            if (allocationChart) {
+                allocationChart.destroy();
+            }
+            
+            allocationChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Equity', 'Debt', 'Gold', 'Cash'],
+                    datasets: [{
+                        data: [allocation.equity, allocation.debt, allocation.gold, allocation.cash],
+                        backgroundColor: ['#ffd700', '#ffffff', '#c0c0c0', '#666666'],
+                        borderColor: ['#000000', '#000000', '#000000', '#000000'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#ffffff',
+                                font: { size: 12 },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffd700',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        function generateFundRecommendations(riskProfile) {
+            const fundCategories = document.getElementById('fund-categories');
+            const allocation = {
+                'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
+                'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
+                'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
+                'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
+                'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
+            }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
+            
+            const fundRecommendations = {
+                equity: [
+                    { name: "Large Cap Equity Fund", category: "Large Cap", risk: "Medium", returns: "10-12%", rating: "★★★★☆" },
+                    { name: "Mid Cap Growth Fund", category: "Mid Cap", risk: "High", returns: "12-15%", rating: "★★★★★" },
+                    { name: "Small Cap Opportunity Fund", category: "Small Cap", risk: "Very High", returns: "15-18%", rating: "★★★★☆" },
+                    { name: "Flexi Cap Fund", category: "Multi Cap", risk: "Medium-High", returns: "11-14%", rating: "★★★★☆" }
+                ],
+                debt: [
+                    { name: "Liquid Fund", category: "Ultra Short", risk: "Very Low", returns: "3-5%", rating: "★★★☆☆" },
+                    { name: "Short Duration Fund", category: "Short Term", risk: "Low", returns: "5-7%", rating: "★★★★☆" },
+                    { name: "Medium Duration Fund", category: "Medium Term", risk: "Medium", returns: "6-8%", rating: "★★★★☆" },
+                    { name: "Long Duration Fund", category: "Long Term", risk: "Medium-High", returns: "7-9%", rating: "★★★★☆" }
+                ],
+                gold: [
+                    { name: "Gold ETF", category: "Physical Gold", risk: "Medium", returns: "8-10%", rating: "★★★☆☆" },
+                    { name: "Gold Fund of Fund", category: "Gold Fund", risk: "Medium", returns: "7-9%", rating: "★★★☆☆" }
+                ]
+            };
+            
+            let fundHTML = '';
+            
+            if (allocation.equity > 0) {
+                fundHTML += `
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Equity Funds (${allocation.equity}% allocation)</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                `;
+                fundRecommendations.equity.forEach(fund => {
+                    fundHTML += `
+                        <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <h6 style="color: var(--accent-white); margin: 0;">${fund.name}</h6>
+                                <span style="color: var(--accent-gold);">${fund.rating}</span>
+                            </div>
+                            <div style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 0.5rem;">${fund.category}</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                                <span style="color: var(--text-gray);">Risk: ${fund.risk}</span>
+                                <span style="color: var(--accent-gold);">Returns: ${fund.returns}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                fundHTML += '</div></div>';
+            }
+            
+            if (allocation.debt > 0) {
+                fundHTML += `
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Debt Funds (${allocation.debt}% allocation)</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                `;
+                fundRecommendations.debt.forEach(fund => {
+                    fundHTML += `
+                        <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-white); border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <h6 style="color: var(--accent-white); margin: 0;">${fund.name}</h6>
+                                <span style="color: var(--accent-white);">${fund.rating}</span>
+                            </div>
+                            <div style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 0.5rem;">${fund.category}</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                                <span style="color: var(--text-gray);">Risk: ${fund.risk}</span>
+                                <span style="color: var(--accent-white);">Returns: ${fund.returns}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                fundHTML += '</div></div>';
+            }
+            
+            if (allocation.gold > 0) {
+                fundHTML += `
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--accent-silver); margin-bottom: 1rem;">Gold Investments (${allocation.gold}% allocation)</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                `;
+                fundRecommendations.gold.forEach(fund => {
+                    fundHTML += `
+                        <div style="background: linear-gradient(135deg, rgba(192,192,192,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-silver); border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <h6 style="color: var(--accent-white); margin: 0;">${fund.name}</h6>
+                                <span style="color: var(--accent-silver);">${fund.rating}</span>
+                            </div>
+                            <div style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 0.5rem;">${fund.category}</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                                <span style="color: var(--text-gray);">Risk: ${fund.risk}</span>
+                                <span style="color: var(--accent-silver);">Returns: ${fund.returns}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                fundHTML += '</div></div>';
+            }
+            
+            fundCategories.innerHTML = fundHTML;
+        }
+
+        function generateRecommendations() {
+            const amount = parseFloat(document.getElementById('investment-amount').value) || 0;
+            if (amount <= 0) {
+                alert('Please enter a valid investment amount');
+                return;
+            }
+            
+            const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+            const riskProfile = clientData.riskProfile;
+            
+            if (!riskProfile) {
+                alert('Please complete your risk assessment first');
+                return;
+            }
+            
+            const allocation = {
+                'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
+                'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
+                'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
+                'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
+                'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
+            }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
+            
+            const equityAmount = Math.round(amount * allocation.equity / 100);
+            const debtAmount = Math.round(amount * allocation.debt / 100);
+            const goldAmount = Math.round(amount * allocation.gold / 100);
+            const cashAmount = Math.round(amount * allocation.cash / 100);
+            
+            alert(`Investment Allocation for ₹${amount.toLocaleString('en-IN')}:\n\nEquity: ₹${equityAmount.toLocaleString('en-IN')} (${allocation.equity}%)\nDebt: ₹${debtAmount.toLocaleString('en-IN')} (${allocation.debt}%)\nGold: ₹${goldAmount.toLocaleString('en-IN')} (${allocation.gold}%)\nCash: ₹${cashAmount.toLocaleString('en-IN')} (${allocation.cash}%)\n\nThis allocation matches your ${riskProfile.riskCategory} risk profile.`);
+        }
+
+        function calculateRebalancing() {
+            const currentEquity = parseFloat(document.getElementById('current-equity').value) || 0;
+            const currentDebt = parseFloat(document.getElementById('current-debt').value) || 0;
+            const currentGold = parseFloat(document.getElementById('current-gold').value) || 0;
+            const currentCash = parseFloat(document.getElementById('current-cash').value) || 0;
+            
+            const totalPortfolio = currentEquity + currentDebt + currentGold + currentCash;
+            
+            if (totalPortfolio <= 0) {
+                alert('Please enter your current portfolio values');
+                return;
+            }
+            
+            const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+            const riskProfile = clientData.riskProfile;
+            
+            if (!riskProfile) {
+                alert('Please complete your risk assessment first');
+                return;
+            }
+            
+            const targetAllocation = {
+                'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
+                'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
+                'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
+                'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
+                'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
+            }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
+            
+            const currentAllocation = {
+                equity: (currentEquity / totalPortfolio * 100).toFixed(1),
+                debt: (currentDebt / totalPortfolio * 100).toFixed(1),
+                gold: (currentGold / totalPortfolio * 100).toFixed(1),
+                cash: (currentCash / totalPortfolio * 100).toFixed(1)
+            };
+            
+            const targetAmounts = {
+                equity: Math.round(totalPortfolio * targetAllocation.equity / 100),
+                debt: Math.round(totalPortfolio * targetAllocation.debt / 100),
+                gold: Math.round(totalPortfolio * targetAllocation.gold / 100),
+                cash: Math.round(totalPortfolio * targetAllocation.cash / 100)
+            };
+            
+            const rebalanceActions = {
+                equity: targetAmounts.equity - currentEquity,
+                debt: targetAmounts.debt - currentDebt,
+                gold: targetAmounts.gold - currentGold,
+                cash: targetAmounts.cash - currentCash
+            };
+            
+            const results = document.getElementById('rebalancing-results');
+            const actions = document.getElementById('rebalancing-actions');
+            
+            let actionsHTML = `
+                <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+                    <h5 style="color: var(--accent-white); margin-bottom: 1rem;">Current vs Target Allocation</h5>
+                    <div style="display: grid; gap: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Equity</span>
+                            <span style="color: var(--accent-gold);">${currentAllocation.equity}% → ${targetAllocation.equity}%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Debt</span>
+                            <span style="color: var(--accent-white);">${currentAllocation.debt}% → ${targetAllocation.debt}%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-gray);">
+                            <span style="color: var(--text-gray);">Gold</span>
+                            <span style="color: var(--accent-silver);">${currentAllocation.gold}% → ${targetAllocation.gold}%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem;">
+                            <span style="color: var(--text-gray);">Cash</span>
+                            <span style="color: var(--text-gray);">${currentAllocation.cash}% → ${targetAllocation.cash}%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-gold); border-radius: 12px; padding: 1.5rem;">
+                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Recommended Actions</h5>
+                    <div style="display: grid; gap: 0.8rem;">
+            `;
+            
+            Object.entries(rebalanceActions).forEach(([asset, amount]) => {
+                const action = amount > 0 ? 'Buy' : amount < 0 ? 'Sell' : 'Hold';
+                const color = amount > 0 ? 'var(--accent-gold)' : amount < 0 ? 'var(--accent-silver)' : 'var(--text-gray)';
+                const absAmount = Math.abs(amount);
+                
+                if (absAmount > 1000) { // Only show if significant rebalancing needed
+                    actionsHTML += `
+                        <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(255,255,255,0.02); border-radius: 6px;">
+                            <span style="color: var(--text-gray); text-transform: capitalize;">${asset}</span>
+                            <span style="color: ${color}; font-weight: bold;">${action} ₹${absAmount.toLocaleString('en-IN')}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            actionsHTML += '</div></div>';
+            
+            actions.innerHTML = actionsHTML;
+            results.style.display = 'block';
+        }
+
+        function generateInvestmentStrategy(riskProfile) {
+            const strategy = document.getElementById('strategy-content');
+            const strategies = {
+                'Conservative': {
+                    title: 'Capital Preservation Strategy',
+                    focus: 'Stability and Capital Protection',
+                    approach: 'Low-risk investments with steady returns',
+                    timeHorizon: 'Short to Medium term (1-5 years)',
+                    keyPrinciples: [
+                        'Prioritize capital preservation over growth',
+                        'Focus on high-grade debt instruments',
+                        'Maintain sufficient liquidity for emergencies',
+                        'Avoid high-volatility investments'
+                    ]
+                },
+                'Moderate Conservative': {
+                    title: 'Balanced Conservative Strategy',
+                    focus: 'Steady Growth with Low Risk',
+                    approach: 'Balanced mix of debt and selective equity',
+                    timeHorizon: 'Medium term (3-7 years)',
+                    keyPrinciples: [
+                        'Balance between safety and growth',
+                        'Gradual equity exposure through large-cap funds',
+                        'Regular monitoring and rebalancing',
+                        'Focus on dividend-paying stocks'
+                    ]
+                },
+                'Moderate': {
+                    title: 'Balanced Growth Strategy',
+                    focus: 'Balanced Risk-Return Profile',
+                    approach: 'Equal emphasis on growth and stability',
+                    timeHorizon: 'Medium to Long term (5-10 years)',
+                    keyPrinciples: [
+                        'Diversified portfolio across asset classes',
+                        'Regular SIP in equity and debt funds',
+                        'Annual portfolio rebalancing',
+                        'Tax-efficient investment planning'
+                    ]
+                },
+                'Moderate Aggressive': {
+                    title: 'Growth-Oriented Strategy',
+                    focus: 'Long-term Wealth Creation',
+                    approach: 'Growth-focused with calculated risks',
+                    timeHorizon: 'Long term (7-15 years)',
+                    keyPrinciples: [
+                        'Higher equity allocation for growth',
+                        'Diversified across market caps',
+                        'Stay invested through market cycles',
+                        'Focus on quality growth companies'
+                    ]
+                },
+                'Aggressive': {
+                    title: 'High Growth Strategy',
+                    focus: 'Maximum Wealth Creation',
+                    approach: 'High-risk, high-reward investments',
+                    timeHorizon: 'Long term (10+ years)',
+                    keyPrinciples: [
+                        'Maximum equity exposure for growth',
+                        'Include mid and small-cap opportunities',
+                        'Accept short-term volatility for long-term gains',
+                        'Regular top-up investments during market dips'
+                    ]
+                }
+            };
+            
+            const currentStrategy = strategies[riskProfile.riskCategory] || strategies['Moderate'];
+            
+            strategy.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">${currentStrategy.title}</h4>
+                        <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+                            <div style="display: grid; gap: 1rem;">
+                                <div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 0.3rem;">Primary Focus</div>
+                                    <div style="color: var(--accent-white); font-weight: bold;">${currentStrategy.focus}</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 0.3rem;">Investment Approach</div>
+                                    <div style="color: var(--accent-white);">${currentStrategy.approach}</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 0.3rem;">Recommended Time Horizon</div>
+                                    <div style="color: var(--accent-gold); font-weight: bold;">${currentStrategy.timeHorizon}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Key Investment Principles</h4>
+                        <div style="background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-radius: 12px; padding: 1.5rem;">
+                            <ul style="color: var(--text-gray); line-height: 1.8; margin: 0; padding-left: 1.5rem;">
+                                ${currentStrategy.keyPrinciples.map(principle => `<li style="margin-bottom: 0.5rem;">${principle}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.3)); border-left: 4px solid var(--accent-gold); border-radius: 8px;">
+                    <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">Market Outlook & Recommendations</h5>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div>
+                            <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Current Market Environment</h6>
+                            <p style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                                Markets are showing mixed signals with global uncertainties. Focus on quality investments
+                                and maintain disciplined approach to achieve long-term financial goals.
+                            </p>
+                        </div>
+                        <div>
+                            <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Action Items</h6>
+                            <ul style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.6; margin: 0; padding-left: 1.2rem;">
+                                <li>Start SIP in recommended funds</li>
+                                <li>Review portfolio quarterly</li>
+                                <li>Rebalance annually or on major life events</li>
+                                <li>Maintain emergency fund separately</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             `;

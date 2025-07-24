@@ -8437,7 +8437,7 @@
                 }
                 
                 const liveFunds = await response.json();
-                console.log(`✅ Successfully fetched ${liveFunds.length} live mutual funds!`);
+                console.log(`Successfully fetched ${liveFunds.length} live mutual funds!`);
                 
                 // Convert API data to our format - randomize selection for variety
                 const shuffledFunds = liveFunds.sort(() => Math.random() - 0.5);
@@ -8466,7 +8466,7 @@
                     };
                 });
                 
-                console.log('✅ Live funds data converted successfully!');
+                console.log('Live funds data converted successfully!');
                 
                 // Debug: Show distribution of fund types and risks
                 const typeDistribution = {};
@@ -8476,8 +8476,8 @@
                     riskDistribution[fund.risk] = (riskDistribution[fund.risk] || 0) + 1;
                 });
                 
-                console.log('📊 Fund Type Distribution:', typeDistribution);
-                console.log('📊 Risk Level Distribution:', riskDistribution);
+                console.log('Fund Type Distribution:', typeDistribution);
+                console.log('Risk Level Distribution:', riskDistribution);
                 
                 return convertedFunds;
                 
@@ -9067,7 +9067,7 @@
             const missingFields = [];
             
             // DEBUG: Log what we're checking
-            console.log('🔍 VALIDATION DEBUG:');
+            console.log('VALIDATION DEBUG:');
             
             // Check Profile Section - MULTIPLE POSSIBLE IDs
             const age = document.getElementById('current-age')?.value || 
@@ -9112,7 +9112,7 @@
                 missingFields.push('Enter your Current Financial Status');
             }
             
-            console.log('🎯 VALIDATION RESULT:', {
+            console.log('VALIDATION RESULT:', {
                 isValid: missingFields.length === 0,
                 missingFields: missingFields
             });
@@ -9432,7 +9432,7 @@
                     button.innerHTML = '<i class="fas fa-check"></i> Updated!';
                     button.style.background = '#4CAF50';
                     
-                    console.log(`🎉 Successfully refreshed with ${liveFunds.length} live funds!`);
+                    console.log(`Successfully refreshed with ${liveFunds.length} live funds!`);
                 } else {
                     throw new Error('No live data available');
                 }
@@ -9599,7 +9599,7 @@
             updateField(section, field, value) {
                 this.userData[section][field] = value;
                 this.autoPopulateFields(field, value);
-                console.log(`📝 Updated ${section}.${field} = ${value}`);
+                console.log(`Updated ${section}.${field} = ${value}`);
             },
             
             // Auto-populate same field across all sections
@@ -9616,7 +9616,7 @@
                     const element = document.getElementById(fieldId);
                     if (element && element.value !== value) {
                         element.value = value;
-                        console.log(`🔄 Auto-populated ${fieldId} = ${value}`);
+                        console.log(`Auto-populated ${fieldId} = ${value}`);
                     }
                 });
             },
@@ -9667,7 +9667,7 @@
                 }
             });
             
-            console.log('✅ Auto-population system activated!');
+            console.log('Auto-population system activated!');
         }
 
         // Initialize app with live data
@@ -9682,7 +9682,7 @@
                 const liveFunds = await fetchLiveMutualFundsData();
                 if (liveFunds && liveFunds.length > 0) {
                     mutualFundsData = liveFunds;
-                    console.log(`🎉 Successfully loaded ${liveFunds.length} live mutual funds!`);
+                    console.log(`Successfully loaded ${liveFunds.length} live mutual funds!`);
                     
                     // CRITICAL FIX: RELOAD TABLE WITH LIVE DATA
                     loadMutualFundsComparison();
@@ -9693,7 +9693,7 @@
                         <div style="position: fixed; top: 20px; right: 20px; background: rgba(76, 175, 80, 0.9); color: white; padding: 0.8rem 1.2rem; border-radius: 20px; font-size: 0.9rem; z-index: 10000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); cursor: pointer;" onclick="this.parentNode.removeChild(this)">
                             <div><i class="fas fa-wifi"></i> <strong>Live Data Connected</strong></div>
                             <div style="font-size: 0.7rem; margin-top: 0.2rem;">${liveFunds.length} funds loaded • Click to dismiss</div>
-                            <div style="font-size: 0.6rem; margin-top: 0.2rem; opacity: 0.8;">✅ Filtering now works!</div>
+                            <div style="font-size: 0.6rem; margin-top: 0.2rem; opacity: 0.8;">Filtering now works!</div>
                         </div>
                     `;
                     document.body.appendChild(liveIndicator);
@@ -9705,7 +9705,7 @@
                         }
                     }, 5000);
                 } else {
-                    console.log('📊 Using static fallback data for mutual funds');
+                    console.log('Using static fallback data for mutual funds');
                 }
                 
                 // Load enhanced insurance and loans data
@@ -9714,12 +9714,12 @@
                 
                 if (liveInsurance) {
                     insuranceData = liveInsurance;
-                    console.log(`✅ Loaded ${liveInsurance.length} enhanced insurance products`);
+                    console.log(`Loaded ${liveInsurance.length} enhanced insurance products`);
                 }
                 
                 if (liveLoans) {
                     loansData = liveLoans;
-                    console.log(`✅ Loaded ${liveLoans.length} enhanced loan products`);
+                    console.log(`Loaded ${liveLoans.length} enhanced loan products`);
                 }
                 
             } catch (error) {

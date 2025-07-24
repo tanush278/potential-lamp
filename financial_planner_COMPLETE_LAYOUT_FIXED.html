@@ -5363,14 +5363,44 @@
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            titleColor: '#ffffff',
+                            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                            titleColor: '#ffd700',
                             bodyColor: '#ffffff',
                             borderColor: '#ffd700',
-                            borderWidth: 1,
+                            borderWidth: 2,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 12,
                             callbacks: {
+                                title: function(context) {
+                                    return `Period: ${context[0].label}`;
+                                },
+                                beforeBody: function(context) {
+                                    const dataIndex = context[0].dataIndex;
+                                    const invested = chartData[dataIndex].invested;
+                                    const nominalValue = chartData[dataIndex].nominalValue;
+                                    const realValue = chartData[dataIndex].realValue;
+                                    const nominalGains = nominalValue - invested;
+                                    const realGains = realValue - invested;
+                                    const nominalReturn = invested > 0 ? ((nominalGains / invested) * 100) : 0;
+                                    const realReturn = invested > 0 ? ((realGains / invested) * 100) : 0;
+                                    
+                                    return [
+                                        `💰 Amount Invested: ₹${Math.round(invested).toLocaleString('en-IN')}`,
+                                        `📈 Nominal Value: ₹${Math.round(nominalValue).toLocaleString('en-IN')}`,
+                                        `🔥 Real Value: ₹${Math.round(realValue).toLocaleString('en-IN')}`,
+                                        ``,
+                                        `💵 Nominal Gains: ₹${Math.round(nominalGains).toLocaleString('en-IN')} (${nominalReturn.toFixed(1)}%)`,
+                                        `⚡ Real Gains: ₹${Math.round(realGains).toLocaleString('en-IN')} (${realReturn.toFixed(1)}%)`,
+                                        ``,
+                                        `🎯 Inflation Impact: ₹${Math.round(nominalValue - realValue).toLocaleString('en-IN')}`
+                                    ];
+                                },
                                 label: function(context) {
-                                    return context.dataset.label + ': ₹' + Math.round(context.parsed.y).toLocaleString('en-IN');
+                                    // Return empty string since we're showing everything in beforeBody
+                                    return '';
                                 }
                             }
                         }

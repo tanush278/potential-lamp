@@ -4974,11 +4974,13 @@
             
             console.log('🎯 STRICT SELECTION CRITERIA:', preferences);
             
-            // STRICT FUND SELECTION - NO FALLBACKS OR RANDOM PICKS
+            // COMPREHENSIVE FUND SELECTION - ALL 6 ASSET CLASSES
             const selectedFunds = {
                 equity: [],
                 debt: [],
-                gold: []
+                gold: [],
+                commodity: [],
+                international: []
             };
             
             // STRICT EQUITY FUND SELECTION
@@ -5148,13 +5150,14 @@
 
         function generateFundRecommendations(riskProfile) {
             const fundCategories = document.getElementById('fund-categories');
+            // COMPREHENSIVE 6-ASSET CLASS ALLOCATION
             const allocation = {
-                'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
-                'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
-                'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
-                'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
-                'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
-            }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
+                'Conservative': { equity: 20, debt: 55, gold: 15, commodity: 0, international: 0, cash: 10 },
+                'Moderate Conservative': { equity: 30, debt: 45, gold: 12, commodity: 3, international: 5, cash: 5 },
+                'Moderate': { equity: 45, debt: 30, gold: 10, commodity: 5, international: 8, cash: 2 },
+                'Moderate Aggressive': { equity: 55, debt: 20, gold: 8, commodity: 7, international: 12, cash: 0 },
+                'Aggressive': { equity: 60, debt: 10, gold: 5, commodity: 10, international: 15, cash: 0 }
+            }[riskProfile.riskCategory] || { equity: 45, debt: 30, gold: 10, commodity: 5, international: 8, cash: 2 };
             
             console.log('GENERATING 100% DYNAMIC FUND RECOMMENDATIONS FOR:', riskProfile.riskCategory);
             console.log('Available live funds in API data:', mutualFundsData.length);
@@ -5184,12 +5187,15 @@
             // 100% DYNAMIC FUND SELECTION FROM LIVE API DATA
             const selectedFunds = selectFundsBasedOnRiskProfile(riskProfile.riskCategory, allocation);
             
-            console.log('LIVE FUND SELECTION COMPLETE:', {
+            console.log('COMPREHENSIVE FUND SELECTION COMPLETE:', {
                 source: 'LIVE_API_DATA',
                 equity: selectedFunds.equity.length,
                 debt: selectedFunds.debt.length, 
                 gold: selectedFunds.gold.length,
-                totalFunds: selectedFunds.equity.length + selectedFunds.debt.length + selectedFunds.gold.length
+                commodity: selectedFunds.commodity?.length || 0,
+                international: selectedFunds.international?.length || 0,
+                totalFunds: selectedFunds.equity.length + selectedFunds.debt.length + selectedFunds.gold.length + 
+                           (selectedFunds.commodity?.length || 0) + (selectedFunds.international?.length || 0)
             });
             
             // Validate that we have sufficient funds for recommendations
@@ -5306,6 +5312,68 @@
                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
                                 <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${fund.expenseRatio}%</span></span>
                                 <span style="color: var(--accent-silver); font-weight: bold;">Recommended for ${riskProfile.riskCategory}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                fundHTML += '</div></div>';
+            }
+            
+            // COMMODITY FUNDS SECTION (only if allocation > 0)
+            if (allocation.commodity > 0 && liveFunds.commodity && liveFunds.commodity.length > 0) {
+                fundHTML += `
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: #CD853F; margin-bottom: 1rem;">
+                            <i class="fas fa-industry"></i> Commodity Funds (${allocation.commodity}% allocation)
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                `;
+                liveFunds.commodity.forEach(fund => {
+                    fundHTML += `
+                        <div style="background: linear-gradient(135deg, rgba(205,133,63,0.05), rgba(0,0,0,0.3)); border: 1px solid #CD853F; border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <h6 style="color: var(--accent-white); margin: 0; font-size: 0.9rem;">${fund.name}</h6>
+                                <span style="color: #CD853F; font-size: 0.8rem;">${'★'.repeat(fund.rating)}${'☆'.repeat(5-fund.rating)}</span>
+                            </div>
+                            <div style="color: var(--text-gray); font-size: 0.8rem; margin-bottom: 0.8rem; padding: 0.3rem 0.6rem; background: rgba(255,255,255,0.05); border-radius: 4px; display: inline-block;">${fund.category}</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; margin-bottom: 0.5rem;">
+                                <div style="color: var(--text-gray);">Risk: <span style="color: #CD853F;">${fund.risk}</span></div>
+                                <div style="color: var(--text-gray);">1Y Returns: <span style="color: ${fund.returns1Y > 10 ? '#4CAF50' : fund.returns1Y > 7 ? '#FFC107' : '#F44336'}">${parseFloat(fund.returns1Y).toFixed(2)}%</span></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                                <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${parseFloat(fund.expenseRatio).toFixed(2)}%</span></span>
+                                <span style="color: #CD853F; font-weight: bold;">Alternative Investment</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                fundHTML += '</div></div>';
+            }
+            
+            // INTERNATIONAL FUNDS SECTION (only if allocation > 0)
+            if (allocation.international > 0 && liveFunds.international && liveFunds.international.length > 0) {
+                fundHTML += `
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: #1E90FF; margin-bottom: 1rem;">
+                            <i class="fas fa-globe"></i> International Funds (${allocation.international}% allocation)
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                `;
+                liveFunds.international.forEach(fund => {
+                    fundHTML += `
+                        <div style="background: linear-gradient(135deg, rgba(30,144,255,0.05), rgba(0,0,0,0.3)); border: 1px solid #1E90FF; border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <h6 style="color: var(--accent-white); margin: 0; font-size: 0.9rem;">${fund.name}</h6>
+                                <span style="color: #1E90FF; font-size: 0.8rem;">${'★'.repeat(fund.rating)}${'☆'.repeat(5-fund.rating)}</span>
+                            </div>
+                            <div style="color: var(--text-gray); font-size: 0.8rem; margin-bottom: 0.8rem; padding: 0.3rem 0.6rem; background: rgba(255,255,255,0.05); border-radius: 4px; display: inline-block;">${fund.category}</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; margin-bottom: 0.5rem;">
+                                <div style="color: var(--text-gray);">Risk: <span style="color: #1E90FF;">${fund.risk}</span></div>
+                                <div style="color: var(--text-gray);">1Y Returns: <span style="color: ${fund.returns1Y > 15 ? '#4CAF50' : fund.returns1Y > 10 ? '#FFC107' : '#F44336'}">${parseFloat(fund.returns1Y).toFixed(2)}%</span></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                                <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${parseFloat(fund.expenseRatio).toFixed(2)}%</span></span>
+                                <span style="color: #1E90FF; font-weight: bold;">Global Diversification</span>
                             </div>
                         </div>
                     `;

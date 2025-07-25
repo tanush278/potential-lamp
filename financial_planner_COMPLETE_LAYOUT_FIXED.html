@@ -8647,11 +8647,12 @@
             return (baseReturn + (Math.random() * 6 - 3)).toFixed(1);
         }
 
-        // STATIC FALLBACK DATA (Your original data as backup)
+        // COMPREHENSIVE MUTUAL FUNDS SHOPPING MALL DATA
         let mutualFundsData = [
+            // LARGE CAP EQUITY FUNDS
             {
                 name: "HDFC Top 100 Fund",
-                type: "equity",
+                type: "large-cap",
                 category: "Large Cap",
                 risk: "medium",
                 expenseRatio: 2.05,
@@ -8663,8 +8664,77 @@
                 minInvestment: 5000
             },
             {
+                name: "SBI BlueChip Fund",
+                type: "large-cap",
+                category: "Large Cap",
+                risk: "medium",
+                expenseRatio: 1.95,
+                returns1Y: 13.1,
+                returns3Y: 16.2,
+                returns5Y: 14.8,
+                aum: 12800,
+                rating: 4,
+                minInvestment: 1000
+            },
+            {
+                name: "ICICI Prudential Bluechip Fund",
+                type: "large-cap",
+                category: "Large Cap",
+                risk: "medium",
+                expenseRatio: 1.85,
+                returns1Y: 12.8,
+                returns3Y: 15.9,
+                returns5Y: 14.5,
+                aum: 16200,
+                rating: 4,
+                minInvestment: 5000
+            },
+            {
+                name: "Mirae Asset Large Cap Fund",
+                type: "large-cap",
+                category: "Large Cap", 
+                risk: "medium",
+                expenseRatio: 1.75,
+                returns1Y: 13.2,
+                returns3Y: 16.5,
+                returns5Y: 15.1,
+                aum: 18900,
+                rating: 5,
+                minInvestment: 1000
+            },
+            
+            // MID CAP EQUITY FUNDS
+            {
+                name: "Axis Midcap Fund",
+                type: "mid-cap",
+                category: "Mid Cap",
+                risk: "high",
+                expenseRatio: 2.15,
+                returns1Y: 16.8,
+                returns3Y: 19.5,
+                returns5Y: 17.2,
+                aum: 9500,
+                rating: 4,
+                minInvestment: 5000
+            },
+            {
+                name: "Kotak Emerging Equity Fund",
+                type: "mid-cap",
+                category: "Mid Cap",
+                risk: "high",
+                expenseRatio: 2.05,
+                returns1Y: 17.2,
+                returns3Y: 20.1,
+                returns5Y: 18.0,
+                aum: 11200,
+                rating: 5,
+                minInvestment: 1000
+            },
+            
+            // SMALL CAP EQUITY FUNDS
+            {
                 name: "SBI Small Cap Fund",
-                type: "equity", 
+                type: "small-cap",
                 category: "Small Cap",
                 risk: "high",
                 expenseRatio: 1.85,
@@ -8676,8 +8746,150 @@
                 minInvestment: 1000
             },
             {
+                name: "Axis Small Cap Fund",
+                type: "small-cap",
+                category: "Small Cap",
+                risk: "high",
+                expenseRatio: 2.25,
+                returns1Y: 19.5,
+                returns3Y: 23.2,
+                returns5Y: 20.8,
+                aum: 7200,
+                rating: 4,
+                minInvestment: 5000
+            },
+            
+            // MULTI CAP FUNDS
+            {
+                name: "SBI Magnum Multicap Fund",
+                type: "multi-cap",
+                category: "Multi Cap",
+                risk: "medium",
+                expenseRatio: 1.95,
+                returns1Y: 14.5,
+                returns3Y: 17.8,
+                returns5Y: 16.2,
+                aum: 13500,
+                rating: 4,
+                minInvestment: 1000
+            },
+            {
+                name: "HDFC Multi Cap Fund",
+                type: "multi-cap",
+                category: "Multi Cap",
+                risk: "medium",
+                expenseRatio: 2.05,
+                returns1Y: 14.2,
+                returns3Y: 17.5,
+                returns5Y: 15.9,
+                aum: 14800,
+                rating: 4,
+                minInvestment: 5000
+            },
+            
+            // ELSS TAX SAVER FUNDS
+            {
+                name: "Axis Long Term Equity Fund",
+                type: "elss",
+                category: "ELSS Tax Saver",
+                risk: "medium",
+                expenseRatio: 1.95,
+                returns1Y: 13.8,
+                returns3Y: 16.9,
+                returns5Y: 15.5,
+                aum: 10500,
+                rating: 5,
+                minInvestment: 500
+            },
+            {
+                name: "Mirae Asset Tax Saver Fund",
+                type: "elss",
+                category: "ELSS Tax Saver",
+                risk: "medium",
+                expenseRatio: 1.85,
+                returns1Y: 14.1,
+                returns3Y: 17.2,
+                returns5Y: 15.8,
+                aum: 9800,
+                rating: 4,
+                minInvestment: 500
+            },
+            
+            // INDEX FUNDS
+            {
+                name: "HDFC Index Fund - Nifty 50",
+                type: "index",
+                category: "Index Fund",
+                risk: "medium",
+                expenseRatio: 0.75,
+                returns1Y: 12.0,
+                returns3Y: 15.2,
+                returns5Y: 13.8,
+                aum: 8200,
+                rating: 4,
+                minInvestment: 1000
+            },
+            {
+                name: "SBI Nifty Index Fund",
+                type: "index",
+                category: "Index Fund",
+                risk: "medium",
+                expenseRatio: 0.65,
+                returns1Y: 11.9,
+                returns3Y: 15.1,
+                returns5Y: 13.7,
+                aum: 6500,
+                rating: 4,
+                minInvestment: 1000
+            },
+            
+            // DEBT FUNDS - LIQUID
+            {
+                name: "HDFC Liquid Fund",
+                type: "liquid",
+                category: "Liquid Fund",
+                risk: "low",
+                expenseRatio: 0.85,
+                returns1Y: 4.2,
+                returns3Y: 5.1,
+                returns5Y: 5.8,
+                aum: 15600,
+                rating: 4,
+                minInvestment: 5000
+            },
+            {
+                name: "SBI Liquid Fund",
+                type: "liquid",
+                category: "Liquid Fund",
+                risk: "low",
+                expenseRatio: 0.75,
+                returns1Y: 4.1,
+                returns3Y: 5.0,
+                returns5Y: 5.7,
+                aum: 12400,
+                rating: 4,
+                minInvestment: 1000
+            },
+            
+            // DEBT FUNDS - SHORT DURATION
+            {
+                name: "ICICI Prudential Short Term Fund",
+                type: "short-duration",
+                category: "Short Duration",
+                risk: "low",
+                expenseRatio: 1.15,
+                returns1Y: 6.5,
+                returns3Y: 7.2,
+                returns5Y: 7.8,
+                aum: 8900,
+                rating: 3,
+                minInvestment: 5000
+            },
+            
+            // DEBT FUNDS - MEDIUM DURATION
+            {
                 name: "ICICI Prudential Debt Fund",
-                type: "debt",
+                type: "medium-duration",
                 category: "Medium Duration",
                 risk: "low",
                 expenseRatio: 1.25,
@@ -8689,8 +8901,38 @@
                 minInvestment: 5000
             },
             {
+                name: "Franklin India Debt Fund",
+                type: "medium-duration",
+                category: "Medium Duration",
+                risk: "low",
+                expenseRatio: 1.35,
+                returns1Y: 6.8,
+                returns3Y: 7.5,
+                returns5Y: 7.2,
+                aum: 9200,
+                rating: 3,
+                minInvestment: 5000
+            },
+            
+            // CORPORATE BOND FUNDS
+            {
+                name: "HDFC Corporate Bond Fund",
+                type: "corporate-bond",
+                category: "Corporate Bond",
+                risk: "low",
+                expenseRatio: 0.95,
+                returns1Y: 7.8,
+                returns3Y: 8.5,
+                returns5Y: 8.2,
+                aum: 7800,
+                rating: 4,
+                minInvestment: 5000
+            },
+            
+            // HYBRID FUNDS - AGGRESSIVE
+            {
                 name: "Axis Hybrid Equity Fund",
-                type: "hybrid",
+                type: "aggressive-hybrid",
                 category: "Aggressive Hybrid",
                 risk: "medium",
                 expenseRatio: 1.95,
@@ -8702,30 +8944,62 @@
                 minInvestment: 5000
             },
             {
-                name: "Mirae Asset Large Cap Fund",
-                type: "equity",
-                category: "Large Cap", 
+                name: "SBI Equity Hybrid Fund",
+                type: "aggressive-hybrid",
+                category: "Aggressive Hybrid",
                 risk: "medium",
-                expenseRatio: 1.75,
-                returns1Y: 13.2,
-                returns3Y: 16.5,
-                returns5Y: 15.1,
-                aum: 18900,
-                rating: 5,
+                expenseRatio: 1.85,
+                returns1Y: 11.2,
+                returns3Y: 13.8,
+                returns5Y: 12.5,
+                aum: 8200,
+                rating: 4,
                 minInvestment: 1000
             },
+            
+            // HYBRID FUNDS - CONSERVATIVE
             {
-                name: "Franklin India Debt Fund",
-                type: "debt",
-                category: "Long Duration",
+                name: "HDFC Hybrid Debt Fund",
+                type: "conservative-hybrid",
+                category: "Conservative Hybrid",
                 risk: "low",
-                expenseRatio: 1.35,
-                returns1Y: 6.8,
-                returns3Y: 7.5,
-                returns5Y: 7.2,
-                aum: 9200,
+                expenseRatio: 1.65,
+                returns1Y: 8.5,
+                returns3Y: 9.8,
+                returns5Y: 9.2,
+                aum: 5600,
                 rating: 3,
                 minInvestment: 5000
+            },
+            
+            // INTERNATIONAL FUNDS
+            {
+                name: "Motilal Oswal Nasdaq 100 Fund",
+                type: "international",
+                category: "International Fund",
+                risk: "high",
+                expenseRatio: 2.45,
+                returns1Y: 22.5,
+                returns3Y: 18.9,
+                returns5Y: 16.8,
+                aum: 4200,
+                rating: 4,
+                minInvestment: 5000
+            },
+            
+            // GOLD FUNDS
+            {
+                name: "HDFC Gold Fund",
+                type: "gold",
+                category: "Gold Fund",
+                risk: "medium",
+                expenseRatio: 1.25,
+                returns1Y: 8.9,
+                returns3Y: 12.5,
+                returns5Y: 9.8,
+                aum: 3500,
+                rating: 3,
+                minInvestment: 1000
             }
         ];
 

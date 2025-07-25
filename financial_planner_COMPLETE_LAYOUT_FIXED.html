@@ -8874,25 +8874,94 @@
         function detectFundType(schemeName) {
             const name = schemeName.toLowerCase();
             
-            // Debt fund indicators
-            if (name.includes('debt') || name.includes('bond') || name.includes('income') || 
-                name.includes('liquid') || name.includes('gilt') || name.includes('treasury') ||
-                name.includes('credit') || name.includes('corporate bond') || name.includes('government') ||
-                name.includes('ultra short') || name.includes('short term') || name.includes('medium term') ||
-                name.includes('long term debt') || name.includes('money market') || name.includes('overnight')) {
-                return 'debt';
+            // DEBT FUND SPECIFIC TYPES
+            if (name.includes('liquid') || name.includes('overnight') || name.includes('money market')) {
+                return 'liquid';
+            }
+            if (name.includes('ultra short') || name.includes('ultra-short')) {
+                return 'ultra-short-duration';
+            }
+            if (name.includes('short term') || name.includes('short duration')) {
+                return 'short-duration';
+            }
+            if (name.includes('medium term') || name.includes('medium duration')) {
+                return 'medium-duration';
+            }
+            if (name.includes('long term') || name.includes('long duration')) {
+                return 'long-duration';
+            }
+            if (name.includes('gilt') || name.includes('government') || name.includes('treasury')) {
+                return 'gilt';
+            }
+            if (name.includes('corporate bond') || name.includes('corporate')) {
+                return 'corporate-bond';
+            }
+            if (name.includes('credit risk') || name.includes('credit')) {
+                return 'credit-risk';
+            }
+            if (name.includes('debt') || name.includes('bond') || name.includes('income')) {
+                return 'medium-duration'; // Default debt type
             }
             
-            // Hybrid fund indicators
-            if (name.includes('hybrid') || name.includes('balanced') || name.includes('conservative') ||
-                name.includes('monthly income') || name.includes('equity savings') || 
-                name.includes('arbitrage') || name.includes('balanced advantage') ||
-                name.includes('dynamic asset') || name.includes('multi asset')) {
-                return 'hybrid';
+            // HYBRID FUND SPECIFIC TYPES
+            if (name.includes('arbitrage')) {
+                return 'arbitrage';
+            }
+            if (name.includes('conservative') || name.includes('monthly income')) {
+                return 'conservative-hybrid';
+            }
+            if (name.includes('aggressive') || name.includes('equity savings')) {
+                return 'aggressive-hybrid';
+            }
+            if (name.includes('balanced') || name.includes('hybrid') || name.includes('dynamic asset') || name.includes('multi asset')) {
+                return 'balanced';
             }
             
-            // Default to equity for all others
-            return 'equity';
+            // EQUITY FUND SPECIFIC TYPES
+            if (name.includes('small cap') || name.includes('small-cap') || name.includes('smallcap')) {
+                return 'small-cap';
+            }
+            if (name.includes('mid cap') || name.includes('mid-cap') || name.includes('midcap')) {
+                return 'mid-cap';
+            }
+            if (name.includes('large cap') || name.includes('large-cap') || name.includes('largecap') || 
+                name.includes('blue chip') || name.includes('bluechip') || name.includes('top 100') || 
+                name.includes('top100')) {
+                return 'large-cap';
+            }
+            if (name.includes('multi cap') || name.includes('multi-cap') || name.includes('multicap')) {
+                return 'multi-cap';
+            }
+            if (name.includes('flexi cap') || name.includes('flexi-cap') || name.includes('flexicap')) {
+                return 'flexi-cap';
+            }
+            if (name.includes('elss') || name.includes('tax saver') || name.includes('tax saving')) {
+                return 'elss';
+            }
+            if (name.includes('index') || name.includes('nifty') || name.includes('sensex') || name.includes('bse')) {
+                return 'index';
+            }
+            if (name.includes('etf') || name.includes('exchange traded')) {
+                return 'etf';
+            }
+            if (name.includes('sector') || name.includes('thematic') || name.includes('pharma') || 
+                name.includes('banking') || name.includes('it') || name.includes('infrastructure') ||
+                name.includes('auto') || name.includes('fmcg') || name.includes('energy')) {
+                return 'sectoral';
+            }
+            if (name.includes('international') || name.includes('global') || name.includes('overseas') ||
+                name.includes('foreign') || name.includes('us') || name.includes('nasdaq') || name.includes('s&p')) {
+                return 'international';
+            }
+            if (name.includes('gold') || name.includes('precious metal')) {
+                return 'gold';
+            }
+            if (name.includes('commodity') || name.includes('commodities')) {
+                return 'commodities';
+            }
+            
+            // Default to large-cap for unidentified equity funds
+            return 'large-cap';
         }
         
         function detectCategory(schemeName) {
@@ -9531,6 +9600,34 @@
                 </table>
             `;
             document.getElementById('mutual-funds-table').innerHTML = tableHTML;
+            
+            // Debug: Test filtering immediately after table load
+            setTimeout(() => {
+                console.log('TESTING FILTER FUNCTIONALITY:');
+                const rows = document.querySelectorAll('#mutual-funds-table tbody tr');
+                console.log(`Total funds loaded: ${rows.length}`);
+                
+                // Show breakdown of fund types
+                const typeBreakdown = {};
+                const riskBreakdown = {};
+                rows.forEach(row => {
+                    const type = row.getAttribute('data-type');
+                    const risk = row.getAttribute('data-risk');
+                    typeBreakdown[type] = (typeBreakdown[type] || 0) + 1;
+                    riskBreakdown[risk] = (riskBreakdown[risk] || 0) + 1;
+                });
+                
+                console.log('FUND TYPE BREAKDOWN:', typeBreakdown);
+                console.log('RISK LEVEL BREAKDOWN:', riskBreakdown);
+                
+                // Test a specific filter combination
+                console.log('TESTING: large-cap + medium risk filter...');
+                const largeCap = Array.from(rows).filter(row => 
+                    row.getAttribute('data-type') === 'large-cap' && 
+                    row.getAttribute('data-risk') === 'medium'
+                );
+                console.log(`Found ${largeCap.length} large-cap + medium risk funds`);
+            }, 500);
         }
 
         function loadInsuranceComparison() {

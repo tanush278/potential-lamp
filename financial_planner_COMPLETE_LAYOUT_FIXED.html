@@ -2776,7 +2776,10 @@
                         
                         <div class="form-group" style="margin-bottom: 2rem;">
                             <label>Investment Amount (₹)</label>
-                            <input type="number" id="investment-amount" class="form-input" placeholder="Enter amount to invest" value="100000">
+                            <input type="number" id="investment-amount" class="form-input" placeholder="Enter amount to invest or leave blank for capacity-based recommendation" onchange="updateInvestmentAmountInfo()">
+                            <div id="investment-amount-info" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-gray);">
+                                Leave blank to use your calculated investment capacity based on income and expenses.
+                            </div>
                         </div>
                         
                         <div id="fund-categories">
@@ -5483,12 +5486,7 @@
 
         function generateRecommendations() {
             try {
-                const amount = parseFloat(document.getElementById('investment-amount').value) || 0;
-                if (amount <= 0) {
-                    alert('Please enter a valid investment amount');
-                    return;
-                }
-                
+                // First check if financial data is available
                 const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
                 console.log('🔍 FULL CLIENT DATA STRUCTURE:', clientData);
                 
@@ -5499,6 +5497,43 @@
                     alert('Please complete your risk assessment first');
                     return;
                 }
+
+                // CALCULATE ACTUAL INVESTMENT CAPACITY BASED ON FINANCIAL DATA
+                const monthlyIncome = parseFloat(clientData.financialStatus?.monthlyIncome) || 0;
+                const monthlyExpenses = parseFloat(clientData.financialStatus?.monthlyExpenses) || 0;
+                const annualIncome = parseFloat(clientData.basicInfo?.income) || (monthlyIncome * 12);
+                
+                if (monthlyIncome <= 0) {
+                    alert('Please complete your financial status information first to get accurate investment recommendations.');
+                    return;
+                }
+
+                // Calculate investment capacity with proper logic
+                const monthlySavings = Math.max(monthlyIncome - monthlyExpenses, 0);
+                const monthlyInvestmentCapacity = Math.min(
+                    monthlySavings * 0.8, // 80% of savings can be invested
+                    monthlyIncome * 0.3   // But not more than 30% of income
+                );
+                const annualInvestmentCapacity = monthlyInvestmentCapacity * 12;
+                
+                // Use manual input if provided, otherwise use calculated capacity
+                const manualAmount = parseFloat(document.getElementById('investment-amount').value) || 0;
+                const recommendedAmount = manualAmount > 0 ? manualAmount : annualInvestmentCapacity;
+                
+                if (recommendedAmount <= 0) {
+                    alert('Based on your financial data, you may need to reduce expenses first to create investment capacity.');
+                    return;
+                }
+
+                console.log('💰 INVESTMENT CAPACITY ANALYSIS:', {
+                    monthlyIncome,
+                    monthlyExpenses,
+                    monthlySavings,
+                    monthlyInvestmentCapacity,
+                    annualInvestmentCapacity,
+                    recommendedAmount,
+                    isManualOverride: manualAmount > 0
+                });
                 
                 // COMPREHENSIVE ASSET ALLOCATION - ALL ASSET CLASSES
                 const allocation = {
@@ -5506,40 +5541,40 @@
                         equity: 20, 
                         debt: 55, 
                         gold: 15, 
-                        commodity: 0, // Conservative investors avoid commodities
-                        international: 0, // Conservative investors focus on domestic
+                        commodity: 0,
+                        international: 0,
                         cash: 10 
                     },
                     'Moderate Conservative': { 
                         equity: 30, 
                         debt: 45, 
                         gold: 12, 
-                        commodity: 3, // Small commodity exposure for diversification
-                        international: 5, // Limited international exposure
+                        commodity: 3,
+                        international: 5,
                         cash: 5 
                     },
                     'Moderate': { 
                         equity: 45, 
                         debt: 30, 
                         gold: 10, 
-                        commodity: 5, // Moderate commodity allocation
-                        international: 8, // Meaningful international diversification
+                        commodity: 5,
+                        international: 8,
                         cash: 2 
                     },
                     'Moderate Aggressive': { 
                         equity: 55, 
                         debt: 20, 
                         gold: 8, 
-                        commodity: 7, // Higher commodity for growth
-                        international: 12, // Significant international exposure
-                        cash: 0 // No cash drag for growth-focused
+                        commodity: 7,
+                        international: 12,
+                        cash: 0
                     },
                     'Aggressive': { 
                         equity: 60, 
                         debt: 10, 
                         gold: 5, 
-                        commodity: 10, // Maximum commodity for high returns
-                        international: 15, // Maximum international diversification
+                        commodity: 10,
+                        international: 15,
                         cash: 0 
                     }
                 }[riskProfile.riskCategory] || { 
@@ -5547,15 +5582,15 @@
                 };
                 
                 // Calculate amounts for all asset classes
-                const equityAmount = Math.round(amount * allocation.equity / 100);
-                const debtAmount = Math.round(amount * allocation.debt / 100);
-                const goldAmount = Math.round(amount * allocation.gold / 100);
-                const commodityAmount = Math.round(amount * allocation.commodity / 100);
-                const internationalAmount = Math.round(amount * allocation.international / 100);
-                const cashAmount = Math.round(amount * allocation.cash / 100);
+                const equityAmount = Math.round(recommendedAmount * allocation.equity / 100);
+                const debtAmount = Math.round(recommendedAmount * allocation.debt / 100);
+                const goldAmount = Math.round(recommendedAmount * allocation.gold / 100);
+                const commodityAmount = Math.round(recommendedAmount * allocation.commodity / 100);
+                const internationalAmount = Math.round(recommendedAmount * allocation.international / 100);
+                const cashAmount = Math.round(recommendedAmount * allocation.cash / 100);
                 
                 console.log('🎯 COMPREHENSIVE ASSET ALLOCATION:', {
-                    total: amount,
+                    total: recommendedAmount,
                     equity: `${allocation.equity}% (₹${equityAmount.toLocaleString()})`,
                     debt: `${allocation.debt}% (₹${debtAmount.toLocaleString()})`,
                     gold: `${allocation.gold}% (₹${goldAmount.toLocaleString()})`,
@@ -5564,8 +5599,27 @@
                     cash: `${allocation.cash}% (₹${cashAmount.toLocaleString()})`
                 });
                 
-                // Display recommendations in interface with all asset classes
-                displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, commodityAmount, internationalAmount, cashAmount, riskProfile, clientData);
+                // Display recommendations with capacity analysis
+                displayRecommendationsInInterface(
+                    recommendedAmount, 
+                    allocation, 
+                    equityAmount, 
+                    debtAmount, 
+                    goldAmount, 
+                    commodityAmount, 
+                    internationalAmount, 
+                    cashAmount, 
+                    riskProfile, 
+                    clientData,
+                    {
+                        monthlyIncome,
+                        monthlyExpenses,
+                        monthlySavings,
+                        monthlyInvestmentCapacity,
+                        annualInvestmentCapacity,
+                        isManualOverride: manualAmount > 0
+                    }
+                );
                 
             } catch (error) {
                 console.error('Error generating recommendations:', error);
@@ -5573,101 +5627,112 @@
             }
         }
         
-        // GENERATE DYNAMIC INSIGHTS BASED ON USER DATA
-        function generateDynamicInsights(amount, allocation, riskProfile, clientData) {
+        // GENERATE DYNAMIC INSIGHTS BASED ON USER DATA WITH FIXED CALCULATIONS
+        function generateDynamicInsights(amount, allocation, riskProfile, clientData, capacityData) {
             console.log('🔍 DEBUGGING CLIENT DATA:', clientData);
+            console.log('💰 CAPACITY DATA:', capacityData);
             
             // Extract data from nested structure
             const age = (clientData.basicInfo?.age) || (clientData.age) || 30;
-            const annualIncome = parseFloat((clientData.basicInfo?.income) || (clientData.income) || 0);
-            const monthlyIncome = parseFloat((clientData.financialStatus?.monthlyIncome) || 0);
-            const monthlyExpenses = parseFloat((clientData.financialStatus?.monthlyExpenses) || 0);
+            const monthlyIncome = capacityData.monthlyIncome || 0;
+            const monthlyExpenses = capacityData.monthlyExpenses || 0;
+            const monthlySavings = capacityData.monthlySavings || 0;
+            const monthlyInvestmentCapacity = capacityData.monthlyInvestmentCapacity || 0;
             
-            // Use annual income if available, otherwise calculate from monthly
-            const totalAnnualIncome = annualIncome > 0 ? annualIncome : (monthlyIncome * 12);
-            const totalAnnualExpenses = monthlyExpenses * 12;
-            
+            const totalAnnualIncome = monthlyIncome * 12;
             const riskCategory = riskProfile.riskCategory;
             const riskScore = riskProfile.riskScore || 0;
             
             console.log('📊 EXTRACTED DATA:', {
                 age,
-                annualIncome,
                 monthlyIncome,
                 monthlyExpenses,
+                monthlySavings,
+                monthlyInvestmentCapacity,
                 totalAnnualIncome,
-                totalAnnualExpenses,
                 riskCategory
             });
             
-            // Calculate investment ratios with better fallbacks
-            const investmentToIncomeRatio = totalAnnualIncome > 0 ? (amount / totalAnnualIncome * 100).toFixed(1) : '0';
-            const monthlyInvestment = amount / 12;
-            const actualMonthlyIncome = totalAnnualIncome / 12;
+            // CORRECTED CALCULATIONS
+            const actualMonthlyInvestment = amount / 12;
+            const investmentCapacityUtilization = monthlyInvestmentCapacity > 0 ? 
+                ((actualMonthlyInvestment / monthlyInvestmentCapacity) * 100).toFixed(1) : '0';
+            const investmentToIncomeRatio = monthlyIncome > 0 ? 
+                ((actualMonthlyInvestment / monthlyIncome) * 100).toFixed(1) : '0';
+            const savingsRate = monthlyIncome > 0 ? 
+                ((monthlySavings / monthlyIncome) * 100).toFixed(1) : '0';
             
-            // Enhanced savings rate calculation
-            let savingsRate = '0';
-            if (actualMonthlyIncome > 0 && monthlyExpenses >= 0) {
-                const monthlySavings = actualMonthlyIncome - monthlyExpenses;
-                savingsRate = ((monthlySavings / actualMonthlyIncome) * 100).toFixed(1);
-                // Ensure it's not negative
-                if (parseFloat(savingsRate) < 0) savingsRate = '0';
-            }
-            
-            console.log('💰 FINANCIAL CALCULATIONS:', {
+            console.log('💰 CORRECTED FINANCIAL CALCULATIONS:', {
+                actualMonthlyInvestment,
+                investmentCapacityUtilization,
                 investmentToIncomeRatio,
-                monthlyInvestment,
-                actualMonthlyIncome,
-                monthlyExpenses,
-                savingsRate
+                savingsRate,
+                monthlyInvestmentCapacity
             });
             
             // Generate age-based insights
             let ageInsight = '';
             if (age < 30) {
-                ageInsight = `At ${age}, you have excellent time horizon for wealth building. Your ${riskCategory} profile allows for higher growth potential.`;
+                ageInsight = `At ${age}, you have excellent time horizon for wealth building. Your ${riskCategory} profile allows for higher growth potential over 30+ years.`;
             } else if (age < 40) {
-                ageInsight = `At ${age}, you're in prime earning years. Your ${riskCategory} approach balances growth with stability.`;
+                ageInsight = `At ${age}, you're in prime earning years. Your ${riskCategory} approach balances growth with stability for 20+ year horizon.`;
             } else if (age < 50) {
-                ageInsight = `At ${age}, it's important to balance growth with security. Your ${riskCategory} strategy reflects this maturity.`;
+                ageInsight = `At ${age}, it's important to balance growth with security. Your ${riskCategory} strategy reflects this maturity for 10-15 year horizon.`;
             } else {
-                ageInsight = `At ${age}, capital preservation becomes crucial. Your ${riskCategory} profile prioritizes stability.`;
+                ageInsight = `At ${age}, capital preservation becomes crucial. Your ${riskCategory} profile prioritizes stability for shorter investment horizon.`;
             }
             
-            // Generate income-based insights with fallback handling
+            // Generate CORRECTED income-based insights
             let incomeInsight = '';
-            if (totalAnnualIncome <= 0) {
-                incomeInsight = `Please complete your financial information to get personalized investment analysis based on your income.`;
-            } else if (parseFloat(investmentToIncomeRatio) > 20) {
-                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income shows strong financial discipline and commitment to wealth building.`;
-            } else if (parseFloat(investmentToIncomeRatio) > 10) {
-                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income is a good start. Consider increasing gradually to 15-20% for optimal growth.`;
-            } else if (parseFloat(investmentToIncomeRatio) > 0) {
-                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income. Aim to increase this to 15-20% for better wealth building potential.`;
+            if (monthlyIncome <= 0) {
+                incomeInsight = `Please complete your financial information to get personalized investment analysis.`;
+            } else if (capacityData.isManualOverride) {
+                if (parseFloat(investmentToIncomeRatio) > 30) {
+                    incomeInsight = `Warning: You're planning to invest ${investmentToIncomeRatio}% of monthly income (₹${actualMonthlyInvestment.toLocaleString()}/₹${monthlyIncome.toLocaleString()}). This exceeds recommended limits and may strain your finances.`;
+                } else if (parseFloat(investmentToIncomeRatio) > 20) {
+                    incomeInsight = `You're planning to invest ${investmentToIncomeRatio}% of monthly income (₹${actualMonthlyInvestment.toLocaleString()}/₹${monthlyIncome.toLocaleString()}). This is aggressive but achievable with disciplined budgeting.`;
+                } else if (parseFloat(investmentToIncomeRatio) > 10) {
+                    incomeInsight = `You're planning to invest ${investmentToIncomeRatio}% of monthly income (₹${actualMonthlyInvestment.toLocaleString()}/₹${monthlyIncome.toLocaleString()}). This is a good investment rate for wealth building.`;
+                } else {
+                    incomeInsight = `You're planning to invest ${investmentToIncomeRatio}% of monthly income (₹${actualMonthlyInvestment.toLocaleString()}/₹${monthlyIncome.toLocaleString()}). Consider increasing this to 15-20% for optimal growth.`;
+                }
             } else {
-                incomeInsight = `Start your investment journey by allocating 10-15% of your annual income for long-term wealth creation.`;
+                // Using calculated capacity
+                if (monthlyInvestmentCapacity > 0) {
+                    incomeInsight = `Based on your finances (Income: ₹${monthlyIncome.toLocaleString()}, Expenses: ₹${monthlyExpenses.toLocaleString()}), your investment capacity is ₹${monthlyInvestmentCapacity.toLocaleString()}/month (${investmentToIncomeRatio}% of income). This creates a sustainable investment plan.`;
+                } else {
+                    incomeInsight = `Your current expenses (₹${monthlyExpenses.toLocaleString()}) equal or exceed your income (₹${monthlyIncome.toLocaleString()}). Focus on expense reduction to create investment capacity.`;
+                }
             }
             
-            // Generate risk-based strategy
+            // Generate ENHANCED risk-based strategy with actual capacity considerations
             let riskStrategy = '';
+            const expectedReturn = {
+                'Conservative': '8-10%',
+                'Moderate Conservative': '10-12%', 
+                'Moderate': '12-14%',
+                'Moderate Aggressive': '14-16%',
+                'Aggressive': '16-18%'
+            }[riskCategory] || '10-14%';
+            
             switch (riskCategory) {
                 case 'Conservative':
-                    riskStrategy = `Your conservative approach prioritizes capital protection. Focus on high-grade debt instruments and blue-chip equity funds. Expected returns: 8-10% annually.`;
+                    riskStrategy = `Your conservative approach prioritizes capital protection with ${allocation.equity}% equity and ${allocation.debt}% debt allocation. With ₹${monthlyInvestmentCapacity.toLocaleString()}/month capacity, focus on high-grade debt instruments and blue-chip equity funds. Expected returns: ${expectedReturn} annually.`;
                     break;
                 case 'Moderate Conservative':
-                    riskStrategy = `Your balanced approach combines safety with moderate growth. Mix of large-cap equity and quality debt funds. Expected returns: 10-12% annually.`;
+                    riskStrategy = `Your balanced approach combines safety with moderate growth using ${allocation.equity}% equity and ${allocation.debt}% debt allocation. With ₹${monthlyInvestmentCapacity.toLocaleString()}/month capacity, mix large-cap equity and quality debt funds. Expected returns: ${expectedReturn} annually.`;
                     break;
                 case 'Moderate':
-                    riskStrategy = `Your moderate risk appetite allows for diversified growth. Blend of equity, debt, and alternative investments. Expected returns: 12-14% annually.`;
+                    riskStrategy = `Your moderate risk appetite allows diversified growth with ${allocation.equity}% equity, ${allocation.debt}% debt, and ${allocation.gold}% gold allocation. With ₹${monthlyInvestmentCapacity.toLocaleString()}/month capacity, blend equity, debt, and alternative investments. Expected returns: ${expectedReturn} annually.`;
                     break;
                 case 'Moderate Aggressive':
-                    riskStrategy = `Your growth-focused approach emphasizes higher returns. Mid-cap and small-cap equity with tactical debt allocation. Expected returns: 14-16% annually.`;
+                    riskStrategy = `Your growth-focused approach emphasizes higher returns with ${allocation.equity}% equity and ${allocation.debt}% debt allocation. With ₹${monthlyInvestmentCapacity.toLocaleString()}/month capacity, use mid-cap and small-cap equity with tactical debt allocation. Expected returns: ${expectedReturn} annually.`;
                     break;
                 case 'Aggressive':
-                    riskStrategy = `Your aggressive strategy maximizes growth potential. Heavy equity focus with small-cap and sectoral funds. Expected returns: 16-18% annually.`;
+                    riskStrategy = `Your aggressive strategy maximizes growth potential with ${allocation.equity}% equity allocation. With ₹${monthlyInvestmentCapacity.toLocaleString()}/month capacity, focus heavily on equity with small-cap and sectoral funds. Expected returns: ${expectedReturn} annually.`;
                     break;
                 default:
-                    riskStrategy = `Your investment strategy is tailored to balance risk and returns based on your profile.`;
+                    riskStrategy = `Your investment strategy is tailored to balance risk and returns based on your profile and ₹${monthlyInvestmentCapacity.toLocaleString()}/month capacity.`;
             }
             
             return {
@@ -5675,16 +5740,19 @@
                 incomeInsight,
                 riskStrategy,
                 investmentToIncomeRatio,
+                investmentCapacityUtilization,
                 savingsRate,
-                monthlyInvestment
+                actualMonthlyInvestment,
+                monthlyInvestmentCapacity,
+                expectedReturn
             };
         }
 
-        function displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, commodityAmount, internationalAmount, cashAmount, riskProfile, clientData) {
+        function displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, commodityAmount, internationalAmount, cashAmount, riskProfile, clientData, capacityData) {
             const recommendationContent = document.getElementById('recommendation-content');
             
-            // Generate dynamic insights
-            const insights = generateDynamicInsights(amount, allocation, riskProfile, clientData);
+            // Generate dynamic insights with capacity data
+            const insights = generateDynamicInsights(amount, allocation, riskProfile, clientData, capacityData);
             
             recommendationContent.innerHTML = `
                 <div style="display: grid; gap: 2rem;">
@@ -5829,16 +5897,30 @@
                             <div style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
                                 <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Investment Capacity Analysis</h6>
                                 <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">${insights.incomeInsight}</p>
-                                <div style="margin-top: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                                <div style="margin-top: 0.8rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; font-size: 0.9rem;">
                                     <div>
                                         <span style="color: var(--text-gray);">Monthly Investment:</span>
-                                        <span style="color: var(--accent-gold); font-weight: bold; margin-left: 0.5rem;">₹${Math.round(insights.monthlyInvestment).toLocaleString('en-IN')}</span>
+                                        <span style="color: var(--accent-gold); font-weight: bold; margin-left: 0.5rem;">₹${Math.round(insights.actualMonthlyInvestment).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: var(--text-gray);">Investment Capacity:</span>
+                                        <span style="color: var(--accent-silver); font-weight: bold; margin-left: 0.5rem;">₹${Math.round(insights.monthlyInvestmentCapacity).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: var(--text-gray);">Capacity Utilization:</span>
+                                        <span style="color: ${parseFloat(insights.investmentCapacityUtilization) > 100 ? '#ff6b6b' : parseFloat(insights.investmentCapacityUtilization) > 80 ? '#ffc107' : '#4caf50'}; font-weight: bold; margin-left: 0.5rem;">${insights.investmentCapacityUtilization}%</span>
                                     </div>
                                     <div>
                                         <span style="color: var(--text-gray);">Savings Rate:</span>
                                         <span style="color: var(--accent-gold); font-weight: bold; margin-left: 0.5rem;">${insights.savingsRate}%</span>
                                     </div>
                                 </div>
+                                ${capacityData.isManualOverride ? `
+                                <div style="margin-top: 0.8rem; padding: 0.8rem; background: rgba(255, 193, 7, 0.1); border-radius: 6px; border-left: 3px solid #ffc107;">
+                                    <div style="color: #ffc107; font-weight: bold; font-size: 0.85rem; margin-bottom: 0.3rem;">Manual Override Active</div>
+                                    <div style="color: var(--text-gray); font-size: 0.8rem;">You've entered a custom amount. Our calculated capacity is ₹${Math.round(insights.monthlyInvestmentCapacity).toLocaleString('en-IN')}/month based on your financial data.</div>
+                                </div>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -5858,7 +5940,11 @@
                             </div>
                             <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
                                 <div style="color: var(--accent-white); font-size: 1.5rem; font-weight: bold;">${insights.investmentToIncomeRatio}%</div>
-                                <div style="color: var(--text-gray); font-size: 0.9rem;">of Annual Income</div>
+                                <div style="color: var(--text-gray); font-size: 0.9rem;">of Monthly Income</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 8px;">
+                                <div style="color: var(--accent-gold); font-size: 1.5rem; font-weight: bold;">${insights.expectedReturn}</div>
+                                <div style="color: var(--text-gray); font-size: 0.9rem;">Expected Return</div>
                             </div>
                         </div>
                     </div>
@@ -5873,6 +5959,22 @@
                 behavior: 'smooth', 
                 block: 'start' 
             });
+        }
+
+        // Helper function to update investment amount info
+        function updateInvestmentAmountInfo() {
+            const amountInput = document.getElementById('investment-amount');
+            const infoDiv = document.getElementById('investment-amount-info');
+            
+            if (!amountInput || !infoDiv) return;
+            
+            const amount = parseFloat(amountInput.value) || 0;
+            
+            if (amount > 0) {
+                infoDiv.innerHTML = `<span style="color: #ffc107;">Manual amount: ₹${amount.toLocaleString('en-IN')} entered. Analysis will be based on this amount.</span>`;
+            } else {
+                infoDiv.innerHTML = `Leave blank to use your calculated investment capacity based on income and expenses.`;
+            }
         }
 
         function calculateSmartRebalancing() {

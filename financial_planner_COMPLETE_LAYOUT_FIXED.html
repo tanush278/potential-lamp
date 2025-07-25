@@ -3204,7 +3204,7 @@
                                         <optgroup label="DEBT FUNDS">
                                             <option value="debt">All Debt Funds</option>
                                             <option value="liquid">Liquid Funds</option>
-                                            <option value="ultra-short">Ultra Short Duration</option>
+                                            <option value="ultra-short-duration">Ultra Short Duration</option>
                                             <option value="short-duration">Short Duration</option>
                                             <option value="medium-duration">Medium Duration</option>
                                             <option value="long-duration">Long Duration</option>
@@ -7674,16 +7674,37 @@
         }
 
         function recalculateRisk() {
+            console.log('RECALCULATING RISK PROFILE - Clearing all data');
+            
             document.getElementById('risk-results').style.display = 'none';
             document.getElementById('risk-assessment').style.display = 'block';
             
-            // Clear form
+            // Clear form fields
             document.getElementById('age-group').value = '';
             document.getElementById('investment-experience').value = '';
             document.getElementById('investment-horizon').value = '';
             document.getElementById('income-stability').value = '';
             document.getElementById('financial-goals').value = '';
             document.getElementById('loss-tolerance').value = '';
+            
+            // CRITICAL FIX: Clear localStorage risk profile data
+            const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+            if (clientData.riskProfile) {
+                delete clientData.riskProfile;
+                localStorage.setItem('clientData', JSON.stringify(clientData));
+                console.log('CLEARED: Risk profile data from localStorage');
+            }
+            
+            // Also clear any standalone risk assessment data
+            localStorage.removeItem('riskAssessmentData');
+            console.log('CLEARED: Risk assessment data');
+            
+            // Update Investment Plan to show "complete risk assessment first" message
+            setTimeout(() => {
+                populateInvestmentPlanFunds();
+            }, 100);
+            
+            console.log('RISK RECALCULATION COMPLETE - All data cleared');
         }
 
         function calculateNetWorth() {
@@ -9634,21 +9655,34 @@
             const fundTypeFilter = document.getElementById('fund-type-filter').value;
             const riskLevelFilter = document.getElementById('risk-level-filter').value;
             
-            console.log(' FILTERING FUNDS:', { fundTypeFilter, riskLevelFilter });
+            console.log('FILTERING FUNDS:', { fundTypeFilter, riskLevelFilter });
             
             const rows = document.querySelectorAll('#mutual-funds-table tbody tr');
+            
+            // Debug: Check what data types actually exist
+            const existingTypes = new Set();
+            const existingRisks = new Set();
+            rows.forEach(row => {
+                const type = row.getAttribute('data-type');
+                const risk = row.getAttribute('data-risk');
+                if (type) existingTypes.add(type);
+                if (risk) existingRisks.add(risk);
+            });
+            console.log('AVAILABLE DATA TYPES:', Array.from(existingTypes));
+            console.log('AVAILABLE RISK LEVELS:', Array.from(existingRisks));
             let visibleCount = 0;
             
             // Define category mappings for broad filters
             const categoryMappings = {
                 'equity': ['large-cap', 'mid-cap', 'small-cap', 'multi-cap', 'flexi-cap', 'sectoral', 'elss', 'index', 'etf'],
-                'debt': ['liquid', 'ultra-short', 'ultra-short-duration', 'short-duration', 'medium-duration', 'long-duration', 'gilt', 'corporate-bond', 'credit-risk'],
+                'debt': ['liquid', 'ultra-short-duration', 'short-duration', 'medium-duration', 'long-duration', 'gilt', 'corporate-bond', 'credit-risk'],
                 'hybrid': ['balanced', 'aggressive-hybrid', 'conservative-hybrid', 'arbitrage']
             };
             
-            rows.forEach(row => {
+            rows.forEach((row, index) => {
                 const fundType = row.getAttribute('data-type');
                 const riskLevel = row.getAttribute('data-risk');
+                const fundName = row.querySelector('td strong')?.textContent || 'Unknown';
                 
                 // Enhanced fund type matching
                 let showFundType = false;
@@ -9663,6 +9697,13 @@
                 
                 // Risk level matching
                 const showRiskLevel = riskLevelFilter === 'all' || riskLevel === riskLevelFilter;
+                
+                // Debug specific problematic combinations
+                if (fundTypeFilter === 'ultra-short-duration' && riskLevelFilter === 'low') {
+                    console.log(`DEBUGGING ROW ${index}: ${fundName}`, {
+                        fundType, riskLevel, showFundType, showRiskLevel
+                    });
+                }
                 
                 if (showFundType && showRiskLevel) {
                     row.style.display = '';

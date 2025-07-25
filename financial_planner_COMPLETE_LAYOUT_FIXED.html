@@ -9301,16 +9301,16 @@
                 <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th>Fund Name</th>
-                            <th>Category</th>
-                            <th>Risk</th>
-                            <th>Expense Ratio</th>
-                            <th>1Y Return</th>
-                            <th>3Y Return</th>
-                            <th>5Y Return</th>
-                            <th>AUM (Cr)</th>
-                            <th>Rating</th>
-                            <th>Min Investment</th>
+                            <th style="text-align: left;">Fund Name</th>
+                            <th style="text-align: left;">Category</th>
+                            <th style="text-align: center;">Risk</th>
+                            <th style="text-align: right;">Expense Ratio</th>
+                            <th style="text-align: right;">1Y Return</th>
+                            <th style="text-align: right;">3Y Return</th>
+                            <th style="text-align: right;">5Y Return</th>
+                            <th style="text-align: right;">AUM (Cr)</th>
+                            <th style="text-align: center;">Rating</th>
+                            <th style="text-align: right;">Min Investment</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -9319,13 +9319,13 @@
                                 <td><strong>${fund.name}</strong></td>
                                 <td>${fund.category}</td>
                                 <td><span class="risk-badge risk-${fund.risk}">${fund.risk}</span></td>
-                                <td>${fund.expenseRatio}%</td>
-                                <td style="color: ${fund.returns1Y > 10 ? '#4CAF50' : fund.returns1Y > 5 ? '#FFC107' : '#F44336'}">${fund.returns1Y}%</td>
-                                <td style="color: ${fund.returns3Y > 12 ? '#4CAF50' : fund.returns3Y > 8 ? '#FFC107' : '#F44336'}">${fund.returns3Y}%</td>
-                                <td style="color: ${fund.returns5Y > 12 ? '#4CAF50' : fund.returns5Y > 8 ? '#FFC107' : '#F44336'}">${fund.returns5Y}%</td>
-                                <td>₹${fund.aum.toLocaleString()}</td>
-                                <td class="rating-stars">${'★'.repeat(fund.rating)}${'☆'.repeat(5-fund.rating)}</td>
-                                <td>₹${fund.minInvestment.toLocaleString()}</td>
+                                <td style="text-align: right;">${parseFloat(fund.expenseRatio).toFixed(2)}%</td>
+                                <td style="color: ${fund.returns1Y > 10 ? '#4CAF50' : fund.returns1Y > 5 ? '#FFC107' : '#F44336'}; text-align: right; font-weight: bold;">${parseFloat(fund.returns1Y).toFixed(2)}%</td>
+                                <td style="color: ${fund.returns3Y > 12 ? '#4CAF50' : fund.returns3Y > 8 ? '#FFC107' : '#F44336'}; text-align: right; font-weight: bold;">${parseFloat(fund.returns3Y).toFixed(2)}%</td>
+                                <td style="color: ${fund.returns5Y > 12 ? '#4CAF50' : fund.returns5Y > 8 ? '#FFC107' : '#F44336'}; text-align: right; font-weight: bold;">${parseFloat(fund.returns5Y).toFixed(2)}%</td>
+                                <td style="text-align: right;">₹${fund.aum.toLocaleString()}</td>
+                                <td class="rating-stars" style="text-align: center;">${'★'.repeat(fund.rating)}${'☆'.repeat(5-fund.rating)}</td>
+                                <td style="text-align: right;">₹${fund.minInvestment.toLocaleString()}</td>
                             </tr>
                         `).join('')}
                     </tbody>

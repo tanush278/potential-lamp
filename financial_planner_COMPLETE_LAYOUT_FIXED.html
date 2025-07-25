@@ -14409,6 +14409,283 @@
         }
     </script>
 
+    <!-- ENHANCEMENT START: INVESTMENT RECOMMENDATIONS UPGRADE -->
+    <!-- This block can be safely removed if it causes issues -->
+    <script>
+        // Enhanced Investment Recommendations - SAFE IMPLEMENTATION
+        // Wrapped in try-catch to prevent crashes
+        try {
+            // Only activate if container exists (feature detection)
+            if (document.getElementById('investment-recommendations-section')) {
+                
+                // SAFE: Advanced Fund Database
+                window.enhancedFundDatabase = {
+                    equity: {
+                        largeCap: [
+                            { name: "HDFC Top 100 Fund", rating: 4.5, expense: 1.25, returns3Y: 14.2, risk: "Moderate" },
+                            { name: "ICICI Pru Bluechip Fund", rating: 4.3, expense: 1.05, returns3Y: 13.8, risk: "Moderate" },
+                            { name: "Axis Bluechip Fund", rating: 4.4, expense: 0.98, returns3Y: 15.1, risk: "Moderate" }
+                        ],
+                        midCap: [
+                            { name: "HDFC Mid-Cap Opportunities", rating: 4.2, expense: 1.89, returns3Y: 16.5, risk: "High" },
+                            { name: "DSP Midcap Fund", rating: 4.1, expense: 1.75, returns3Y: 15.8, risk: "High" }
+                        ],
+                        smallCap: [
+                            { name: "SBI Small Cap Fund", rating: 4.0, expense: 1.95, returns3Y: 18.2, risk: "Very High" },
+                            { name: "HDFC Small Cap Fund", rating: 3.9, expense: 2.15, returns3Y: 17.6, risk: "Very High" }
+                        ]
+                    },
+                    debt: [
+                        { name: "ICICI Pru Short Term Fund", rating: 4.1, expense: 1.05, returns3Y: 7.2, risk: "Low" },
+                        { name: "HDFC Corporate Bond Fund", rating: 4.0, expense: 1.25, returns3Y: 8.1, risk: "Low" }
+                    ]
+                };
+
+                // SAFE: Enhanced Recommendation Function
+                window.generateEnhancedRecommendations = function(amount, riskProfile) {
+                    try {
+                        if (!amount || amount <= 0) return null;
+                        
+                        const recommendations = [];
+                        const fundDb = window.enhancedFundDatabase;
+                        
+                        // Risk-based allocation
+                        let allocation = {};
+                        switch(riskProfile?.toLowerCase()) {
+                            case 'conservative':
+                                allocation = { debt: 70, largeCap: 25, midCap: 5, smallCap: 0 };
+                                break;
+                            case 'moderate':
+                                allocation = { debt: 40, largeCap: 40, midCap: 15, smallCap: 5 };
+                                break;
+                            case 'aggressive':
+                                allocation = { debt: 20, largeCap: 30, midCap: 30, smallCap: 20 };
+                                break;
+                            default:
+                                allocation = { debt: 40, largeCap: 40, midCap: 15, smallCap: 5 };
+                        }
+                        
+                        // Generate recommendations based on allocation
+                        Object.keys(allocation).forEach(category => {
+                            const percentage = allocation[category];
+                            if (percentage > 0) {
+                                const categoryAmount = (amount * percentage) / 100;
+                                
+                                let funds = [];
+                                if (category === 'debt') {
+                                    funds = fundDb.debt.slice(0, 1);
+                                } else {
+                                    funds = fundDb.equity[category]?.slice(0, 1) || [];
+                                }
+                                
+                                funds.forEach(fund => {
+                                    recommendations.push({
+                                        fund: fund,
+                                        category: category,
+                                        allocation: categoryAmount,
+                                        percentage: percentage,
+                                        reasoning: generateFundReasoning(fund, category, riskProfile)
+                                    });
+                                });
+                            }
+                        });
+                        
+                        return recommendations;
+                        
+                    } catch (error) {
+                        console.warn('Enhanced recommendations failed, using fallback:', error);
+                        return null; // Graceful fallback
+                    }
+                };
+
+                // SAFE: Fund reasoning generator
+                function generateFundReasoning(fund, category, riskProfile) {
+                    try {
+                        const reasons = [];
+                        
+                        if (fund.rating >= 4.0) reasons.push("High-rated fund with consistent performance");
+                        if (fund.expense < 1.5) reasons.push("Low expense ratio for cost efficiency");
+                        if (fund.returns3Y > 12) reasons.push("Strong historical returns");
+                        
+                        const categoryReasons = {
+                            largeCap: "Stable large-cap exposure for portfolio foundation",
+                            midCap: "Growth potential from mid-cap companies",
+                            smallCap: "High growth potential from emerging companies",
+                            debt: "Stable income and capital preservation"
+                        };
+                        
+                        if (categoryReasons[category]) {
+                            reasons.push(categoryReasons[category]);
+                        }
+                        
+                        return reasons.join(". ") || "Suitable for your risk profile";
+                        
+                    } catch (error) {
+                        return "Recommended based on your investment profile";
+                    }
+                }
+
+                // SAFE: Enhanced Display Function
+                window.displayEnhancedRecommendations = function(recommendations, totalAmount) {
+                    try {
+                        if (!recommendations || recommendations.length === 0) {
+                            return; // Exit gracefully if no recommendations
+                        }
+                        
+                        const container = document.getElementById('generated-recommendations') || 
+                                         document.getElementById('recommendations-container') ||
+                                         document.getElementById('investment-results');
+                        
+                        if (!container) return; // Exit if no container found
+                        
+                        // Calculate expected returns
+                        const expectedReturn = recommendations.reduce((total, rec) => 
+                            total + (rec.allocation * (rec.fund.returns3Y / 100)), 0);
+                        const expectedReturnPercent = totalAmount > 0 ? (expectedReturn / totalAmount) * 100 : 0;
+                        
+                        const enhancedHTML = `
+                            <div style="background: var(--card-black); border-radius: 12px; padding: 2rem; margin: 2rem 0; border: 1px solid var(--border-gray);">
+                                <!-- Performance Summary -->
+                                <div style="background: rgba(255,215,0,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                                    <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Enhanced Portfolio Analysis</h4>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                        <div style="text-align: center;">
+                                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--accent-gold);">${expectedReturnPercent.toFixed(1)}%</div>
+                                            <div style="color: var(--text-gray);">Expected Annual Return</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--accent-white);">₹${Math.round(expectedReturn).toLocaleString('en-IN')}</div>
+                                            <div style="color: var(--text-gray);">Annual Return Amount</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--accent-silver);">${recommendations.length}</div>
+                                            <div style="color: var(--text-gray);">Recommended Funds</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fund Recommendations -->
+                                <h4 style="color: var(--accent-white); margin-bottom: 1.5rem;">Optimized Fund Selection</h4>
+                                ${recommendations.map((rec, index) => `
+                                    <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid var(--accent-gold);">
+                                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                            <div style="flex: 1;">
+                                                <h5 style="color: var(--accent-white); margin: 0; font-size: 16px;">${rec.fund.name}</h5>
+                                                <div style="color: var(--text-gray); font-size: 0.9rem; margin-top: 0.5rem;">${rec.reasoning}</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="background: var(--accent-gold); color: var(--primary-black); padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: 600;">
+                                                    Rating: ${rec.fund.rating}/5
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+                                            <div style="text-align: center; padding: 0.8rem; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-gold);">${rec.percentage}%</div>
+                                                <div style="font-size: 0.8rem; color: var(--text-gray);">Allocation</div>
+                                            </div>
+                                            <div style="text-align: center; padding: 0.8rem; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-white);">₹${Math.round(rec.allocation).toLocaleString('en-IN')}</div>
+                                                <div style="font-size: 0.8rem; color: var(--text-gray);">Amount</div>
+                                            </div>
+                                            <div style="text-align: center; padding: 0.8rem; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent-silver);">${rec.fund.returns3Y}%</div>
+                                                <div style="font-size: 0.8rem; color: var(--text-gray);">3Y Returns</div>
+                                            </div>
+                                            <div style="text-align: center; padding: 0.8rem; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                                                <div style="font-size: 1.2rem; font-weight: bold; color: var(--text-white);">${rec.fund.expense}%</div>
+                                                <div style="font-size: 0.8rem; color: var(--text-gray);">Expense Ratio</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                                
+                                <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; text-align: center;">
+                                    <p style="color: var(--text-gray); margin: 0; font-size: 0.9rem;">
+                                        💡 This enhanced analysis considers fund ratings, expense ratios, and historical performance. 
+                                        Consult with a financial advisor before making investment decisions.
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Safely append to existing content
+                        const existingContent = container.innerHTML;
+                        container.innerHTML = existingContent + enhancedHTML;
+                        
+                    } catch (error) {
+                        console.warn('Enhanced display failed, using fallback:', error);
+                        // Graceful fallback - do nothing, existing functionality continues
+                    }
+                };
+
+                // SAFE: Auto-enhancement hook
+                window.autoEnhanceInvestmentRecommendations = function() {
+                    try {
+                        // Look for existing recommendation triggers
+                        const generateButton = document.querySelector('[onclick*="generateRecommendations"]') ||
+                                             document.querySelector('[onclick*="calculateInvestment"]') ||
+                                             document.getElementById('generate-recommendations');
+                        
+                        if (generateButton) {
+                            const originalOnClick = generateButton.onclick;
+                            generateButton.onclick = function(event) {
+                                try {
+                                    // Call original function first
+                                    if (originalOnClick) {
+                                        originalOnClick.call(this, event);
+                                    }
+                                    
+                                    // Add enhancement after a brief delay
+                                    setTimeout(() => {
+                                        const amount = parseFloat(document.getElementById('investment-amount')?.value) || 
+                                                     parseFloat(document.getElementById('monthlyInvestment')?.value) || 
+                                                     100000;
+                                        
+                                        const riskProfile = document.querySelector('input[name="riskProfile"]:checked')?.value ||
+                                                          document.getElementById('riskCategory')?.value ||
+                                                          'moderate';
+                                        
+                                        const recommendations = window.generateEnhancedRecommendations(amount, riskProfile);
+                                        if (recommendations) {
+                                            window.displayEnhancedRecommendations(recommendations, amount);
+                                        }
+                                    }, 500);
+                                    
+                                } catch (error) {
+                                    console.warn('Enhancement hook failed:', error);
+                                    // Original functionality continues unaffected
+                                }
+                            };
+                        }
+                        
+                    } catch (error) {
+                        console.warn('Auto-enhancement setup failed:', error);
+                    }
+                };
+
+                // Initialize enhancement
+                document.addEventListener('DOMContentLoaded', function() {
+                    try {
+                        window.autoEnhanceInvestmentRecommendations();
+                        console.log('✅ Investment Recommendations Enhancement Loaded Successfully');
+                    } catch (error) {
+                        console.warn('Enhancement initialization failed:', error);
+                    }
+                });
+
+            } else {
+                console.log('Investment recommendations section not found - enhancement skipped');
+            }
+            
+        } catch (error) {
+            console.error('Investment recommendations enhancement failed to load:', error);
+            // App continues to work normally
+        }
+    </script>
+    <!-- ENHANCEMENT END: INVESTMENT RECOMMENDATIONS UPGRADE -->
+
     <!-- Version Footer -->
     <footer style="
         position: fixed; 

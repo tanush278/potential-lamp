@@ -4654,6 +4654,35 @@
             });
         }
 
+        // DEBUG FUNCTION TO TEST RISK PROFILE CHANGES
+        function testRiskProfileRecommendations() {
+            console.log('🧪 TESTING ALL RISK PROFILES:');
+            
+            const testProfiles = ['Conservative', 'Moderate Conservative', 'Moderate', 'Moderate Aggressive', 'Aggressive'];
+            
+            testProfiles.forEach(riskCategory => {
+                console.log(`\n📊 TESTING: ${riskCategory}`);
+                const allocation = {
+                    'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
+                    'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
+                    'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
+                    'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
+                    'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
+                }[riskCategory];
+                
+                const selectedFunds = selectFundsBasedOnRiskProfile(riskCategory, allocation);
+                
+                console.log(`✅ ${riskCategory} Recommendations:`, {
+                    allocation: allocation,
+                    equityFunds: selectedFunds.equity.map(f => f.name),
+                    debtFunds: selectedFunds.debt.map(f => f.name),
+                    goldFunds: selectedFunds.gold.map(f => f.name)
+                });
+            });
+            
+            console.log('\n🎯 Test complete! Check recommendations above - they should be different for each risk profile.');
+        }
+
         // POPULATE INVESTMENT PLAN WITH DYNAMIC FUND NAMES
         function populateInvestmentPlanFunds() {
             console.log('🔄 POPULATING INVESTMENT PLAN WITH DYNAMIC FUNDS');
@@ -10689,6 +10718,11 @@
                     
                     // POPULATE INVESTMENT PLAN WITH DYNAMIC FUNDS
                     populateInvestmentPlanFunds();
+                    
+                    // RUN TEST TO VERIFY DYNAMIC RECOMMENDATIONS
+                    setTimeout(() => {
+                        testRiskProfileRecommendations();
+                    }, 2000);
                     
                     // Add a detailed indicator that live data is loaded
                     const liveIndicator = document.createElement('div');

@@ -4965,125 +4965,98 @@
                 'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
             }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
             
-            console.log(' GENERATING DYNAMIC FUND RECOMMENDATIONS FOR:', riskProfile.riskCategory);
-            console.log(' Available funds in API data:', mutualFundsData.length);
+            console.log('GENERATING 100% DYNAMIC FUND RECOMMENDATIONS FOR:', riskProfile.riskCategory);
+            console.log('Available live funds in API data:', mutualFundsData.length);
             
-            // DYNAMIC FUND SELECTION FROM API DATA BASED ON RISK PROFILE
-            const selectedFunds = selectFundsBasedOnRiskProfile(riskProfile.riskCategory, allocation);
-            
-            // Legacy static fund database kept as fallback
-            const staticFundDatabase = {
-                equity: {
-                    'Conservative': [
-                        { name: "SBI Bluechip Fund", category: "Large Cap", risk: "Low", returns: "10-12%", rating: "★★★★☆", expense: "0.50%" },
-                        { name: "HDFC Top 100 Fund", category: "Large Cap", risk: "Low", returns: "9-11%", rating: "★★★★☆", expense: "0.52%" },
-                        { name: "Nippon India Large Cap Fund", category: "Large Cap", risk: "Low", returns: "10-11%", rating: "★★★★☆", expense: "0.49%" }
-                    ],
-                    'Moderate Conservative': [
-                        { name: "ICICI Prudential Bluechip Fund", category: "Large Cap", risk: "Low-Medium", returns: "11-13%", rating: "★★★★☆", expense: "0.55%" },
-                        { name: "UTI Mastershare Fund", category: "Large Cap", risk: "Low-Medium", returns: "10-12%", rating: "★★★★☆", expense: "0.58%" },
-                        { name: "Kotak Bluechip Fund", category: "Large Cap", risk: "Low-Medium", returns: "11-12%", rating: "★★★★☆", expense: "0.65%" },
-                        { name: "HDFC Balanced Advantage Fund", category: "Hybrid", risk: "Medium", returns: "10-13%", rating: "★★★★☆", expense: "0.75%" }
-                    ],
-                    'Moderate': [
-                        { name: "Axis Bluechip Fund", category: "Large Cap", risk: "Medium", returns: "12-15%", rating: "★★★★★", expense: "0.46%" },
-                        { name: "Mirae Asset Large Cap Fund", category: "Large Cap", risk: "Medium", returns: "11-14%", rating: "★★★★☆", expense: "0.52%" },
-                        { name: "Parag Parikh Long Term Equity Fund", category: "Multi Cap", risk: "Medium", returns: "13-16%", rating: "★★★★★", expense: "0.68%" },
-                        { name: "HDFC Mid-Cap Opportunities Fund", category: "Mid Cap", risk: "Medium-High", returns: "14-17%", rating: "★★★★☆", expense: "0.82%" }
-                    ],
-                    'Moderate Aggressive': [
-                        { name: "Axis Midcap Fund", category: "Mid Cap", risk: "High", returns: "15-18%", rating: "★★★★★", expense: "0.69%" },
-                        { name: "DSP Midcap Fund", category: "Mid Cap", risk: "High", returns: "14-17%", rating: "★★★★☆", expense: "0.75%" },
-                        { name: "Kotak Emerging Equity Fund", category: "Mid Cap", risk: "High", returns: "15-19%", rating: "★★★★☆", expense: "0.71%" },
-                        { name: "Franklin India Focused Equity Fund", category: "Focused", risk: "High", returns: "16-20%", rating: "★★★★☆", expense: "0.89%" }
-                    ],
-                    'Aggressive': [
-                        { name: "SBI Small Cap Fund", category: "Small Cap", risk: "Very High", returns: "16-20%", rating: "★★★★☆", expense: "0.95%" },
-                        { name: "Axis Small Cap Fund", category: "Small Cap", risk: "Very High", returns: "17-22%", rating: "★★★★★", expense: "0.87%" },
-                        { name: "ICICI Prudential Technology Fund", category: "Sectoral", risk: "Very High", returns: "18-25%", rating: "★★★★☆", expense: "1.05%" },
-                        { name: "Quant ELSS Tax Saver Fund", category: "ELSS", risk: "Very High", returns: "19-24%", rating: "★★★★☆", expense: "0.65%" },
-                        { name: "PGIM India Midcap Opportunities Fund", category: "Mid Cap", risk: "Very High", returns: "18-23%", rating: "★★★★☆", expense: "0.79%" }
-                    ]
-                },
-                debt: {
-                    'Conservative': [
-                        { name: "HDFC Liquid Fund", category: "Liquid", risk: "Very Low", returns: "3-4%", rating: "★★★★★", expense: "0.13%" },
-                        { name: "SBI Liquid Fund", category: "Liquid", risk: "Very Low", returns: "3-4%", rating: "★★★★☆", expense: "0.15%" },
-                        { name: "ICICI Prudential Ultra Short Term Fund", category: "Ultra Short", risk: "Very Low", returns: "4-5%", rating: "★★★★★", expense: "0.25%" },
-                        { name: "Axis Treasury Advantage Fund", category: "Ultra Short", risk: "Very Low", returns: "4-5%", rating: "★★★★☆", expense: "0.28%" }
-                    ],
-                    'Moderate Conservative': [
-                        { name: "SBI Short Term Debt Fund", category: "Short Term", risk: "Low", returns: "6-8%", rating: "★★★★☆", expense: "0.45%" },
-                        { name: "ICICI Prudential Corporate Bond Fund", category: "Corporate Bond", risk: "Low", returns: "6-7%", rating: "★★★★☆", expense: "0.42%" },
-                        { name: "Axis Corporate Debt Fund", category: "Corporate Bond", risk: "Low", returns: "6-8%", rating: "★★★★☆", expense: "0.48%" }
-                    ],
-                    'Moderate': [
-                        { name: "Axis Strategic Bond Fund", category: "Strategic", risk: "Medium", returns: "7-9%", rating: "★★★★★", expense: "0.65%" },
-                        { name: "Kotak Dynamic Bond Fund", category: "Dynamic", risk: "Medium", returns: "7-9%", rating: "★★★★☆", expense: "0.68%" },
-                        { name: "HDFC Medium Term Debt Fund", category: "Medium Term", risk: "Medium", returns: "7-9%", rating: "★★★★☆", expense: "0.55%" }
-                    ],
-                    'Moderate Aggressive': [
-                        { name: "Axis Strategic Bond Fund", category: "Strategic", risk: "Medium", returns: "8-10%", rating: "★★★★★", expense: "0.65%" },
-                        { name: "ICICI Prudential All Seasons Bond Fund", category: "Dynamic", risk: "Medium", returns: "8-10%", rating: "★★★★☆", expense: "0.72%" }
-                    ],
-                    'Aggressive': [
-                        { name: "Axis Strategic Bond Fund", category: "Strategic", risk: "Medium", returns: "8-10%", rating: "★★★★★", expense: "0.65%" },
-                        { name: "HDFC Corporate Bond Fund", category: "Corporate", risk: "Low", returns: "7-9%", rating: "★★★★☆", expense: "0.45%" }
-                    ]
-                },
-                gold: {
-                    all: [
-                        { name: "SBI Gold ETF", category: "Gold ETF", risk: "Medium", returns: "8-12%", rating: "★★★★☆", expense: "0.40%" },
-                        { name: "HDFC Gold ETF", category: "Gold ETF", risk: "Medium", returns: "8-12%", rating: "★★★★☆", expense: "0.50%" },
-                        { name: "Nippon India Gold Savings Fund", category: "Gold Fund", risk: "Medium", returns: "8-11%", rating: "★★★★☆", expense: "0.82%" }
-                    ]
-                }
-            };
-            
-            // Use dynamic funds if available, fallback to static database
-            let dynamicFunds = selectedFunds;
-            let usingDynamicData = true;
-            
-            // Fallback to static data if dynamic selection failed
-            if (!dynamicFunds.equity.length && !dynamicFunds.debt.length && !dynamicFunds.gold.length) {
-                console.log('⚠️ Dynamic fund selection failed, using static fallback');
-                dynamicFunds = {
-                    equity: staticFundDatabase.equity[riskProfile.riskCategory] || staticFundDatabase.equity['Moderate'],
-                    debt: staticFundDatabase.debt[riskProfile.riskCategory] || staticFundDatabase.debt['Moderate'], 
-                    gold: staticFundDatabase.gold.all
-                };
-                usingDynamicData = false;
+            // Check if we have live data available
+            if (!mutualFundsData || mutualFundsData.length === 0) {
+                console.log('WAITING FOR LIVE DATA: Mutual funds data not loaded yet...');
+                fundCategories.innerHTML = `
+                    <div style="text-align: center; padding: 40px; background: rgba(255,215,0,0.05); border: 1px solid var(--accent-gold); border-radius: 8px;">
+                        <h4 style="color: var(--accent-gold); margin-bottom: 15px;">Loading Live Fund Recommendations...</h4>
+                        <p style="color: var(--text-gray);">Fetching real-time mutual fund data from market APIs...</p>
+                        <div style="margin-top: 20px;">
+                            <div class="spinner" style="border: 3px solid rgba(255,215,0,0.3); border-top: 3px solid var(--accent-gold); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                        </div>
+                    </div>
+                `;
+                
+                // Retry after a short delay
+                setTimeout(() => {
+                    if (mutualFundsData && mutualFundsData.length > 0) {
+                        generateFundRecommendations(riskProfile);
+                    }
+                }, 2000);
+                return;
             }
             
-            console.log(' FINAL FUND SELECTION:', {
-                source: usingDynamicData ? 'API_DATA' : 'STATIC_FALLBACK',
-                equity: dynamicFunds.equity.length,
-                debt: dynamicFunds.debt.length,
-                gold: dynamicFunds.gold.length
+            // 100% DYNAMIC FUND SELECTION FROM LIVE API DATA
+            const selectedFunds = selectFundsBasedOnRiskProfile(riskProfile.riskCategory, allocation);
+            
+            console.log('LIVE FUND SELECTION COMPLETE:', {
+                source: 'LIVE_API_DATA',
+                equity: selectedFunds.equity.length,
+                debt: selectedFunds.debt.length, 
+                gold: selectedFunds.gold.length,
+                totalFunds: selectedFunds.equity.length + selectedFunds.debt.length + selectedFunds.gold.length
             });
             
+            // Validate that we have sufficient funds for recommendations
+            if (selectedFunds.equity.length === 0 && selectedFunds.debt.length === 0 && selectedFunds.gold.length === 0) {
+                console.error('CRITICAL ERROR: No funds available for recommendations');
+                fundCategories.innerHTML = `
+                    <div style="text-align: center; padding: 40px; background: rgba(244, 67, 54, 0.1); border: 1px solid #f44336; border-radius: 8px;">
+                        <h4 style="color: #f44336; margin-bottom: 15px;">Unable to Load Fund Recommendations</h4>
+                        <p style="color: var(--text-gray); margin-bottom: 20px;">Live fund data is temporarily unavailable. Please check your internet connection.</p>
+                        <button onclick="fetchCompleteLiveMutualFundsData().then(() => generateFundRecommendations(${JSON.stringify(riskProfile)}))" 
+                                style="background: var(--accent-gold); color: black; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                            Retry Loading Live Data
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // PURE DYNAMIC SYSTEM - NO STATIC FALLBACK
+            const liveFunds = selectedFunds;
+            
             let fundHTML = '';
+            
+            // Add timestamp to show data freshness
+            fundHTML += `
+                <div style="background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+                    <h4 style="color: #4CAF50; margin: 0 0 0.5rem 0;">
+                        <i class="fas fa-broadcast-tower"></i> Live Fund Recommendations
+                    </h4>
+                    <p style="color: var(--text-gray); margin: 0; font-size: 0.9rem;">
+                        Real-time data from market APIs • Last updated: ${new Date().toLocaleString()} • 
+                        Total funds analyzed: ${mutualFundsData.length}
+                    </p>
+                </div>
+            `;
             
             if (allocation.equity > 0) {
                 fundHTML += `
                     <div style="margin-bottom: 2rem;">
-                        <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Equity Funds (${allocation.equity}% allocation)</h4>
+                        <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">
+                            <i class="fas fa-chart-line"></i> Equity Funds (${allocation.equity}% allocation)
+                        </h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                 `;
-                dynamicFunds.equity.forEach(fund => {
+                liveFunds.equity.forEach(fund => {
                     fundHTML += `
                         <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
                                 <h6 style="color: var(--accent-white); margin: 0; font-size: 0.9rem;">${fund.name}</h6>
-                                <span style="color: var(--accent-gold); font-size: 0.8rem;">${fund.rating}</span>
+                                <span style="color: var(--accent-gold); font-size: 0.8rem;">${'★'.repeat(fund.rating)}${'☆'.repeat(5-fund.rating)}</span>
                             </div>
                             <div style="color: var(--text-gray); font-size: 0.8rem; margin-bottom: 0.8rem; padding: 0.3rem 0.6rem; background: rgba(255,255,255,0.05); border-radius: 4px; display: inline-block;">${fund.category}</div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; margin-bottom: 0.5rem;">
                                 <div style="color: var(--text-gray);">Risk: <span style="color: var(--accent-white);">${fund.risk}</span></div>
-                                <div style="color: var(--text-gray);">Returns: <span style="color: var(--accent-gold);">${fund.returns}</span></div>
+                                <div style="color: var(--text-gray);">1Y Returns: <span style="color: ${fund.returns1Y > 15 ? '#4CAF50' : fund.returns1Y > 10 ? '#FFC107' : '#F44336'}">${fund.returns1Y}%</span></div>
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                                <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${fund.expense}</span></span>
+                                <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${fund.expenseRatio}%</span></span>
                                 <span style="color: var(--accent-gold); font-weight: bold;">Recommended for ${riskProfile.riskCategory}</span>
                             </div>
                         </div>
@@ -5095,23 +5068,25 @@
             if (allocation.debt > 0) {
                 fundHTML += `
                     <div style="margin-bottom: 2rem;">
-                        <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Debt Funds (${allocation.debt}% allocation)</h4>
+                        <h4 style="color: var(--accent-white); margin-bottom: 1rem;">
+                            <i class="fas fa-shield-alt"></i> Debt Funds (${allocation.debt}% allocation)
+                        </h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                 `;
-                dynamicFunds.debt.forEach(fund => {
+                liveFunds.debt.forEach(fund => {
                     fundHTML += `
                         <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-white); border-radius: 8px; padding: 1rem;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
                                 <h6 style="color: var(--accent-white); margin: 0; font-size: 0.9rem;">${fund.name}</h6>
-                                <span style="color: var(--accent-white); font-size: 0.8rem;">${fund.rating}</span>
+                                <span style="color: var(--accent-white); font-size: 0.8rem;">${'★'.repeat(fund.rating)}${'☆'.repeat(5-fund.rating)}</span>
                             </div>
                             <div style="color: var(--text-gray); font-size: 0.8rem; margin-bottom: 0.8rem; padding: 0.3rem 0.6rem; background: rgba(255,255,255,0.05); border-radius: 4px; display: inline-block;">${fund.category}</div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; margin-bottom: 0.5rem;">
                                 <div style="color: var(--text-gray);">Risk: <span style="color: var(--accent-white);">${fund.risk}</span></div>
-                                <div style="color: var(--text-gray);">Returns: <span style="color: var(--accent-white);">${fund.returns}</span></div>
+                                <div style="color: var(--text-gray);">1Y Returns: <span style="color: ${fund.returns1Y > 10 ? '#4CAF50' : fund.returns1Y > 5 ? '#FFC107' : '#F44336'}">${fund.returns1Y}%</span></div>
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                                <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${fund.expense}</span></span>
+                                <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${fund.expenseRatio}%</span></span>
                                 <span style="color: var(--accent-white); font-weight: bold;">Recommended for ${riskProfile.riskCategory}</span>
                             </div>
                         </div>
@@ -5123,23 +5098,25 @@
             if (allocation.gold > 0) {
                 fundHTML += `
                     <div style="margin-bottom: 2rem;">
-                        <h4 style="color: var(--accent-silver); margin-bottom: 1rem;">Gold Investments (${allocation.gold}% allocation)</h4>
+                        <h4 style="color: var(--accent-silver); margin-bottom: 1rem;">
+                            <i class="fas fa-coins"></i> Gold Investments (${allocation.gold}% allocation)
+                        </h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                 `;
-                dynamicFunds.gold.forEach(fund => {
+                liveFunds.gold.forEach(fund => {
                     fundHTML += `
                         <div style="background: linear-gradient(135deg, rgba(192,192,192,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-silver); border-radius: 8px; padding: 1rem;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
                                 <h6 style="color: var(--accent-white); margin: 0; font-size: 0.9rem;">${fund.name}</h6>
-                                <span style="color: var(--accent-silver); font-size: 0.8rem;">${fund.rating}</span>
+                                <span style="color: var(--accent-silver); font-size: 0.8rem;">${'★'.repeat(fund.rating)}${'☆'.repeat(5-fund.rating)}</span>
                             </div>
                             <div style="color: var(--text-gray); font-size: 0.8rem; margin-bottom: 0.8rem; padding: 0.3rem 0.6rem; background: rgba(255,255,255,0.05); border-radius: 4px; display: inline-block;">${fund.category}</div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; margin-bottom: 0.5rem;">
                                 <div style="color: var(--text-gray);">Risk: <span style="color: var(--accent-silver);">${fund.risk}</span></div>
-                                <div style="color: var(--text-gray);">Returns: <span style="color: var(--accent-silver);">${fund.returns}</span></div>
+                                <div style="color: var(--text-gray);">1Y Returns: <span style="color: ${fund.returns1Y > 8 ? '#4CAF50' : fund.returns1Y > 5 ? '#FFC107' : '#F44336'}">${fund.returns1Y}%</span></div>
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                                <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${fund.expense}</span></span>
+                                <span style="color: var(--text-gray);">Expense Ratio: <span style="color: var(--accent-silver);">${fund.expenseRatio}%</span></span>
                                 <span style="color: var(--accent-silver); font-weight: bold;">Recommended for ${riskProfile.riskCategory}</span>
                             </div>
                         </div>

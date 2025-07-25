@@ -3222,7 +3222,7 @@
                                         <optgroup label="SPECIALTY FUNDS">
                                             <option value="international">International Funds</option>
                                             <option value="gold">Gold Funds</option>
-                                            <option value="commodities">Commodity Funds</option>
+                                            <option value="commodity">Commodity Funds</option>
                                         </optgroup>
                                     </select>
                                 </div>
@@ -5126,14 +5126,111 @@
                 console.log(`✅ Selected ${selectedFunds.gold.length} gold funds:`, selectedFunds.gold.map(f => f.name));
             }
             
-            // FINAL VALIDATION AND SUMMARY
-            const totalSelected = selectedFunds.equity.length + selectedFunds.debt.length + selectedFunds.gold.length;
+            // COMMODITY FUND SELECTION (only if allocation > 0)
+            if (allocation.commodity > 0) {
+                console.log('🔍 SELECTING COMMODITY FUNDS...');
+                console.log('Commodity allocation percentage:', allocation.commodity);
+                
+                const allCommodityFunds = mutualFundsData.filter(fund => fund.type === 'commodity');
+                console.log(`Total commodity funds in database: ${allCommodityFunds.length}`);
+                
+                const eligibleCommodityFunds = allCommodityFunds.filter(fund => {
+                    const riskMatch = fund.risk === 'medium' || fund.risk === 'high'; // Commodities are typically medium-high risk
+                    const ratingMatch = (fund.rating || 0) >= 2; // Lower minimum rating for commodities
+                    const expenseMatch = (fund.expenseRatio || 0) <= 3.0; // Higher expense ratio tolerance
+                    
+                    console.log(`Commodity fund ${fund.name}: risk=${riskMatch}, rating=${ratingMatch}, expense=${expenseMatch}`);
+                    return riskMatch && ratingMatch && expenseMatch;
+                });
+                
+                console.log(`Found ${eligibleCommodityFunds.length} eligible commodity funds`);
+                
+                // Sort by rating then returns
+                const sortedCommodityFunds = eligibleCommodityFunds.sort((a, b) => {
+                    if ((b.rating || 0) !== (a.rating || 0)) {
+                        return (b.rating || 0) - (a.rating || 0);
+                    }
+                    return (b.returns1Y || 0) - (a.returns1Y || 0);
+                });
+                
+                // Select top 2-3 commodity funds
+                const selectedCommodityFunds = sortedCommodityFunds.slice(0, 3);
+                
+                selectedFunds.commodity = selectedCommodityFunds.map(fund => ({
+                    name: fund.name,
+                    category: fund.category,
+                    risk: fund.risk,
+                    returns1Y: parseFloat(fund.returns1Y || 0).toFixed(2),
+                    returns3Y: parseFloat(fund.returns3Y || 0).toFixed(2),
+                    returns5Y: parseFloat(fund.returns5Y || 0).toFixed(2),
+                    rating: fund.rating || 2,
+                    expenseRatio: parseFloat(fund.expenseRatio || 0).toFixed(2),
+                    type: fund.type,
+                    isLive: true,
+                    selectedFor: riskCategory
+                }));
+                
+                console.log(`✅ Selected ${selectedFunds.commodity.length} commodity funds:`, selectedFunds.commodity.map(f => f.name));
+            }
             
-            console.log('🎯 STRICT RISK-BASED SELECTION COMPLETE:', {
+            // INTERNATIONAL FUND SELECTION (only if allocation > 0)
+            if (allocation.international > 0) {
+                console.log('🔍 SELECTING INTERNATIONAL FUNDS...');
+                console.log('International allocation percentage:', allocation.international);
+                
+                const allInternationalFunds = mutualFundsData.filter(fund => fund.type === 'international');
+                console.log(`Total international funds in database: ${allInternationalFunds.length}`);
+                
+                const eligibleInternationalFunds = allInternationalFunds.filter(fund => {
+                    const riskMatch = true; // International funds can be any risk level
+                    const ratingMatch = (fund.rating || 0) >= 2; // Minimum 2-star rating
+                    const expenseMatch = (fund.expenseRatio || 0) <= 3.0; // Higher expense ratio tolerance for international
+                    
+                    console.log(`International fund ${fund.name}: risk=${riskMatch}, rating=${ratingMatch}, expense=${expenseMatch}`);
+                    return riskMatch && ratingMatch && expenseMatch;
+                });
+                
+                console.log(`Found ${eligibleInternationalFunds.length} eligible international funds`);
+                
+                // Sort by rating then returns
+                const sortedInternationalFunds = eligibleInternationalFunds.sort((a, b) => {
+                    if ((b.rating || 0) !== (a.rating || 0)) {
+                        return (b.rating || 0) - (a.rating || 0);
+                    }
+                    return (b.returns1Y || 0) - (a.returns1Y || 0);
+                });
+                
+                // Select top 3-4 international funds
+                const selectedInternationalFunds = sortedInternationalFunds.slice(0, 4);
+                
+                selectedFunds.international = selectedInternationalFunds.map(fund => ({
+                    name: fund.name,
+                    category: fund.category,
+                    risk: fund.risk,
+                    returns1Y: parseFloat(fund.returns1Y || 0).toFixed(2),
+                    returns3Y: parseFloat(fund.returns3Y || 0).toFixed(2),
+                    returns5Y: parseFloat(fund.returns5Y || 0).toFixed(2),
+                    rating: fund.rating || 3,
+                    expenseRatio: parseFloat(fund.expenseRatio || 0).toFixed(2),
+                    type: fund.type,
+                    isLive: true,
+                    selectedFor: riskCategory
+                }));
+                
+                console.log(`✅ Selected ${selectedFunds.international.length} international funds:`, selectedFunds.international.map(f => f.name));
+            }
+            
+            // FINAL VALIDATION AND SUMMARY
+            const totalSelected = selectedFunds.equity.length + selectedFunds.debt.length + selectedFunds.gold.length + 
+                                selectedFunds.commodity.length + selectedFunds.international.length;
+            
+            console.log('🎯 COMPREHENSIVE RISK-BASED SELECTION COMPLETE:', {
                 riskCategory: riskCategory,
                 equity: `${selectedFunds.equity.length} funds selected`,
                 debt: `${selectedFunds.debt.length} funds selected`, 
                 gold: `${selectedFunds.gold.length} funds selected`,
+                commodity: `${selectedFunds.commodity.length} funds selected`,
+                international: `${selectedFunds.international.length} funds selected`,
                 totalFunds: totalSelected,
                 allFundsMatchRiskProfile: true,
                 noRandomSelections: true,
@@ -10595,11 +10692,14 @@
             console.log('AVAILABLE RISK LEVELS:', Array.from(existingRisks));
             let visibleCount = 0;
             
-            // Define category mappings for broad filters
+            // Define category mappings for broad filters - ALL 6 ASSET CLASSES
             const categoryMappings = {
                 'equity': ['large-cap', 'mid-cap', 'small-cap', 'multi-cap', 'flexi-cap', 'sectoral', 'elss', 'index', 'etf'],
                 'debt': ['liquid', 'ultra-short-duration', 'short-duration', 'medium-duration', 'long-duration', 'gilt', 'corporate-bond', 'credit-risk'],
-                'hybrid': ['balanced', 'aggressive-hybrid', 'conservative-hybrid', 'arbitrage']
+                'hybrid': ['balanced', 'aggressive-hybrid', 'conservative-hybrid', 'arbitrage'],
+                'gold': ['gold'],
+                'commodity': ['commodity'],
+                'international': ['international']
             };
             
             rows.forEach((row, index) => {

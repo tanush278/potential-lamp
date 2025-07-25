@@ -3201,7 +3201,7 @@
                                             <option value="index">Index Funds</option>
                                             <option value="etf">ETF Funds</option>
                                         </optgroup>
-                                        <optgroup label="🏦 DEBT FUNDS">
+                                        <optgroup label="DEBT FUNDS">
                                             <option value="debt">All Debt Funds</option>
                                             <option value="liquid">Liquid Funds</option>
                                             <option value="ultra-short">Ultra Short Duration</option>
@@ -3212,14 +3212,14 @@
                                             <option value="corporate-bond">Corporate Bond</option>
                                             <option value="credit-risk">Credit Risk</option>
                                         </optgroup>
-                                        <optgroup label="⚖️ HYBRID FUNDS">
+                                        <optgroup label="HYBRID FUNDS">
                                             <option value="hybrid">All Hybrid Funds</option>
                                             <option value="balanced">Balanced Funds</option>
                                             <option value="aggressive-hybrid">Aggressive Hybrid</option>
                                             <option value="conservative-hybrid">Conservative Hybrid</option>
                                             <option value="arbitrage">Arbitrage Funds</option>
                                         </optgroup>
-                                        <optgroup label="🌍 SPECIALTY FUNDS">
+                                        <optgroup label="SPECIALTY FUNDS">
                                             <option value="international">International Funds</option>
                                             <option value="gold">Gold Funds</option>
                                             <option value="commodities">Commodity Funds</option>
@@ -4656,12 +4656,12 @@
 
         // DEBUG FUNCTION TO TEST RISK PROFILE CHANGES
         function testRiskProfileRecommendations() {
-            console.log('🧪 TESTING ALL RISK PROFILES:');
+            console.log('TESTING ALL RISK PROFILES:');
             
             const testProfiles = ['Conservative', 'Moderate Conservative', 'Moderate', 'Moderate Aggressive', 'Aggressive'];
             
             testProfiles.forEach(riskCategory => {
-                console.log(`\n📊 TESTING: ${riskCategory}`);
+                console.log(`\nTESTING: ${riskCategory}`);
                 const allocation = {
                     'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
                     'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
@@ -4672,7 +4672,7 @@
                 
                 const selectedFunds = selectFundsBasedOnRiskProfile(riskCategory, allocation);
                 
-                console.log(`✅ ${riskCategory} Recommendations:`, {
+                console.log(`${riskCategory} Recommendations:`, {
                     allocation: allocation,
                     equityFunds: selectedFunds.equity.map(f => f.name),
                     debtFunds: selectedFunds.debt.map(f => f.name),
@@ -4680,8 +4680,8 @@
                 });
             });
             
-            console.log('\n🎯 Test complete! Check recommendations above - they should be different for each risk profile.');
-            console.log('\n🧪 MANUAL TEST: Try these commands in console:');
+            console.log('\n Test complete! Check recommendations above - they should be different for each risk profile.');
+            console.log('\n MANUAL TEST: Try these commands in console:');
             console.log('   updateInvestmentPlanForRiskProfile("Conservative")');
             console.log('   updateInvestmentPlanForRiskProfile("Aggressive")');
             console.log('   → Watch the fund names change in Investment Plan section!');
@@ -4704,7 +4704,7 @@
                 }
             }
             
-            console.log('🎯 USING RISK PROFILE FOR FUND SELECTION:', riskCategory);
+            console.log(' USING RISK PROFILE FOR FUND SELECTION:', riskCategory);
             
             // Get allocation for this risk profile
             const allocation = {
@@ -4718,7 +4718,7 @@
             // Use the same dynamic selection logic as the detailed recommendations
             const selectedFunds = selectFundsBasedOnRiskProfile(riskCategory, allocation);
             
-            console.log('📊 SELECTED FUNDS FOR DISPLAY:', {
+            console.log(' SELECTED FUNDS FOR DISPLAY:', {
                 riskCategory,
                 equity: selectedFunds.equity.length,
                 debt: selectedFunds.debt.length,
@@ -4730,7 +4730,7 @@
                 const equityFund1 = document.getElementById('equity-fund-1');
                 if (equityFund1) {
                     equityFund1.textContent = selectedFunds.equity[0].name;
-                    console.log('✅ Updated equity fund 1:', selectedFunds.equity[0].name);
+                    console.log(' Updated equity fund 1:', selectedFunds.equity[0].name);
                 }
             }
             
@@ -4738,7 +4738,7 @@
                 const equityFund2 = document.getElementById('equity-fund-2');
                 if (equityFund2) {
                     equityFund2.textContent = selectedFunds.equity[1].name;
-                    console.log('✅ Updated equity fund 2:', selectedFunds.equity[1].name);
+                    console.log(' Updated equity fund 2:', selectedFunds.equity[1].name);
                 }
             }
             
@@ -4746,7 +4746,7 @@
                 const debtFund1 = document.getElementById('debt-fund-1');
                 if (debtFund1) {
                     debtFund1.textContent = selectedFunds.debt[0].name;
-                    console.log('✅ Updated debt fund 1:', selectedFunds.debt[0].name);
+                    console.log(' Updated debt fund 1:', selectedFunds.debt[0].name);
                 }
             }
             
@@ -4754,7 +4754,7 @@
                 const debtFund2 = document.getElementById('debt-fund-2');
                 if (debtFund2) {
                     debtFund2.textContent = selectedFunds.debt[1].name;
-                    console.log('✅ Updated debt fund 2:', selectedFunds.debt[1].name);
+                    console.log(' Updated debt fund 2:', selectedFunds.debt[1].name);
                 }
             }
             
@@ -4762,17 +4762,17 @@
                 const goldFund1 = document.getElementById('gold-fund-1');
                 if (goldFund1) {
                     goldFund1.textContent = selectedFunds.gold[0].name;
-                    console.log('✅ Updated gold fund 1:', selectedFunds.gold[0].name);
+                    console.log(' Updated gold fund 1:', selectedFunds.gold[0].name);
                 }
             }
             
-            console.log('✅ INVESTMENT PLAN POPULATED WITH RISK-BASED DYNAMIC FUNDS');
+            console.log(' INVESTMENT PLAN POPULATED WITH RISK-BASED DYNAMIC FUNDS');
         }
 
         // FUNCTION TO UPDATE INVESTMENT PLAN WHEN RISK PROFILE CHANGES
         function updateInvestmentPlanForRiskProfile(newRiskCategory) {
             console.log('🔄 RISK PROFILE CHANGED TO:', newRiskCategory);
-            console.log('📊 UPDATING INVESTMENT PLAN RECOMMENDATIONS...');
+            console.log(' UPDATING INVESTMENT PLAN RECOMMENDATIONS...');
             
             // Update the displayed fund recommendations
             populateInvestmentPlanFunds(newRiskCategory);
@@ -4801,12 +4801,12 @@
                 }
             }, 4000);
             
-            console.log('✅ INVESTMENT PLAN UPDATED FOR NEW RISK PROFILE');
+            console.log(' INVESTMENT PLAN UPDATED FOR NEW RISK PROFILE');
         }
 
         // DYNAMIC FUND SELECTION FROM API DATA
         function selectFundsBasedOnRiskProfile(riskCategory, allocation) {
-            console.log('🔍 SELECTING FUNDS FOR RISK CATEGORY:', riskCategory);
+            console.log(' SELECTING FUNDS FOR RISK CATEGORY:', riskCategory);
             
             // Define fund type preferences based on risk profile
             const riskProfileMapping = {
@@ -4946,7 +4946,7 @@
                 }));
             }
             
-            console.log('✅ SELECTED FUNDS:', {
+            console.log(' SELECTED FUNDS:', {
                 equity: selectedFunds.equity.length,
                 debt: selectedFunds.debt.length,
                 gold: selectedFunds.gold.length
@@ -4965,8 +4965,8 @@
                 'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
             }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
             
-            console.log('🎯 GENERATING DYNAMIC FUND RECOMMENDATIONS FOR:', riskProfile.riskCategory);
-            console.log('📊 Available funds in API data:', mutualFundsData.length);
+            console.log(' GENERATING DYNAMIC FUND RECOMMENDATIONS FOR:', riskProfile.riskCategory);
+            console.log(' Available funds in API data:', mutualFundsData.length);
             
             // DYNAMIC FUND SELECTION FROM API DATA BASED ON RISK PROFILE
             const selectedFunds = selectFundsBasedOnRiskProfile(riskProfile.riskCategory, allocation);
@@ -5055,7 +5055,7 @@
                 usingDynamicData = false;
             }
             
-            console.log('🎯 FINAL FUND SELECTION:', {
+            console.log(' FINAL FUND SELECTION:', {
                 source: usingDynamicData ? 'API_DATA' : 'STATIC_FALLBACK',
                 equity: dynamicFunds.equity.length,
                 debt: dynamicFunds.debt.length,
@@ -8785,7 +8785,7 @@
         // LIVE MUTUAL FUNDS DATA INTEGRATION
         async function fetchLiveMutualFundsData() {
             try {
-                console.log('🚀 Fetching live mutual funds data...');
+                console.log(' Fetching live mutual funds data...');
                 
                 // Try to fetch live data from MFApi
                 const response = await fetch('https://api.mfapi.in/mf', {
@@ -9634,7 +9634,7 @@
             const fundTypeFilter = document.getElementById('fund-type-filter').value;
             const riskLevelFilter = document.getElementById('risk-level-filter').value;
             
-            console.log('🔍 FILTERING FUNDS:', { fundTypeFilter, riskLevelFilter });
+            console.log(' FILTERING FUNDS:', { fundTypeFilter, riskLevelFilter });
             
             const rows = document.querySelectorAll('#mutual-funds-table tbody tr');
             let visibleCount = 0;
@@ -9674,7 +9674,7 @@
                 }
             });
             
-            console.log(`✅ FILTER RESULT: ${visibleCount} funds visible out of ${rows.length} total`);
+            console.log(` FILTER RESULT: ${visibleCount} funds visible out of ${rows.length} total`);
             
             // Show/hide no results message
             updateNoResultsMessage(visibleCount);
@@ -10244,7 +10244,7 @@
                     if (element && element.value !== String(value)) {
                         const oldValue = element.value;
                         element.value = value;
-                        console.log(`✅ Auto-populated ${fieldId}: ${oldValue} → ${value}`);
+                        console.log(` Auto-populated ${fieldId}: ${oldValue} → ${value}`);
                         
                         // Trigger change event so other listeners work
                         element.dispatchEvent(new Event('input', { bubbles: true }));
@@ -10628,7 +10628,7 @@
             currentAgeFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
-                    console.log(`✅ CURRENT AGE FIELD FOUND: ${fieldId}`);
+                    console.log(` CURRENT AGE FIELD FOUND: ${fieldId}`);
                     field.addEventListener('input', function() {
                         const value = this.value;
                         if (value && value > 0) {
@@ -10640,7 +10640,7 @@
                                     const otherField = document.getElementById(otherFieldId);
                                     if (otherField && otherField.value !== value) {
                                         otherField.value = value;
-                                        console.log(`✅ AUTO-POPULATED CURRENT AGE: ${otherFieldId} = ${value}`);
+                                        console.log(` AUTO-POPULATED CURRENT AGE: ${otherFieldId} = ${value}`);
                                         
                                         // VISUAL FEEDBACK
                                         otherField.style.background = 'rgba(76, 175, 80, 0.2)';
@@ -10662,7 +10662,7 @@
             // MONTHLY INCOME INTEGRATION WITH ANNUAL CONVERSION
             const monthlyIncomeField = document.getElementById('monthly-income');
             if (monthlyIncomeField) {
-                console.log(`✅ MONTHLY INCOME FIELD FOUND: monthly-income`);
+                console.log(` MONTHLY INCOME FIELD FOUND: monthly-income`);
                 monthlyIncomeField.addEventListener('input', function() {
                     const value = this.value;
                     if (value && value > 0) {
@@ -10676,7 +10676,7 @@
                             const field = document.getElementById(fieldId);
                             if (field && field.value !== String(annualValue)) {
                                 field.value = annualValue;
-                                console.log(`✅ AUTO-POPULATED ANNUAL INCOME: ${fieldId} = ${annualValue} (from monthly ${value})`);
+                                console.log(` AUTO-POPULATED ANNUAL INCOME: ${fieldId} = ${annualValue} (from monthly ${value})`);
                                 
                                 // VISUAL FEEDBACK
                                 field.style.background = 'rgba(255, 193, 7, 0.2)';
@@ -10699,7 +10699,7 @@
             annualIncomeFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
-                    console.log(`✅ ANNUAL INCOME FIELD FOUND: ${fieldId}`);
+                    console.log(` ANNUAL INCOME FIELD FOUND: ${fieldId}`);
                     field.addEventListener('input', function() {
                         const value = this.value;
                         if (value && value > 0) {
@@ -10711,7 +10711,7 @@
                                     const otherField = document.getElementById(otherFieldId);
                                     if (otherField && otherField.value !== value) {
                                         otherField.value = value;
-                                        console.log(`✅ AUTO-POPULATED ANNUAL INCOME: ${otherFieldId} = ${value}`);
+                                        console.log(` AUTO-POPULATED ANNUAL INCOME: ${otherFieldId} = ${value}`);
                                         
                                         // VISUAL FEEDBACK
                                         otherField.style.background = 'rgba(255, 193, 7, 0.2)';
@@ -10729,7 +10729,7 @@
                             const monthlyField = document.getElementById('monthly-income');
                             if (monthlyField && monthlyField.value !== String(monthlyValue)) {
                                 monthlyField.value = monthlyValue;
-                                console.log(`✅ AUTO-POPULATED MONTHLY INCOME: monthly-income = ${monthlyValue} (from annual ${value})`);
+                                console.log(` AUTO-POPULATED MONTHLY INCOME: monthly-income = ${monthlyValue} (from annual ${value})`);
                                 
                                 // VISUAL FEEDBACK
                                 monthlyField.style.background = 'rgba(255, 193, 7, 0.2)';
@@ -10752,7 +10752,7 @@
             monthlyExpensesFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
-                    console.log(`✅ MONTHLY EXPENSES FIELD FOUND: ${fieldId}`);
+                    console.log(` MONTHLY EXPENSES FIELD FOUND: ${fieldId}`);
                     field.addEventListener('input', function() {
                         const value = this.value;
                         if (value && value > 0) {
@@ -10764,7 +10764,7 @@
                                     const otherField = document.getElementById(otherFieldId);
                                     if (otherField && otherField.value !== value) {
                                         otherField.value = value;
-                                        console.log(`✅ AUTO-POPULATED MONTHLY EXPENSES: ${otherFieldId} = ${value}`);
+                                        console.log(` AUTO-POPULATED MONTHLY EXPENSES: ${otherFieldId} = ${value}`);
                                         
                                         // VISUAL FEEDBACK
                                         otherField.style.background = 'rgba(255, 87, 34, 0.2)';
@@ -10789,7 +10789,7 @@
             outstandingLoansFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
-                    console.log(`✅ OUTSTANDING LOANS FIELD FOUND: ${fieldId}`);
+                    console.log(` OUTSTANDING LOANS FIELD FOUND: ${fieldId}`);
                     field.addEventListener('input', function() {
                         const value = this.value;
                         if (value && value >= 0) {
@@ -10801,7 +10801,7 @@
                                     const otherField = document.getElementById(otherFieldId);
                                     if (otherField && otherField.value !== value) {
                                         otherField.value = value;
-                                        console.log(`✅ AUTO-POPULATED OUTSTANDING LOANS: ${otherFieldId} = ${value}`);
+                                        console.log(` AUTO-POPULATED OUTSTANDING LOANS: ${otherFieldId} = ${value}`);
                                         
                                         // VISUAL FEEDBACK
                                         otherField.style.background = 'rgba(156, 39, 176, 0.2)';
@@ -10824,7 +10824,7 @@
             
             // COMPREHENSIVE INTEGRATION TEST
             setTimeout(() => {
-                console.log('🧪 TESTING ALL LOGICAL INTEGRATIONS...');
+                console.log(' TESTING ALL LOGICAL INTEGRATIONS...');
                 
                 const currentAgeField = document.getElementById('current-age');
                 const insuranceAgeField = document.getElementById('insurance-age');
@@ -10847,7 +10847,7 @@
                 });
                 
                 // INTEGRATION TEST - NO PREDEFINED VALUES
-                console.log('✅ INTEGRATION SETUP COMPLETE - Fields are ready for user input');
+                console.log(' INTEGRATION SETUP COMPLETE - Fields are ready for user input');
                 console.log('📝 Integration will activate when user enters data in any connected field');
             }, 2000);
         }
@@ -10917,7 +10917,7 @@
                 }
                 
             } catch (error) {
-                console.log('📊 Using static fallback data due to error:', error.message);
+                console.log(' Using static fallback data due to error:', error.message);
                 // Populate Investment Plan even with static data
                 populateInvestmentPlanFunds();
             }

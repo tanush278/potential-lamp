@@ -4804,153 +4804,292 @@
             console.log(' INVESTMENT PLAN UPDATED FOR NEW RISK PROFILE');
         }
 
-        // DYNAMIC FUND SELECTION FROM API DATA
+        // STRICT RISK-BASED DYNAMIC FUND SELECTION
         function selectFundsBasedOnRiskProfile(riskCategory, allocation) {
-            console.log(' SELECTING FUNDS FOR RISK CATEGORY:', riskCategory);
+            console.log('🎯 STRICT RISK-BASED FUND SELECTION FOR:', riskCategory);
+            console.log('Available funds in database:', mutualFundsData.length);
             
-            // Define fund type preferences based on risk profile
+            // PRECISE risk profile mapping - NO RANDOM SELECTIONS
             const riskProfileMapping = {
                 'Conservative': {
-                    equity: ['large-cap', 'index'],
-                    debt: ['liquid', 'ultra-short', 'short-duration'],
-                    gold: ['gold'],
-                    preferredRisk: 'low'
+                    equity: {
+                        allowedTypes: ['large-cap', 'index', 'multi-cap'],
+                        allowedRisks: ['low'],
+                        minRating: 4,
+                        maxExpenseRatio: 1.5,
+                        targetCount: 3
+                    },
+                    debt: {
+                        allowedTypes: ['liquid', 'ultra-short-duration', 'short-duration', 'corporate-bond'],
+                        allowedRisks: ['low'],
+                        minRating: 3,
+                        maxExpenseRatio: 1.0,
+                        targetCount: 3
+                    },
+                    gold: {
+                        allowedTypes: ['gold'],
+                        allowedRisks: ['low', 'medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 1.5,
+                        targetCount: 2
+                    }
                 },
                 'Moderate Conservative': {
-                    equity: ['large-cap', 'multi-cap', 'index'],
-                    debt: ['short-duration', 'medium-duration', 'corporate-bond'],
-                    gold: ['gold'],
-                    preferredRisk: 'low'
+                    equity: {
+                        allowedTypes: ['large-cap', 'multi-cap', 'index', 'elss'],
+                        allowedRisks: ['low', 'medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 2.0,
+                        targetCount: 4
+                    },
+                    debt: {
+                        allowedTypes: ['short-duration', 'medium-duration', 'corporate-bond', 'gilt'],
+                        allowedRisks: ['low'],
+                        minRating: 3,
+                        maxExpenseRatio: 1.2,
+                        targetCount: 3
+                    },
+                    gold: {
+                        allowedTypes: ['gold'],
+                        allowedRisks: ['low', 'medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 1.5,
+                        targetCount: 2
+                    }
                 },
                 'Moderate': {
-                    equity: ['large-cap', 'multi-cap', 'mid-cap', 'elss'],
-                    debt: ['medium-duration', 'corporate-bond', 'aggressive-hybrid'],
-                    gold: ['gold'],
-                    preferredRisk: 'medium'
+                    equity: {
+                        allowedTypes: ['large-cap', 'multi-cap', 'mid-cap', 'elss', 'flexi-cap'],
+                        allowedRisks: ['low', 'medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 2.5,
+                        targetCount: 4
+                    },
+                    debt: {
+                        allowedTypes: ['medium-duration', 'corporate-bond', 'balanced', 'aggressive-hybrid'],
+                        allowedRisks: ['low', 'medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 1.5,
+                        targetCount: 2
+                    },
+                    gold: {
+                        allowedTypes: ['gold'],
+                        allowedRisks: ['medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 1.5,
+                        targetCount: 2
+                    }
                 },
                 'Moderate Aggressive': {
-                    equity: ['mid-cap', 'multi-cap', 'small-cap', 'elss'],
-                    debt: ['aggressive-hybrid', 'medium-duration'],
-                    gold: ['gold'],
-                    preferredRisk: 'high'
+                    equity: {
+                        allowedTypes: ['mid-cap', 'multi-cap', 'small-cap', 'elss', 'flexi-cap', 'sectoral'],
+                        allowedRisks: ['medium', 'high'],
+                        minRating: 3,
+                        maxExpenseRatio: 3.0,
+                        targetCount: 5
+                    },
+                    debt: {
+                        allowedTypes: ['aggressive-hybrid', 'balanced', 'medium-duration'],
+                        allowedRisks: ['medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 2.0,
+                        targetCount: 2
+                    },
+                    gold: {
+                        allowedTypes: ['gold'],
+                        allowedRisks: ['medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 1.5,
+                        targetCount: 1
+                    }
                 },
                 'Aggressive': {
-                    equity: ['small-cap', 'mid-cap', 'sectoral', 'international'],
-                    debt: ['aggressive-hybrid'],
-                    gold: ['gold'],
-                    preferredRisk: 'high'
+                    equity: {
+                        allowedTypes: ['small-cap', 'mid-cap', 'sectoral', 'international', 'elss'],
+                        allowedRisks: ['high'],
+                        minRating: 3,
+                        maxExpenseRatio: 3.5,
+                        targetCount: 6
+                    },
+                    debt: {
+                        allowedTypes: ['aggressive-hybrid', 'balanced'],
+                        allowedRisks: ['medium', 'high'],
+                        minRating: 3,
+                        maxExpenseRatio: 2.5,
+                        targetCount: 1
+                    },
+                    gold: {
+                        allowedTypes: ['gold'],
+                        allowedRisks: ['medium'],
+                        minRating: 3,
+                        maxExpenseRatio: 1.5,
+                        targetCount: 1
+                    }
                 }
             };
             
-            const preferences = riskProfileMapping[riskCategory] || riskProfileMapping['Moderate'];
-            console.log('📋 Fund preferences for', riskCategory, ':', preferences);
+            const preferences = riskProfileMapping[riskCategory];
+            if (!preferences) {
+                console.error('INVALID RISK CATEGORY:', riskCategory);
+                return { equity: [], debt: [], gold: [] };
+            }
             
-            // Filter and select best funds from API data
+            console.log('🎯 STRICT SELECTION CRITERIA:', preferences);
+            
+            // STRICT FUND SELECTION - NO FALLBACKS OR RANDOM PICKS
             const selectedFunds = {
                 equity: [],
                 debt: [],
                 gold: []
             };
             
-            // SELECT EQUITY FUNDS
+            // STRICT EQUITY FUND SELECTION
             if (allocation.equity > 0) {
-                preferences.equity.forEach(fundType => {
-                    const fundsOfType = mutualFundsData.filter(fund => 
-                        fund.type === fundType && 
-                        (fund.risk === preferences.preferredRisk || fund.risk === 'medium')
-                    ).sort((a, b) => (b.rating || 0) - (a.rating || 0)); // Sort by rating
+                console.log('🔍 SELECTING EQUITY FUNDS...');
+                
+                const eligibleEquityFunds = mutualFundsData.filter(fund => {
+                    const typeMatch = preferences.equity.allowedTypes.includes(fund.type);
+                    const riskMatch = preferences.equity.allowedRisks.includes(fund.risk);
+                    const ratingMatch = (fund.rating || 0) >= preferences.equity.minRating;
+                    const expenseMatch = (fund.expenseRatio || 0) <= preferences.equity.maxExpenseRatio;
                     
-                    if (fundsOfType.length > 0) {
-                        // Map API data to expected format
-                        const mappedFunds = fundsOfType.slice(0, 2).map(fund => ({
-                            name: fund.name,
-                            category: fund.category,
-                            risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
-                            returns: `${fund.returns1Y || 12}-${(fund.returns1Y || 12) + 3}%`,
-                            rating: '★'.repeat(fund.rating || 4) + '☆'.repeat(5 - (fund.rating || 4)),
-                            expense: `${fund.expenseRatio || 1.5}%`
-                        }));
-                        selectedFunds.equity.push(...mappedFunds);
-                    }
+                    return typeMatch && riskMatch && ratingMatch && expenseMatch;
                 });
                 
-                // If not enough equity funds, add top-rated large cap funds
-                if (selectedFunds.equity.length < 3) {
-                    const largeCaps = mutualFundsData.filter(fund => 
-                        fund.type === 'large-cap'
-                    ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                    
-                    const mappedLargeCaps = largeCaps.slice(0, 3 - selectedFunds.equity.length).map(fund => ({
-                        name: fund.name,
-                        category: fund.category,
-                        risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
-                        returns: `${fund.returns1Y || 12}-${(fund.returns1Y || 12) + 3}%`,
-                        rating: '★'.repeat(fund.rating || 4) + '☆'.repeat(5 - (fund.rating || 4)),
-                        expense: `${fund.expenseRatio || 1.5}%`
-                    }));
-                    selectedFunds.equity.push(...mappedLargeCaps);
-                }
-            }
-            
-            // SELECT DEBT FUNDS
-            if (allocation.debt > 0) {
-                preferences.debt.forEach(fundType => {
-                    const fundsOfType = mutualFundsData.filter(fund => 
-                        fund.type === fundType
-                    ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                    
-                    if (fundsOfType.length > 0) {
-                        const mappedFunds = fundsOfType.slice(0, 2).map(fund => ({
-                            name: fund.name,
-                            category: fund.category,
-                            risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
-                            returns: `${fund.returns1Y || 7}-${(fund.returns1Y || 7) + 2}%`,
-                            rating: '★'.repeat(fund.rating || 4) + '☆'.repeat(5 - (fund.rating || 4)),
-                            expense: `${fund.expenseRatio || 1.2}%`
-                        }));
-                        selectedFunds.debt.push(...mappedFunds);
+                console.log(`Found ${eligibleEquityFunds.length} eligible equity funds for ${riskCategory}`);
+                
+                // Sort by rating (descending) then by returns (descending)
+                const sortedEquityFunds = eligibleEquityFunds.sort((a, b) => {
+                    if ((b.rating || 0) !== (a.rating || 0)) {
+                        return (b.rating || 0) - (a.rating || 0);
                     }
+                    return (b.returns1Y || 0) - (a.returns1Y || 0);
                 });
                 
-                // If not enough debt funds, add medium duration funds
-                if (selectedFunds.debt.length < 2) {
-                    const mediumDebt = mutualFundsData.filter(fund => 
-                        fund.type === 'medium-duration'
-                    ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                    
-                    const mappedMediumDebt = mediumDebt.slice(0, 2 - selectedFunds.debt.length).map(fund => ({
-                        name: fund.name,
-                        category: fund.category,
-                        risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
-                        returns: `${fund.returns1Y || 7}-${(fund.returns1Y || 7) + 2}%`,
-                        rating: '★'.repeat(fund.rating || 4) + '☆'.repeat(5 - (fund.rating || 4)),
-                        expense: `${fund.expenseRatio || 1.2}%`
-                    }));
-                    selectedFunds.debt.push(...mappedMediumDebt);
-                }
-            }
-            
-            // SELECT GOLD FUNDS
-            if (allocation.gold > 0) {
-                const goldFunds = mutualFundsData.filter(fund => 
-                    fund.type === 'gold'
-                ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                // Select top funds based on target count
+                const selectedEquityFunds = sortedEquityFunds.slice(0, preferences.equity.targetCount);
                 
-                selectedFunds.gold = goldFunds.slice(0, 2).map(fund => ({
+                selectedFunds.equity = selectedEquityFunds.map(fund => ({
                     name: fund.name,
                     category: fund.category,
-                    risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
-                    returns: `${fund.returns1Y || 9}-${(fund.returns1Y || 9) + 3}%`,
-                    rating: '★'.repeat(fund.rating || 3) + '☆'.repeat(5 - (fund.rating || 3)),
-                    expense: `${fund.expenseRatio || 1.0}%`
+                    risk: fund.risk,
+                    returns1Y: parseFloat(fund.returns1Y || 0).toFixed(2),
+                    returns3Y: parseFloat(fund.returns3Y || 0).toFixed(2),
+                    returns5Y: parseFloat(fund.returns5Y || 0).toFixed(2),
+                    rating: fund.rating || 3,
+                    expenseRatio: parseFloat(fund.expenseRatio || 0).toFixed(2),
+                    type: fund.type,
+                    isLive: true,
+                    selectedFor: riskCategory
                 }));
+                
+                console.log(`✅ Selected ${selectedFunds.equity.length} equity funds:`, selectedFunds.equity.map(f => f.name));
             }
             
-            console.log(' SELECTED FUNDS:', {
-                equity: selectedFunds.equity.length,
-                debt: selectedFunds.debt.length,
-                gold: selectedFunds.gold.length
+            // STRICT DEBT FUND SELECTION
+            if (allocation.debt > 0) {
+                console.log('🔍 SELECTING DEBT FUNDS...');
+                
+                const eligibleDebtFunds = mutualFundsData.filter(fund => {
+                    const typeMatch = preferences.debt.allowedTypes.includes(fund.type);
+                    const riskMatch = preferences.debt.allowedRisks.includes(fund.risk);
+                    const ratingMatch = (fund.rating || 0) >= preferences.debt.minRating;
+                    const expenseMatch = (fund.expenseRatio || 0) <= preferences.debt.maxExpenseRatio;
+                    
+                    return typeMatch && riskMatch && ratingMatch && expenseMatch;
+                });
+                
+                console.log(`Found ${eligibleDebtFunds.length} eligible debt funds for ${riskCategory}`);
+                
+                // Sort by rating (descending) then by returns (descending)
+                const sortedDebtFunds = eligibleDebtFunds.sort((a, b) => {
+                    if ((b.rating || 0) !== (a.rating || 0)) {
+                        return (b.rating || 0) - (a.rating || 0);
+                    }
+                    return (b.returns1Y || 0) - (a.returns1Y || 0);
+                });
+                
+                // Select top funds based on target count
+                const selectedDebtFunds = sortedDebtFunds.slice(0, preferences.debt.targetCount);
+                
+                selectedFunds.debt = selectedDebtFunds.map(fund => ({
+                    name: fund.name,
+                    category: fund.category,
+                    risk: fund.risk,
+                    returns1Y: parseFloat(fund.returns1Y || 0).toFixed(2),
+                    returns3Y: parseFloat(fund.returns3Y || 0).toFixed(2),
+                    returns5Y: parseFloat(fund.returns5Y || 0).toFixed(2),
+                    rating: fund.rating || 3,
+                    expenseRatio: parseFloat(fund.expenseRatio || 0).toFixed(2),
+                    type: fund.type,
+                    isLive: true,
+                    selectedFor: riskCategory
+                }));
+                
+                console.log(`✅ Selected ${selectedFunds.debt.length} debt funds:`, selectedFunds.debt.map(f => f.name));
+            }
+            
+            // STRICT GOLD FUND SELECTION
+            if (allocation.gold > 0) {
+                console.log('🔍 SELECTING GOLD FUNDS...');
+                
+                const eligibleGoldFunds = mutualFundsData.filter(fund => {
+                    const typeMatch = preferences.gold.allowedTypes.includes(fund.type);
+                    const riskMatch = preferences.gold.allowedRisks.includes(fund.risk);
+                    const ratingMatch = (fund.rating || 0) >= preferences.gold.minRating;
+                    const expenseMatch = (fund.expenseRatio || 0) <= preferences.gold.maxExpenseRatio;
+                    
+                    return typeMatch && riskMatch && ratingMatch && expenseMatch;
+                });
+                
+                console.log(`Found ${eligibleGoldFunds.length} eligible gold funds for ${riskCategory}`);
+                
+                // Sort by rating (descending) then by returns (descending)
+                const sortedGoldFunds = eligibleGoldFunds.sort((a, b) => {
+                    if ((b.rating || 0) !== (a.rating || 0)) {
+                        return (b.rating || 0) - (a.rating || 0);
+                    }
+                    return (b.returns1Y || 0) - (a.returns1Y || 0);
+                });
+                
+                // Select top funds based on target count
+                const selectedGoldFunds = sortedGoldFunds.slice(0, preferences.gold.targetCount);
+                
+                selectedFunds.gold = selectedGoldFunds.map(fund => ({
+                    name: fund.name,
+                    category: fund.category,
+                    risk: fund.risk,
+                    returns1Y: parseFloat(fund.returns1Y || 0).toFixed(2),
+                    returns3Y: parseFloat(fund.returns3Y || 0).toFixed(2),
+                    returns5Y: parseFloat(fund.returns5Y || 0).toFixed(2),
+                    rating: fund.rating || 3,
+                    expenseRatio: parseFloat(fund.expenseRatio || 0).toFixed(2),
+                    type: fund.type,
+                    isLive: true,
+                    selectedFor: riskCategory
+                }));
+                
+                console.log(`✅ Selected ${selectedFunds.gold.length} gold funds:`, selectedFunds.gold.map(f => f.name));
+            }
+            
+            // FINAL VALIDATION AND SUMMARY
+            const totalSelected = selectedFunds.equity.length + selectedFunds.debt.length + selectedFunds.gold.length;
+            
+            console.log('🎯 STRICT RISK-BASED SELECTION COMPLETE:', {
+                riskCategory: riskCategory,
+                equity: `${selectedFunds.equity.length} funds selected`,
+                debt: `${selectedFunds.debt.length} funds selected`, 
+                gold: `${selectedFunds.gold.length} funds selected`,
+                totalFunds: totalSelected,
+                allFundsMatchRiskProfile: true,
+                noRandomSelections: true,
+                source: 'LIVE_API_DATA'
             });
+            
+            if (totalSelected === 0) {
+                console.warn('⚠️ NO FUNDS MATCH STRICT CRITERIA FOR', riskCategory);
+                console.warn('Consider reviewing risk profile mapping or fund database');
+            }
             
             return selectedFunds;
         }

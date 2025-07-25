@@ -3114,26 +3114,35 @@
                         <p class="section-subtitle">Personalized recommendations based on your complete financial profile</p>
                     </div>
 
-                    <!-- Smart Recommendations Banner -->
-                    <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.05) 100%); border: 2px solid rgba(255,215,0,0.3);">
+                    <!-- Financial Products Shopping Mall -->
+                    <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(76,175,80,0.1) 0%, rgba(46,125,50,0.05) 100%); border: 2px solid rgba(76,175,80,0.3);">
                         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                            <i class="fas fa-brain" style="font-size: 2rem; color: var(--accent-gold);"></i>
+                            <i class="fas fa-store" style="font-size: 2rem; color: #4CAF50;"></i>
                             <div>
-                                <h3 style="color: var(--accent-gold); margin: 0; font-size: 1.4rem; font-weight: 600;">Smart Personalized Recommendations</h3>
-                                <p style="color: var(--text-gray); margin: 0; font-size: 0.95rem;">Based on your age, income, risk profile, goals, and current portfolio</p>
+                                <h3 style="color: #4CAF50; margin: 0; font-size: 1.4rem; font-weight: 600;">Financial Products Mall</h3>
+                                <p style="color: var(--text-gray); margin: 0; font-size: 0.95rem;">Browse, compare, and choose the best financial products for your needs</p>
                             </div>
                         </div>
-                        <div id="smart-recommendations-summary" style="padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem;">
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem;">
-                                <div><strong style="color: var(--accent-gold);">Profile:</strong> <span id="user-profile-summary">Complete your profile for personalized recommendations</span></div>
-                                <div><strong style="color: var(--accent-gold);">Risk Level:</strong> <span id="user-risk-summary">Take risk assessment</span></div>
-                                <div><strong style="color: var(--accent-gold);">Top Priority:</strong> <span id="user-goal-summary">Set your financial goals</span></div>
-                                <div><strong style="color: var(--accent-gold);">Recommendation:</strong> <span id="smart-recommendation-text">Building your recommendation...</span></div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-search" style="color: #4CAF50;"></i>
+                                    <span><strong>Browse:</strong> Explore all product categories</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-filter" style="color: #4CAF50;"></i>
+                                    <span><strong>Filter:</strong> Find products that match your criteria</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-balance-scale" style="color: #4CAF50;"></i>
+                                    <span><strong>Compare:</strong> Side-by-side detailed analysis</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-lightbulb" style="color: #FFD700;"></i>
+                                    <span><strong>💡 Tip:</strong> Get personalized advice from Investment Plan section</span>
+                                </div>
                             </div>
                         </div>
-                        <button onclick="generateSmartRecommendations()" style="padding: 0.8rem 1.5rem; background: var(--accent-gold); color: var(--primary-black); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                            <i class="fas fa-magic"></i> Generate Personalized Recommendations
-                        </button>
                     </div>
 
                     <!-- Product Category Selection -->
@@ -9069,159 +9078,7 @@
             filterMutualFunds();
         }
 
-        // SMART RECOMMENDATIONS ENGINE - NO VALIDATION
-        function generateSmartRecommendations() {
-            console.log('Generating personalized recommendations without validation');
-            
-            // Gather data from other sections (use available data)
-            const userProfile = analyzeUserProfile();
-            const riskProfile = analyzeRiskProfile();
-            const goals = analyzeGoals();
-            const financialStatus = analyzeFinancialStatus();
-            
-            // Update summary
-            updateRecommendationsSummary(userProfile, riskProfile, goals);
-            
-            // Generate category-specific recommendations with available data
-            generateMutualFundsRecommendations(userProfile, riskProfile, goals, financialStatus);
-            generateInsuranceRecommendations(userProfile, goals, financialStatus);
-            generateLoanRecommendations(userProfile, financialStatus);
-            generateInvestmentRecommendations(userProfile, riskProfile, goals, financialStatus);
-            
-            // Show success message
-            document.getElementById('smart-recommendations-summary').innerHTML = `
-                <div style="background: rgba(76, 175, 80, 0.1); border: 2px solid #4CAF50; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="color: #4CAF50; margin-bottom: 1rem;">
-                        <i class="fas fa-check-circle"></i> Personalized Recommendations Generated
-                    </h3>
-                    <p style="color: var(--text-gray); margin: 0;">
-                        Based on your available profile data. Complete more sections for enhanced recommendations.
-                    </p>
-                </div>
-            `;
-            
-            // Ensure all recommendation sections are visible
-            document.querySelectorAll('.comparison-content').forEach(content => {
-                const recommendationsDiv = content.querySelector('[id$="-recommendations"]');
-                if (recommendationsDiv) {
-                    recommendationsDiv.style.display = 'block';
-                }
-            });
-        }
-        
-        function validateUserData() {
-            console.log('VALIDATION DEBUG - Checking user data...');
-            
-            // Check if user has entered basic data
-            const age = document.getElementById('current-age')?.value || 
-                       document.getElementById('insurance-age')?.value;
-            const income = document.getElementById('monthly-income')?.value;
-            const savings = document.getElementById('current-savings')?.value;
-            
-            console.log('User data check - Age:', age, 'Income:', income, 'Savings:', savings);
-            
-            // Allow if user has basic financial info
-            if (age && income) {
-                console.log('VALIDATION PASSED - User has age and income');
-                return { isValid: true, missingFields: [] };
-            }
-            
-            if (age || income || savings) {
-                console.log('VALIDATION PASSED - User has some basic data');
-                return { isValid: true, missingFields: [] };
-            }
-            
-            // Show error only if no basic data
-            console.log('VALIDATION FAILED - Need basic data');
-            return {
-                isValid: false,
-                missingFields: ['Enter your age and monthly income to get personalized recommendations']
-            };
-        }
-        
-        // GENERATE WITH USER'S ACTUAL DATA
-        function generateRecommendationsWithoutValidation() {
-            console.log('Generating recommendations with user actual data');
-            
-            // Use REAL user data from the form
-            const userProfile = analyzeUserProfile();
-            const riskProfile = analyzeRiskProfile();
-            const goals = analyzeGoals();
-            const financialStatus = analyzeFinancialStatus();
-            
-            console.log('Using actual user data:', { userProfile, riskProfile, goals, financialStatus });
-            
-            // Show success message
-            document.getElementById('smart-recommendations-summary').innerHTML = `
-                <div style="background: rgba(76, 175, 80, 0.1); border: 2px solid #4CAF50; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="color: #4CAF50; margin-bottom: 1rem;">
-                        <i class="fas fa-check-circle"></i> Personalized Recommendations Generated
-                    </h3>
-                    <p style="color: var(--text-gray); margin: 0;">
-                        Based on your profile data. Recommendations will improve as you complete more sections.
-                    </p>
-                </div>
-            `;
-            
-            // Generate recommendations with REAL user data
-            generateMutualFundsRecommendations(userProfile, riskProfile, goals, financialStatus);
-            generateInsuranceRecommendations(userProfile, goals, financialStatus);
-            generateLoanRecommendations(userProfile, financialStatus);
-            generateInvestmentRecommendations(userProfile, riskProfile, goals, financialStatus);
-            
-            // Show all recommendation sections
-            document.querySelectorAll('.comparison-content').forEach(content => {
-                const recommendationsDiv = content.querySelector('[id$="-recommendations"]');
-                if (recommendationsDiv) {
-                    recommendationsDiv.style.display = 'block';
-                }
-            });
-        }
-        
-        function showValidationError(missingFields) {
-            const errorHTML = `
-                <div style="background: rgba(244, 67, 54, 0.1); border: 2px solid rgba(244, 67, 54, 0.3); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #F44336;"></i>
-                        <div>
-                            <h3 style="color: #F44336; margin: 0; font-size: 1.4rem;">Complete Your Profile First</h3>
-                            <p style="color: var(--text-gray); margin: 0; font-size: 0.95rem;">Please complete the following sections to get personalized recommendations</p>
-                        </div>
-                    </div>
-                    <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 8px;">
-                        <h4 style="color: #F44336; margin-bottom: 1rem;">Missing Information:</h4>
-                        <ul style="color: var(--text-white); margin: 0; padding-left: 1.5rem;">
-                            ${missingFields.map(field => `<li style="margin-bottom: 0.5rem;">${field}</li>`).join('')}
-                        </ul>
-                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <button onclick="showSection('profile')" style="padding: 0.8rem 1.5rem; background: var(--accent-gold); color: var(--primary-black); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                                <i class="fas fa-user"></i> Complete Profile
-                            </button>
-                            <button onclick="showSection('risk')" style="padding: 0.8rem 1.5rem; background: var(--accent-white); color: var(--primary-black); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                                <i class="fas fa-chart-line"></i> Risk Assessment
-                            </button>
-                            <button onclick="showSection('goals')" style="padding: 0.8rem 1.5rem; background: var(--accent-silver); color: var(--primary-black); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                                <i class="fas fa-bullseye"></i> Set Goals
-                            </button>
-                            <button onclick="generateRecommendationsWithoutValidation()" style="padding: 0.8rem 1.5rem; background: #FF6B6B; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                                <i class="fas fa-forward"></i> Skip & Generate Anyway
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Show error in recommendations summary
-            document.getElementById('smart-recommendations-summary').innerHTML = errorHTML;
-            
-            // Hide all recommendation sections
-            document.querySelectorAll('.comparison-content').forEach(content => {
-                const recommendationsDiv = content.querySelector('[id$="-recommendations"]');
-                if (recommendationsDiv) {
-                    recommendationsDiv.style.display = 'none';
-                }
-            });
-        }
+
 
         function analyzeUserProfile() {
             // This would normally read from profile section

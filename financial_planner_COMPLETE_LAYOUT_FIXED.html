@@ -3180,9 +3180,41 @@
                                     <label style="color: var(--text-gray); font-size: 0.9rem; white-space: nowrap;">Fund Type:</label>
                                     <select id="fund-type-filter" onchange="filterMutualFunds()" style="padding: 0.5rem; border-radius: 5px; border: 1px solid var(--border-gray); background: var(--card-black); color: var(--text-white);">
                                         <option value="all">All Types</option>
-                                        <option value="equity">Equity</option>
-                                        <option value="debt">Debt</option>
-                                        <option value="hybrid">Hybrid</option>
+                                        <optgroup label="🚀 EQUITY FUNDS">
+                                            <option value="equity">All Equity Funds</option>
+                                            <option value="large-cap">Large Cap Funds</option>
+                                            <option value="mid-cap">Mid Cap Funds</option>
+                                            <option value="small-cap">Small Cap Funds</option>
+                                            <option value="multi-cap">Multi Cap Funds</option>
+                                            <option value="flexi-cap">Flexi Cap Funds</option>
+                                            <option value="sectoral">Sectoral/Thematic</option>
+                                            <option value="elss">ELSS Tax Saver</option>
+                                            <option value="index">Index Funds</option>
+                                            <option value="etf">ETF Funds</option>
+                                        </optgroup>
+                                        <optgroup label="🏦 DEBT FUNDS">
+                                            <option value="debt">All Debt Funds</option>
+                                            <option value="liquid">Liquid Funds</option>
+                                            <option value="ultra-short">Ultra Short Duration</option>
+                                            <option value="short-duration">Short Duration</option>
+                                            <option value="medium-duration">Medium Duration</option>
+                                            <option value="long-duration">Long Duration</option>
+                                            <option value="gilt">Gilt Funds</option>
+                                            <option value="corporate-bond">Corporate Bond</option>
+                                            <option value="credit-risk">Credit Risk</option>
+                                        </optgroup>
+                                        <optgroup label="⚖️ HYBRID FUNDS">
+                                            <option value="hybrid">All Hybrid Funds</option>
+                                            <option value="balanced">Balanced Funds</option>
+                                            <option value="aggressive-hybrid">Aggressive Hybrid</option>
+                                            <option value="conservative-hybrid">Conservative Hybrid</option>
+                                            <option value="arbitrage">Arbitrage Funds</option>
+                                        </optgroup>
+                                        <optgroup label="🌍 SPECIALTY FUNDS">
+                                            <option value="international">International Funds</option>
+                                            <option value="gold">Gold Funds</option>
+                                            <option value="commodities">Commodity Funds</option>
+                                        </optgroup>
                                     </select>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -9037,17 +9069,11 @@
             filterMutualFunds();
         }
 
-        // SMART RECOMMENDATIONS ENGINE WITH VALIDATION
+        // SMART RECOMMENDATIONS ENGINE - NO VALIDATION
         function generateSmartRecommendations() {
-            // Check if user has completed required sections
-            const validationResult = validateUserData();
+            console.log('Generating personalized recommendations without validation');
             
-            if (!validationResult.isValid) {
-                showValidationError(validationResult.missingFields);
-                return;
-            }
-            
-            // Gather data from other sections
+            // Gather data from other sections (use available data)
             const userProfile = analyzeUserProfile();
             const riskProfile = analyzeRiskProfile();
             const goals = analyzeGoals();
@@ -9056,11 +9082,31 @@
             // Update summary
             updateRecommendationsSummary(userProfile, riskProfile, goals);
             
-            // Generate category-specific recommendations
+            // Generate category-specific recommendations with available data
             generateMutualFundsRecommendations(userProfile, riskProfile, goals, financialStatus);
             generateInsuranceRecommendations(userProfile, goals, financialStatus);
             generateLoanRecommendations(userProfile, financialStatus);
             generateInvestmentRecommendations(userProfile, riskProfile, goals, financialStatus);
+            
+            // Show success message
+            document.getElementById('smart-recommendations-summary').innerHTML = `
+                <div style="background: rgba(76, 175, 80, 0.1); border: 2px solid #4CAF50; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="color: #4CAF50; margin-bottom: 1rem;">
+                        <i class="fas fa-check-circle"></i> Personalized Recommendations Generated
+                    </h3>
+                    <p style="color: var(--text-gray); margin: 0;">
+                        Based on your available profile data. Complete more sections for enhanced recommendations.
+                    </p>
+                </div>
+            `;
+            
+            // Ensure all recommendation sections are visible
+            document.querySelectorAll('.comparison-content').forEach(content => {
+                const recommendationsDiv = content.querySelector('[id$="-recommendations"]');
+                if (recommendationsDiv) {
+                    recommendationsDiv.style.display = 'block';
+                }
+            });
         }
         
         function validateUserData() {

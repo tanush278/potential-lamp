@@ -4654,6 +4654,52 @@
             });
         }
 
+        // POPULATE INVESTMENT PLAN WITH DYNAMIC FUND NAMES
+        function populateInvestmentPlanFunds() {
+            console.log('🔄 POPULATING INVESTMENT PLAN WITH DYNAMIC FUNDS');
+            
+            // Get top-rated funds from API data for initial display
+            const topEquityFunds = mutualFundsData.filter(fund => 
+                fund.type === 'large-cap'
+            ).sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 2);
+            
+            const topDebtFunds = mutualFundsData.filter(fund => 
+                fund.type === 'medium-duration'
+            ).sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 2);
+            
+            const topGoldFunds = mutualFundsData.filter(fund => 
+                fund.type === 'gold'
+            ).sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 1);
+            
+            // Update HTML elements with dynamic fund names
+            if (topEquityFunds[0]) {
+                const equityFund1 = document.getElementById('equity-fund-1');
+                if (equityFund1) equityFund1.textContent = topEquityFunds[0].name;
+            }
+            
+            if (topEquityFunds[1]) {
+                const equityFund2 = document.getElementById('equity-fund-2');
+                if (equityFund2) equityFund2.textContent = topEquityFunds[1].name;
+            }
+            
+            if (topDebtFunds[0]) {
+                const debtFund1 = document.getElementById('debt-fund-1');
+                if (debtFund1) debtFund1.textContent = topDebtFunds[0].name;
+            }
+            
+            if (topDebtFunds[1]) {
+                const debtFund2 = document.getElementById('debt-fund-2');
+                if (debtFund2) debtFund2.textContent = topDebtFunds[1].name;
+            }
+            
+            if (topGoldFunds[0]) {
+                const goldFund1 = document.getElementById('gold-fund-1');
+                if (goldFund1) goldFund1.textContent = topGoldFunds[0].name;
+            }
+            
+            console.log('✅ INVESTMENT PLAN POPULATED WITH DYNAMIC FUNDS');
+        }
+
         // DYNAMIC FUND SELECTION FROM API DATA
         function selectFundsBasedOnRiskProfile(riskCategory, allocation) {
             console.log('🔍 SELECTING FUNDS FOR RISK CATEGORY:', riskCategory);
@@ -10641,6 +10687,9 @@
                     // CRITICAL FIX: RELOAD TABLE WITH LIVE DATA
                     loadMutualFundsComparison();
                     
+                    // POPULATE INVESTMENT PLAN WITH DYNAMIC FUNDS
+                    populateInvestmentPlanFunds();
+                    
                     // Add a detailed indicator that live data is loaded
                     const liveIndicator = document.createElement('div');
                     liveIndicator.innerHTML = `
@@ -10660,6 +10709,8 @@
                     }, 5000);
                 } else {
                     console.log('Using static fallback data for mutual funds');
+                    // Still populate Investment Plan with static data
+                    populateInvestmentPlanFunds();
                 }
                 
                 // Load enhanced insurance and loans data
@@ -10678,6 +10729,8 @@
                 
             } catch (error) {
                 console.log('📊 Using static fallback data due to error:', error.message);
+                // Populate Investment Plan even with static data
+                populateInvestmentPlanFunds();
             }
             
             // Initialize Investment Recommendations dynamically

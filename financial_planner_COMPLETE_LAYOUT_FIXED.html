@@ -2785,7 +2785,7 @@
                                 <div style="display: grid; gap: 1rem;">
                                     <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-gold);">
                                         <div>
-                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Axis Bluechip Fund</div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;" id="equity-fund-1">Loading...</div>
                                             <div style="color: var(--text-gray); font-size: 0.9rem;">Large Cap</div>
                                         </div>
                                         <div class="investment-card-cell">
@@ -2802,7 +2802,7 @@
                                     </div>
                                     <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-gold);">
                                         <div>
-                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Mirae Asset Large Cap Fund</div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;" id="equity-fund-2">Loading...</div>
                                             <div style="color: var(--text-gray); font-size: 0.9rem;">Large Cap</div>
                                         </div>
                                         <div class="investment-card-cell">
@@ -2825,7 +2825,7 @@
                                 <div style="display: grid; gap: 1rem;">
                                     <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-white);">
                                         <div>
-                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Axis Strategic Bond Fund</div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;" id="debt-fund-1">Loading...</div>
                                             <div style="color: var(--text-gray); font-size: 0.9rem;">Debt</div>
                                         </div>
                                         <div style="text-align: center;">
@@ -2842,7 +2842,7 @@
                                     </div>
                                     <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-white);">
                                         <div>
-                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">Kotak Dynamic Bond Fund</div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;" id="debt-fund-2">Loading...</div>
                                             <div style="color: var(--text-gray); font-size: 0.9rem;">Debt</div>
                                         </div>
                                         <div style="text-align: center;">
@@ -2865,7 +2865,7 @@
                                 <div style="display: grid; gap: 1rem;">
                                     <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border-left: 4px solid var(--accent-silver);">
                                         <div>
-                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;">SBI Gold ETF</div>
+                                            <div style="color: var(--accent-white); font-weight: bold; margin-bottom: 0.2rem;" id="gold-fund-1">Loading...</div>
                                             <div style="color: var(--text-gray); font-size: 0.9rem;">Gold ETF</div>
                                         </div>
                                         <div style="text-align: center;">
@@ -4711,7 +4711,16 @@
                     ).sort((a, b) => (b.rating || 0) - (a.rating || 0)); // Sort by rating
                     
                     if (fundsOfType.length > 0) {
-                        selectedFunds.equity.push(...fundsOfType.slice(0, 2)); // Top 2 funds of each type
+                        // Map API data to expected format
+                        const mappedFunds = fundsOfType.slice(0, 2).map(fund => ({
+                            name: fund.name,
+                            category: fund.category,
+                            risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
+                            returns: `${fund.returns1Y || 12}-${(fund.returns1Y || 12) + 3}%`,
+                            rating: '★'.repeat(fund.rating || 4) + '☆'.repeat(5 - (fund.rating || 4)),
+                            expense: `${fund.expenseRatio || 1.5}%`
+                        }));
+                        selectedFunds.equity.push(...mappedFunds);
                     }
                 });
                 
@@ -4721,7 +4730,15 @@
                         fund.type === 'large-cap'
                     ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
                     
-                    selectedFunds.equity.push(...largeCaps.slice(0, 3 - selectedFunds.equity.length));
+                    const mappedLargeCaps = largeCaps.slice(0, 3 - selectedFunds.equity.length).map(fund => ({
+                        name: fund.name,
+                        category: fund.category,
+                        risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
+                        returns: `${fund.returns1Y || 12}-${(fund.returns1Y || 12) + 3}%`,
+                        rating: '★'.repeat(fund.rating || 4) + '☆'.repeat(5 - (fund.rating || 4)),
+                        expense: `${fund.expenseRatio || 1.5}%`
+                    }));
+                    selectedFunds.equity.push(...mappedLargeCaps);
                 }
             }
             
@@ -4733,7 +4750,15 @@
                     ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
                     
                     if (fundsOfType.length > 0) {
-                        selectedFunds.debt.push(...fundsOfType.slice(0, 2));
+                        const mappedFunds = fundsOfType.slice(0, 2).map(fund => ({
+                            name: fund.name,
+                            category: fund.category,
+                            risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
+                            returns: `${fund.returns1Y || 7}-${(fund.returns1Y || 7) + 2}%`,
+                            rating: '★'.repeat(fund.rating || 4) + '☆'.repeat(5 - (fund.rating || 4)),
+                            expense: `${fund.expenseRatio || 1.2}%`
+                        }));
+                        selectedFunds.debt.push(...mappedFunds);
                     }
                 });
                 
@@ -4743,7 +4768,15 @@
                         fund.type === 'medium-duration'
                     ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
                     
-                    selectedFunds.debt.push(...mediumDebt.slice(0, 2 - selectedFunds.debt.length));
+                    const mappedMediumDebt = mediumDebt.slice(0, 2 - selectedFunds.debt.length).map(fund => ({
+                        name: fund.name,
+                        category: fund.category,
+                        risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
+                        returns: `${fund.returns1Y || 7}-${(fund.returns1Y || 7) + 2}%`,
+                        rating: '★'.repeat(fund.rating || 4) + '☆'.repeat(5 - (fund.rating || 4)),
+                        expense: `${fund.expenseRatio || 1.2}%`
+                    }));
+                    selectedFunds.debt.push(...mappedMediumDebt);
                 }
             }
             
@@ -4753,7 +4786,14 @@
                     fund.type === 'gold'
                 ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
                 
-                selectedFunds.gold = goldFunds.slice(0, 2);
+                selectedFunds.gold = goldFunds.slice(0, 2).map(fund => ({
+                    name: fund.name,
+                    category: fund.category,
+                    risk: fund.risk === 'low' ? 'Low' : fund.risk === 'medium' ? 'Medium' : 'High',
+                    returns: `${fund.returns1Y || 9}-${(fund.returns1Y || 9) + 3}%`,
+                    rating: '★'.repeat(fund.rating || 3) + '☆'.repeat(5 - (fund.rating || 3)),
+                    expense: `${fund.expenseRatio || 1.0}%`
+                }));
             }
             
             console.log('✅ SELECTED FUNDS:', {
@@ -4880,7 +4920,7 @@
                         <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">Equity Funds (${allocation.equity}% allocation)</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                 `;
-                selectedFunds.equity.forEach(fund => {
+                dynamicFunds.equity.forEach(fund => {
                     fundHTML += `
                         <div style="background: linear-gradient(135deg, rgba(255,215,0,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-gold); border-radius: 8px; padding: 1rem;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
@@ -4908,7 +4948,7 @@
                         <h4 style="color: var(--accent-white); margin-bottom: 1rem;">Debt Funds (${allocation.debt}% allocation)</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                 `;
-                selectedFunds.debt.forEach(fund => {
+                dynamicFunds.debt.forEach(fund => {
                     fundHTML += `
                         <div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-white); border-radius: 8px; padding: 1rem;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
@@ -4936,7 +4976,7 @@
                         <h4 style="color: var(--accent-silver); margin-bottom: 1rem;">Gold Investments (${allocation.gold}% allocation)</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                 `;
-                selectedFunds.gold.forEach(fund => {
+                dynamicFunds.gold.forEach(fund => {
                     fundHTML += `
                         <div style="background: linear-gradient(135deg, rgba(192,192,192,0.05), rgba(0,0,0,0.3)); border: 1px solid var(--accent-silver); border-radius: 8px; padding: 1rem;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">

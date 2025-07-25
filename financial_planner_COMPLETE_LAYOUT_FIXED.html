@@ -4699,8 +4699,8 @@
                     return;
                 }
                 
-                // Get user's actual risk profile from localStorage or use default
-                let riskCategory = 'Moderate'; // Default
+                // Get user's actual risk profile from localStorage - NO DEFAULT
+                let riskCategory = null;
                 
                 if (userRiskProfile) {
                     riskCategory = userRiskProfile;
@@ -4709,11 +4709,25 @@
                     const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
                     if (clientData.riskProfile && clientData.riskProfile.riskCategory) {
                         riskCategory = clientData.riskProfile.riskCategory;
-                    } else {
-                        console.log('⚠️ No risk profile found - showing generic fund names');
-                        // Don't proceed without risk profile to avoid showing wrong recommendations
-                        return;
                     }
+                }
+                
+                // If no risk profile found, don't show any recommendations
+                if (!riskCategory) {
+                    console.log('⚠️ No risk profile found - user needs to complete risk assessment first');
+                    // Clear any existing fund names and show prompt
+                    const fundElements = [
+                        'equity-fund-1', 'equity-fund-2', 'debt-fund-1', 'debt-fund-2', 'gold-fund-1', 'gold-fund-2'
+                    ];
+                    fundElements.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.textContent = 'Complete Risk Assessment First';
+                            element.style.color = '#FFC107';
+                            element.style.fontStyle = 'italic';
+                        }
+                    });
+                    return;
                 }
                 
                 console.log('✅ USING RISK PROFILE FOR FUND SELECTION:', riskCategory);
@@ -5056,12 +5070,26 @@
             // STRICT GOLD FUND SELECTION
             if (allocation.gold > 0) {
                 console.log('🔍 SELECTING GOLD FUNDS...');
+                console.log('Gold allocation percentage:', allocation.gold);
+                console.log('Gold fund criteria:', preferences.gold);
+                
+                // First, let's see how many gold funds exist in the data
+                const allGoldFunds = mutualFundsData.filter(fund => fund.type === 'gold');
+                console.log(`Total gold funds in database: ${allGoldFunds.length}`);
+                if (allGoldFunds.length > 0) {
+                    console.log('Gold funds found:', allGoldFunds.map(f => ({ name: f.name, type: f.type, risk: f.risk, rating: f.rating })));
+                }
                 
                 const eligibleGoldFunds = mutualFundsData.filter(fund => {
                     const typeMatch = preferences.gold.allowedTypes.includes(fund.type);
                     const riskMatch = preferences.gold.allowedRisks.includes(fund.risk);
                     const ratingMatch = (fund.rating || 0) >= preferences.gold.minRating;
                     const expenseMatch = (fund.expenseRatio || 0) <= preferences.gold.maxExpenseRatio;
+                    
+                    // Debug each filter
+                    if (fund.type === 'gold') {
+                        console.log(`Gold fund ${fund.name}: type=${typeMatch}, risk=${riskMatch}, rating=${ratingMatch}, expense=${expenseMatch}`);
+                    }
                     
                     return typeMatch && riskMatch && ratingMatch && expenseMatch;
                 });

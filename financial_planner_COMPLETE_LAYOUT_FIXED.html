@@ -9620,35 +9620,70 @@
             document.getElementById('investments-table').innerHTML = tableHTML;
         }
 
+        // IMPROVED FILTERING WITH PERFORMANCE OPTIMIZATION
+        let filterTimeout;
         function filterMutualFunds() {
+            // Debounce filtering to improve performance
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                performFilteringLogic();
+            }, 100);
+        }
+        
+        function performFilteringLogic() {
             const fundTypeFilter = document.getElementById('fund-type-filter').value;
             const riskLevelFilter = document.getElementById('risk-level-filter').value;
             
-            console.log('Filter applied:', { fundTypeFilter, riskLevelFilter });
+            console.log('🔍 FILTERING FUNDS:', { fundTypeFilter, riskLevelFilter });
             
             const rows = document.querySelectorAll('#mutual-funds-table tbody tr');
             let visibleCount = 0;
+            
+            // Define category mappings for broad filters
+            const categoryMappings = {
+                'equity': ['large-cap', 'mid-cap', 'small-cap', 'multi-cap', 'flexi-cap', 'sectoral', 'elss', 'index', 'etf'],
+                'debt': ['liquid', 'ultra-short', 'ultra-short-duration', 'short-duration', 'medium-duration', 'long-duration', 'gilt', 'corporate-bond', 'credit-risk'],
+                'hybrid': ['balanced', 'aggressive-hybrid', 'conservative-hybrid', 'arbitrage']
+            };
             
             rows.forEach(row => {
                 const fundType = row.getAttribute('data-type');
                 const riskLevel = row.getAttribute('data-risk');
                 
-                console.log('Row data:', { fundType, riskLevel });
+                // Enhanced fund type matching
+                let showFundType = false;
+                if (fundTypeFilter === 'all') {
+                    showFundType = true;
+                } else if (fundTypeFilter === fundType) {
+                    showFundType = true;
+                } else if (categoryMappings[fundTypeFilter] && categoryMappings[fundTypeFilter].includes(fundType)) {
+                    // Handle broad category filters (e.g., "equity" should show all equity types)
+                    showFundType = true;
+                }
                 
-                const showFundType = fundTypeFilter === 'all' || fundType === fundTypeFilter;
+                // Risk level matching
                 const showRiskLevel = riskLevelFilter === 'all' || riskLevel === riskLevelFilter;
                 
                 if (showFundType && showRiskLevel) {
                     row.style.display = '';
+                    row.style.opacity = '1';
                     visibleCount++;
                 } else {
                     row.style.display = 'none';
+                    row.style.opacity = '0.5';
                 }
             });
             
-            console.log(`Filter result: ${visibleCount} funds visible`);
+            console.log(`✅ FILTER RESULT: ${visibleCount} funds visible out of ${rows.length} total`);
             
-            // Show message if no funds match
+            // Show/hide no results message
+            updateNoResultsMessage(visibleCount);
+            
+            // Update filter status indicator
+            updateFilterStatusIndicator(fundTypeFilter, riskLevelFilter, visibleCount, rows.length);
+        }
+        
+        function updateNoResultsMessage(visibleCount) {
             const tableContainer = document.getElementById('mutual-funds-table');
             let noResultsMsg = tableContainer.querySelector('.no-results-message');
             
@@ -9656,8 +9691,18 @@
                 if (!noResultsMsg) {
                     noResultsMsg = document.createElement('div');
                     noResultsMsg.className = 'no-results-message';
-                    noResultsMsg.style.cssText = 'text-align: center; padding: 2rem; color: var(--text-gray); font-style: italic;';
-                    noResultsMsg.innerHTML = '<i class="fas fa-search"></i> No funds match your filter criteria. Try adjusting the filters.';
+                    noResultsMsg.style.cssText = 'text-align: center; padding: 3rem; color: var(--text-gray); font-style: italic; background: rgba(255,255,255,0.02); border-radius: 12px; margin: 1rem 0;';
+                    noResultsMsg.innerHTML = `
+                        <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div style="font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--accent-gold);">
+                            No funds match your criteria
+                        </div>
+                        <div style="font-size: 0.9rem; opacity: 0.7;">
+                            Try adjusting the filters or selecting "All Types"
+                        </div>
+                    `;
                     tableContainer.appendChild(noResultsMsg);
                 }
                 noResultsMsg.style.display = 'block';
@@ -9666,6 +9711,41 @@
                     noResultsMsg.style.display = 'none';
                 }
             }
+        }
+        
+        function updateFilterStatusIndicator(fundTypeFilter, riskLevelFilter, visibleCount, totalCount) {
+            // Create or update filter status indicator
+            let statusIndicator = document.getElementById('filter-status-indicator');
+            if (!statusIndicator) {
+                statusIndicator = document.createElement('div');
+                statusIndicator.id = 'filter-status-indicator';
+                statusIndicator.style.cssText = 'margin: 1rem 0; padding: 0.8rem 1rem; background: rgba(255,215,0,0.1); border-left: 4px solid var(--accent-gold); border-radius: 4px; font-size: 0.9rem;';
+                
+                const filterContainer = document.querySelector('#mutual-funds-content .card');
+                if (filterContainer) {
+                    filterContainer.insertBefore(statusIndicator, document.getElementById('mutual-funds-table'));
+                }
+            }
+            
+            const typeText = fundTypeFilter === 'all' ? 'All Types' : fundTypeFilter.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const riskText = riskLevelFilter === 'all' ? 'All Risk Levels' : riskLevelFilter.replace(/\b\w/g, l => l.toUpperCase());
+            
+            statusIndicator.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <i class="fas fa-filter" style="color: var(--accent-gold);"></i>
+                        <strong style="color: var(--accent-gold);">Active Filters:</strong>
+                        <span style="color: var(--text-white);">${typeText}</span>
+                        ${riskLevelFilter !== 'all' ? `<span style="color: var(--text-gray);"> • </span><span style="color: var(--text-white);">${riskText}</span>` : ''}
+                    </div>
+                    <div style="color: var(--accent-gold); font-weight: bold;">
+                        ${visibleCount} of ${totalCount} funds
+                    </div>
+                </div>
+            `;
+            
+            // Hide indicator if showing all funds
+            statusIndicator.style.display = (fundTypeFilter === 'all' && riskLevelFilter === 'all') ? 'none' : 'block';
         }
 
         function resetMutualFundsFilters() {

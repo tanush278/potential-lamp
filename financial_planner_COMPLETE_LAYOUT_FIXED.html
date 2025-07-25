@@ -5325,9 +5325,12 @@
                 }
                 
                 const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
-                const riskProfile = clientData.riskProfile;
+                console.log('🔍 FULL CLIENT DATA STRUCTURE:', clientData);
                 
-                if (!riskProfile) {
+                const riskProfile = clientData.riskProfile;
+                console.log('🎯 RISK PROFILE:', riskProfile);
+                
+                if (!riskProfile || !riskProfile.riskCategory) {
                     alert('Please complete your risk assessment first');
                     return;
                 }
@@ -5356,18 +5359,52 @@
         
         // GENERATE DYNAMIC INSIGHTS BASED ON USER DATA
         function generateDynamicInsights(amount, allocation, riskProfile, clientData) {
-            const age = clientData.age || 30;
-            const income = clientData.income || 0;
-            const expenses = clientData.expenses || 0;
+            console.log('🔍 DEBUGGING CLIENT DATA:', clientData);
+            
+            // Extract data from nested structure
+            const age = (clientData.basicInfo?.age) || (clientData.age) || 30;
+            const annualIncome = parseFloat((clientData.basicInfo?.income) || (clientData.income) || 0);
+            const monthlyIncome = parseFloat((clientData.financialStatus?.monthlyIncome) || 0);
+            const monthlyExpenses = parseFloat((clientData.financialStatus?.monthlyExpenses) || 0);
+            
+            // Use annual income if available, otherwise calculate from monthly
+            const totalAnnualIncome = annualIncome > 0 ? annualIncome : (monthlyIncome * 12);
+            const totalAnnualExpenses = monthlyExpenses * 12;
+            
             const riskCategory = riskProfile.riskCategory;
             const riskScore = riskProfile.riskScore || 0;
             
-            // Calculate investment ratios
-            const investmentToIncomeRatio = income > 0 ? (amount / income * 100).toFixed(1) : 0;
+            console.log('📊 EXTRACTED DATA:', {
+                age,
+                annualIncome,
+                monthlyIncome,
+                monthlyExpenses,
+                totalAnnualIncome,
+                totalAnnualExpenses,
+                riskCategory
+            });
+            
+            // Calculate investment ratios with better fallbacks
+            const investmentToIncomeRatio = totalAnnualIncome > 0 ? (amount / totalAnnualIncome * 100).toFixed(1) : '0';
             const monthlyInvestment = amount / 12;
-            const monthlyIncome = income / 12;
-            const monthlyExpenses = expenses / 12;
-            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome * 100).toFixed(1) : 0;
+            const actualMonthlyIncome = totalAnnualIncome / 12;
+            
+            // Enhanced savings rate calculation
+            let savingsRate = '0';
+            if (actualMonthlyIncome > 0 && monthlyExpenses >= 0) {
+                const monthlySavings = actualMonthlyIncome - monthlyExpenses;
+                savingsRate = ((monthlySavings / actualMonthlyIncome) * 100).toFixed(1);
+                // Ensure it's not negative
+                if (parseFloat(savingsRate) < 0) savingsRate = '0';
+            }
+            
+            console.log('💰 FINANCIAL CALCULATIONS:', {
+                investmentToIncomeRatio,
+                monthlyInvestment,
+                actualMonthlyIncome,
+                monthlyExpenses,
+                savingsRate
+            });
             
             // Generate age-based insights
             let ageInsight = '';
@@ -5381,14 +5418,18 @@
                 ageInsight = `At ${age}, capital preservation becomes crucial. Your ${riskCategory} profile prioritizes stability.`;
             }
             
-            // Generate income-based insights
+            // Generate income-based insights with fallback handling
             let incomeInsight = '';
-            if (investmentToIncomeRatio > 20) {
-                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income shows strong financial discipline.`;
-            } else if (investmentToIncomeRatio > 10) {
-                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income is a good start. Consider increasing gradually.`;
+            if (totalAnnualIncome <= 0) {
+                incomeInsight = `Please complete your financial information to get personalized investment analysis based on your income.`;
+            } else if (parseFloat(investmentToIncomeRatio) > 20) {
+                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income shows strong financial discipline and commitment to wealth building.`;
+            } else if (parseFloat(investmentToIncomeRatio) > 10) {
+                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income is a good start. Consider increasing gradually to 15-20% for optimal growth.`;
+            } else if (parseFloat(investmentToIncomeRatio) > 0) {
+                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income. Aim to increase this to 15-20% for better wealth building potential.`;
             } else {
-                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income. Aim to increase this to 15-20% for better wealth building.`;
+                incomeInsight = `Start your investment journey by allocating 10-15% of your annual income for long-term wealth creation.`;
             }
             
             // Generate risk-based strategy
@@ -5443,7 +5484,7 @@
                             </div>
                             <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
                                 <div style="color: var(--text-gray); font-size: 0.9rem;">Risk Profile</div>
-                                <div style="color: var(--accent-white); font-size: 1.2rem; font-weight: bold;">${riskProfile.riskCategory}</div>
+                                <div style="color: var(--accent-white); font-size: 1.2rem; font-weight: bold;">${riskProfile?.riskCategory || 'Not Set'}</div>
                             </div>
                         </div>
                     </div>

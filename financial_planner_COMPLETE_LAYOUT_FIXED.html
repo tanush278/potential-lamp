@@ -4654,6 +4654,117 @@
             });
         }
 
+        // DYNAMIC FUND SELECTION FROM API DATA
+        function selectFundsBasedOnRiskProfile(riskCategory, allocation) {
+            console.log('🔍 SELECTING FUNDS FOR RISK CATEGORY:', riskCategory);
+            
+            // Define fund type preferences based on risk profile
+            const riskProfileMapping = {
+                'Conservative': {
+                    equity: ['large-cap', 'index'],
+                    debt: ['liquid', 'ultra-short', 'short-duration'],
+                    gold: ['gold'],
+                    preferredRisk: 'low'
+                },
+                'Moderate Conservative': {
+                    equity: ['large-cap', 'multi-cap', 'index'],
+                    debt: ['short-duration', 'medium-duration', 'corporate-bond'],
+                    gold: ['gold'],
+                    preferredRisk: 'low'
+                },
+                'Moderate': {
+                    equity: ['large-cap', 'multi-cap', 'mid-cap', 'elss'],
+                    debt: ['medium-duration', 'corporate-bond', 'aggressive-hybrid'],
+                    gold: ['gold'],
+                    preferredRisk: 'medium'
+                },
+                'Moderate Aggressive': {
+                    equity: ['mid-cap', 'multi-cap', 'small-cap', 'elss'],
+                    debt: ['aggressive-hybrid', 'medium-duration'],
+                    gold: ['gold'],
+                    preferredRisk: 'high'
+                },
+                'Aggressive': {
+                    equity: ['small-cap', 'mid-cap', 'sectoral', 'international'],
+                    debt: ['aggressive-hybrid'],
+                    gold: ['gold'],
+                    preferredRisk: 'high'
+                }
+            };
+            
+            const preferences = riskProfileMapping[riskCategory] || riskProfileMapping['Moderate'];
+            console.log('📋 Fund preferences for', riskCategory, ':', preferences);
+            
+            // Filter and select best funds from API data
+            const selectedFunds = {
+                equity: [],
+                debt: [],
+                gold: []
+            };
+            
+            // SELECT EQUITY FUNDS
+            if (allocation.equity > 0) {
+                preferences.equity.forEach(fundType => {
+                    const fundsOfType = mutualFundsData.filter(fund => 
+                        fund.type === fundType && 
+                        (fund.risk === preferences.preferredRisk || fund.risk === 'medium')
+                    ).sort((a, b) => (b.rating || 0) - (a.rating || 0)); // Sort by rating
+                    
+                    if (fundsOfType.length > 0) {
+                        selectedFunds.equity.push(...fundsOfType.slice(0, 2)); // Top 2 funds of each type
+                    }
+                });
+                
+                // If not enough equity funds, add top-rated large cap funds
+                if (selectedFunds.equity.length < 3) {
+                    const largeCaps = mutualFundsData.filter(fund => 
+                        fund.type === 'large-cap'
+                    ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                    
+                    selectedFunds.equity.push(...largeCaps.slice(0, 3 - selectedFunds.equity.length));
+                }
+            }
+            
+            // SELECT DEBT FUNDS
+            if (allocation.debt > 0) {
+                preferences.debt.forEach(fundType => {
+                    const fundsOfType = mutualFundsData.filter(fund => 
+                        fund.type === fundType
+                    ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                    
+                    if (fundsOfType.length > 0) {
+                        selectedFunds.debt.push(...fundsOfType.slice(0, 2));
+                    }
+                });
+                
+                // If not enough debt funds, add medium duration funds
+                if (selectedFunds.debt.length < 2) {
+                    const mediumDebt = mutualFundsData.filter(fund => 
+                        fund.type === 'medium-duration'
+                    ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                    
+                    selectedFunds.debt.push(...mediumDebt.slice(0, 2 - selectedFunds.debt.length));
+                }
+            }
+            
+            // SELECT GOLD FUNDS
+            if (allocation.gold > 0) {
+                const goldFunds = mutualFundsData.filter(fund => 
+                    fund.type === 'gold'
+                ).sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                
+                selectedFunds.gold = goldFunds.slice(0, 2);
+            }
+            
+            console.log('✅ SELECTED FUNDS:', {
+                equity: selectedFunds.equity.length,
+                debt: selectedFunds.debt.length,
+                gold: selectedFunds.gold.length
+            });
+            
+            return selectedFunds;
+        }
+
         function generateFundRecommendations(riskProfile) {
             const fundCategories = document.getElementById('fund-categories');
             const allocation = {
@@ -4664,8 +4775,14 @@
                 'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
             }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
             
-            // Comprehensive fund database with all risk categories
-            const fundDatabase = {
+            console.log('🎯 GENERATING DYNAMIC FUND RECOMMENDATIONS FOR:', riskProfile.riskCategory);
+            console.log('📊 Available funds in API data:', mutualFundsData.length);
+            
+            // DYNAMIC FUND SELECTION FROM API DATA BASED ON RISK PROFILE
+            const selectedFunds = selectFundsBasedOnRiskProfile(riskProfile.riskCategory, allocation);
+            
+            // Legacy static fund database kept as fallback
+            const staticFundDatabase = {
                 equity: {
                     'Conservative': [
                         { name: "SBI Bluechip Fund", category: "Large Cap", risk: "Low", returns: "10-12%", rating: "★★★★☆", expense: "0.50%" },
@@ -4733,12 +4850,27 @@
                 }
             };
             
-            // Select funds specifically for user's exact risk category
-            const selectedFunds = {
-                equity: fundDatabase.equity[riskProfile.riskCategory] || fundDatabase.equity['Moderate'],
-                debt: fundDatabase.debt[riskProfile.riskCategory] || fundDatabase.debt['Moderate'], 
-                gold: fundDatabase.gold.all
-            };
+            // Use dynamic funds if available, fallback to static database
+            let dynamicFunds = selectedFunds;
+            let usingDynamicData = true;
+            
+            // Fallback to static data if dynamic selection failed
+            if (!dynamicFunds.equity.length && !dynamicFunds.debt.length && !dynamicFunds.gold.length) {
+                console.log('⚠️ Dynamic fund selection failed, using static fallback');
+                dynamicFunds = {
+                    equity: staticFundDatabase.equity[riskProfile.riskCategory] || staticFundDatabase.equity['Moderate'],
+                    debt: staticFundDatabase.debt[riskProfile.riskCategory] || staticFundDatabase.debt['Moderate'], 
+                    gold: staticFundDatabase.gold.all
+                };
+                usingDynamicData = false;
+            }
+            
+            console.log('🎯 FINAL FUND SELECTION:', {
+                source: usingDynamicData ? 'API_DATA' : 'STATIC_FALLBACK',
+                equity: dynamicFunds.equity.length,
+                debt: dynamicFunds.debt.length,
+                gold: dynamicFunds.gold.length
+            });
             
             let fundHTML = '';
             

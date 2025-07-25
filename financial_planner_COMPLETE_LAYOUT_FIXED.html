@@ -4681,52 +4681,127 @@
             });
             
             console.log('\n🎯 Test complete! Check recommendations above - they should be different for each risk profile.');
+            console.log('\n🧪 MANUAL TEST: Try these commands in console:');
+            console.log('   updateInvestmentPlanForRiskProfile("Conservative")');
+            console.log('   updateInvestmentPlanForRiskProfile("Aggressive")');
+            console.log('   → Watch the fund names change in Investment Plan section!');
         }
 
-        // POPULATE INVESTMENT PLAN WITH DYNAMIC FUND NAMES
-        function populateInvestmentPlanFunds() {
+        // POPULATE INVESTMENT PLAN WITH RISK-BASED DYNAMIC FUND NAMES
+        function populateInvestmentPlanFunds(userRiskProfile = null) {
             console.log('🔄 POPULATING INVESTMENT PLAN WITH DYNAMIC FUNDS');
             
-            // Get top-rated funds from API data for initial display
-            const topEquityFunds = mutualFundsData.filter(fund => 
-                fund.type === 'large-cap'
-            ).sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 2);
+            // Get user's actual risk profile from localStorage or use default
+            let riskCategory = 'Moderate'; // Default
             
-            const topDebtFunds = mutualFundsData.filter(fund => 
-                fund.type === 'medium-duration'
-            ).sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 2);
+            if (userRiskProfile) {
+                riskCategory = userRiskProfile;
+            } else {
+                // Try to get from localStorage
+                const clientData = JSON.parse(localStorage.getItem('clientData') || '{}');
+                if (clientData.riskProfile && clientData.riskProfile.riskCategory) {
+                    riskCategory = clientData.riskProfile.riskCategory;
+                }
+            }
             
-            const topGoldFunds = mutualFundsData.filter(fund => 
-                fund.type === 'gold'
-            ).sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 1);
+            console.log('🎯 USING RISK PROFILE FOR FUND SELECTION:', riskCategory);
             
-            // Update HTML elements with dynamic fund names
-            if (topEquityFunds[0]) {
+            // Get allocation for this risk profile
+            const allocation = {
+                'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
+                'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
+                'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
+                'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
+                'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
+            }[riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
+            
+            // Use the same dynamic selection logic as the detailed recommendations
+            const selectedFunds = selectFundsBasedOnRiskProfile(riskCategory, allocation);
+            
+            console.log('📊 SELECTED FUNDS FOR DISPLAY:', {
+                riskCategory,
+                equity: selectedFunds.equity.length,
+                debt: selectedFunds.debt.length,
+                gold: selectedFunds.gold.length
+            });
+            
+            // Update HTML elements with risk-appropriate fund names
+            if (selectedFunds.equity[0]) {
                 const equityFund1 = document.getElementById('equity-fund-1');
-                if (equityFund1) equityFund1.textContent = topEquityFunds[0].name;
+                if (equityFund1) {
+                    equityFund1.textContent = selectedFunds.equity[0].name;
+                    console.log('✅ Updated equity fund 1:', selectedFunds.equity[0].name);
+                }
             }
             
-            if (topEquityFunds[1]) {
+            if (selectedFunds.equity[1]) {
                 const equityFund2 = document.getElementById('equity-fund-2');
-                if (equityFund2) equityFund2.textContent = topEquityFunds[1].name;
+                if (equityFund2) {
+                    equityFund2.textContent = selectedFunds.equity[1].name;
+                    console.log('✅ Updated equity fund 2:', selectedFunds.equity[1].name);
+                }
             }
             
-            if (topDebtFunds[0]) {
+            if (selectedFunds.debt[0]) {
                 const debtFund1 = document.getElementById('debt-fund-1');
-                if (debtFund1) debtFund1.textContent = topDebtFunds[0].name;
+                if (debtFund1) {
+                    debtFund1.textContent = selectedFunds.debt[0].name;
+                    console.log('✅ Updated debt fund 1:', selectedFunds.debt[0].name);
+                }
             }
             
-            if (topDebtFunds[1]) {
+            if (selectedFunds.debt[1]) {
                 const debtFund2 = document.getElementById('debt-fund-2');
-                if (debtFund2) debtFund2.textContent = topDebtFunds[1].name;
+                if (debtFund2) {
+                    debtFund2.textContent = selectedFunds.debt[1].name;
+                    console.log('✅ Updated debt fund 2:', selectedFunds.debt[1].name);
+                }
             }
             
-            if (topGoldFunds[0]) {
+            if (selectedFunds.gold[0]) {
                 const goldFund1 = document.getElementById('gold-fund-1');
-                if (goldFund1) goldFund1.textContent = topGoldFunds[0].name;
+                if (goldFund1) {
+                    goldFund1.textContent = selectedFunds.gold[0].name;
+                    console.log('✅ Updated gold fund 1:', selectedFunds.gold[0].name);
+                }
             }
             
-            console.log('✅ INVESTMENT PLAN POPULATED WITH DYNAMIC FUNDS');
+            console.log('✅ INVESTMENT PLAN POPULATED WITH RISK-BASED DYNAMIC FUNDS');
+        }
+
+        // FUNCTION TO UPDATE INVESTMENT PLAN WHEN RISK PROFILE CHANGES
+        function updateInvestmentPlanForRiskProfile(newRiskCategory) {
+            console.log('🔄 RISK PROFILE CHANGED TO:', newRiskCategory);
+            console.log('📊 UPDATING INVESTMENT PLAN RECOMMENDATIONS...');
+            
+            // Update the displayed fund recommendations
+            populateInvestmentPlanFunds(newRiskCategory);
+            
+            // Show a notification that recommendations have been updated
+            const notification = document.createElement('div');
+            notification.innerHTML = `
+                <div style="position: fixed; top: 20px; right: 20px; background: rgba(255, 193, 7, 0.95); color: #000; padding: 1rem 1.5rem; border-radius: 12px; font-size: 0.9rem; z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; max-width: 300px;" onclick="this.parentNode.removeChild(this)">
+                    <div style="font-weight: bold; margin-bottom: 0.3rem;">
+                        <i class="fas fa-sync-alt"></i> Investment Plan Updated!
+                    </div>
+                    <div style="font-size: 0.8rem; opacity: 0.9;">
+                        Recommendations updated for ${newRiskCategory} risk profile
+                    </div>
+                    <div style="font-size: 0.7rem; margin-top: 0.3rem; opacity: 0.7;">
+                        Click to dismiss
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            // Auto-remove notification after 4 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 4000);
+            
+            console.log('✅ INVESTMENT PLAN UPDATED FOR NEW RISK PROFILE');
         }
 
         // DYNAMIC FUND SELECTION FROM API DATA

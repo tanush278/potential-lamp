@@ -10080,6 +10080,40 @@
                 }
             });
                 
+            // MONTHLY INCOME INTEGRATION WITH ANNUAL CONVERSION
+            const monthlyIncomeField = document.getElementById('monthly-income');
+            if (monthlyIncomeField) {
+                console.log(`✅ MONTHLY INCOME FIELD FOUND: monthly-income`);
+                monthlyIncomeField.addEventListener('input', function() {
+                    const value = this.value;
+                    if (value && value > 0) {
+                        console.log(`🔄 MONTHLY INCOME INTEGRATION: monthly-income = ${value}`);
+                        
+                        // CONVERT TO ANNUAL AND UPDATE ANNUAL INCOME FIELDS
+                        const annualValue = value * 12;
+                        const annualIncomeFields = ['client-income', 'insurance-income'];
+                        
+                        annualIncomeFields.forEach(fieldId => {
+                            const field = document.getElementById(fieldId);
+                            if (field && field.value !== String(annualValue)) {
+                                field.value = annualValue;
+                                console.log(`✅ AUTO-POPULATED ANNUAL INCOME: ${fieldId} = ${annualValue} (from monthly ${value})`);
+                                
+                                // VISUAL FEEDBACK
+                                field.style.background = 'rgba(255, 193, 7, 0.2)';
+                                field.style.border = '2px solid #FFC107';
+                                setTimeout(() => {
+                                    field.style.background = '';
+                                    field.style.border = '';
+                                }, 2000);
+                            }
+                        });
+                    }
+                });
+            } else {
+                console.log(`❌ Monthly income field not found: monthly-income`);
+            }
+            
             // ANNUAL INCOME FIELDS INTEGRATION  
             const annualIncomeFields = ['client-income', 'insurance-income'];
             
@@ -10110,6 +10144,22 @@
                                     }
                                 }
                             });
+                            
+                            // CONVERT TO MONTHLY AND UPDATE MONTHLY INCOME FIELD
+                            const monthlyValue = Math.round(value / 12);
+                            const monthlyField = document.getElementById('monthly-income');
+                            if (monthlyField && monthlyField.value !== String(monthlyValue)) {
+                                monthlyField.value = monthlyValue;
+                                console.log(`✅ AUTO-POPULATED MONTHLY INCOME: monthly-income = ${monthlyValue} (from annual ${value})`);
+                                
+                                // VISUAL FEEDBACK
+                                monthlyField.style.background = 'rgba(255, 193, 7, 0.2)';
+                                monthlyField.style.border = '2px solid #FFC107';
+                                setTimeout(() => {
+                                    monthlyField.style.background = '';
+                                    monthlyField.style.border = '';
+                                }, 2000);
+                            }
                         }
                     });
                 } else {
@@ -10217,59 +10267,9 @@
                     insuranceLoans: !!insuranceLoansField
                 });
                 
-                // TEST 1: CURRENT AGE INTEGRATION
-                if (currentAgeField && insuranceAgeField) {
-                    console.log('🔥 TEST 1: CURRENT AGE INTEGRATION...');
-                    currentAgeField.value = '30';
-                    currentAgeField.dispatchEvent(new Event('input', { bubbles: true }));
-                    
-                    setTimeout(() => {
-                        console.log(`RESULT: Insurance age = ${insuranceAgeField.value}`);
-                        console.log(insuranceAgeField.value === '30' ? '✅ CURRENT AGE INTEGRATION WORKS!' : '❌ CURRENT AGE INTEGRATION FAILED');
-                    }, 300);
-                }
-                
-                // TEST 2: ANNUAL INCOME INTEGRATION
-                if (clientIncomeField && insuranceIncomeField) {
-                    setTimeout(() => {
-                        console.log('🔥 TEST 2: ANNUAL INCOME INTEGRATION...');
-                        clientIncomeField.value = '600000';
-                        clientIncomeField.dispatchEvent(new Event('input', { bubbles: true }));
-                        
-                        setTimeout(() => {
-                            console.log(`RESULT: Insurance income = ${insuranceIncomeField.value}`);
-                            console.log(insuranceIncomeField.value === '600000' ? '✅ ANNUAL INCOME INTEGRATION WORKS!' : '❌ ANNUAL INCOME INTEGRATION FAILED');
-                        }, 300);
-                    }, 800);
-                }
-                
-                // TEST 3: MONTHLY EXPENSES INTEGRATION
-                if (monthlyExpensesField && currentExpensesField) {
-                    setTimeout(() => {
-                        console.log('🔥 TEST 3: MONTHLY EXPENSES INTEGRATION...');
-                        monthlyExpensesField.value = '40000';
-                        monthlyExpensesField.dispatchEvent(new Event('input', { bubbles: true }));
-                        
-                        setTimeout(() => {
-                            console.log(`RESULT: Current expenses = ${currentExpensesField.value}`);
-                            console.log(currentExpensesField.value === '40000' ? '✅ MONTHLY EXPENSES INTEGRATION WORKS!' : '❌ MONTHLY EXPENSES INTEGRATION FAILED');
-                        }, 300);
-                    }, 1600);
-                }
-                
-                // TEST 4: OUTSTANDING LOANS INTEGRATION
-                if (outstandingLoansField && insuranceLoansField) {
-                    setTimeout(() => {
-                        console.log('🔥 TEST 4: OUTSTANDING LOANS INTEGRATION...');
-                        outstandingLoansField.value = '500000';
-                        outstandingLoansField.dispatchEvent(new Event('input', { bubbles: true }));
-                        
-                        setTimeout(() => {
-                            console.log(`RESULT: Insurance loans = ${insuranceLoansField.value}`);
-                            console.log(insuranceLoansField.value === '500000' ? '✅ OUTSTANDING LOANS INTEGRATION WORKS!' : '❌ OUTSTANDING LOANS INTEGRATION FAILED');
-                        }, 300);
-                    }, 2400);
-                }
+                // INTEGRATION TEST - NO PREDEFINED VALUES
+                console.log('✅ INTEGRATION SETUP COMPLETE - Fields are ready for user input');
+                console.log('📝 Integration will activate when user enters data in any connected field');
             }, 2000);
         }
 

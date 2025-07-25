@@ -4388,8 +4388,8 @@
         }
 
         function generateDefaultAssetAllocation() {
-            // Use moderate allocation as default
-            const allocation = { equity: 50, debt: 35, gold: 10, cash: 5 };
+            // Use moderate allocation as default with all asset classes
+            const allocation = { equity: 45, debt: 30, gold: 10, commodity: 5, international: 8, cash: 2 };
             
             // Update the static HTML with dynamic content but keep the structure
             const breakdown = document.getElementById('allocation-breakdown');
@@ -4734,12 +4734,12 @@
                 
                 // Get allocation for this risk profile
                 const allocation = {
-                    'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
-                    'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
-                    'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
-                    'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
-                    'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
-                }[riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
+                    'Conservative': { equity: 20, debt: 55, gold: 15, commodity: 0, international: 0, cash: 10 },
+                    'Moderate Conservative': { equity: 30, debt: 45, gold: 12, commodity: 3, international: 5, cash: 5 },
+                    'Moderate': { equity: 45, debt: 30, gold: 10, commodity: 5, international: 8, cash: 2 },
+                    'Moderate Aggressive': { equity: 55, debt: 20, gold: 8, commodity: 7, international: 12, cash: 0 },
+                    'Aggressive': { equity: 60, debt: 10, gold: 5, commodity: 10, international: 15, cash: 0 }
+                }[riskCategory] || { equity: 45, debt: 30, gold: 10, commodity: 5, international: 8, cash: 2 };
                 
                 // Use the same dynamic selection logic as the detailed recommendations
                 const selectedFunds = selectFundsBasedOnRiskProfile(riskCategory, allocation);
@@ -5335,21 +5335,72 @@
                     return;
                 }
                 
+                // COMPREHENSIVE ASSET ALLOCATION - ALL ASSET CLASSES
                 const allocation = {
-                    'Conservative': { equity: 20, debt: 60, gold: 10, cash: 10 },
-                    'Moderate Conservative': { equity: 35, debt: 50, gold: 10, cash: 5 },
-                    'Moderate': { equity: 50, debt: 35, gold: 10, cash: 5 },
-                    'Moderate Aggressive': { equity: 65, debt: 25, gold: 7, cash: 3 },
-                    'Aggressive': { equity: 80, debt: 15, gold: 3, cash: 2 }
-                }[riskProfile.riskCategory] || { equity: 50, debt: 35, gold: 10, cash: 5 };
+                    'Conservative': { 
+                        equity: 20, 
+                        debt: 55, 
+                        gold: 15, 
+                        commodity: 0, // Conservative investors avoid commodities
+                        international: 0, // Conservative investors focus on domestic
+                        cash: 10 
+                    },
+                    'Moderate Conservative': { 
+                        equity: 30, 
+                        debt: 45, 
+                        gold: 12, 
+                        commodity: 3, // Small commodity exposure for diversification
+                        international: 5, // Limited international exposure
+                        cash: 5 
+                    },
+                    'Moderate': { 
+                        equity: 45, 
+                        debt: 30, 
+                        gold: 10, 
+                        commodity: 5, // Moderate commodity allocation
+                        international: 8, // Meaningful international diversification
+                        cash: 2 
+                    },
+                    'Moderate Aggressive': { 
+                        equity: 55, 
+                        debt: 20, 
+                        gold: 8, 
+                        commodity: 7, // Higher commodity for growth
+                        international: 12, // Significant international exposure
+                        cash: 0 // No cash drag for growth-focused
+                    },
+                    'Aggressive': { 
+                        equity: 60, 
+                        debt: 10, 
+                        gold: 5, 
+                        commodity: 10, // Maximum commodity for high returns
+                        international: 15, // Maximum international diversification
+                        cash: 0 
+                    }
+                }[riskProfile.riskCategory] || { 
+                    equity: 45, debt: 30, gold: 10, commodity: 5, international: 8, cash: 2 
+                };
                 
+                // Calculate amounts for all asset classes
                 const equityAmount = Math.round(amount * allocation.equity / 100);
                 const debtAmount = Math.round(amount * allocation.debt / 100);
                 const goldAmount = Math.round(amount * allocation.gold / 100);
+                const commodityAmount = Math.round(amount * allocation.commodity / 100);
+                const internationalAmount = Math.round(amount * allocation.international / 100);
                 const cashAmount = Math.round(amount * allocation.cash / 100);
                 
-                // Display recommendations in interface with dynamic insights
-                displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, cashAmount, riskProfile, clientData);
+                console.log('🎯 COMPREHENSIVE ASSET ALLOCATION:', {
+                    total: amount,
+                    equity: `${allocation.equity}% (₹${equityAmount.toLocaleString()})`,
+                    debt: `${allocation.debt}% (₹${debtAmount.toLocaleString()})`,
+                    gold: `${allocation.gold}% (₹${goldAmount.toLocaleString()})`,
+                    commodity: `${allocation.commodity}% (₹${commodityAmount.toLocaleString()})`,
+                    international: `${allocation.international}% (₹${internationalAmount.toLocaleString()})`,
+                    cash: `${allocation.cash}% (₹${cashAmount.toLocaleString()})`
+                });
+                
+                // Display recommendations in interface with all asset classes
+                displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, commodityAmount, internationalAmount, cashAmount, riskProfile, clientData);
                 
             } catch (error) {
                 console.error('Error generating recommendations:', error);
@@ -5464,7 +5515,7 @@
             };
         }
 
-        function displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, cashAmount, riskProfile, clientData) {
+        function displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, commodityAmount, internationalAmount, cashAmount, riskProfile, clientData) {
             const recommendationContent = document.getElementById('recommendation-content');
             
             // Generate dynamic insights
@@ -5495,6 +5546,7 @@
                             <i class="fas fa-chart-pie"></i> Recommended Asset Allocation
                         </h5>
                         <div style="display: grid; gap: 1rem;">
+                            <!-- Equity Allocation -->
                             <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 8px;">
                                 <div>
                                     <div style="color: var(--accent-gold); font-weight: bold;">Equity</div>
@@ -5505,6 +5557,8 @@
                                     <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.equity}%</div>
                                 </div>
                             </div>
+                            
+                            <!-- Debt Allocation -->
                             <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
                                 <div>
                                     <div style="color: var(--accent-white); font-weight: bold;">Debt</div>
@@ -5515,26 +5569,60 @@
                                     <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.debt}%</div>
                                 </div>
                             </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(192,192,192,0.05); border-radius: 8px;">
+                            
+                            <!-- Gold Allocation -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,215,0,0.03); border-radius: 8px;">
                                 <div>
-                                    <div style="color: var(--accent-silver); font-weight: bold;">Gold</div>
-                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Inflation hedge</div>
+                                    <div style="color: #FFD700; font-weight: bold;">Gold</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Inflation hedge & portfolio diversification</div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <div style="color: var(--accent-silver); font-size: 1.3rem; font-weight: bold;">₹${goldAmount.toLocaleString('en-IN')}</div>
+                                    <div style="color: #FFD700; font-size: 1.3rem; font-weight: bold;">₹${goldAmount.toLocaleString('en-IN')}</div>
                                     <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.gold}%</div>
                                 </div>
                             </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                            
+                            <!-- Commodity Allocation (only if > 0) -->
+                            ${allocation.commodity > 0 ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(139,69,19,0.1); border-radius: 8px;">
                                 <div>
-                                    <div style="color: var(--text-gray); font-weight: bold;">Cash</div>
-                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Emergency fund</div>
+                                    <div style="color: #CD853F; font-weight: bold;">Commodity</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Alternative investments & inflation protection</div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <div style="color: var(--text-gray); font-size: 1.3rem; font-weight: bold;">₹${cashAmount.toLocaleString('en-IN')}</div>
+                                    <div style="color: #CD853F; font-size: 1.3rem; font-weight: bold;">₹${commodityAmount.toLocaleString('en-IN')}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.commodity}%</div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- International Allocation (only if > 0) -->
+                            ${allocation.international > 0 ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(30,144,255,0.1); border-radius: 8px;">
+                                <div>
+                                    <div style="color: #1E90FF; font-weight: bold;">International</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Global diversification & currency hedge</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: #1E90FF; font-size: 1.3rem; font-weight: bold;">₹${internationalAmount.toLocaleString('en-IN')}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.international}%</div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Cash Allocation (only if > 0) -->
+                            ${allocation.cash > 0 ? `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(128,128,128,0.1); border-radius: 8px;">
+                                <div>
+                                    <div style="color: #A0A0A0; font-weight: bold;">Cash</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Emergency fund & liquidity</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: #A0A0A0; font-size: 1.3rem; font-weight: bold;">₹${cashAmount.toLocaleString('en-IN')}</div>
                                     <div style="color: var(--text-gray); font-size: 0.9rem;">${allocation.cash}%</div>
                                 </div>
                             </div>
+                            ` : ''}
                         </div>
                     </div>
                     

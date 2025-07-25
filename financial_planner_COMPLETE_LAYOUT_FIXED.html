@@ -5317,8 +5317,8 @@
                 const goldAmount = Math.round(amount * allocation.gold / 100);
                 const cashAmount = Math.round(amount * allocation.cash / 100);
                 
-                // Display recommendations in interface
-                displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, cashAmount, riskProfile);
+                // Display recommendations in interface with dynamic insights
+                displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, cashAmount, riskProfile, clientData);
                 
             } catch (error) {
                 console.error('Error generating recommendations:', error);
@@ -5326,8 +5326,80 @@
             }
         }
         
-        function displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, cashAmount, riskProfile) {
+        // GENERATE DYNAMIC INSIGHTS BASED ON USER DATA
+        function generateDynamicInsights(amount, allocation, riskProfile, clientData) {
+            const age = clientData.age || 30;
+            const income = clientData.income || 0;
+            const expenses = clientData.expenses || 0;
+            const riskCategory = riskProfile.riskCategory;
+            const riskScore = riskProfile.riskScore || 0;
+            
+            // Calculate investment ratios
+            const investmentToIncomeRatio = income > 0 ? (amount / income * 100).toFixed(1) : 0;
+            const monthlyInvestment = amount / 12;
+            const monthlyIncome = income / 12;
+            const monthlyExpenses = expenses / 12;
+            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome * 100).toFixed(1) : 0;
+            
+            // Generate age-based insights
+            let ageInsight = '';
+            if (age < 30) {
+                ageInsight = `At ${age}, you have excellent time horizon for wealth building. Your ${riskCategory} profile allows for higher growth potential.`;
+            } else if (age < 40) {
+                ageInsight = `At ${age}, you're in prime earning years. Your ${riskCategory} approach balances growth with stability.`;
+            } else if (age < 50) {
+                ageInsight = `At ${age}, it's important to balance growth with security. Your ${riskCategory} strategy reflects this maturity.`;
+            } else {
+                ageInsight = `At ${age}, capital preservation becomes crucial. Your ${riskCategory} profile prioritizes stability.`;
+            }
+            
+            // Generate income-based insights
+            let incomeInsight = '';
+            if (investmentToIncomeRatio > 20) {
+                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income shows strong financial discipline.`;
+            } else if (investmentToIncomeRatio > 10) {
+                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income is a good start. Consider increasing gradually.`;
+            } else {
+                incomeInsight = `Investing ${investmentToIncomeRatio}% of annual income. Aim to increase this to 15-20% for better wealth building.`;
+            }
+            
+            // Generate risk-based strategy
+            let riskStrategy = '';
+            switch (riskCategory) {
+                case 'Conservative':
+                    riskStrategy = `Your conservative approach prioritizes capital protection. Focus on high-grade debt instruments and blue-chip equity funds. Expected returns: 8-10% annually.`;
+                    break;
+                case 'Moderate Conservative':
+                    riskStrategy = `Your balanced approach combines safety with moderate growth. Mix of large-cap equity and quality debt funds. Expected returns: 10-12% annually.`;
+                    break;
+                case 'Moderate':
+                    riskStrategy = `Your moderate risk appetite allows for diversified growth. Blend of equity, debt, and alternative investments. Expected returns: 12-14% annually.`;
+                    break;
+                case 'Moderate Aggressive':
+                    riskStrategy = `Your growth-focused approach emphasizes higher returns. Mid-cap and small-cap equity with tactical debt allocation. Expected returns: 14-16% annually.`;
+                    break;
+                case 'Aggressive':
+                    riskStrategy = `Your aggressive strategy maximizes growth potential. Heavy equity focus with small-cap and sectoral funds. Expected returns: 16-18% annually.`;
+                    break;
+                default:
+                    riskStrategy = `Your investment strategy is tailored to balance risk and returns based on your profile.`;
+            }
+            
+            return {
+                ageInsight,
+                incomeInsight,
+                riskStrategy,
+                investmentToIncomeRatio,
+                savingsRate,
+                monthlyInvestment
+            };
+        }
+
+        function displayRecommendationsInInterface(amount, allocation, equityAmount, debtAmount, goldAmount, cashAmount, riskProfile, clientData) {
             const recommendationContent = document.getElementById('recommendation-content');
+            
+            // Generate dynamic insights
+            const insights = generateDynamicInsights(amount, allocation, riskProfile, clientData);
             
             recommendationContent.innerHTML = `
                 <div style="display: grid; gap: 2rem;">
@@ -5418,6 +5490,53 @@
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <i class="fas fa-check-circle" style="color: var(--accent-gold);"></i>
                                 <span style="color: var(--text-gray);">Keep ${allocation.cash}% in liquid funds for emergency needs</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic Investment Insights -->
+                    <div style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 1.5rem; border-left: 4px solid var(--accent-gold);">
+                        <h5 style="color: var(--accent-gold); margin-bottom: 1rem;">
+                            <i class="fas fa-lightbulb"></i> Personalized Investment Insights
+                        </h5>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 8px; border: 1px solid rgba(255,215,0,0.2);">
+                                <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Age-Based Analysis</h6>
+                                <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">${insights.ageInsight}</p>
+                            </div>
+                            <div style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 style="color: var(--accent-white); margin-bottom: 0.5rem;">Investment Capacity Analysis</h6>
+                                <p style="color: var(--text-gray); margin: 0; line-height: 1.6;">${insights.incomeInsight}</p>
+                                <div style="margin-top: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+                                    <div>
+                                        <span style="color: var(--text-gray);">Monthly Investment:</span>
+                                        <span style="color: var(--accent-gold); font-weight: bold; margin-left: 0.5rem;">₹${Math.round(insights.monthlyInvestment).toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: var(--text-gray);">Savings Rate:</span>
+                                        <span style="color: var(--accent-gold); font-weight: bold; margin-left: 0.5rem;">${insights.savingsRate}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic Strategy Recommendations -->
+                    <div style="background: rgba(76, 175, 80, 0.05); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(76, 175, 80, 0.3);">
+                        <h5 style="color: #4CAF50; margin-bottom: 1rem;">
+                            <i class="fas fa-chart-line"></i> Risk-Based Strategy
+                        </h5>
+                        <div style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                            <p style="color: var(--text-gray); margin: 0; line-height: 1.7; font-size: 1rem;">${insights.riskStrategy}</p>
+                        </div>
+                        <div style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="text-align: center; padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 8px;">
+                                <div style="color: var(--accent-gold); font-size: 1.5rem; font-weight: bold;">${riskProfile.riskCategory}</div>
+                                <div style="color: var(--text-gray); font-size: 0.9rem;">Risk Profile</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                <div style="color: var(--accent-white); font-size: 1.5rem; font-weight: bold;">${insights.investmentToIncomeRatio}%</div>
+                                <div style="color: var(--text-gray); font-size: 0.9rem;">of Annual Income</div>
                             </div>
                         </div>
                     </div>

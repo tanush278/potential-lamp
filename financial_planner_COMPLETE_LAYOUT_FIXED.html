@@ -4606,52 +4606,109 @@
             createAllocationChart(allocation);
         }
 
+        // OPTIMIZED CHART CREATION - PHASE 1 PERFORMANCE FIXES
+        let allocationChart = null;
+        let chartLoadingStates = new Map();
+        
         function createAllocationChart(allocation) {
-            const ctx = document.getElementById('allocationChart').getContext('2d');
-            
-            if (allocationChart) {
-                allocationChart.destroy();
+            const canvas = document.getElementById('allocationChart');
+            if (!canvas) {
+                console.warn('📊 Allocation chart canvas not found');
+                return;
             }
             
-            allocationChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Equity', 'Debt', 'Gold', 'Cash'],
-                    datasets: [{
-                        data: [allocation.equity, allocation.debt, allocation.gold, allocation.cash],
-                        backgroundColor: ['#ffd700', '#ffffff', '#c0c0c0', '#666666'],
-                        borderColor: ['#000000', '#000000', '#000000', '#000000'],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: false,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#ffffff',
-                                font: { size: 12 },
-                                padding: 20
-                            }
+            // PERFORMANCE: Check if chart is already being created
+            if (chartLoadingStates.get('allocation')) {
+                console.log('📊 Chart creation already in progress, skipping...');
+                return;
+            }
+            
+            chartLoadingStates.set('allocation', true);
+            
+            try {
+                const ctx = canvas.getContext('2d');
+                
+                // CRITICAL FIX: Properly destroy existing chart to prevent memory leaks
+                if (allocationChart) {
+                    console.log('📊 Destroying existing allocation chart...');
+                    allocationChart.destroy();
+                    allocationChart = null;
+                }
+                
+                // OPTIMIZATION: Only include non-zero allocations for cleaner chart
+                const chartData = [
+                    { label: 'Equity', value: allocation.equity, color: '#FFD700' },
+                    { label: 'Debt', value: allocation.debt, color: '#FFFFFF' },
+                    { label: 'Gold', value: allocation.gold, color: '#C0C0C0' },
+                    { label: 'Commodity', value: allocation.commodity || 0, color: '#CD853F' },
+                    { label: 'International', value: allocation.international || 0, color: '#1E90FF' },
+                    { label: 'Cash', value: allocation.cash || 0, color: '#A0A0A0' }
+                ].filter(item => item.value > 0);
+                
+                console.log('📊 Creating optimized allocation chart with', chartData.length, 'segments');
+                
+                allocationChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartData.map(item => `${item.label} (${item.value}%)`),
+                        datasets: [{
+                            data: chartData.map(item => item.value),
+                            backgroundColor: chartData.map(item => item.color),
+                            borderColor: '#000000',
+                            borderWidth: 2,
+                            hoverBorderWidth: 3,
+                            hoverBorderColor: '#FFFFFF'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false
                         },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                            titleColor: '#ffffff',
-                            bodyColor: '#ffffff',
-                            borderColor: '#ffd700',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed + '%';
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#FFFFFF',
+                                    font: { size: 12, weight: '500' },
+                                    padding: 15,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                                titleColor: '#FFD700',
+                                bodyColor: '#FFFFFF',
+                                borderColor: '#FFD700',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                        return `${context.label}: ${percentage}%`;
+                                    }
                                 }
                             }
+                        },
+                        cutout: '65%',
+                        animation: {
+                            duration: 600,
+                            easing: 'easeInOutQuart'
                         }
-                    },
-                    cutout: '60%'
-                }
-            });
+                    }
+                });
+                
+                console.log('✅ Optimized allocation chart created successfully');
+                
+            } catch (error) {
+                console.error('❌ Error creating allocation chart:', error);
+            } finally {
+                chartLoadingStates.set('allocation', false);
+            }
         }
 
         // DEBUG FUNCTION TO TEST RISK PROFILE CHANGES
